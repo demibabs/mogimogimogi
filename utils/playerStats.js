@@ -230,7 +230,6 @@ class PlayerStats {
 		return false;
 	}
 
-
 	static async getH2HTables(userId1, userId2, serverId) {
 		const tables = {};
 		const serverData = await ServerData.getServerData(serverId);

@@ -174,7 +174,6 @@ async function getAllPlayerTables(userId, serverId) {
 		    }
 		}
 		return tables;
-
 	}
     	catch (error) {
 		if (error.message.includes("404")) {

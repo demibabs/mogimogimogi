@@ -152,8 +152,8 @@ module.exports = {
 				"This is the ype of mogi I have when I'm about to promote.",
 				"Video games aren't for everyone. Maybe try sports?",
 				"Yowch.",
-				"At least you beat somebody! Wait, no you didn't,",
-				"Thanks for graciously donating your MMR to those other players",
+				"At least you beat somebody! Wait, no you didn't.",
+				"Thanks for graciously donating your MMR to those other players.",
 				"Can't blame any teammates for THIS one.",
 				"You suck.",
 			];
@@ -169,14 +169,14 @@ module.exports = {
 			];
 
 			const uPMessages = [
-				"Even Lightning McQueen has lost races.",
+				"Well, even Lightning McQueen has lost races.",
 				"But you were just unlucky, right?",
 				"Oof.",
 				"Guess the room was punching above its weight.",
 				"Washed?",
 				"Yikes.",
 				"Everyone was silently judging you.",
-				"Not your mogi",
+				"Not your mogi.",
 			];
 
 			const bCMessages = [
