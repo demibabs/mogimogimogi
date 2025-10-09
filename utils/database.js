@@ -7,22 +7,13 @@ class Database {
 		// Use Railway's provided DATABASE_URL or fallback to local file storage
 		this.useDatabase = !!process.env.DATABASE_URL;
 		this.dataDir = path.join(__dirname, "..", "data", "servers");
-		
-		console.log("Database initialization:");
-		console.log("- DATABASE_URL exists:", !!process.env.DATABASE_URL);
-		console.log("- Using database:", this.useDatabase);
-		console.log("- Fallback to file storage:", !this.useDatabase);
 
 		if (this.useDatabase) {
-			console.log("Setting up PostgreSQL connection...");
 			this.pool = new Pool({
 				connectionString: process.env.DATABASE_URL,
 				ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 			});
 			this.initializeDatabase();
-		}
-		else {
-			console.log("Using file storage fallback...");
 		}
 	}
 
