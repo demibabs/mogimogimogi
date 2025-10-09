@@ -7,10 +7,10 @@ const DataManager = require("../../utils/dataManager");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("stats")
-		.setDescription("Check your (or someone else's) stats vs. all other server members.")
+		.setDescription("Check your (or someone else's) stats.")
 		.addUserOption(option =>
 			option.setName("user")
-				.setDescription("User to get the stats of. Leave blank for yourself"))
+				.setDescription("Yourself if left blank."))
 		.addBooleanOption(option =>
 			option.setName("server-only")
 				.setDescription("True = only mogis including other server members."))
@@ -22,7 +22,6 @@ module.exports = {
 		try {
 			await interaction.deferReply();
 			await interaction.editReply("Fetching tables...");
-			await interaction.channel.sendTyping();
 
 			const discordUser = interaction.options.getUser("user") || interaction.user;
 			const serverId = interaction.guild.id;
@@ -105,7 +104,6 @@ module.exports = {
 			}
 
 			await interaction.editReply("Calculating stats...");
-			await interaction.channel.sendTyping();
 
 			const eP = PlayerStats.getMatchesPlayed(userTables, loungeUser.name);
 			const tWR = PlayerStats.getWinRate(userTables, loungeUser.name);

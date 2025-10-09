@@ -54,11 +54,8 @@ module.exports = {
 				try {
 					await DataManager.addServerUser(interaction.guild.id, lounger, interaction.client);
 					addedCount++;
-
-					// Update progress every 5 users
-					if (addedCount % 5 === 0) {
-						await interaction.editReply(`Adding users... (${addedCount}/${loungers.length})`);
-					}
+					// Update progress every user
+					await interaction.editReply(`Adding users... (${addedCount}/${loungers.length})`);
 				}
 				catch (error) {
 					console.error(`Failed to add user ${lounger}:`, error);

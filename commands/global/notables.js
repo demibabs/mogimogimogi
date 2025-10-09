@@ -19,7 +19,7 @@ module.exports = {
 				.setRequired(false))
 		.addBooleanOption(option =>
 			option.setName("server-only")
-				.setDescription("Only include mogis with other server members."))
+				.setDescription("True = include only mogis with other server members."))
 		.addBooleanOption(option =>
 			option.setName("squads")
 				.setDescription("True = sq only, false = soloq only."),
