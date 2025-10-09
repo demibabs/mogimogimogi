@@ -154,6 +154,7 @@ async function getAllPlayerTables(userId, serverId) {
 		const serverData = await ServerData.getServerData(serverId);
 		const user = serverData?.users?.[userId];
 	    const maxTableId = Math.max(...(user?.tables || [0]));
+		const maxSeasonId = serverData?.tables?.maxTableId?.season || 0;
 		const tables = {};
 		if (maxTableId !== 0) {
 			for (const tableId of user.tables) {
@@ -164,7 +165,7 @@ async function getAllPlayerTables(userId, serverId) {
 		    discordId: userId,
 		    game: "mkworld",
 		};
-		for (let season = 0; season <= DEFAULT_SEASON; season++) {
+		for (let season = maxSeasonId; season <= DEFAULT_SEASON; season++) {
 		    params.season = season;
 		    const details = await apiGet("/player/details", params);
 		    const changes = details.mmrChanges.filter(c => c.reason === "Table" && c.changeId > maxTableId);
