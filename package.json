@@ -1,0 +1,40 @@
+{
+  "name": "mogibot",
+  "version": "1.0.0",
+  "description": "discord bot",
+  "keywords": [
+    "discord",
+    "bot",
+    "mario"
+  ],
+  "homepage": "https://github.com/demibabs/mogibot#readme",
+  "bugs": {
+    "url": "https://github.com/demibabs/mogibot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/demibabs/mogibot.git"
+  },
+  "license": "ISC",
+  "author": "demibabs",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "node deploy.js",
+    "test": "test"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+		"discord.js": "^14.22.1",
+		"dotenv": "^16.4.5",
+		"express": "^4.21.2",
+		"util": "^0.12.5"
+	},
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "eslint": "^9.37.0"
+  }
+}
