@@ -33,3 +33,7 @@ data/servers/
 
 # Config files with sensitive data
 config.json
+
+LOUNGE_API_GUIDE.md
+
+commands\testing
