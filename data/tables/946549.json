@@ -1,0 +1,209 @@
+{
+  "id": 946549,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-06-22T06:39:25.8981957Z",
+  "verifiedOn": "2025-06-22T06:40:20.8109312Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/946549.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 140,
+          "multiplier": 1,
+          "prevMmr": 6000,
+          "newMmr": 6189,
+          "delta": 189,
+          "playerId": 11255,
+          "playerName": "Hu Tao",
+          "playerDiscordId": "345222051591618563",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 103,
+          "multiplier": 1,
+          "prevMmr": 5072,
+          "newMmr": 5256,
+          "delta": 184,
+          "playerId": 36130,
+          "playerName": "necozane",
+          "playerDiscordId": "948134485319352320",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 6142,
+          "newMmr": 6245,
+          "delta": 103,
+          "playerId": 18849,
+          "playerName": "0L3",
+          "playerDiscordId": "885032998364401684",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 6187,
+          "newMmr": 6228,
+          "delta": 41,
+          "playerId": 18972,
+          "playerName": "Mega Gyrodos",
+          "playerDiscordId": "471842649398181888",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 5000,
+          "newMmr": 5087,
+          "delta": 87,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 5000,
+          "newMmr": 5027,
+          "delta": 27,
+          "playerId": 22968,
+          "playerName": "Chess",
+          "playerDiscordId": "735578077614047254",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5000,
+          "newMmr": 4987,
+          "delta": -13,
+          "playerId": 9150,
+          "playerName": "Dame Veneno ESP",
+          "playerDiscordId": "793567277122584617",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 4866,
+          "newMmr": 4778,
+          "delta": -88,
+          "playerId": 16135,
+          "playerName": "CNKman",
+          "playerDiscordId": "900492605282988123",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 5026,
+          "newMmr": 4932,
+          "delta": -94,
+          "playerId": 22370,
+          "playerName": "Mitr0",
+          "playerDiscordId": "1360923526189809829",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 5000,
+          "newMmr": 4907,
+          "delta": -93,
+          "playerId": 40458,
+          "playerName": "Kayden21",
+          "playerDiscordId": "279616723890470915",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 4940,
+          "newMmr": 4769,
+          "delta": -171,
+          "playerId": 62125,
+          "playerName": "coinflip",
+          "playerDiscordId": "1073842738186944594",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 47,
+          "multiplier": 1,
+          "prevMmr": 3838,
+          "newMmr": 3668,
+          "delta": -170,
+          "playerId": 66953,
+          "playerName": "FydraU",
+          "playerDiscordId": "236517460596097035",
+          "playerCountryCode": "DE"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1386234108748763176",
+  "updateMessageId": "1386234344296939551",
+  "authorId": "885032998364401684"
+}

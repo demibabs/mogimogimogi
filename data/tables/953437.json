@@ -1,0 +1,209 @@
+{
+  "id": 953437,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-06T21:00:39.8552491Z",
+  "verifiedOn": "2025-07-06T21:03:28.2961917Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/953437.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 104,
+          "multiplier": 1,
+          "prevMmr": 6316,
+          "newMmr": 6536,
+          "delta": 220,
+          "playerId": 13606,
+          "playerName": "QuieroAprender",
+          "playerDiscordId": "1399043503228584069",
+          "playerCountryCode": "PR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 103,
+          "multiplier": 1,
+          "prevMmr": 6214,
+          "newMmr": 6398,
+          "delta": 184,
+          "playerId": 15341,
+          "playerName": "Sergio Ramos 2.0",
+          "playerDiscordId": "347076149592981504",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 6082,
+          "newMmr": 6231,
+          "delta": 149,
+          "playerId": 68317,
+          "playerName": "Splashy the III",
+          "playerDiscordId": "714775675969732699",
+          "playerCountryCode": "TR"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6257,
+          "newMmr": 6359,
+          "delta": 102,
+          "playerId": 16405,
+          "playerName": "vee367",
+          "playerDiscordId": "788977531154857996",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6402,
+          "newMmr": 6458,
+          "delta": 56,
+          "playerId": 12609,
+          "playerName": "LX",
+          "playerDiscordId": "89578560955633664",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6333,
+          "newMmr": 6352,
+          "delta": 19,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6216,
+          "newMmr": 6200,
+          "delta": -16,
+          "playerId": 68651,
+          "playerName": "Red",
+          "playerDiscordId": "520813340939911188",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 6447,
+          "newMmr": 6381,
+          "delta": -66,
+          "playerId": 10002,
+          "playerName": "Nikes",
+          "playerDiscordId": "106890434738974720",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 6539,
+          "newMmr": 6430,
+          "delta": -109,
+          "playerId": 66908,
+          "playerName": "Nomai",
+          "playerDiscordId": "131504952739758080",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 6213,
+          "newMmr": 6077,
+          "delta": -136,
+          "playerId": 47123,
+          "playerName": "Coconut Mall",
+          "playerDiscordId": "1129884540781985872",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 6327,
+          "newMmr": 6146,
+          "delta": -181,
+          "playerId": 69975,
+          "playerName": "ZSGJason",
+          "playerDiscordId": "407651987577110540",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 57,
+          "multiplier": 1,
+          "prevMmr": 6362,
+          "newMmr": 6140,
+          "delta": -222,
+          "playerId": 15066,
+          "playerName": "Seb",
+          "playerDiscordId": "154972283671150593",
+          "playerCountryCode": "DE"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1391524281577639956",
+  "updateMessageId": "1391524987105706105",
+  "authorId": "788977531154857996"
+}

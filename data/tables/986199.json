@@ -1,0 +1,169 @@
+{
+  "id": 986199,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-24T04:02:56.5409788Z",
+  "verifiedOn": "2025-09-24T04:08:27.3116412Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/986199.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 5051,
+          "newMmr": 5248,
+          "delta": 197,
+          "playerId": 9771,
+          "playerName": "DU PLESSIS",
+          "playerDiscordId": "814389737284567041",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 121,
+          "multiplier": 1,
+          "prevMmr": 5767,
+          "newMmr": 5964,
+          "delta": 197,
+          "playerId": 12222,
+          "playerName": "Akagi",
+          "playerDiscordId": "209136575735529472",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 4929,
+          "newMmr": 5126,
+          "delta": 197,
+          "playerId": 15477,
+          "playerName": "Sorriso",
+          "playerDiscordId": "256221766769180674",
+          "playerCountryCode": "CO"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 5350,
+          "newMmr": 5413,
+          "delta": 63,
+          "playerId": 9589,
+          "playerName": "Playboi",
+          "playerDiscordId": "426496071741603861",
+          "playerCountryCode": "VE"
+        },
+        {
+          "score": 99,
+          "multiplier": 1,
+          "prevMmr": 4850,
+          "newMmr": 4913,
+          "delta": 63,
+          "playerId": 41162,
+          "playerName": "Ninfercho",
+          "playerDiscordId": "1332493098479128630",
+          "playerCountryCode": "HN"
+        },
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6095,
+          "newMmr": 6158,
+          "delta": 63,
+          "playerId": 54677,
+          "playerName": "devuelvaneloro",
+          "playerDiscordId": "546466098955157555",
+          "playerCountryCode": "VE"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 6063,
+          "newMmr": 5988,
+          "delta": -75,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 106,
+          "multiplier": 1,
+          "prevMmr": 6718,
+          "newMmr": 6643,
+          "delta": -75,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 45,
+          "multiplier": 1,
+          "prevMmr": 4191,
+          "newMmr": 4116,
+          "delta": -75,
+          "playerId": 74863,
+          "playerName": "Shortrat",
+          "playerDiscordId": "1395498941675602030",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 6083,
+          "newMmr": 5898,
+          "delta": -185,
+          "playerId": 38942,
+          "playerName": "dmaru",
+          "playerDiscordId": "420934971272986644",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 7030,
+          "newMmr": 6845,
+          "delta": -185,
+          "playerId": 44586,
+          "playerName": "Tunekenu",
+          "playerDiscordId": "1097869228406751343",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 57,
+          "multiplier": 1,
+          "prevMmr": 3492,
+          "newMmr": 3307,
+          "delta": -185,
+          "playerId": 63117,
+          "playerName": "ayanon",
+          "playerDiscordId": "1136967130223485008",
+          "playerCountryCode": "JP"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1420259190311489658",
+  "updateMessageId": "1420260581935419453",
+  "authorId": "546466098955157555"
+}

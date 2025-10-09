@@ -1,0 +1,209 @@
+{
+  "id": 950051,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-06-29T16:14:35.472764Z",
+  "verifiedOn": "2025-06-29T16:20:51.4166255Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/950051.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 109,
+          "multiplier": 1,
+          "prevMmr": 6278,
+          "newMmr": 6505,
+          "delta": 227,
+          "playerId": 66908,
+          "playerName": "Nomai",
+          "playerDiscordId": "131504952739758080",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 6448,
+          "newMmr": 6628,
+          "delta": 180,
+          "playerId": 14998,
+          "playerName": "dark gaia",
+          "playerDiscordId": "192695400497545217",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6764,
+          "newMmr": 6871,
+          "delta": 107,
+          "playerId": 15064,
+          "playerName": "sean",
+          "playerDiscordId": "83755201164480512",
+          "playerCountryCode": "IE"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6493,
+          "newMmr": 6611,
+          "delta": 118,
+          "playerId": 20415,
+          "playerName": "Xewo",
+          "playerDiscordId": "434668365248856067",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6588,
+          "newMmr": 6642,
+          "delta": 54,
+          "playerId": 44082,
+          "playerName": "sumosuma",
+          "playerDiscordId": "745256478704926811",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6446,
+          "newMmr": 6466,
+          "delta": 20,
+          "playerId": 24602,
+          "playerName": "B3rns",
+          "playerDiscordId": "564770457530662922",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6432,
+          "newMmr": 6413,
+          "delta": -19,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6386,
+          "newMmr": 6329,
+          "delta": -57,
+          "playerId": 45335,
+          "playerName": "Day",
+          "playerDiscordId": "736945898336288809",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 6449,
+          "newMmr": 6349,
+          "delta": -100,
+          "playerId": 15639,
+          "playerName": "Sui",
+          "playerDiscordId": "190566348005310465",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 6425,
+          "newMmr": 6286,
+          "delta": -139,
+          "playerId": 23194,
+          "playerName": "Player Austria",
+          "playerDiscordId": "315423074742960129",
+          "playerCountryCode": "AT"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 6546,
+          "newMmr": 6362,
+          "delta": -184,
+          "playerId": 9500,
+          "playerName": "British",
+          "playerDiscordId": "336239168533561344",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 43,
+          "multiplier": 1,
+          "prevMmr": 6148,
+          "newMmr": 5940,
+          "delta": -208,
+          "playerId": 69369,
+          "playerName": "jandro",
+          "playerDiscordId": "743138106357841983",
+          "playerCountryCode": "ES"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1388915571642466396",
+  "updateMessageId": "1388917150051471400",
+  "authorId": "564770457530662922"
+}

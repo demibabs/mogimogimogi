@@ -1,0 +1,179 @@
+{
+  "id": 986766,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-25T19:49:49.3042956Z",
+  "verifiedOn": "2025-09-25T20:04:12.1324605Z",
+  "numTeams": 6,
+  "numPlayers": 12,
+  "format": "2v2",
+  "url": "/TableImage/986766.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 6103,
+          "newMmr": 6302,
+          "delta": 199,
+          "playerId": 48274,
+          "playerName": "Bernd das Boot",
+          "playerDiscordId": "941050969096081449",
+          "playerCountryCode": "DE"
+        },
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 5988,
+          "newMmr": 6187,
+          "delta": 199,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 5966,
+          "newMmr": 6093,
+          "delta": 127,
+          "playerId": 66542,
+          "playerName": "Lonie",
+          "playerDiscordId": "414521126295830531",
+          "playerCountryCode": "SE"
+        },
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 5912,
+          "newMmr": 6039,
+          "delta": 127,
+          "playerId": 70497,
+          "playerName": "shzott",
+          "playerDiscordId": "333094996968210444",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 102,
+          "multiplier": 1,
+          "prevMmr": 5953,
+          "newMmr": 6003,
+          "delta": 50,
+          "playerId": 58298,
+          "playerName": "reus075",
+          "playerDiscordId": "303916399896821770",
+          "playerCountryCode": "DE"
+        },
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5822,
+          "newMmr": 5872,
+          "delta": 50,
+          "playerId": 69868,
+          "playerName": "ElGiovanni",
+          "playerDiscordId": "328250801627725825",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 58,
+          "multiplier": 1,
+          "prevMmr": 6390,
+          "newMmr": 6339,
+          "delta": -51,
+          "playerId": 38120,
+          "playerName": "ekitikefanboy",
+          "playerDiscordId": "543885438402822148",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 5992,
+          "newMmr": 5941,
+          "delta": -51,
+          "playerId": 70116,
+          "playerName": "Lollenzo",
+          "playerDiscordId": "294157000680407041",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 58,
+          "multiplier": 1,
+          "prevMmr": 5842,
+          "newMmr": 5685,
+          "delta": -157,
+          "playerId": 36612,
+          "playerName": "Luv Resval",
+          "playerDiscordId": "679166163652968459",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6146,
+          "newMmr": 5989,
+          "delta": -157,
+          "playerId": 68301,
+          "playerName": "PotentialHazard",
+          "playerDiscordId": "763597795063627776",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 6021,
+          "newMmr": 5853,
+          "delta": -168,
+          "playerId": 69862,
+          "playerName": "Francis",
+          "playerDiscordId": "548901930466934784",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6270,
+          "newMmr": 6102,
+          "delta": -168,
+          "playerId": 76240,
+          "playerName": "Drained",
+          "playerDiscordId": "1418288936639402085",
+          "playerCountryCode": "NL"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1420859868788817990",
+  "updateMessageId": "1420863489182011514",
+  "authorId": "679166163652968459"
+}

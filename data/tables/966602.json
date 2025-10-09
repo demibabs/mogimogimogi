@@ -1,0 +1,209 @@
+{
+  "id": 966602,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-08-05T03:51:39.9810167Z",
+  "verifiedOn": "2025-08-05T03:57:20.4317234Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/966602.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 110,
+          "multiplier": 1,
+          "prevMmr": 6220,
+          "newMmr": 6445,
+          "delta": 225,
+          "playerId": 18332,
+          "playerName": "Rexzi",
+          "playerDiscordId": "1225215357875392579",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 6162,
+          "newMmr": 6349,
+          "delta": 187,
+          "playerId": 68675,
+          "playerName": "Caysiii",
+          "playerDiscordId": "307174356600225792",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6118,
+          "newMmr": 6267,
+          "delta": 149,
+          "playerId": 51810,
+          "playerName": "am i macman",
+          "playerDiscordId": "579405852679864350",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 6512,
+          "newMmr": 6605,
+          "delta": 93,
+          "playerId": 70029,
+          "playerName": "Nix",
+          "playerDiscordId": "225015494099468288",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6077,
+          "newMmr": 6147,
+          "delta": 70,
+          "playerId": 46093,
+          "playerName": "RWE",
+          "playerDiscordId": "1135824927224778812",
+          "playerCountryCode": "HK"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 6645,
+          "newMmr": 6652,
+          "delta": 7,
+          "playerId": 26416,
+          "playerName": "Fortune",
+          "playerDiscordId": "956666591297302568",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 6663,
+          "newMmr": 6630,
+          "delta": -33,
+          "playerId": 46027,
+          "playerName": "Milkshake",
+          "playerDiscordId": "251162239472500736",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6179,
+          "newMmr": 6125,
+          "delta": -54,
+          "playerId": 17467,
+          "playerName": "Dragolini",
+          "playerDiscordId": "812077610241884220",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 6411,
+          "newMmr": 6308,
+          "delta": -103,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 6463,
+          "newMmr": 6318,
+          "delta": -145,
+          "playerId": 71551,
+          "playerName": "Takomari",
+          "playerDiscordId": "534599378703351828",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 5939,
+          "newMmr": 5775,
+          "delta": -164,
+          "playerId": 73233,
+          "playerName": "lori",
+          "playerDiscordId": "1397504579209396224",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 6566,
+          "newMmr": 6336,
+          "delta": -230,
+          "playerId": 44290,
+          "playerName": "Tonight Tonight",
+          "playerDiscordId": "1069490593148981318",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1402136960423821493",
+  "updateMessageId": "1402138387787550842",
+  "authorId": "1225215357875392579"
+}

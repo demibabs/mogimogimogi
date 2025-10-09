@@ -1,0 +1,179 @@
+{
+  "id": 981698,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-13T07:55:28.9874184Z",
+  "verifiedOn": "2025-09-13T07:56:03.4028454Z",
+  "numTeams": 6,
+  "numPlayers": 12,
+  "format": "2v2",
+  "url": "/TableImage/981698.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 135,
+          "multiplier": 1,
+          "prevMmr": 5591,
+          "newMmr": 5796,
+          "delta": 205,
+          "playerId": 42983,
+          "playerName": "KR 81",
+          "playerDiscordId": "1031240989530148957",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 5634,
+          "newMmr": 5839,
+          "delta": 205,
+          "playerId": 68022,
+          "playerName": "Thukachan",
+          "playerDiscordId": "374374382824456212",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 5386,
+          "newMmr": 5508,
+          "delta": 122,
+          "playerId": 67540,
+          "playerName": "Shaunix17",
+          "playerDiscordId": "737742328407785555",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 109,
+          "multiplier": 1,
+          "prevMmr": 5925,
+          "newMmr": 6047,
+          "delta": 122,
+          "playerId": 74305,
+          "playerName": "rascal22",
+          "playerDiscordId": "1311542582207316009",
+          "playerCountryCode": "CN"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6093,
+          "newMmr": 6126,
+          "delta": 33,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 5479,
+          "newMmr": 5512,
+          "delta": 33,
+          "playerId": 67518,
+          "playerName": "Chocowasa",
+          "playerDiscordId": "375399473456742410",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 6081,
+          "newMmr": 5980,
+          "delta": -101,
+          "playerId": 10424,
+          "playerName": "Yu Ji-min",
+          "playerDiscordId": "405803376484548617",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 5884,
+          "newMmr": 5783,
+          "delta": -101,
+          "playerId": 45181,
+          "playerName": "Auftakt",
+          "playerDiscordId": "882672689993646090",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 5732,
+          "newMmr": 5657,
+          "delta": -75,
+          "playerId": 70727,
+          "playerName": "FunkyRacer",
+          "playerDiscordId": "672042505151184896",
+          "playerCountryCode": "NL"
+        },
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 5489,
+          "newMmr": 5414,
+          "delta": -75,
+          "playerId": 75681,
+          "playerName": "Mizusho",
+          "playerDiscordId": "1268399280796991612",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 5583,
+          "newMmr": 5401,
+          "delta": -182,
+          "playerId": 32877,
+          "playerName": "Lovemachine",
+          "playerDiscordId": "929993432896770048",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 62,
+          "multiplier": 1,
+          "prevMmr": 5252,
+          "newMmr": 5070,
+          "delta": -182,
+          "playerId": 52794,
+          "playerName": "C.Westmoreland",
+          "playerDiscordId": "1407959947681202269",
+          "playerCountryCode": "JP"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1416331443755552890",
+  "updateMessageId": "1416331592506540053",
+  "authorId": "882672689993646090"
+}

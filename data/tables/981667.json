@@ -1,0 +1,209 @@
+{
+  "id": 981667,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-13T06:51:42.5513183Z",
+  "verifiedOn": "2025-09-13T06:52:27.9446403Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/981667.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 6116,
+          "newMmr": 6323,
+          "delta": 207,
+          "playerId": 70043,
+          "playerName": "aspa",
+          "playerDiscordId": "410706414231617537",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 5581,
+          "newMmr": 5769,
+          "delta": 188,
+          "playerId": 74090,
+          "playerName": "Kinpira",
+          "playerDiscordId": "226543683053420544",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 5960,
+          "newMmr": 6093,
+          "delta": 133,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 6165,
+          "newMmr": 6250,
+          "delta": 85,
+          "playerId": 41001,
+          "playerName": "Moo Moo Cow",
+          "playerDiscordId": "342146563591634947",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 5512,
+          "newMmr": 5583,
+          "delta": 71,
+          "playerId": 32877,
+          "playerName": "Lovemachine",
+          "playerDiscordId": "929993432896770048",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 5910,
+          "newMmr": 5925,
+          "delta": 15,
+          "playerId": 74305,
+          "playerName": "rascal22",
+          "playerDiscordId": "1311542582207316009",
+          "playerCountryCode": "CN"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 5756,
+          "newMmr": 5697,
+          "delta": -59,
+          "playerId": 13926,
+          "playerName": "Orochi",
+          "playerDiscordId": "189215231187091457",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 5587,
+          "newMmr": 5535,
+          "delta": -52,
+          "playerId": 70495,
+          "playerName": "A-milly",
+          "playerDiscordId": "1147653835901386863",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 5619,
+          "newMmr": 5566,
+          "delta": -53,
+          "playerId": 73168,
+          "playerName": "PieHat",
+          "playerDiscordId": "307707693894860800",
+          "playerCountryCode": "PE"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 5747,
+          "newMmr": 5609,
+          "delta": -138,
+          "playerId": 69588,
+          "playerName": "Stevenz1030",
+          "playerDiscordId": "1273740601614925968",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 5922,
+          "newMmr": 5737,
+          "delta": -185,
+          "playerId": 26563,
+          "playerName": "har",
+          "playerDiscordId": "888091608036306945",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5598,
+          "newMmr": 5386,
+          "delta": -212,
+          "playerId": 67540,
+          "playerName": "Shaunix17",
+          "playerDiscordId": "737742328407785555",
+          "playerCountryCode": "MX"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1416315395014529125",
+  "updateMessageId": "1416315587461775471",
+  "authorId": "1147653835901386863"
+}

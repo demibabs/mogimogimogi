@@ -1,0 +1,169 @@
+{
+  "id": 988053,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-28T21:56:35.9040158Z",
+  "verifiedOn": "2025-09-28T22:11:13.2277923Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/988053.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 7694,
+          "newMmr": 7867,
+          "delta": 173,
+          "playerId": 53192,
+          "playerName": "GLEISON BREMER",
+          "playerDiscordId": "316645071875211265",
+          "playerCountryCode": "IT"
+        },
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6290,
+          "newMmr": 6463,
+          "delta": 173,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 107,
+          "multiplier": 1,
+          "prevMmr": 6110,
+          "newMmr": 6283,
+          "delta": 173,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 5943,
+          "newMmr": 6024,
+          "delta": 81,
+          "playerId": 38035,
+          "playerName": "Gilgamesh fanboy",
+          "playerDiscordId": "916434849043193907",
+          "playerCountryCode": "IT"
+        },
+        {
+          "score": 127,
+          "multiplier": 1,
+          "prevMmr": 7924,
+          "newMmr": 8005,
+          "delta": 81,
+          "playerId": 50075,
+          "playerName": "EYEKON",
+          "playerDiscordId": "779879346080448573",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 31,
+          "multiplier": 1,
+          "prevMmr": 5114,
+          "newMmr": 5195,
+          "delta": 81,
+          "playerId": 71187,
+          "playerName": "fwstx",
+          "playerDiscordId": "1179911592826109952",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 7278,
+          "newMmr": 7184,
+          "delta": -94,
+          "playerId": 17055,
+          "playerName": "Zouzou",
+          "playerDiscordId": "195924353597177856",
+          "playerCountryCode": "TN"
+        },
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 8010,
+          "newMmr": 7916,
+          "delta": -94,
+          "playerId": 34760,
+          "playerName": "Wox",
+          "playerDiscordId": "813477543444611113",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 5867,
+          "newMmr": 5773,
+          "delta": -94,
+          "playerId": 60020,
+          "playerName": "Q 2 92i 4 Tolxlx",
+          "playerDiscordId": "797562533422170232",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6570,
+          "newMmr": 6409,
+          "delta": -161,
+          "playerId": 26639,
+          "playerName": "alhen",
+          "playerDiscordId": "344419268538007553",
+          "playerCountryCode": "SE"
+        },
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 6026,
+          "newMmr": 5865,
+          "delta": -161,
+          "playerId": 66860,
+          "playerName": "Cozmic",
+          "playerDiscordId": "180275359302942720",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 6417,
+          "newMmr": 6256,
+          "delta": -161,
+          "playerId": 66994,
+          "playerName": "foolycl",
+          "playerDiscordId": "178365002149920768",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1421978936505663609",
+  "updateMessageId": "1421982627707097229",
+  "authorId": "916434849043193907"
+}

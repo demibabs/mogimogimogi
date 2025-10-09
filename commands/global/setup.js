@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
 const DataManager = require("../../utils/dataManager");
 const LoungeApi = require("../../utils/loungeApi");
-const ServerData = require("../../utils/serverData");
+const database = require("../../utils/database");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,7 +14,7 @@ module.exports = {
 			await interaction.editReply("Starting setup process...");
 
 			const members = await interaction.guild.members.fetch();
-			const serverData = await ServerData.getServerData(interaction.guild.id);
+			const serverData = await database.getServerData(interaction.guild.id);
 
 			const loungers = [];
 			const totalMembers = members.size;

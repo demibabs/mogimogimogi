@@ -1,0 +1,209 @@
+{
+  "id": 953474,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-06T22:17:44.027962Z",
+  "verifiedOn": "2025-07-06T22:20:06.6307569Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/953474.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 121,
+          "multiplier": 1,
+          "prevMmr": 6414,
+          "newMmr": 6633,
+          "delta": 219,
+          "playerId": 17848,
+          "playerName": "Charging Charles",
+          "playerDiscordId": "219494120010416128",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 6336,
+          "newMmr": 6498,
+          "delta": 162,
+          "playerId": 43149,
+          "playerName": "Lucker",
+          "playerDiscordId": "616672787813367816",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 6370,
+          "newMmr": 6530,
+          "delta": 160,
+          "playerId": 66972,
+          "playerName": "Galaaxy",
+          "playerDiscordId": "1380536028212756490",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6369,
+          "newMmr": 6469,
+          "delta": 100,
+          "playerId": 25817,
+          "playerName": "Greninja",
+          "playerDiscordId": "561968179790741520",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6398,
+          "newMmr": 6457,
+          "delta": 59,
+          "playerId": 15341,
+          "playerName": "Sergio Ramos 2.0",
+          "playerDiscordId": "347076149592981504",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6458,
+          "newMmr": 6455,
+          "delta": -3,
+          "playerId": 12609,
+          "playerName": "LX",
+          "playerDiscordId": "89578560955633664",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6352,
+          "newMmr": 6353,
+          "delta": 1,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 6358,
+          "newMmr": 6299,
+          "delta": -59,
+          "playerId": 49224,
+          "playerName": "Soraval",
+          "playerDiscordId": "939451150728577034",
+          "playerCountryCode": "SE"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 6346,
+          "newMmr": 6247,
+          "delta": -99,
+          "playerId": 66458,
+          "playerName": "Pluto City",
+          "playerDiscordId": "177600682948296704",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 6436,
+          "newMmr": 6294,
+          "delta": -142,
+          "playerId": 53007,
+          "playerName": "Y Que Fue",
+          "playerDiscordId": "1008285876591276062",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 56,
+          "multiplier": 1,
+          "prevMmr": 6359,
+          "newMmr": 6180,
+          "delta": -179,
+          "playerId": 16405,
+          "playerName": "vee367",
+          "playerDiscordId": "788977531154857996",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 55,
+          "multiplier": 1,
+          "prevMmr": 6351,
+          "newMmr": 6132,
+          "delta": -219,
+          "playerId": 23970,
+          "playerName": "Samuel Badcock",
+          "playerDiscordId": "311096076650414091",
+          "playerCountryCode": "AU"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1391543673673617440",
+  "updateMessageId": "1391544274171986033",
+  "authorId": "219494120010416128"
+}

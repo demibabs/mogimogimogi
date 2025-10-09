@@ -36,5 +36,7 @@ Thumbs.db
 config.json
 
 LOUNGE_API_GUIDE.md
+MIGRATION_INSTRUCTIONS.md
+MIGRATION_NOTES.md
 
 commands\testing

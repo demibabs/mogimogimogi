@@ -1,0 +1,179 @@
+{
+  "id": 982023,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-13T22:54:27.4546244Z",
+  "verifiedOn": "2025-09-13T23:02:59.4015836Z",
+  "numTeams": 6,
+  "numPlayers": 12,
+  "format": "2v2",
+  "url": "/TableImage/982023.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6419,
+          "newMmr": 6618,
+          "delta": 199,
+          "playerId": 29596,
+          "playerName": "KNShun",
+          "playerDiscordId": "531418782850351115",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 5993,
+          "newMmr": 6192,
+          "delta": 199,
+          "playerId": 38120,
+          "playerName": "ekitikefanboy",
+          "playerDiscordId": "543885438402822148",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 6201,
+          "newMmr": 6282,
+          "delta": 81,
+          "playerId": 32901,
+          "playerName": "cant",
+          "playerDiscordId": "785819226589888513",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 100,
+          "multiplier": 1,
+          "prevMmr": 6164,
+          "newMmr": 6245,
+          "delta": 81,
+          "playerId": 37204,
+          "playerName": "Edgar_MK",
+          "playerDiscordId": "866852835035840543",
+          "playerCountryCode": "DO"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6416,
+          "newMmr": 6485,
+          "delta": 69,
+          "playerId": 38035,
+          "playerName": "Gilgamesh fanboy",
+          "playerDiscordId": "916434849043193907",
+          "playerCountryCode": "IT"
+        },
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6280,
+          "newMmr": 6349,
+          "delta": 69,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 6170,
+          "newMmr": 6133,
+          "delta": -37,
+          "playerId": 56455,
+          "playerName": "Najman",
+          "playerDiscordId": "400701445135007744",
+          "playerCountryCode": "GB"
+        },
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 6126,
+          "newMmr": 6089,
+          "delta": -37,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6027,
+          "newMmr": 5913,
+          "delta": -114,
+          "playerId": 14360,
+          "playerName": "Sora Nimi",
+          "playerDiscordId": "827760486031687702",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 6171,
+          "newMmr": 6057,
+          "delta": -114,
+          "playerId": 67300,
+          "playerName": "cocona",
+          "playerDiscordId": "202411546058555393",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6295,
+          "newMmr": 6097,
+          "delta": -198,
+          "playerId": 50472,
+          "playerName": "-rob-",
+          "playerDiscordId": "642469701284266044",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 6035,
+          "newMmr": 5837,
+          "delta": -198,
+          "playerId": 70116,
+          "playerName": "Lollenzo",
+          "playerDiscordId": "294157000680407041",
+          "playerCountryCode": "IT"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1416557678867648564",
+  "updateMessageId": "1416559831841771532",
+  "authorId": "916434849043193907"
+}

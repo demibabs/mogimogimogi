@@ -1,0 +1,209 @@
+{
+  "id": 964448,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-31T03:51:58.0802072Z",
+  "verifiedOn": "2025-07-31T04:24:44.66916Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/964448.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 100,
+          "multiplier": 1,
+          "prevMmr": 6928,
+          "newMmr": 7157,
+          "delta": 229,
+          "playerId": 25817,
+          "playerName": "Greninja",
+          "playerDiscordId": "561968179790741520",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 99,
+          "multiplier": 1,
+          "prevMmr": 7625,
+          "newMmr": 7787,
+          "delta": 162,
+          "playerId": 12609,
+          "playerName": "LX",
+          "playerDiscordId": "89578560955633664",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 8188,
+          "newMmr": 8288,
+          "delta": 100,
+          "playerId": 57290,
+          "playerName": "sopt",
+          "playerDiscordId": "409818685038002176",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 6250,
+          "newMmr": 6385,
+          "delta": 135,
+          "playerId": 69472,
+          "playerName": "Alien Pi",
+          "playerDiscordId": "1380928784278093836",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 10416,
+          "newMmr": 10333,
+          "delta": -83,
+          "playerId": 11648,
+          "playerName": "JPGiviner",
+          "playerDiscordId": "82883731739643904",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6450,
+          "newMmr": 6517,
+          "delta": 67,
+          "playerId": 15533,
+          "playerName": "Splendy",
+          "playerDiscordId": "726193735490076742",
+          "playerCountryCode": "PE"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 6354,
+          "newMmr": 6361,
+          "delta": 7,
+          "playerId": 19019,
+          "playerName": "Shakira",
+          "playerDiscordId": "538870511401304064",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 7034,
+          "newMmr": 6975,
+          "delta": -59,
+          "playerId": 68276,
+          "playerName": "Naldo",
+          "playerDiscordId": "278028620516294656",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 6688,
+          "newMmr": 6602,
+          "delta": -86,
+          "playerId": 68882,
+          "playerName": "mika",
+          "playerDiscordId": "177203178301816832",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 6659,
+          "newMmr": 6534,
+          "delta": -125,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 6348,
+          "newMmr": 6195,
+          "delta": -153,
+          "playerId": 25554,
+          "playerName": "Aline Pee",
+          "playerDiscordId": "459865098794827796",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 58,
+          "multiplier": 1,
+          "prevMmr": 6410,
+          "newMmr": 6215,
+          "delta": -195,
+          "playerId": 23970,
+          "playerName": "Samuel Badcock",
+          "playerDiscordId": "311096076650414091",
+          "playerCountryCode": "AU"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1400325096895287366",
+  "updateMessageId": "1400333348852858940",
+  "authorId": "437813284981309441"
+}

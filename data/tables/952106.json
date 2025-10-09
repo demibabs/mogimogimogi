@@ -1,0 +1,209 @@
+{
+  "id": 952106,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-04T04:11:53.6589202Z",
+  "verifiedOn": "2025-07-04T04:34:36.0335659Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/952106.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 104,
+          "multiplier": 1,
+          "prevMmr": 6218,
+          "newMmr": 6434,
+          "delta": 216,
+          "playerId": 68993,
+          "playerName": "Beat",
+          "playerDiscordId": "784078866611830785",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 103,
+          "multiplier": 1,
+          "prevMmr": 6079,
+          "newMmr": 6260,
+          "delta": 181,
+          "playerId": 14335,
+          "playerName": "Lobotomized",
+          "playerDiscordId": "493885737889038350",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 6077,
+          "newMmr": 6218,
+          "delta": 141,
+          "playerId": 8788,
+          "playerName": "Ako",
+          "playerDiscordId": "284673166285209600",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 94,
+          "multiplier": 1,
+          "prevMmr": 5959,
+          "newMmr": 6065,
+          "delta": 106,
+          "playerId": 12609,
+          "playerName": "LX",
+          "playerDiscordId": "89578560955633664",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6259,
+          "newMmr": 6313,
+          "delta": 54,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6038,
+          "newMmr": 6061,
+          "delta": 23,
+          "playerId": 12090,
+          "playerName": "Knee",
+          "playerDiscordId": "82829038451691520",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 6185,
+          "newMmr": 6162,
+          "delta": -23,
+          "playerId": 31743,
+          "playerName": "Runaway",
+          "playerDiscordId": "891537950150656020",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 6130,
+          "newMmr": 6069,
+          "delta": -61,
+          "playerId": 25491,
+          "playerName": "Kira",
+          "playerDiscordId": "465629153715159042",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6153,
+          "newMmr": 6051,
+          "delta": -102,
+          "playerId": 61536,
+          "playerName": "Moondancer",
+          "playerDiscordId": "358847555594878978",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 5895,
+          "newMmr": 5764,
+          "delta": -131,
+          "playerId": 70880,
+          "playerName": "kiYubEE",
+          "playerDiscordId": "275522342552338452",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 50,
+          "multiplier": 1,
+          "prevMmr": 6138,
+          "newMmr": 5957,
+          "delta": -181,
+          "playerId": 20201,
+          "playerName": "Josue",
+          "playerDiscordId": "324944030020534292",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 47,
+          "multiplier": 1,
+          "prevMmr": 6191,
+          "newMmr": 5968,
+          "delta": -223,
+          "playerId": 70520,
+          "playerName": "Jperm",
+          "playerDiscordId": "355061441205895169",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1390545637363159051",
+  "updateMessageId": "1390551353860030485",
+  "authorId": "437813284981309441"
+}

@@ -1,0 +1,209 @@
+{
+  "id": 990189,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-10-05T03:58:29.2805707Z",
+  "verifiedOn": "2025-10-05T04:03:57.229956Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/990189.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 5791,
+          "newMmr": 6001,
+          "delta": 210,
+          "playerId": 61333,
+          "playerName": "Natchu",
+          "playerDiscordId": "1398113817380126732",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 5896,
+          "newMmr": 6102,
+          "delta": 206,
+          "playerId": 68301,
+          "playerName": "PotentialHazard",
+          "playerDiscordId": "763597795063627776",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6213,
+          "newMmr": 6346,
+          "delta": 133,
+          "playerId": 31073,
+          "playerName": "BlackY.",
+          "playerDiscordId": "972181164330737664",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 5910,
+          "newMmr": 6016,
+          "delta": 106,
+          "playerId": 36711,
+          "playerName": "Redrock733",
+          "playerDiscordId": "581366609411571712",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 6076,
+          "newMmr": 6135,
+          "delta": 59,
+          "playerId": 36193,
+          "playerName": "tornado_",
+          "playerDiscordId": "313024927844532228",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6048,
+          "newMmr": 6068,
+          "delta": 20,
+          "playerId": 66046,
+          "playerName": "W13RDGUY",
+          "playerDiscordId": "558789937093279747",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 6111,
+          "newMmr": 6088,
+          "delta": -23,
+          "playerId": 26937,
+          "playerName": "Hot Rodimus",
+          "playerDiscordId": "307867713768914945",
+          "playerCountryCode": "HK"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 6393,
+          "newMmr": 6299,
+          "delta": -94,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 5912,
+          "newMmr": 5837,
+          "delta": -75,
+          "playerId": 74646,
+          "playerName": "SaltyBanana",
+          "playerDiscordId": "504039461017878540",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 5829,
+          "newMmr": 5698,
+          "delta": -131,
+          "playerId": 12222,
+          "playerName": "Akagi",
+          "playerDiscordId": "209136575735529472",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 6403,
+          "newMmr": 6208,
+          "delta": -195,
+          "playerId": 66414,
+          "playerName": "Meowser",
+          "playerDiscordId": "82805658990153728",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 5966,
+          "newMmr": 5749,
+          "delta": -217,
+          "playerId": 68882,
+          "playerName": "mika",
+          "playerDiscordId": "177203178301816832",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1424244335473332276",
+  "updateMessageId": "1424245711679000596",
+  "authorId": "1098787580180451338"
+}

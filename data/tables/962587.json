@@ -1,0 +1,209 @@
+{
+  "id": 962587,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-27T03:51:18.3817822Z",
+  "verifiedOn": "2025-07-27T03:55:47.7977185Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/962587.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 110,
+          "multiplier": 1,
+          "prevMmr": 6281,
+          "newMmr": 6497,
+          "delta": 216,
+          "playerId": 19019,
+          "playerName": "Shakira",
+          "playerDiscordId": "538870511401304064",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 6233,
+          "newMmr": 6411,
+          "delta": 178,
+          "playerId": 36711,
+          "playerName": "Redrock733",
+          "playerDiscordId": "581366609411571712",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 6063,
+          "newMmr": 6208,
+          "delta": 145,
+          "playerId": 56207,
+          "playerName": "COOK yezy",
+          "playerDiscordId": "916490499936907274",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6106,
+          "newMmr": 6209,
+          "delta": 103,
+          "playerId": 38652,
+          "playerName": "shichimi",
+          "playerDiscordId": "1082301444729876620",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6252,
+          "newMmr": 6309,
+          "delta": 57,
+          "playerId": 66745,
+          "playerName": "Pilky",
+          "playerDiscordId": "549832687934898186",
+          "playerCountryCode": "AU"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6233,
+          "newMmr": 6251,
+          "delta": 18,
+          "playerId": 39685,
+          "playerName": "Ace",
+          "playerDiscordId": "756311085543325707",
+          "playerCountryCode": "AU"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 6258,
+          "newMmr": 6235,
+          "delta": -23,
+          "playerId": 50175,
+          "playerName": "MqSyu",
+          "playerDiscordId": "1175488056682352733",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6197,
+          "newMmr": 6116,
+          "delta": -81,
+          "playerId": 55510,
+          "playerName": "Aslan",
+          "playerDiscordId": "210171777702166529",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6143,
+          "newMmr": 6065,
+          "delta": -78,
+          "playerId": 68882,
+          "playerName": "mika",
+          "playerDiscordId": "177203178301816832",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 6193,
+          "newMmr": 6053,
+          "delta": -140,
+          "playerId": 17645,
+          "playerName": "DayNeptune",
+          "playerDiscordId": "344679586992357376",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 6139,
+          "newMmr": 5961,
+          "delta": -178,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 6113,
+          "newMmr": 5896,
+          "delta": -217,
+          "playerId": 72848,
+          "playerName": "EskyYT",
+          "playerDiscordId": "1163327804142796820",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1398875378482941978",
+  "updateMessageId": "1398876510143643660",
+  "authorId": "437813284981309441"
+}

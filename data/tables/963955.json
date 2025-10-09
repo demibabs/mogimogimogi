@@ -1,0 +1,209 @@
+{
+  "id": 963955,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-29T22:53:43.2905695Z",
+  "verifiedOn": "2025-07-29T23:17:44.6927058Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/963955.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 121,
+          "multiplier": 1,
+          "prevMmr": 6174,
+          "newMmr": 6395,
+          "delta": 221,
+          "playerId": 63589,
+          "playerName": "zaytox",
+          "playerDiscordId": "1324877819578290178",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 6167,
+          "newMmr": 6348,
+          "delta": 181,
+          "playerId": 24655,
+          "playerName": "Miku",
+          "playerDiscordId": "865168333061881866",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 5948,
+          "newMmr": 6098,
+          "delta": 150,
+          "playerId": 10243,
+          "playerName": "Dylan49",
+          "playerDiscordId": "255023970657632257",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6077,
+          "newMmr": 6182,
+          "delta": 105,
+          "playerId": 9565,
+          "playerName": "callum",
+          "playerDiscordId": "298053571147202561",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 6192,
+          "newMmr": 6252,
+          "delta": 60,
+          "playerId": 67048,
+          "playerName": "ZEBI",
+          "playerDiscordId": "790271383182901289",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 6165,
+          "newMmr": 6186,
+          "delta": 21,
+          "playerId": 66860,
+          "playerName": "Cozmic",
+          "playerDiscordId": "180275359302942720",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6219,
+          "newMmr": 6178,
+          "delta": -41,
+          "playerId": 17175,
+          "playerName": "Izumi Miyamura",
+          "playerDiscordId": "89446213375500288",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6422,
+          "newMmr": 6373,
+          "delta": -49,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6076,
+          "newMmr": 5981,
+          "delta": -95,
+          "playerId": 68675,
+          "playerName": "Caysiii",
+          "playerDiscordId": "307174356600225792",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 6387,
+          "newMmr": 6219,
+          "delta": -168,
+          "playerId": 46010,
+          "playerName": "Plat",
+          "playerDiscordId": "983180860012523561",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 6187,
+          "newMmr": 6027,
+          "delta": -160,
+          "playerId": 59745,
+          "playerName": "Staticalx",
+          "playerDiscordId": "458729055626461204",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 41,
+          "multiplier": 1,
+          "prevMmr": 6305,
+          "newMmr": 6080,
+          "delta": -225,
+          "playerId": 68318,
+          "playerName": "Convicted Felon",
+          "playerDiscordId": "755656786467618836",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1399887650797781003",
+  "updateMessageId": "1399893699772813434",
+  "authorId": "865168333061881866"
+}

@@ -1,0 +1,209 @@
+{
+  "id": 951587,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-03T00:35:56.6359221Z",
+  "verifiedOn": "2025-07-03T00:49:17.8318563Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/951587.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 113,
+          "multiplier": 1,
+          "prevMmr": 5819,
+          "newMmr": 6037,
+          "delta": 218,
+          "playerId": 67192,
+          "playerName": "Traga",
+          "playerDiscordId": "207675875720822784",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 5821,
+          "newMmr": 5999,
+          "delta": 178,
+          "playerId": 12895,
+          "playerName": "Mees",
+          "playerDiscordId": "306507822126989323",
+          "playerCountryCode": "NL"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 5809,
+          "newMmr": 5947,
+          "delta": 138,
+          "playerId": 68882,
+          "playerName": "mika",
+          "playerDiscordId": "177203178301816832",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 5761,
+          "newMmr": 5861,
+          "delta": 100,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5660,
+          "newMmr": 5724,
+          "delta": 64,
+          "playerId": 70245,
+          "playerName": "Jsaav",
+          "playerDiscordId": "471645607057031168",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 5681,
+          "newMmr": 5704,
+          "delta": 23,
+          "playerId": 14755,
+          "playerName": "Rookie",
+          "playerDiscordId": "87654745023463424",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5791,
+          "newMmr": 5770,
+          "delta": -21,
+          "playerId": 51810,
+          "playerName": "am i macman",
+          "playerDiscordId": "579405852679864350",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 5655,
+          "newMmr": 5599,
+          "delta": -56,
+          "playerId": 42566,
+          "playerName": "Hoe-nouns",
+          "playerDiscordId": "823384158725865513",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 5803,
+          "newMmr": 5701,
+          "delta": -102,
+          "playerId": 68648,
+          "playerName": "Aurukel",
+          "playerDiscordId": "283822560116867074",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5696,
+          "newMmr": 5559,
+          "delta": -137,
+          "playerId": 66112,
+          "playerName": "remedy",
+          "playerDiscordId": "117765740307677186",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 5822,
+          "newMmr": 5639,
+          "delta": -183,
+          "playerId": 13157,
+          "playerName": "Mazda MX-5",
+          "playerDiscordId": "647892979524173855",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 61,
+          "multiplier": 1,
+          "prevMmr": 5791,
+          "newMmr": 5570,
+          "delta": -221,
+          "playerId": 70067,
+          "playerName": "kazumare",
+          "playerDiscordId": "728965559160537179",
+          "playerCountryCode": "JP"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1390128903317753958",
+  "updateMessageId": "1390132266709024872",
+  "authorId": "207675875720822784"
+}

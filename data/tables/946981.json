@@ -1,0 +1,208 @@
+{
+  "id": 946981,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-06-22T21:09:41.4372187Z",
+  "verifiedOn": "2025-06-22T21:13:03.205888Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/946981.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 114,
+          "multiplier": 1,
+          "prevMmr": 5447,
+          "newMmr": 5662,
+          "delta": 215,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 109,
+          "multiplier": 1,
+          "prevMmr": 5282,
+          "newMmr": 5464,
+          "delta": 182,
+          "playerId": 15631,
+          "playerName": "Sufy",
+          "playerDiscordId": "127989645521715200"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 100,
+          "multiplier": 1,
+          "prevMmr": 5234,
+          "newMmr": 5377,
+          "delta": 143,
+          "playerId": 16560,
+          "playerName": "JUGGERNAUT",
+          "playerDiscordId": "317650601427206144",
+          "playerCountryCode": "BE"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 5348,
+          "newMmr": 5447,
+          "delta": 99,
+          "playerId": 65731,
+          "playerName": "Obiyo",
+          "playerDiscordId": "83003008425656320",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 5366,
+          "newMmr": 5424,
+          "delta": 58,
+          "playerId": 46425,
+          "playerName": "Denisss",
+          "playerDiscordId": "314404968188870656",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 5222,
+          "newMmr": 5246,
+          "delta": 24,
+          "playerId": 60235,
+          "playerName": "Case",
+          "playerDiscordId": "82958626704064512",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5346,
+          "newMmr": 5325,
+          "delta": -21,
+          "playerId": 10424,
+          "playerName": "Yu Ji-min",
+          "playerDiscordId": "405803376484548617",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 5280,
+          "newMmr": 5222,
+          "delta": -58,
+          "playerId": 37511,
+          "playerName": "zepekenio",
+          "playerDiscordId": "682272732582379547",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 5442,
+          "newMmr": 5337,
+          "delta": -105,
+          "playerId": 66972,
+          "playerName": "Galaaxy",
+          "playerDiscordId": "1380536028212756490",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 5343,
+          "newMmr": 5202,
+          "delta": -141,
+          "playerId": 45071,
+          "playerName": "Sakuto",
+          "playerDiscordId": "782241449982296066",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5262,
+          "newMmr": 5084,
+          "delta": -178,
+          "playerId": 10075,
+          "playerName": "Desert",
+          "playerDiscordId": "95912230687633408",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 42,
+          "multiplier": 1,
+          "prevMmr": 5266,
+          "newMmr": 5048,
+          "delta": -218,
+          "playerId": 35650,
+          "playerName": "XinShlag",
+          "playerDiscordId": "529009972219215872",
+          "playerCountryCode": "FR"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1386453150419914883",
+  "updateMessageId": "1386453969240461545",
+  "authorId": "314404968188870656"
+}

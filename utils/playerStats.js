@@ -3,7 +3,8 @@
  * Pure functions that calculate stats from table data without data fetching
  */
 
-const ServerData = require("./serverData");
+const database = require("./database");
+const DataManager = require("./dataManager");
 
 class PlayerStats {
 	/**
@@ -218,7 +219,7 @@ class PlayerStats {
 	}
 
 	static async checkIfServerTable(userId, table, serverId) {
-		const serverData = await ServerData.getServerData(serverId);
+		const serverData = await database.getServerData(serverId);
 		const playersTable = PlayerStats.getPlayersFromTable(table);
 		for (const id in serverData.users) {
 			for (const player of playersTable) {
@@ -232,13 +233,16 @@ class PlayerStats {
 
 	static async getH2HTables(userId1, userId2, serverId) {
 		const tables = {};
-		const serverData = await ServerData.getServerData(serverId);
-		for (const tableId of serverData.users[userId1].tables) {
-			const table = serverData.tables[tableId];
+		const userTables = await DataManager.getUserTables(userId1, serverId);
+		
+		for (const userTable of userTables) {
+			const table = await database.getTable(userTable.id);
+			if (!table) continue;
+			
 			const playersTable = PlayerStats.getPlayersFromTable(table);
 			for (const player of playersTable) {
 				if (player.playerDiscordId == userId2) {
-					tables[tableId] = table;
+					tables[userTable.id] = table;
 				}
 			}
 		}
@@ -246,7 +250,7 @@ class PlayerStats {
 	}
 
 	static async getTotalH2H(tables, playerName, serverId) {
-		const serverData = await ServerData.getServerData(serverId);
+		const serverData = await database.getServerData(serverId);
 		const record = {
 			wins: 0,
 			losses: 0,

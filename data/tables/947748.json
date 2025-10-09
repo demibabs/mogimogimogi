@@ -1,0 +1,209 @@
+{
+  "id": 947748,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-06-24T16:15:30.7876307Z",
+  "verifiedOn": "2025-06-24T16:16:05.0699389Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/947748.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 120,
+          "multiplier": 1,
+          "prevMmr": 6085,
+          "newMmr": 6305,
+          "delta": 220,
+          "playerId": 56062,
+          "playerName": "Rocar",
+          "playerDiscordId": "327428307211780097",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 6335,
+          "newMmr": 6505,
+          "delta": 170,
+          "playerId": 66524,
+          "playerName": "yukino00000",
+          "playerDiscordId": "855139669145681931",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 6203,
+          "newMmr": 6339,
+          "delta": 136,
+          "playerId": 44838,
+          "playerName": "syn.",
+          "playerDiscordId": "371305052339568640",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6128,
+          "newMmr": 6227,
+          "delta": 99,
+          "playerId": 19676,
+          "playerName": "tarot cards",
+          "playerDiscordId": "292392974560788480",
+          "playerCountryCode": "NO"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6101,
+          "newMmr": 6161,
+          "delta": 60,
+          "playerId": 10739,
+          "playerName": "4hm",
+          "playerDiscordId": "783347803350499369",
+          "playerCountryCode": "VN"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 6063,
+          "newMmr": 6084,
+          "delta": 21,
+          "playerId": 23170,
+          "playerName": "Gate of Babylon",
+          "playerDiscordId": "1136442546634113157",
+          "playerCountryCode": "BE"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 6004,
+          "newMmr": 5988,
+          "delta": -16,
+          "playerId": 27564,
+          "playerName": "Xooo",
+          "playerDiscordId": "389008484781260820",
+          "playerCountryCode": "CH"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 6277,
+          "newMmr": 6210,
+          "delta": -67,
+          "playerId": 40271,
+          "playerName": "Ky1e",
+          "playerDiscordId": "609000222487609346",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 5793,
+          "newMmr": 5705,
+          "delta": -88,
+          "playerId": 31833,
+          "playerName": "Raheesh Patel",
+          "playerDiscordId": "711717471635374110",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 6017,
+          "newMmr": 5880,
+          "delta": -137,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 46,
+          "multiplier": 1,
+          "prevMmr": 5987,
+          "newMmr": 5811,
+          "delta": -176,
+          "playerId": 56765,
+          "playerName": "AiMuzza",
+          "playerDiscordId": "527540716734251028",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 41,
+          "multiplier": 1,
+          "prevMmr": 6146,
+          "newMmr": 5924,
+          "delta": -222,
+          "playerId": 67314,
+          "playerName": "xdpro79",
+          "playerDiscordId": "823178914474098718",
+          "playerCountryCode": "ES"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1387103863319822519",
+  "updateMessageId": "1387104010036838494",
+  "authorId": "292392974560788480"
+}

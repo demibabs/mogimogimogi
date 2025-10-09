@@ -1,0 +1,209 @@
+{
+  "id": 946949,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-06-22T20:00:18.6736881Z",
+  "verifiedOn": "2025-06-22T20:07:16.3534746Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/946949.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 114,
+          "multiplier": 1,
+          "prevMmr": 5423,
+          "newMmr": 5640,
+          "delta": 217,
+          "playerId": 67281,
+          "playerName": "Maitrash",
+          "playerDiscordId": "160433823597723648",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 107,
+          "multiplier": 1,
+          "prevMmr": 5385,
+          "newMmr": 5563,
+          "delta": 178,
+          "playerId": 12927,
+          "playerName": "Melonz",
+          "playerDiscordId": "176126710989717505",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 103,
+          "multiplier": 1,
+          "prevMmr": 5306,
+          "newMmr": 5447,
+          "delta": 141,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 5342,
+          "newMmr": 5442,
+          "delta": 100,
+          "playerId": 66972,
+          "playerName": "Galaaxy",
+          "playerDiscordId": "1380536028212756490",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 5305,
+          "newMmr": 5366,
+          "delta": 61,
+          "playerId": 46425,
+          "playerName": "Denisss",
+          "playerDiscordId": "314404968188870656",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 5337,
+          "newMmr": 5357,
+          "delta": 20,
+          "playerId": 27016,
+          "playerName": "Shiny Greninja",
+          "playerDiscordId": "772624737767260160",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 5446,
+          "newMmr": 5422,
+          "delta": -24,
+          "playerId": 15515,
+          "playerName": "Sphinx",
+          "playerDiscordId": "540157903001092116",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 5588,
+          "newMmr": 5518,
+          "delta": -70,
+          "playerId": 67041,
+          "playerName": "Fantsu",
+          "playerDiscordId": "219453053387014144",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 5305,
+          "newMmr": 5206,
+          "delta": -99,
+          "playerId": 12609,
+          "playerName": "LX",
+          "playerDiscordId": "89578560955633664",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 5335,
+          "newMmr": 5195,
+          "delta": -140,
+          "playerId": 67302,
+          "playerName": "Jhay",
+          "playerDiscordId": "255364750186119168",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 58,
+          "multiplier": 1,
+          "prevMmr": 5158,
+          "newMmr": 4985,
+          "delta": -173,
+          "playerId": 54379,
+          "playerName": "M4E",
+          "playerDiscordId": "133833882406617088",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 48,
+          "multiplier": 1,
+          "prevMmr": 5132,
+          "newMmr": 4920,
+          "delta": -212,
+          "playerId": 66793,
+          "playerName": "Margeese",
+          "playerDiscordId": "458833357267009538",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1386435655806091334",
+  "updateMessageId": "1386437415505367162",
+  "authorId": "772624737767260160"
+}

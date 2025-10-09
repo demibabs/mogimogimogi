@@ -1,0 +1,164 @@
+{
+  "id": 982978,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-16T02:51:37.2786431Z",
+  "verifiedOn": "2025-09-16T04:00:18.3819903Z",
+  "numTeams": 3,
+  "numPlayers": 12,
+  "format": "4v4",
+  "url": "/TableImage/982978.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 7072,
+          "newMmr": 7206,
+          "delta": 134,
+          "playerId": 19673,
+          "playerName": "Slick",
+          "playerDiscordId": "716162712706744370",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 128,
+          "multiplier": 1,
+          "prevMmr": 9310,
+          "newMmr": 9444,
+          "delta": 134,
+          "playerId": 27536,
+          "playerName": "yezy",
+          "playerDiscordId": "358306692141678594",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 8635,
+          "newMmr": 8769,
+          "delta": 134,
+          "playerId": 31833,
+          "playerName": "Raheesh Patel",
+          "playerDiscordId": "711717471635374110",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 8014,
+          "newMmr": 8148,
+          "delta": 134,
+          "playerId": 56207,
+          "playerName": "COOK yezy",
+          "playerDiscordId": "916490499936907274",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 46,
+          "multiplier": 1,
+          "prevMmr": 8098,
+          "newMmr": 8036,
+          "delta": -62,
+          "playerId": 36194,
+          "playerName": "Bapevc",
+          "playerDiscordId": "556650124483231754",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 10318,
+          "newMmr": 10256,
+          "delta": -62,
+          "playerId": 38597,
+          "playerName": "Luma",
+          "playerDiscordId": "605010882249883648",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 8205,
+          "newMmr": 8143,
+          "delta": -62,
+          "playerId": 40774,
+          "playerName": "sliced oxy",
+          "playerDiscordId": "965703593325887488",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 113,
+          "multiplier": 1,
+          "prevMmr": 8429,
+          "newMmr": 8367,
+          "delta": -62,
+          "playerId": 45625,
+          "playerName": "The Shy Praise",
+          "playerDiscordId": "788576493424869387",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6214,
+          "newMmr": 6142,
+          "delta": -72,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 6227,
+          "newMmr": 6155,
+          "delta": -72,
+          "playerId": 66955,
+          "playerName": "PCDamonD",
+          "playerDiscordId": "130741136678453248",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 44,
+          "multiplier": 1,
+          "prevMmr": 6126,
+          "newMmr": 6054,
+          "delta": -72,
+          "playerId": 67764,
+          "playerName": "Imp1904",
+          "playerDiscordId": "597931655784562707",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 7047,
+          "newMmr": 6975,
+          "delta": -72,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1417342140098281482",
+  "updateMessageId": "1417359425039241357",
+  "authorId": "716162712706744370"
+}

@@ -1,8 +1,9 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { getTable } = require("../../utils/loungeApi");
+const LoungeApi = require("../../utils/loungeApi");
 const DataManager = require("../../utils/dataManager");
 const PlayerStats = require("../../utils/playerStats");
-const ServerData = require("../../utils/serverData");
+const database = require("../../utils/database");
+const { getTable } = require("../../utils/loungeApi");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -29,7 +30,7 @@ module.exports = {
 			}
 
 			await DataManager.addServerTable(interaction.guild.id, tableId);
-			const data = await ServerData.getServerData(serverId);
+			const data = await database.getServerData(serverId);
 
 			const allPlayers = PlayerStats.getPlayersFromTable(table);
 			let userCount = 0;

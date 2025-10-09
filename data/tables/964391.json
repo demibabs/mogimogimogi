@@ -1,0 +1,209 @@
+{
+  "id": 964391,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-31T00:55:39.9730475Z",
+  "verifiedOn": "2025-07-31T00:59:23.0543329Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/964391.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 115,
+          "multiplier": 1,
+          "prevMmr": 6423,
+          "newMmr": 6640,
+          "delta": 217,
+          "playerId": 67430,
+          "playerName": "HPXX",
+          "playerDiscordId": "1264682073902419968",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 110,
+          "multiplier": 1,
+          "prevMmr": 6350,
+          "newMmr": 6530,
+          "delta": 180,
+          "playerId": 18906,
+          "playerName": "Xx_UnLuNkY_xX",
+          "playerDiscordId": "800151331804938321",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6564,
+          "newMmr": 6696,
+          "delta": 132,
+          "playerId": 53168,
+          "playerName": "ZeroMKW",
+          "playerDiscordId": "1180596782519046178",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 6232,
+          "newMmr": 6337,
+          "delta": 105,
+          "playerId": 53192,
+          "playerName": "GLEISON BREMER",
+          "playerDiscordId": "316645071875211265",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6175,
+          "newMmr": 6242,
+          "delta": 67,
+          "playerId": 19019,
+          "playerName": "Shakira",
+          "playerDiscordId": "538870511401304064",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6529,
+          "newMmr": 6522,
+          "delta": -7,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6553,
+          "newMmr": 6545,
+          "delta": -8,
+          "playerId": 68882,
+          "playerName": "mika",
+          "playerDiscordId": "177203178301816832",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6255,
+          "newMmr": 6199,
+          "delta": -56,
+          "playerId": 12583,
+          "playerName": "LuisMX",
+          "playerDiscordId": "412832982433398784",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 6457,
+          "newMmr": 6353,
+          "delta": -104,
+          "playerId": 32036,
+          "playerName": "GoldMK",
+          "playerDiscordId": "704309194714644611",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 6186,
+          "newMmr": 6053,
+          "delta": -133,
+          "playerId": 39987,
+          "playerName": "Lil Uzi Squirt",
+          "playerDiscordId": "728741014440771656",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 6289,
+          "newMmr": 6112,
+          "delta": -177,
+          "playerId": 72001,
+          "playerName": "XD_oof",
+          "playerDiscordId": "689247310626029568",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 45,
+          "multiplier": 1,
+          "prevMmr": 6256,
+          "newMmr": 6040,
+          "delta": -216,
+          "playerId": 21372,
+          "playerName": "Player India",
+          "playerDiscordId": "256160148542717952",
+          "playerCountryCode": "DE"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1400280727605743636",
+  "updateMessageId": "1400281671412224061",
+  "authorId": "800151331804938321"
+}

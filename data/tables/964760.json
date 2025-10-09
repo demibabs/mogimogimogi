@@ -1,0 +1,209 @@
+{
+  "id": 964760,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-31T21:53:25.8753481Z",
+  "verifiedOn": "2025-07-31T22:08:30.1053017Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/964760.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 113,
+          "multiplier": 1,
+          "prevMmr": 6634,
+          "newMmr": 6841,
+          "delta": 207,
+          "playerId": 10161,
+          "playerName": "Domymmo",
+          "playerDiscordId": "82827843003748352",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 6172,
+          "newMmr": 6357,
+          "delta": 185,
+          "playerId": 50903,
+          "playerName": "Alonso890",
+          "playerDiscordId": "596463367233863703",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6154,
+          "newMmr": 6300,
+          "delta": 146,
+          "playerId": 54597,
+          "playerName": "AD_SIR-GP",
+          "playerDiscordId": "1138506190716936272",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6534,
+          "newMmr": 6625,
+          "delta": 91,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6167,
+          "newMmr": 6232,
+          "delta": 65,
+          "playerId": 17467,
+          "playerName": "Dragolini",
+          "playerDiscordId": "812077610241884220",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 6184,
+          "newMmr": 6209,
+          "delta": 25,
+          "playerId": 19614,
+          "playerName": "Jut187",
+          "playerDiscordId": "1192181824768725043",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 6284,
+          "newMmr": 6265,
+          "delta": -19,
+          "playerId": 69529,
+          "playerName": "Impact",
+          "playerDiscordId": "342736380163653633",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6478,
+          "newMmr": 6411,
+          "delta": -67,
+          "playerId": 66994,
+          "playerName": "foolycl",
+          "playerDiscordId": "178365002149920768",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 5890,
+          "newMmr": 5807,
+          "delta": -83,
+          "playerId": 46001,
+          "playerName": "Chai Latte",
+          "playerDiscordId": "672542732442533907",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 6423,
+          "newMmr": 6278,
+          "delta": -145,
+          "playerId": 19937,
+          "playerName": "clawe",
+          "playerDiscordId": "856658239034228756",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 6189,
+          "newMmr": 6014,
+          "delta": -175,
+          "playerId": 17200,
+          "playerName": "Phrolova",
+          "playerDiscordId": "179532128927744000",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 6527,
+          "newMmr": 6298,
+          "delta": -229,
+          "playerId": 22305,
+          "playerName": "Xosman",
+          "playerDiscordId": "415221708983894038",
+          "playerCountryCode": "FR"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1400597255127302144",
+  "updateMessageId": "1400601050880282684",
+  "authorId": "437813284981309441"
+}

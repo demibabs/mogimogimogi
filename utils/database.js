@@ -19,6 +19,7 @@ class Database {
 
 	async initializeDatabase() {
 		try {
+			// Server-specific data (users, settings, but no tables)
 			await this.pool.query(`
 				CREATE TABLE IF NOT EXISTS server_data (
 					server_id VARCHAR(20) PRIMARY KEY,
@@ -26,6 +27,30 @@ class Database {
 					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 				)
 			`);
+
+			// Global table data (shared across all servers)
+			await this.pool.query(`
+				CREATE TABLE IF NOT EXISTS tables (
+					table_id VARCHAR(20) PRIMARY KEY,
+					table_data JSONB NOT NULL,
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+				)
+			`);
+
+			// Link users to tables they participated in
+			await this.pool.query(`
+				CREATE TABLE IF NOT EXISTS user_tables (
+					id SERIAL PRIMARY KEY,
+					user_id VARCHAR(20) NOT NULL,
+					table_id VARCHAR(20) NOT NULL,
+					server_id VARCHAR(20) NOT NULL,
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					UNIQUE(user_id, table_id, server_id),
+					FOREIGN KEY (table_id) REFERENCES tables(table_id) ON DELETE CASCADE
+				)
+			`);
+
 			console.log("Database initialized successfully");
 		}
 		catch (error) {
@@ -117,6 +142,96 @@ class Database {
 		}
 	}
 
+	// Table management methods
+	async saveTable(tableId, tableData) {
+		if (!this.useDatabase) {
+			return await this._saveTableToFile(tableId, tableData);
+		}
+
+		try {
+			await this.pool.query(
+				`INSERT INTO tables (table_id, table_data, updated_at) 
+				 VALUES ($1, $2, CURRENT_TIMESTAMP)
+				 ON CONFLICT (table_id) 
+				 DO UPDATE SET table_data = $2, updated_at = CURRENT_TIMESTAMP`,
+				[tableId, JSON.stringify(tableData)],
+			);
+			return true;
+		}
+		catch (error) {
+			console.error("Database table save error:", error);
+			return false;
+		}
+	}
+
+	async getTable(tableId) {
+		if (!this.useDatabase) {
+			return await this._getTableFromFile(tableId);
+		}
+
+		try {
+			const result = await this.pool.query(
+				"SELECT table_data FROM tables WHERE table_id = $1",
+				[tableId],
+			);
+			
+			if (result.rows.length === 0) {
+				return null;
+			}
+			
+			return result.rows[0].table_data;
+		}
+		catch (error) {
+			console.error("Database table read error:", error);
+			return null;
+		}
+	}
+
+	async linkUserToTable(userId, tableId, serverId) {
+		if (!this.useDatabase) {
+			return await this._linkUserToTableInFile(userId, tableId, serverId);
+		}
+
+		try {
+			await this.pool.query(
+				`INSERT INTO user_tables (user_id, table_id, server_id) 
+				 VALUES ($1, $2, $3)
+				 ON CONFLICT (user_id, table_id, server_id) DO NOTHING`,
+				[userId, tableId, serverId],
+			);
+			return true;
+		}
+		catch (error) {
+			console.error("Database user-table link error:", error);
+			return false;
+		}
+	}
+
+	async getUserTables(userId, serverId) {
+		if (!this.useDatabase) {
+			return await this._getUserTablesFromFile(userId, serverId);
+		}
+
+		try {
+			const result = await this.pool.query(
+				`SELECT t.table_id, t.table_data 
+				 FROM tables t
+				 JOIN user_tables ut ON t.table_id = ut.table_id
+				 WHERE ut.user_id = $1 AND ut.server_id = $2`,
+				[userId, serverId],
+			);
+			
+			return result.rows.map(row => ({
+				id: row.table_id,
+				...row.table_data,
+			}));
+		}
+		catch (error) {
+			console.error("Database user tables query error:", error);
+			return [];
+		}
+	}
+
 	// File storage fallback methods
 	async _ensureDataDir() {
 		try {
@@ -184,6 +299,100 @@ class Database {
 		}
 		catch (error) {
 			console.error("Error reading data directory:", error);
+			return [];
+		}
+	}
+
+	// File storage methods for normalized schema
+	async _saveTableToFile(tableId, tableData) {
+		try {
+			const tablesDir = path.join(__dirname, "..", "data", "tables");
+			await fs.mkdir(tablesDir, { recursive: true });
+			
+			const tablePath = path.join(tablesDir, `${tableId}.json`);
+			await fs.writeFile(tablePath, JSON.stringify(tableData, null, 2));
+			return true;
+		}
+		catch (error) {
+			console.error(`Error saving table ${tableId} to file:`, error);
+			return false;
+		}
+	}
+
+	async _getTableFromFile(tableId) {
+		try {
+			const tablePath = path.join(__dirname, "..", "data", "tables", `${tableId}.json`);
+			const data = await fs.readFile(tablePath, "utf8");
+			return JSON.parse(data);
+		}
+		catch (error) {
+			if (error.code !== "ENOENT") {
+				console.error(`Error reading table ${tableId} from file:`, error);
+			}
+			return null;
+		}
+	}
+
+	async _linkUserToTableInFile(userId, tableId, serverId) {
+		try {
+			const relationshipsDir = path.join(__dirname, "..", "data", "user_tables");
+			await fs.mkdir(relationshipsDir, { recursive: true });
+			
+			const relationshipPath = path.join(relationshipsDir, `${serverId}.json`);
+			
+			// Read existing relationships
+			let relationships = {};
+			try {
+				const data = await fs.readFile(relationshipPath, "utf8");
+				relationships = JSON.parse(data);
+			}
+			catch (readError) {
+				if (readError.code !== "ENOENT") {
+					console.error("Error reading relationships file:", readError);
+				}
+			}
+			
+			// Add new relationship
+			if (!relationships[userId]) {
+				relationships[userId] = [];
+			}
+			
+			if (!relationships[userId].includes(tableId)) {
+				relationships[userId].push(tableId);
+			}
+			
+			// Save relationships
+			await fs.writeFile(relationshipPath, JSON.stringify(relationships, null, 2));
+			return true;
+		}
+		catch (error) {
+			console.error(`Error linking user ${userId} to table ${tableId}:`, error);
+			return false;
+		}
+	}
+
+	async _getUserTablesFromFile(userId, serverId) {
+		try {
+			const relationshipPath = path.join(__dirname, "..", "data", "user_tables", `${serverId}.json`);
+			const data = await fs.readFile(relationshipPath, "utf8");
+			const relationships = JSON.parse(data);
+			
+			const userTableIds = relationships[userId] || [];
+			const tables = [];
+			
+			for (const tableId of userTableIds) {
+				const tableData = await this._getTableFromFile(tableId);
+				if (tableData) {
+					tables.push({ id: tableId, ...tableData });
+				}
+			}
+			
+			return tables;
+		}
+		catch (error) {
+			if (error.code !== "ENOENT") {
+				console.error(`Error getting user tables for ${userId}:`, error);
+			}
 			return [];
 		}
 	}

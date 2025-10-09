@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const DataManager = require("../../utils/dataManager");
-const ServerData = require("../../utils/serverData");
+const database = require("../../utils/database");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -8,7 +8,7 @@ module.exports = {
 		.setDescription("Updates all users with existing table data."),
 
 	async execute(interaction) {
-		const serverData = await ServerData.getServerData(interaction.guild.id);
+		const serverData = await database.getServerData(interaction.guild.id);
 
 		await interaction.deferReply();
 

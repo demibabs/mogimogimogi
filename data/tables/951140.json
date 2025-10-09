@@ -1,0 +1,209 @@
+{
+  "id": 951140,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-01T23:29:39.7768748Z",
+  "verifiedOn": "2025-07-01T23:53:54.024489Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/951140.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 111,
+          "multiplier": 1,
+          "prevMmr": 5918,
+          "newMmr": 6143,
+          "delta": 225,
+          "playerId": 53007,
+          "playerName": "Y Que Fue",
+          "playerDiscordId": "1008285876591276062",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 109,
+          "multiplier": 1,
+          "prevMmr": 6167,
+          "newMmr": 6342,
+          "delta": 175,
+          "playerId": 57616,
+          "playerName": "Marcho",
+          "playerDiscordId": "868083926248325130",
+          "playerCountryCode": "IE"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 105,
+          "multiplier": 1,
+          "prevMmr": 5988,
+          "newMmr": 6130,
+          "delta": 142,
+          "playerId": 43149,
+          "playerName": "Lucker",
+          "playerDiscordId": "616672787813367816",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 99,
+          "multiplier": 1,
+          "prevMmr": 5969,
+          "newMmr": 6071,
+          "delta": 102,
+          "playerId": 70019,
+          "playerName": "Sera",
+          "playerDiscordId": "345228666315472897",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 5957,
+          "newMmr": 6020,
+          "delta": 63,
+          "playerId": 67596,
+          "playerName": "Morsa",
+          "playerDiscordId": "97393875760451584",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 5857,
+          "newMmr": 5884,
+          "delta": 27,
+          "playerId": 44815,
+          "playerName": "Luckyllua",
+          "playerDiscordId": "398435642096484352",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6071,
+          "newMmr": 6049,
+          "delta": -22,
+          "playerId": 9184,
+          "playerName": "AxelTS",
+          "playerDiscordId": "702537601944649747",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 6138,
+          "newMmr": 6074,
+          "delta": -64,
+          "playerId": 64133,
+          "playerName": "LiamMk96",
+          "playerDiscordId": "1360578453555908748",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5971,
+          "newMmr": 5873,
+          "delta": -98,
+          "playerId": 68013,
+          "playerName": "Thurmos",
+          "playerDiscordId": "147310238393958400",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 6189,
+          "newMmr": 6043,
+          "delta": -146,
+          "playerId": 18897,
+          "playerName": "HypaZ",
+          "playerDiscordId": "177818826451189760",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 49,
+          "multiplier": 1,
+          "prevMmr": 6076,
+          "newMmr": 5894,
+          "delta": -182,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 36,
+          "multiplier": 1,
+          "prevMmr": 6062,
+          "newMmr": 5841,
+          "delta": -221,
+          "playerId": 70036,
+          "playerName": "SANTORRES98",
+          "playerDiscordId": "357751167679463424",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1389749835732619326",
+  "updateMessageId": "1389755938512179331",
+  "authorId": "437813284981309441"
+}

@@ -1,0 +1,209 @@
+{
+  "id": 947790,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-06-24T18:37:25.1493788Z",
+  "verifiedOn": "2025-06-24T18:41:15.5812895Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/947790.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 116,
+          "multiplier": 1,
+          "prevMmr": 6094,
+          "newMmr": 6309,
+          "delta": 215,
+          "playerId": 15064,
+          "playerName": "sean",
+          "playerDiscordId": "83755201164480512",
+          "playerCountryCode": "IE"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 103,
+          "multiplier": 1,
+          "prevMmr": 5971,
+          "newMmr": 6151,
+          "delta": 180,
+          "playerId": 66969,
+          "playerName": "reons",
+          "playerDiscordId": "1336944260896784414",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 5979,
+          "newMmr": 6118,
+          "delta": 139,
+          "playerId": 11878,
+          "playerName": "Kayne",
+          "playerDiscordId": "183852316795994122",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 6007,
+          "newMmr": 6105,
+          "delta": 98,
+          "playerId": 39232,
+          "playerName": "BDD Aryhn",
+          "playerDiscordId": "878830714768986173",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 5836,
+          "newMmr": 5901,
+          "delta": 65,
+          "playerId": 16541,
+          "playerName": "Small Country",
+          "playerDiscordId": "161643851428265984",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6050,
+          "newMmr": 6066,
+          "delta": 16,
+          "playerId": 9695,
+          "playerName": "Maki",
+          "playerDiscordId": "229564162655649792",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5761,
+          "newMmr": 5749,
+          "delta": -12,
+          "playerId": 66486,
+          "playerName": "Mae",
+          "playerDiscordId": "82780023190192128",
+          "playerCountryCode": "NL"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 5772,
+          "newMmr": 5720,
+          "delta": -52,
+          "playerId": 67737,
+          "playerName": "Sick Kid",
+          "playerDiscordId": "405795848447066112",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 6040,
+          "newMmr": 5937,
+          "delta": -103,
+          "playerId": 9872,
+          "playerName": "crono",
+          "playerDiscordId": "949429379652542494",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 6061,
+          "newMmr": 5917,
+          "delta": -144,
+          "playerId": 49892,
+          "playerName": "Togore Dreemurr",
+          "playerDiscordId": "1120019223171829842",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 6002,
+          "newMmr": 5820,
+          "delta": -182,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 5956,
+          "newMmr": 5736,
+          "delta": -220,
+          "playerId": 22068,
+          "playerName": "Kunder",
+          "playerDiscordId": "624480587314626567",
+          "playerCountryCode": "FR"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1387139575188689030",
+  "updateMessageId": "1387140544785944706",
+  "authorId": "878830714768986173"
+}

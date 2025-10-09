@@ -1,0 +1,169 @@
+{
+  "id": 990803,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-10-06T18:53:56.190922Z",
+  "verifiedOn": "2025-10-06T19:21:14.3264947Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/990803.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 8311,
+          "newMmr": 8476,
+          "delta": 165,
+          "playerId": 15341,
+          "playerName": "Sergio Ramos 2.0",
+          "playerDiscordId": "347076149592981504",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 5804,
+          "newMmr": 5969,
+          "delta": 165,
+          "playerId": 27247,
+          "playerName": "Vomicia",
+          "playerDiscordId": "696382153117794426",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 120,
+          "multiplier": 1,
+          "prevMmr": 8390,
+          "newMmr": 8555,
+          "delta": 165,
+          "playerId": 34760,
+          "playerName": "Wox",
+          "playerDiscordId": "813477543444611113",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 106,
+          "multiplier": 1,
+          "prevMmr": 8270,
+          "newMmr": 8318,
+          "delta": 48,
+          "playerId": 12033,
+          "playerName": "Cruz Azul",
+          "playerDiscordId": "372902291730202625",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6036,
+          "newMmr": 6084,
+          "delta": 48,
+          "playerId": 28864,
+          "playerName": "REDEMPTION",
+          "playerDiscordId": "1175787462136692739",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 8078,
+          "newMmr": 8126,
+          "delta": 48,
+          "playerId": 70288,
+          "playerName": "Aleek",
+          "playerDiscordId": "866706277328617480",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 7660,
+          "newMmr": 7633,
+          "delta": -27,
+          "playerId": 53192,
+          "playerName": "GLEISON BREMER",
+          "playerDiscordId": "316645071875211265",
+          "playerCountryCode": "IT"
+        },
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 6646,
+          "newMmr": 6619,
+          "delta": -27,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 6253,
+          "newMmr": 6226,
+          "delta": -27,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 102,
+          "multiplier": 1,
+          "prevMmr": 8344,
+          "newMmr": 8157,
+          "delta": -187,
+          "playerId": 9968,
+          "playerName": "Elyoyer",
+          "playerDiscordId": "279255226588856323",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 54,
+          "multiplier": 1,
+          "prevMmr": 5458,
+          "newMmr": 5271,
+          "delta": -187,
+          "playerId": 15978,
+          "playerName": "Ultramort",
+          "playerDiscordId": "727791989206024252",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 57,
+          "multiplier": 1,
+          "prevMmr": 8342,
+          "newMmr": 8155,
+          "delta": -187,
+          "playerId": 45342,
+          "playerName": "Timo",
+          "playerDiscordId": "302065086489690113",
+          "playerCountryCode": "ES"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1424832071083491443",
+  "updateMessageId": "1424838943353864293",
+  "authorId": "696382153117794426"
+}

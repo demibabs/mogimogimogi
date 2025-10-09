@@ -1,0 +1,208 @@
+{
+  "id": 965770,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-08-03T04:48:53.7456374Z",
+  "verifiedOn": "2025-08-03T04:51:18.4978233Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/965770.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 6298,
+          "newMmr": 6507,
+          "delta": 209,
+          "playerId": 67622,
+          "playerName": "mugino",
+          "playerDiscordId": "179961948845113344",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 6310,
+          "newMmr": 6518,
+          "delta": 208,
+          "playerId": 70029,
+          "playerName": "Nix",
+          "playerDiscordId": "225015494099468288",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 103,
+          "multiplier": 1,
+          "prevMmr": 7063,
+          "newMmr": 7181,
+          "delta": 118,
+          "playerId": 14049,
+          "playerName": "Patchouli",
+          "playerDiscordId": "217322518384476163",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 6842,
+          "newMmr": 6929,
+          "delta": 87,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6766,
+          "newMmr": 6816,
+          "delta": 50,
+          "playerId": 15294,
+          "playerName": "syo",
+          "playerDiscordId": "969629267417792573",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 6187,
+          "newMmr": 6220,
+          "delta": 33,
+          "playerId": 68136,
+          "playerName": "Dodo25",
+          "playerDiscordId": "1093194916844273774",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6367,
+          "newMmr": 6353,
+          "delta": -14,
+          "playerId": 15631,
+          "playerName": "Sufy",
+          "playerDiscordId": "127989645521715200"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6755,
+          "newMmr": 6665,
+          "delta": -90,
+          "playerId": 8788,
+          "playerName": "Ako",
+          "playerDiscordId": "284673166285209600",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6417,
+          "newMmr": 6341,
+          "delta": -76,
+          "playerId": 16405,
+          "playerName": "vee367",
+          "playerDiscordId": "788977531154857996",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 56,
+          "multiplier": 1,
+          "prevMmr": 6352,
+          "newMmr": 6218,
+          "delta": -134,
+          "playerId": 46996,
+          "playerName": "Kod49",
+          "playerDiscordId": "790448839709949972",
+          "playerCountryCode": "AU"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 55,
+          "multiplier": 1,
+          "prevMmr": 6372,
+          "newMmr": 6197,
+          "delta": -175,
+          "playerId": 72803,
+          "playerName": "Niginigi",
+          "playerDiscordId": "1387829639782731826",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 53,
+          "multiplier": 1,
+          "prevMmr": 6351,
+          "newMmr": 6137,
+          "delta": -214,
+          "playerId": 24602,
+          "playerName": "B3rns",
+          "playerDiscordId": "564770457530662922",
+          "playerCountryCode": "CA"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1401426585751650358",
+  "updateMessageId": "1401427194613596172",
+  "authorId": "564770457530662922"
+}

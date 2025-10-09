@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const ServerData = require("../../utils/serverData");
+const database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
 const DataManager = require("../../utils/dataManager");
@@ -27,7 +27,7 @@ module.exports = {
 			const serverId = interaction.guild.id;
 
 			// Validate user exists in server data
-			const serverData = await ServerData.getServerData(serverId);
+			const serverData = await database.getServerData(serverId);
 			const userData = serverData?.users?.[discordUser.id];
 
 			if (!userData) {

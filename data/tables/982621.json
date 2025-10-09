@@ -1,0 +1,169 @@
+{
+  "id": 982621,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-15T05:53:39.292698Z",
+  "verifiedOn": "2025-09-15T06:00:20.22392Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/982621.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 114,
+          "multiplier": 1,
+          "prevMmr": 6637,
+          "newMmr": 6826,
+          "delta": 189,
+          "playerId": 26119,
+          "playerName": "howl",
+          "playerDiscordId": "95659633523294208",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 6320,
+          "newMmr": 6509,
+          "delta": 189,
+          "playerId": 46027,
+          "playerName": "Milkshake",
+          "playerDiscordId": "251162239472500736",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 94,
+          "multiplier": 1,
+          "prevMmr": 6261,
+          "newMmr": 6450,
+          "delta": 189,
+          "playerId": 68651,
+          "playerName": "Red",
+          "playerDiscordId": "520813340939911188",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 6601,
+          "newMmr": 6659,
+          "delta": 58,
+          "playerId": 26049,
+          "playerName": "Chinese Lakitu",
+          "playerDiscordId": "393953643889557504",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6156,
+          "newMmr": 6214,
+          "delta": 58,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6894,
+          "newMmr": 6952,
+          "delta": 58,
+          "playerId": 69472,
+          "playerName": "Alien Pi",
+          "playerDiscordId": "1380928784278093836",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6422,
+          "newMmr": 6370,
+          "delta": -52,
+          "playerId": 25554,
+          "playerName": "Aline Pee",
+          "playerDiscordId": "459865098794827796",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 6804,
+          "newMmr": 6752,
+          "delta": -52,
+          "playerId": 60144,
+          "playerName": "Abeille 20",
+          "playerDiscordId": "643453445369757707",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6045,
+          "newMmr": 5993,
+          "delta": -52,
+          "playerId": 74054,
+          "playerName": "aaaaasu9",
+          "playerDiscordId": "525061757186867211",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 7091,
+          "newMmr": 6896,
+          "delta": -195,
+          "playerId": 10776,
+          "playerName": "Gecko",
+          "playerDiscordId": "334529895281459200",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 6809,
+          "newMmr": 6614,
+          "delta": -195,
+          "playerId": 16509,
+          "playerName": "cr4life",
+          "playerDiscordId": "442563534413365250",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 6267,
+          "newMmr": 6072,
+          "delta": -195,
+          "playerId": 72343,
+          "playerName": "Pamperinos",
+          "playerDiscordId": "597963333093687296",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1417025560949035030",
+  "updateMessageId": "1417027247940042783",
+  "authorId": "459865098794827796"
+}

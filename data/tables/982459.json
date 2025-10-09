@@ -1,0 +1,169 @@
+{
+  "id": 982459,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-14T19:50:36.3989629Z",
+  "verifiedOn": "2025-09-14T20:09:45.9491887Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/982459.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 94,
+          "multiplier": 1,
+          "prevMmr": 5741,
+          "newMmr": 5923,
+          "delta": 182,
+          "playerId": 10243,
+          "playerName": "Dylan49",
+          "playerDiscordId": "255023970657632257",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 114,
+          "multiplier": 1,
+          "prevMmr": 6143,
+          "newMmr": 6325,
+          "delta": 182,
+          "playerId": 11538,
+          "playerName": "zero luck",
+          "playerDiscordId": "95623623305334784",
+          "playerCountryCode": "NL"
+        },
+        {
+          "score": 106,
+          "multiplier": 1,
+          "prevMmr": 5938,
+          "newMmr": 6120,
+          "delta": 182,
+          "playerId": 25007,
+          "playerName": "Willo",
+          "playerDiscordId": "313738388702232578",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 5893,
+          "newMmr": 5951,
+          "delta": 58,
+          "playerId": 12965,
+          "playerName": "Wanda",
+          "playerDiscordId": "364259212102205440",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 106,
+          "multiplier": 1,
+          "prevMmr": 5921,
+          "newMmr": 5979,
+          "delta": 58,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 6181,
+          "newMmr": 6239,
+          "delta": 58,
+          "playerId": 75202,
+          "playerName": "LegoWiiMan",
+          "playerDiscordId": "1410448431675084840",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5904,
+          "newMmr": 5845,
+          "delta": -59,
+          "playerId": 20036,
+          "playerName": "Gouenji",
+          "playerDiscordId": "1384754160788045834",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6064,
+          "newMmr": 6005,
+          "delta": -59,
+          "playerId": 26927,
+          "playerName": "Sushi susu gogo",
+          "playerDiscordId": "485090469777375232",
+          "playerCountryCode": "IT"
+        },
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 5878,
+          "newMmr": 5819,
+          "delta": -59,
+          "playerId": 56455,
+          "playerName": "Najman",
+          "playerDiscordId": "400701445135007744",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 5942,
+          "newMmr": 5761,
+          "delta": -181,
+          "playerId": 26062,
+          "playerName": "Jack041",
+          "playerDiscordId": "295985699960782848",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 58,
+          "multiplier": 1,
+          "prevMmr": 5932,
+          "newMmr": 5751,
+          "delta": -181,
+          "playerId": 67412,
+          "playerName": "khannah",
+          "playerDiscordId": "305697697636155404",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 6068,
+          "newMmr": 5887,
+          "delta": -181,
+          "playerId": 74280,
+          "playerName": "Kzzen",
+          "playerDiscordId": "1403711988172849153",
+          "playerCountryCode": "ES"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1416873801295335454",
+  "updateMessageId": "1416878622761025658",
+  "authorId": "255023970657632257"
+}

@@ -1,0 +1,169 @@
+{
+  "id": 990211,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-10-05T05:53:31.8719847Z",
+  "verifiedOn": "2025-10-05T06:04:55.487323Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/990211.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 6482,
+          "newMmr": 6640,
+          "delta": 158,
+          "playerId": 19673,
+          "playerName": "Slick",
+          "playerDiscordId": "716162712706744370",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6953,
+          "newMmr": 7111,
+          "delta": 158,
+          "playerId": 32519,
+          "playerName": "plonk",
+          "playerDiscordId": "377930984210825216",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6488,
+          "newMmr": 6646,
+          "delta": 158,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6400,
+          "newMmr": 6486,
+          "delta": 86,
+          "playerId": 18296,
+          "playerName": "Chippy",
+          "playerDiscordId": "299042516831830017",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 5641,
+          "newMmr": 5727,
+          "delta": 86,
+          "playerId": 47915,
+          "playerName": "Skylord71",
+          "playerDiscordId": "890805514341072947",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5921,
+          "newMmr": 6007,
+          "delta": 86,
+          "playerId": 51810,
+          "playerName": "am i macman",
+          "playerDiscordId": "579405852679864350",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 6203,
+          "newMmr": 6134,
+          "delta": -69,
+          "playerId": 13978,
+          "playerName": "Moon Geonwoo",
+          "playerDiscordId": "1308910449034788959",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 6963,
+          "newMmr": 6894,
+          "delta": -69,
+          "playerId": 42743,
+          "playerName": "Comet0307",
+          "playerDiscordId": "926443832369905714",
+          "playerCountryCode": "KR"
+        },
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 6175,
+          "newMmr": 6106,
+          "delta": -69,
+          "playerId": 45181,
+          "playerName": "Auftakt",
+          "playerDiscordId": "882672689993646090",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6248,
+          "newMmr": 6073,
+          "delta": -175,
+          "playerId": 12432,
+          "playerName": "Lezard",
+          "playerDiscordId": "82873636930719744",
+          "playerCountryCode": "DE"
+        },
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 6626,
+          "newMmr": 6451,
+          "delta": -175,
+          "playerId": 22370,
+          "playerName": "Mitr0",
+          "playerDiscordId": "1360923526189809829",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5929,
+          "newMmr": 5754,
+          "delta": -175,
+          "playerId": 68440,
+          "playerName": "Deidara",
+          "playerDiscordId": "1387745546646851657",
+          "playerCountryCode": "IN"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1424273286946099283",
+  "updateMessageId": "1424276166470144041",
+  "authorId": "716162712706744370"
+}

@@ -5,6 +5,7 @@
 
 const { DataManager } = require("discord.js");
 const ServerData = require("./serverData");
+const database = require("./database");
 
 // Use the Mario Kart World lounge API endpoint
 const LOUNGE_API_BASE = "https://lounge.mkcentral.com/api";
@@ -151,35 +152,73 @@ async function getTable(tableId) {
  */
 async function getAllPlayerTables(userId, serverId) {
 	try {
-		const serverData = await ServerData.getServerData(serverId);
-		const user = serverData?.users?.[userId];
-	    const maxTableId = Math.max(...(user?.tables || [0]));
-		const maxSeasonId = serverData?.tables?.maxTableId?.season || 0;
+		// Get existing tables from normalized storage
+		let existingTables = [];
+		try {
+			existingTables = await database.getUserTables(userId, serverId);
+		}
+		catch (error) {
+			console.warn(`Could not get existing tables for user ${userId}:`, error);
+			// Continue with empty array
+		}
+		
 		const tables = {};
-		if (maxTableId !== 0) {
-			for (const tableId of user.tables) {
-				tables[tableId] = serverData.tables[tableId];
+		
+		// Load existing tables into the result
+		for (const userTable of existingTables) {
+			try {
+				const tableData = await database.getTable(userTable.id);
+				if (tableData) {
+					tables[userTable.id] = tableData;
+				}
+			}
+			catch (error) {
+				console.warn(`Could not load table ${userTable.id}:`, error);
 			}
 		}
+		
+		// Find the maximum table ID we already have
+		const maxTableId = existingTables.length > 0 ?
+			Math.max(...existingTables.map(t => parseInt(t.id))) : 0;
+
+		// Get new tables from API
 		const params = {
-		    discordId: userId,
-		    game: "mkworld",
+			discordId: userId,
+			game: "mkworld",
 		};
-		for (let season = maxSeasonId; season <= DEFAULT_SEASON; season++) {
-		    params.season = season;
-		    const details = await apiGet("/player/details", params);
-		    const changes = details.mmrChanges.filter(c => c.reason === "Table" && c.changeId > maxTableId);
-		    for (const change of changes) {
-		    	tables[change.changeId] = await getTable(change.changeId);
-		    }
+		
+		for (let season = 1; season <= DEFAULT_SEASON; season++) {
+			params.season = season;
+			try {
+				const details = await apiGet("/player/details", params);
+				const changes = details.mmrChanges.filter(c => c.reason === "Table" && c.changeId > maxTableId);
+				
+				for (const change of changes) {
+					try {
+						const tableData = await getTable(change.changeId);
+						if (tableData) {
+							tables[change.changeId] = tableData;
+						}
+					}
+					catch (error) {
+						console.warn(`Could not fetch table ${change.changeId}:`, error);
+					}
+				}
+			}
+			catch (error) {
+				// Skip this season if API call fails
+				console.warn(`API call failed for season ${season}, user ${userId}:`, error);
+			}
 		}
+		
 		return tables;
 	}
-    	catch (error) {
+	catch (error) {
 		if (error.message.includes("404")) {
 			return {};
 		}
-		throw error;
+		console.error(`Error in getAllPlayerTables for user ${userId}:`, error);
+		return {};
 	}
 }
 
@@ -196,5 +235,6 @@ module.exports = {
 	getPlayerByDiscordId,
 	getTable,
 	getAllPlayerTables,
+	apiGet,
 	DEFAULT_SEASON,
 };

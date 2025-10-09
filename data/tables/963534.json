@@ -1,0 +1,169 @@
+{
+  "id": 963534,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-29T02:59:27.3566889Z",
+  "verifiedOn": "2025-07-29T03:00:21.3729518Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/963534.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 6064,
+          "newMmr": 6245,
+          "delta": 181,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 109,
+          "multiplier": 1,
+          "prevMmr": 5648,
+          "newMmr": 5829,
+          "delta": 181,
+          "playerId": 67764,
+          "playerName": "Imp1904",
+          "playerDiscordId": "597931655784562707",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 5255,
+          "newMmr": 5436,
+          "delta": 181,
+          "playerId": 73351,
+          "playerName": "Bren",
+          "playerDiscordId": "877780747627405313",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6141,
+          "newMmr": 6205,
+          "delta": 64,
+          "playerId": 55510,
+          "playerName": "Aslan",
+          "playerDiscordId": "210171777702166529",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 5344,
+          "newMmr": 5408,
+          "delta": 64,
+          "playerId": 56170,
+          "playerName": "Jackisons",
+          "playerDiscordId": "1259153667001548800",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 5362,
+          "newMmr": 5426,
+          "delta": 64,
+          "playerId": 64535,
+          "playerName": "GJPhoenix",
+          "playerDiscordId": "446799816031338516",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 5637,
+          "newMmr": 5577,
+          "delta": -60,
+          "playerId": 68469,
+          "playerName": "Minh",
+          "playerDiscordId": "482893290266427422",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 5713,
+          "newMmr": 5653,
+          "delta": -60,
+          "playerId": 68892,
+          "playerName": "Eeepy",
+          "playerDiscordId": "166969688511741952",
+          "playerCountryCode": "GB"
+        },
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 5652,
+          "newMmr": 5592,
+          "delta": -60,
+          "playerId": 71278,
+          "playerName": "Grotazz",
+          "playerDiscordId": "1391106337324142703",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 30,
+          "multiplier": 1,
+          "prevMmr": 6116,
+          "newMmr": 5931,
+          "delta": -185,
+          "playerId": 62760,
+          "playerName": "Chaloka",
+          "playerDiscordId": "693109158739705938",
+          "playerCountryCode": "DE"
+        },
+        {
+          "score": 124,
+          "multiplier": 1,
+          "prevMmr": 6194,
+          "newMmr": 6009,
+          "delta": -185,
+          "playerId": 73151,
+          "playerName": "Emerald_Jade",
+          "playerDiscordId": "1214179925796589569",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 4883,
+          "newMmr": 4698,
+          "delta": -185,
+          "playerId": 73370,
+          "playerName": "Bao",
+          "playerDiscordId": "941126939022880778",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1399587105692455057",
+  "updateMessageId": "1399587334449528902",
+  "authorId": "446799816031338516"
+}

@@ -1,0 +1,401 @@
+{
+  "id": 985054,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-21T08:11:14.8872572Z",
+  "verifiedOn": "2025-09-21T08:19:53.2411481Z",
+  "numTeams": 24,
+  "numPlayers": 24,
+  "format": "FFA",
+  "url": "/TableImage/985054.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 112,
+          "multiplier": 1,
+          "prevMmr": 6872,
+          "newMmr": 7118,
+          "delta": 246,
+          "playerId": 74338,
+          "playerName": "Mtrsdang",
+          "playerDiscordId": "1345658179622539304",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 6225,
+          "newMmr": 6477,
+          "delta": 252,
+          "playerId": 23687,
+          "playerName": "Nachtmusik",
+          "playerDiscordId": "1136333687395454992",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6959,
+          "newMmr": 7153,
+          "delta": 194,
+          "playerId": 42728,
+          "playerName": "sq only",
+          "playerDiscordId": "708320173412843591",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 7268,
+          "newMmr": 7425,
+          "delta": 157,
+          "playerId": 55410,
+          "playerName": "JAMES EventsKing",
+          "playerDiscordId": "182653137788600330",
+          "playerCountryCode": "AU"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6488,
+          "newMmr": 6656,
+          "delta": 168,
+          "playerId": 73184,
+          "playerName": "WiiSAN",
+          "playerDiscordId": "916666764232904714",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 6754,
+          "newMmr": 6886,
+          "delta": 132,
+          "playerId": 18915,
+          "playerName": "nisemonar",
+          "playerDiscordId": "855073152647692299",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 5678,
+          "newMmr": 5836,
+          "delta": 158,
+          "playerId": 29733,
+          "playerName": "ayura",
+          "playerDiscordId": "705042288153198702",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6542,
+          "newMmr": 6623,
+          "delta": 81,
+          "playerId": 38995,
+          "playerName": "rakko",
+          "playerDiscordId": "729655444762787911",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6017,
+          "newMmr": 6123,
+          "delta": 106,
+          "playerId": 53025,
+          "playerName": "Babylon456",
+          "playerDiscordId": "1123573349898002524",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 6851,
+          "newMmr": 6858,
+          "delta": 7,
+          "playerId": 11571,
+          "playerName": "Porygon-X",
+          "playerDiscordId": "687212748513345546",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 6079,
+          "newMmr": 6123,
+          "delta": 44,
+          "playerId": 12583,
+          "playerName": "LuisMX",
+          "playerDiscordId": "412832982433398784",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5625,
+          "newMmr": 5690,
+          "delta": 65,
+          "playerId": 75543,
+          "playerName": "AQui",
+          "playerDiscordId": "228079069525180417",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 6619,
+          "newMmr": 6589,
+          "delta": -30,
+          "playerId": 16013,
+          "playerName": "Chucky",
+          "playerDiscordId": "627101988282171402",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "scores": [
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 5812,
+          "newMmr": 5796,
+          "delta": -16,
+          "playerId": 26135,
+          "playerName": "nachiguron",
+          "playerDiscordId": "820219634745081886",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 5893,
+          "newMmr": 5849,
+          "delta": -44,
+          "playerId": 50567,
+          "playerName": "Saito clock",
+          "playerDiscordId": "1101445856445616129",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 7068,
+          "newMmr": 6945,
+          "delta": -123,
+          "playerId": 24959,
+          "playerName": "Rainbowpd",
+          "playerDiscordId": "853997114979778601",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5457,
+          "newMmr": 5386,
+          "delta": -71,
+          "playerId": 56689,
+          "playerName": "sunshine",
+          "playerDiscordId": "621688839370571808",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "scores": [
+        {
+          "score": 61,
+          "multiplier": 1,
+          "prevMmr": 6093,
+          "newMmr": 5968,
+          "delta": -125,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "scores": [
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 5875,
+          "newMmr": 5736,
+          "delta": -139,
+          "playerId": 17637,
+          "playerName": "kichimero",
+          "playerDiscordId": "823526977301774336",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "scores": [
+        {
+          "score": 58,
+          "multiplier": 1,
+          "prevMmr": 6630,
+          "newMmr": 6432,
+          "delta": -198,
+          "playerId": 23351,
+          "playerName": "Mercury",
+          "playerDiscordId": "825970754570944573",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "scores": [
+        {
+          "score": 57,
+          "multiplier": 1,
+          "prevMmr": 5921,
+          "newMmr": 5720,
+          "delta": -201,
+          "playerId": 38640,
+          "playerName": "Ichou",
+          "playerDiscordId": "1082280056728076308",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "scores": [
+        {
+          "score": 57,
+          "multiplier": 1,
+          "prevMmr": 5707,
+          "newMmr": 5516,
+          "delta": -191,
+          "playerId": 61068,
+          "playerName": "sb",
+          "playerDiscordId": "1133240043075555338",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 23,
+      "scores": [
+        {
+          "score": 56,
+          "multiplier": 1,
+          "prevMmr": 5717,
+          "newMmr": 5490,
+          "delta": -227,
+          "playerId": 74058,
+          "playerName": "T4KO",
+          "playerDiscordId": "819886059847680001",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 24,
+      "scores": [
+        {
+          "score": 35,
+          "multiplier": 1,
+          "prevMmr": 5625,
+          "newMmr": 5378,
+          "delta": -247,
+          "playerId": 75127,
+          "playerName": "baguu",
+          "playerDiscordId": "1302569962858352666",
+          "playerCountryCode": "JP"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1419234516148682752",
+  "updateMessageId": "1419236702328717332",
+  "authorId": "1133240043075555338"
+}

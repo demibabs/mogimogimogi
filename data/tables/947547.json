@@ -1,0 +1,209 @@
+{
+  "id": 947547,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-06-24T03:03:14.1944976Z",
+  "verifiedOn": "2025-06-24T03:03:46.437164Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/947547.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 5858,
+          "newMmr": 6074,
+          "delta": 216,
+          "playerId": 48992,
+          "playerName": "HBV",
+          "playerDiscordId": "982506801901764678",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 100,
+          "multiplier": 1,
+          "prevMmr": 5901,
+          "newMmr": 6075,
+          "delta": 174,
+          "playerId": 16739,
+          "playerName": "El Coleccionista",
+          "playerDiscordId": "447967437783171072",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 5980,
+          "newMmr": 6111,
+          "delta": 131,
+          "playerId": 15592,
+          "playerName": "Steez",
+          "playerDiscordId": "754947179545624667",
+          "playerCountryCode": "PR"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 5751,
+          "newMmr": 5851,
+          "delta": 100,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 5766,
+          "newMmr": 5826,
+          "delta": 60,
+          "playerId": 65731,
+          "playerName": "Obiyo",
+          "playerDiscordId": "83003008425656320",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 5591,
+          "newMmr": 5618,
+          "delta": 27,
+          "playerId": 39298,
+          "playerName": "Mitsukii",
+          "playerDiscordId": "282975711793512448",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6002,
+          "newMmr": 5972,
+          "delta": -30,
+          "playerId": 39933,
+          "playerName": "Beleth",
+          "playerDiscordId": "334588353263435778",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 5870,
+          "newMmr": 5806,
+          "delta": -64,
+          "playerId": 44397,
+          "playerName": "Major Whimsy",
+          "playerDiscordId": "330521775756804097",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 5483,
+          "newMmr": 5394,
+          "delta": -89,
+          "playerId": 67618,
+          "playerName": "WesKhol07",
+          "playerDiscordId": "1248374706801999886",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5541,
+          "newMmr": 5410,
+          "delta": -131,
+          "playerId": 22587,
+          "playerName": "Riot Mortdog",
+          "playerDiscordId": "150717218223685633",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 5904,
+          "newMmr": 5718,
+          "delta": -186,
+          "playerId": 27016,
+          "playerName": "Shiny Greninja",
+          "playerDiscordId": "772624737767260160",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 48,
+          "multiplier": 1,
+          "prevMmr": 5477,
+          "newMmr": 5268,
+          "delta": -209,
+          "playerId": 64522,
+          "playerName": "kpepper108",
+          "playerDiscordId": "506256651951538193",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1386904480209178624",
+  "updateMessageId": "1386904619812257884",
+  "authorId": "982506801901764678"
+}

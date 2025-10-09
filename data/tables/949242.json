@@ -1,0 +1,209 @@
+{
+  "id": 949242,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-06-28T02:02:21.7728964Z",
+  "verifiedOn": "2025-06-28T02:13:08.7217766Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/949242.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 114,
+          "multiplier": 1,
+          "prevMmr": 6321,
+          "newMmr": 6535,
+          "delta": 214,
+          "playerId": 15341,
+          "playerName": "Sergio Ramos 2.0",
+          "playerDiscordId": "347076149592981504",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 6132,
+          "newMmr": 6313,
+          "delta": 181,
+          "playerId": 59006,
+          "playerName": "Mirymeg",
+          "playerDiscordId": "429809262189871106",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6202,
+          "newMmr": 6341,
+          "delta": 139,
+          "playerId": 45791,
+          "playerName": "Kaizon",
+          "playerDiscordId": "610947961802850305",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6206,
+          "newMmr": 6284,
+          "delta": 78,
+          "playerId": 12927,
+          "playerName": "Melonz",
+          "playerDiscordId": "176126710989717505",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6386,
+          "newMmr": 6457,
+          "delta": 71,
+          "playerId": 35712,
+          "playerName": "Plug in Baby",
+          "playerDiscordId": "800860850470518794",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6141,
+          "newMmr": 6162,
+          "delta": 21,
+          "playerId": 65731,
+          "playerName": "Obiyo",
+          "playerDiscordId": "83003008425656320",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6148,
+          "newMmr": 6129,
+          "delta": -19,
+          "playerId": 68890,
+          "playerName": "Saige",
+          "playerDiscordId": "310969423223848962",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6186,
+          "newMmr": 6125,
+          "delta": -61,
+          "playerId": 12090,
+          "playerName": "Knee",
+          "playerDiscordId": "82829038451691520",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6234,
+          "newMmr": 6131,
+          "delta": -103,
+          "playerId": 27080,
+          "playerName": "taxy",
+          "playerDiscordId": "505723617762476043",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6110,
+          "newMmr": 5972,
+          "delta": -138,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 5928,
+          "newMmr": 5758,
+          "delta": -170,
+          "playerId": 67764,
+          "playerName": "Imp1904",
+          "playerDiscordId": "597931655784562707",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 55,
+          "multiplier": 1,
+          "prevMmr": 6026,
+          "newMmr": 5812,
+          "delta": -214,
+          "playerId": 68689,
+          "playerName": "Drip",
+          "playerDiscordId": "640405291653136404",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1388338712743645295",
+  "updateMessageId": "1388341428320469224",
+  "authorId": "437813284981309441"
+}

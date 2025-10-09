@@ -1,0 +1,209 @@
+{
+  "id": 950694,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-01T00:49:39.8133113Z",
+  "verifiedOn": "2025-07-01T00:50:28.5100109Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/950694.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 112,
+          "multiplier": 1,
+          "prevMmr": 6317,
+          "newMmr": 6532,
+          "delta": 215,
+          "playerId": 20603,
+          "playerName": "Andremar",
+          "playerDiscordId": "480459545395855380",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 104,
+          "multiplier": 1,
+          "prevMmr": 6094,
+          "newMmr": 6278,
+          "delta": 184,
+          "playerId": 16615,
+          "playerName": "Xeter",
+          "playerDiscordId": "492316186919567360",
+          "playerCountryCode": "AT"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 6368,
+          "newMmr": 6501,
+          "delta": 133,
+          "playerId": 8979,
+          "playerName": "Lando Norris",
+          "playerDiscordId": "329298559633719296",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 5950,
+          "newMmr": 6060,
+          "delta": 110,
+          "playerId": 46605,
+          "playerName": "shreddies",
+          "playerDiscordId": "951390168215093298",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6290,
+          "newMmr": 6346,
+          "delta": 56,
+          "playerId": 34760,
+          "playerName": "Wox",
+          "playerDiscordId": "813477543444611113",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6141,
+          "newMmr": 6163,
+          "delta": 22,
+          "playerId": 69656,
+          "playerName": "potency",
+          "playerDiscordId": "1388794473047130132",
+          "playerCountryCode": "AU"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6260,
+          "newMmr": 6238,
+          "delta": -22,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6188,
+          "newMmr": 6128,
+          "delta": -60,
+          "playerId": 19743,
+          "playerName": "vanessa",
+          "playerDiscordId": "594676216858935314",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 6304,
+          "newMmr": 6200,
+          "delta": -104,
+          "playerId": 20181,
+          "playerName": "Roby",
+          "playerDiscordId": "121838197553496065",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 6272,
+          "newMmr": 6129,
+          "delta": -143,
+          "playerId": 69078,
+          "playerName": "G-danzee",
+          "playerDiscordId": "213650939314176000",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 57,
+          "multiplier": 1,
+          "prevMmr": 6021,
+          "newMmr": 5848,
+          "delta": -173,
+          "playerId": 9184,
+          "playerName": "AxelTS",
+          "playerDiscordId": "702537601944649747",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 48,
+          "multiplier": 1,
+          "prevMmr": 6185,
+          "newMmr": 5966,
+          "delta": -219,
+          "playerId": 68342,
+          "playerName": "kipsiiy",
+          "playerDiscordId": "1124123204760371331",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1389407581017079929",
+  "updateMessageId": "1389407787527700501",
+  "authorId": "437813284981309441"
+}

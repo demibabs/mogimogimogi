@@ -1,0 +1,209 @@
+{
+  "id": 966986,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-08-06T00:45:00.3720962Z",
+  "verifiedOn": "2025-08-06T00:56:59.0005797Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/966986.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 7597,
+          "newMmr": 7784,
+          "delta": 187,
+          "playerId": 28440,
+          "playerName": "Mario",
+          "playerDiscordId": "422785330840731658",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 99,
+          "multiplier": 1,
+          "prevMmr": 6826,
+          "newMmr": 7002,
+          "delta": 176,
+          "playerId": 34653,
+          "playerName": "JRoz",
+          "playerDiscordId": "642145936247750666",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 7112,
+          "newMmr": 7237,
+          "delta": 125,
+          "playerId": 9696,
+          "playerName": "Chibi",
+          "playerDiscordId": "930708959206199336",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 7216,
+          "newMmr": 7297,
+          "delta": 81,
+          "playerId": 72001,
+          "playerName": "XD_oof",
+          "playerDiscordId": "689247310626029568",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 7270,
+          "newMmr": 7289,
+          "delta": 19,
+          "playerId": 19198,
+          "playerName": "Piero",
+          "playerDiscordId": "135674881869086721",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 6463,
+          "newMmr": 6513,
+          "delta": 50,
+          "playerId": 67310,
+          "playerName": "Narshen",
+          "playerDiscordId": "263386383257698304",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 6470,
+          "newMmr": 6460,
+          "delta": -10,
+          "playerId": 8979,
+          "playerName": "Lando Norris",
+          "playerDiscordId": "329298559633719296",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6410,
+          "newMmr": 6342,
+          "delta": -68,
+          "playerId": 51032,
+          "playerName": "Judgesphinx",
+          "playerDiscordId": "259711901091627009",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6309,
+          "newMmr": 6245,
+          "delta": -64,
+          "playerId": 65731,
+          "playerName": "Obiyo",
+          "playerDiscordId": "83003008425656320",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 6708,
+          "newMmr": 6568,
+          "delta": -140,
+          "playerId": 40774,
+          "playerName": "sliced oxy",
+          "playerDiscordId": "965703593325887488",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 55,
+          "multiplier": 1,
+          "prevMmr": 6213,
+          "newMmr": 6053,
+          "delta": -160,
+          "playerId": 63763,
+          "playerName": "crash.",
+          "playerDiscordId": "437813284981309441",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 54,
+          "multiplier": 1,
+          "prevMmr": 6091,
+          "newMmr": 5895,
+          "delta": -196,
+          "playerId": 67640,
+          "playerName": "Shimofuri Myojo",
+          "playerDiscordId": "1035914326197948547",
+          "playerCountryCode": "JP"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1402452372977881189",
+  "updateMessageId": "1402455387432554606",
+  "authorId": "642145936247750666"
+}
