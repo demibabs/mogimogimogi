@@ -31,6 +31,15 @@ module.exports = {
 			const serverId = interaction.guild.id;
 			const squads = interaction.options.getBoolean("squads");
 
+			// Force cache users to ensure mentions display properly for everyone
+			try {
+				await interaction.client.users.fetch(userId1);
+				await interaction.client.users.fetch(userId2);
+			}
+			catch (error) {
+				console.warn("Failed to cache users:", error);
+			}
+
 			// Validate users exist in server data
 			const serverData = await database.getServerData(serverId);
 			const user1Data = serverData?.users?.[userId1];
@@ -139,8 +148,8 @@ module.exports = {
 				fields.push({
 					name: `${discordUser1.displayName}'s biggest victory:`,
 					value: `[In this ${table1.numPlayers}p ${table1.format}](https://lounge.mkcentral.com/mkworld/TableDetails/${biggestWin1.tableId}) ` +
-						`<@${discordUser1.id}> scored ${biggestWin1.player1Score} (rank ${biggestWin1.player1Rank}) ` +
-						`while <@${discordUser2.id}> scored ${biggestWin1.player1Score - biggestWin1.scoreDifference} (rank ${biggestWin1.player2Rank}). `,
+						`${discordUser1.toString()} scored ${biggestWin1.player1Score} (rank ${biggestWin1.player1Rank}) ` +
+						`while ${discordUser2.toString()} scored ${biggestWin1.player1Score - biggestWin1.scoreDifference} (rank ${biggestWin1.player2Rank}). `,
 				});
 			}
 
@@ -149,8 +158,8 @@ module.exports = {
 				fields.push({
 					name: `${discordUser2.displayName}'s biggest victory:`,
 					value: `[In this ${table2.numPlayers}p ${table2.format}](https://lounge.mkcentral.com/mkworld/TableDetails/${biggestWin2.tableId}) ` +
-						`<@${discordUser2.id}> scored ${biggestWin2.player1Score} (rank ${biggestWin2.player1Rank}) ` +
-						`while <@${discordUser1.id}> scored ${biggestWin2.player1Score - biggestWin2.scoreDifference} (rank ${biggestWin2.player2Rank}). `,
+						`${discordUser2.toString()} scored ${biggestWin2.player1Score} (rank ${biggestWin2.player1Rank}) ` +
+						`while ${discordUser1.toString()} scored ${biggestWin2.player1Score - biggestWin2.scoreDifference} (rank ${biggestWin2.player2Rank}). `,
 				});
 			}
 

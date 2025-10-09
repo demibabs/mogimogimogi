@@ -45,7 +45,7 @@ for (const folder of commandFolders) {
 
 client.once(Events.ClientReady, readyClient => {
 	client.user.setActivity({
-		name: "your mogis...",
+		name: "your matches...",
 		type: ActivityType.Watching,
 	});
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);

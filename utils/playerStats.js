@@ -4,7 +4,6 @@
  */
 
 const database = require("./database");
-const DataManager = require("./dataManager");
 
 class PlayerStats {
 	/**
@@ -233,7 +232,7 @@ class PlayerStats {
 
 	static async getH2HTables(userId1, userId2, serverId) {
 		const tables = {};
-		const userTables = await DataManager.getUserTables(userId1, serverId);
+		const userTables = await database.getUserTables(userId1, serverId);
 
 		for (const userTable of userTables) {
 			const table = await database.getTable(userTable.id);
