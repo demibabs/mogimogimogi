@@ -8,12 +8,21 @@ class Database {
 		this.useDatabase = !!process.env.DATABASE_URL;
 		this.dataDir = path.join(__dirname, "..", "data", "servers");
 		
+		console.log("Database initialization:");
+		console.log("- DATABASE_URL exists:", !!process.env.DATABASE_URL);
+		console.log("- Using database:", this.useDatabase);
+		console.log("- Fallback to file storage:", !this.useDatabase);
+
 		if (this.useDatabase) {
+			console.log("Setting up PostgreSQL connection...");
 			this.pool = new Pool({
 				connectionString: process.env.DATABASE_URL,
 				ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 			});
 			this.initializeDatabase();
+		}
+		else {
+			console.log("Using file storage fallback...");
 		}
 	}
 
@@ -44,7 +53,7 @@ class Database {
 				"SELECT data FROM server_data WHERE server_id = $1",
 				[serverId],
 			);
-			
+
 			if (result.rows.length === 0) {
 				// Return default structure if no data exists
 				return {
@@ -53,7 +62,7 @@ class Database {
 					setupComplete: false,
 				};
 			}
-			
+
 			return result.rows[0].data;
 		}
 		catch (error) {
