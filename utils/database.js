@@ -1,9 +1,12 @@
 const { Pool } = require("pg");
+const fs = require("fs").promises;
+const path = require("path");
 
 class Database {
 	constructor() {
 		// Use Railway's provided DATABASE_URL or fallback to local file storage
 		this.useDatabase = !!process.env.DATABASE_URL;
+		this.dataDir = path.join(__dirname, "..", "data", "servers");
 		
 		if (this.useDatabase) {
 			this.pool = new Pool({
@@ -33,8 +36,7 @@ class Database {
 	async getServerData(serverId) {
 		if (!this.useDatabase) {
 			// Fallback to file storage for local development
-			const ServerData = require("./serverData");
-			return await ServerData.getServerData(serverId);
+			return await this._getServerDataFromFile(serverId);
 		}
 
 		try {
@@ -63,8 +65,7 @@ class Database {
 	async saveServerData(serverId, data) {
 		if (!this.useDatabase) {
 			// Fallback to file storage for local development
-			const ServerData = require("./serverData");
-			return await ServerData.saveServerData(serverId, data);
+			return await this._saveServerDataToFile(serverId, data);
 		}
 
 		try {
@@ -85,8 +86,7 @@ class Database {
 	async deleteServerData(serverId) {
 		if (!this.useDatabase) {
 			// Fallback to file storage for local development
-			const ServerData = require("./serverData");
-			return await ServerData.deleteServerData(serverId);
+			return await this._deleteServerDataFile(serverId);
 		}
 
 		try {
@@ -104,8 +104,7 @@ class Database {
 	async getAllServerIds() {
 		if (!this.useDatabase) {
 			// Fallback to file storage for local development
-			const ServerData = require("./serverData");
-			return await ServerData.getAllServerIds();
+			return await this._getAllServerIdsFromFiles();
 		}
 
 		try {
@@ -115,6 +114,77 @@ class Database {
 		catch (error) {
 			console.error("Database query error:", error);
 			throw error;
+		}
+	}
+
+	// File storage fallback methods
+	async _ensureDataDir() {
+		try {
+			await fs.mkdir(this.dataDir, { recursive: true });
+		}
+		catch (error) {
+			console.error("Error creating data directory:", error);
+		}
+	}
+
+	_getServerDataPath(serverId) {
+		return path.join(this.dataDir, `${serverId}.json`);
+	}
+
+	async _getServerDataFromFile(serverId) {
+		try {
+			const filePath = this._getServerDataPath(serverId);
+			const data = await fs.readFile(filePath, "utf8");
+			return JSON.parse(data);
+		}
+		catch (error) {
+			// File doesn't exist, return default structure
+			return {
+				serverId,
+				users: {},
+				tables: {},
+				createdAt: new Date().toISOString(),
+			};
+		}
+	}
+
+	async _saveServerDataToFile(serverId, data) {
+		try {
+			await this._ensureDataDir();
+			const filePath = this._getServerDataPath(serverId);
+			data.updatedAt = new Date().toISOString();
+			await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+			return true;
+		}
+		catch (error) {
+			console.error("Error saving server data:", error);
+			return false;
+		}
+	}
+
+	async _deleteServerDataFile(serverId) {
+		try {
+			const filePath = this._getServerDataPath(serverId);
+			await fs.unlink(filePath);
+			return true;
+		}
+		catch (error) {
+			console.error("Error deleting server data:", error);
+			return false;
+		}
+	}
+
+	async _getAllServerIdsFromFiles() {
+		try {
+			await this._ensureDataDir();
+			const files = await fs.readdir(this.dataDir);
+			return files
+				.filter(file => file.endsWith(".json"))
+				.map(file => file.replace(".json", ""));
+		}
+		catch (error) {
+			console.error("Error reading data directory:", error);
+			return [];
 		}
 	}
 }
