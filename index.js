@@ -6,6 +6,19 @@ const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST } = re
 require("dotenv").config();
 const token = process.env.DISCORD_TOKEN;
 
+// Debug token loading
+console.log("Environment check:");
+console.log("- DISCORD_TOKEN exists:", !!process.env.DISCORD_TOKEN);
+console.log("- DISCORD_TOKEN type:", typeof process.env.DISCORD_TOKEN);
+console.log("- DISCORD_TOKEN length:", process.env.DISCORD_TOKEN ? process.env.DISCORD_TOKEN.length : "N/A");
+console.log("- Token variable:", !!token);
+
+if (!token) {
+	console.error("ERROR: No DISCORD_TOKEN found in environment variables!");
+	console.log("Available env vars:", Object.keys(process.env).filter(key => key.includes("TOKEN") || key.includes("DISCORD")));
+	process.exit(1);
+}
+
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
