@@ -13,15 +13,6 @@ const useDev = args.includes("--dev");
 const token = useDev ? process.env.DEV_DISCORD_TOKEN : process.env.DISCORD_TOKEN;
 
 console.log(`Starting ${useDev ? "DEVELOPMENT" : "PRODUCTION"} bot...`);
-console.log("Token check:", !!token, "Length:", token ? token.length : "N/A");
-
-if (!token) {
-	console.error("ERROR: No bot token found!");
-	console.log("Available env vars:", Object.keys(process.env).filter(key =>
-		key.includes("TOKEN") || key.includes("DISCORD") || key.includes("APP"),
-	));
-	process.exit(1);
-}
 
 const client = new Client({
 	intents: [
