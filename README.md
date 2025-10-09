@@ -1,6 +1,6 @@
-# MogiBot
+# mogimogimogi
 
-A Discord bot for Mario Kart 8 Deluxe Lounge statistics and player management.
+A Discord bot for Mario Kart World Lounge statistics and player management.
 
 ## Features
 
