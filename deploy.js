@@ -4,14 +4,19 @@ const path = require("node:path");
 
 // Load environment variables
 require("dotenv").config();
-const clientID = process.env.APP_ID;
-const guildID = process.env.GUILD_ID;
-const token = process.env.DISCORD_TOKEN;
-
-const rest = new REST().setToken(token);
 
 // Parse command line arguments
 const args = process.argv.slice(2);
+
+// Check if using development bot
+const useDev = args.includes("--dev");
+const clientID = useDev ? process.env.DEV_APP_ID : process.env.APP_ID;
+const token = useDev ? process.env.DEV_DISCORD_TOKEN : process.env.DISCORD_TOKEN;
+const guildID = process.env.GUILD_ID;
+
+console.log(`Using ${useDev ? "DEVELOPMENT" : "PRODUCTION"} bot configuration`);
+
+const rest = new REST().setToken(token);
 const shouldClear = args.includes("--clear");
 const shouldClearGuild = args.includes("--clear-guild");
 const shouldClearAll = args.includes("--clear-all");
@@ -23,21 +28,21 @@ const specificCommand = args.find(arg => !arg.startsWith("--"));
 function loadAllCommands(commandsDir = "commands") {
 	const commands = [];
 	const foldersPath = path.join(__dirname, commandsDir);
-	
+
 	// Check if directory exists
 	if (!fs.existsSync(foldersPath)) {
 		console.log(`[WARNING] Commands directory "${commandsDir}" does not exist.`);
 		return commands;
 	}
-	
+
 	const commandFolders = fs.readdirSync(foldersPath);
 
 	for (const folder of commandFolders) {
 		const commandsPath = path.join(foldersPath, folder);
-		
+
 		// Skip if not a directory
 		if (!fs.statSync(commandsPath).isDirectory()) continue;
-		
+
 		const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
 		for (const file of commandFiles) {
 			const filePath = path.join(commandsPath, file);
@@ -58,13 +63,13 @@ function loadAllCommands(commandsDir = "commands") {
 function loadGlobalCommands() {
 	const commands = [];
 	const globalPath = path.join(__dirname, "commands", "global");
-	
+
 	// Check if global directory exists
 	if (!fs.existsSync(globalPath)) {
 		console.log("[WARNING] Global commands directory does not exist.");
 		return commands;
 	}
-	
+
 	const commandFiles = fs.readdirSync(globalPath).filter(file => file.endsWith(".js"));
 	for (const file of commandFiles) {
 		const filePath = path.join(globalPath, file);
@@ -204,6 +209,8 @@ function loadSpecificCommand(commandName) {
 			console.log("  node deploy --clear         - Clear global commands only");
 			console.log("  node deploy --clear-guild   - Clear test server commands only");
 			console.log("  node deploy --clear-all     - Clear both global and test server commands");
+			console.log("\nBot configuration:");
+			console.log("  Add --dev to any command    - Use development bot instead of production");
 		}
 	}
 	catch (error) {
