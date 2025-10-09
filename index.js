@@ -1,6 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST } = require("discord.js");
+const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST, ActivityType } = require("discord.js");
 
 // Load environment variables
 require("dotenv").config();
@@ -44,6 +44,10 @@ for (const folder of commandFolders) {
 }
 
 client.once(Events.ClientReady, readyClient => {
+	client.user.setActivity({
+		name: "your mogis...",
+		type: ActivityType.Watching,
+	});
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
