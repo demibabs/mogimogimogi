@@ -29,7 +29,7 @@ Thumbs.db
 *~
 
 # Local data files (if you want to exclude them)
-data/servers/
+# data/servers/
 
 # Config files with sensitive data
 config.json
