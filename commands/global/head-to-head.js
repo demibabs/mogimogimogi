@@ -140,7 +140,7 @@ module.exports = {
 					name: `${discordUser1.displayName}'s biggest victory:`,
 					value: `[In this ${table1.numPlayers}p ${table1.format}](https://lounge.mkcentral.com/mkworld/TableDetails/${biggestWin1.tableId}) ` +
 						`<@${discordUser1.id}> scored ${biggestWin1.player1Score} (rank ${biggestWin1.player1Rank}) ` +
-						`while <@${discordUser2.id}> scored ${biggestWin1.player1Score - biggestWin1.scoreDifference}. `,
+						`while <@${discordUser2.id}> scored ${biggestWin1.player1Score - biggestWin1.scoreDifference} (rank ${biggestWin1.player2Rank}). `,
 				});
 			}
 
@@ -150,7 +150,7 @@ module.exports = {
 					name: `${discordUser2.displayName}'s biggest victory:`,
 					value: `[In this ${table2.numPlayers}p ${table2.format}](https://lounge.mkcentral.com/mkworld/TableDetails/${biggestWin2.tableId}) ` +
 						`<@${discordUser2.id}> scored ${biggestWin2.player1Score} (rank ${biggestWin2.player1Rank}) ` +
-						`while <@${discordUser1.id}> scored ${biggestWin2.player1Score - biggestWin2.scoreDifference}. `,
+						`while <@${discordUser1.id}> scored ${biggestWin2.player1Score - biggestWin2.scoreDifference} (rank ${biggestWin2.player2Rank}). `,
 				});
 			}
 

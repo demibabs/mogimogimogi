@@ -369,6 +369,7 @@ class PlayerStats {
 					player1Score: player1Ranking.score,
 					scoreDifference: scoreDifference,
 					player1Rank: player1Ranking.individualRank,
+					player2Rank: player2Ranking.individualRank,
 					rankDifference: rankDifference,
 				};
 			}
