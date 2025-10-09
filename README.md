@@ -1,4 +1,4 @@
-# MogiBot
+# mogimogimogi
 
 A Discord bot for Mario Kart World Lounge statistics and player management.
 
