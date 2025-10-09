@@ -161,9 +161,9 @@ async function getAllPlayerTables(userId, serverId) {
 			console.warn(`Could not get existing tables for user ${userId}:`, error);
 			// Continue with empty array
 		}
-		
+
 		const tables = {};
-		
+
 		// Load existing tables into the result
 		for (const userTable of existingTables) {
 			try {
@@ -176,7 +176,7 @@ async function getAllPlayerTables(userId, serverId) {
 				console.warn(`Could not load table ${userTable.id}:`, error);
 			}
 		}
-		
+
 		// Find the maximum table ID we already have
 		const maxTableId = existingTables.length > 0 ?
 			Math.max(...existingTables.map(t => parseInt(t.id))) : 0;
@@ -186,13 +186,13 @@ async function getAllPlayerTables(userId, serverId) {
 			discordId: userId,
 			game: "mkworld",
 		};
-		
-		for (let season = 1; season <= DEFAULT_SEASON; season++) {
+
+		for (let season = 0; season <= DEFAULT_SEASON; season++) {
 			params.season = season;
 			try {
 				const details = await apiGet("/player/details", params);
 				const changes = details.mmrChanges.filter(c => c.reason === "Table" && c.changeId > maxTableId);
-				
+
 				for (const change of changes) {
 					try {
 						const tableData = await getTable(change.changeId);
@@ -210,7 +210,7 @@ async function getAllPlayerTables(userId, serverId) {
 				console.warn(`API call failed for season ${season}, user ${userId}:`, error);
 			}
 		}
-		
+
 		return tables;
 	}
 	catch (error) {

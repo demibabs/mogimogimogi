@@ -234,11 +234,11 @@ class PlayerStats {
 	static async getH2HTables(userId1, userId2, serverId) {
 		const tables = {};
 		const userTables = await DataManager.getUserTables(userId1, serverId);
-		
+
 		for (const userTable of userTables) {
 			const table = await database.getTable(userTable.id);
 			if (!table) continue;
-			
+
 			const playersTable = PlayerStats.getPlayersFromTable(table);
 			for (const player of playersTable) {
 				if (player.playerDiscordId == userId2) {

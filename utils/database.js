@@ -174,11 +174,11 @@ class Database {
 				"SELECT table_data FROM tables WHERE table_id = $1",
 				[tableId],
 			);
-			
+
 			if (result.rows.length === 0) {
 				return null;
 			}
-			
+
 			return result.rows[0].table_data;
 		}
 		catch (error) {
@@ -220,7 +220,7 @@ class Database {
 				 WHERE ut.user_id = $1 AND ut.server_id = $2`,
 				[userId, serverId],
 			);
-			
+
 			return result.rows.map(row => ({
 				id: row.table_id,
 				...row.table_data,
@@ -308,7 +308,7 @@ class Database {
 		try {
 			const tablesDir = path.join(__dirname, "..", "data", "tables");
 			await fs.mkdir(tablesDir, { recursive: true });
-			
+
 			const tablePath = path.join(tablesDir, `${tableId}.json`);
 			await fs.writeFile(tablePath, JSON.stringify(tableData, null, 2));
 			return true;
@@ -337,9 +337,9 @@ class Database {
 		try {
 			const relationshipsDir = path.join(__dirname, "..", "data", "user_tables");
 			await fs.mkdir(relationshipsDir, { recursive: true });
-			
+
 			const relationshipPath = path.join(relationshipsDir, `${serverId}.json`);
-			
+
 			// Read existing relationships
 			let relationships = {};
 			try {
@@ -351,16 +351,16 @@ class Database {
 					console.error("Error reading relationships file:", readError);
 				}
 			}
-			
+
 			// Add new relationship
 			if (!relationships[userId]) {
 				relationships[userId] = [];
 			}
-			
+
 			if (!relationships[userId].includes(tableId)) {
 				relationships[userId].push(tableId);
 			}
-			
+
 			// Save relationships
 			await fs.writeFile(relationshipPath, JSON.stringify(relationships, null, 2));
 			return true;
@@ -376,17 +376,17 @@ class Database {
 			const relationshipPath = path.join(__dirname, "..", "data", "user_tables", `${serverId}.json`);
 			const data = await fs.readFile(relationshipPath, "utf8");
 			const relationships = JSON.parse(data);
-			
+
 			const userTableIds = relationships[userId] || [];
 			const tables = [];
-			
+
 			for (const tableId of userTableIds) {
 				const tableData = await this._getTableFromFile(tableId);
 				if (tableData) {
 					tables.push({ id: tableId, ...tableData });
 				}
 			}
-			
+
 			return tables;
 		}
 		catch (error) {

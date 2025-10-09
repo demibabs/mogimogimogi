@@ -76,7 +76,7 @@ class DataManager {
 					if (!existingTable) {
 						await database.saveTable(tableId, tableData);
 					}
-					
+
 					// Link user to this table (if not already linked)
 					await database.linkUserToTable(userId, tableId, serverId);
 				}
@@ -173,7 +173,7 @@ class DataManager {
 		try {
 			// Get current server data (might include embedded tables)
 			const fullData = await database.getServerData(serverId);
-			
+
 			if (!fullData.tables) {
 				console.log(`Server ${serverId} has no tables to migrate`);
 				return true;
