@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const optimizedLeaderboard = require("../../utils/optimizedLeaderboard");
+const streakCache = require("../../utils/streakCache");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -43,7 +44,7 @@ module.exports = {
 			const serverId = interaction.guild.id;
 			
 			// Get streak data from cache
-			const streakData = await optimizedLeaderboard.getStreakCache().getServerStreaks(serverId, leaderboardData);
+			const streakData = await streakCache.getServerStreaks(serverId, leaderboardData);
 			
 			// Filter to only players with active streaks
 			const playersWithStreaks = streakData.filter(player => {
