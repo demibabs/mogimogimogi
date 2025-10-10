@@ -1,8 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const database = require("../../utils/database");
-const LoungeApi = require("../../utils/loungeApi");
-const PlayerStats = require("../../utils/playerStats");
-const DataManager = require("../../utils/dataManager");
+const optimizedLeaderboard = require("../../utils/optimizedLeaderboard");
 const embedEnhancer = require("../../utils/embedEnhancer");
 
 module.exports = {
@@ -36,8 +33,8 @@ module.exports = {
 			const squads = interaction.options.getBoolean("squads");
 			const serverId = interaction.guildId;
 
-			// Use generateLeaderboard for consistency with button interactions
-			const result = await this.generateLeaderboard(interaction, serverId, stat, serverOnly, squads, "alltime");
+			// Generate leaderboard using optimized cache system
+			const result = await this.generateLeaderboard(interaction, serverId, stat, serverOnly, squads, "all");
 
 			if (!result) {
 				return await interaction.editReply({
@@ -48,9 +45,8 @@ module.exports = {
 			// Create action row with three buttons (current one disabled)
 			const row = new ActionRowBuilder()
 				.addComponents(
-					// Current view is disabled
 					new ButtonBuilder()
-						.setCustomId(`leaderboard_alltime_${stat}_${serverOnly}_${squads}`)
+						.setCustomId(`leaderboard_all_${stat}_${serverOnly}_${squads}`)
 						.setLabel("all time")
 						.setStyle(ButtonStyle.Secondary)
 						.setDisabled(true),
@@ -88,7 +84,6 @@ module.exports = {
 
 			// Parse the custom ID to get parameters
 			const parts = interaction.customId.split("_");
-			// "weekly", "alltime", or "season"
 			const timeFilter = parts[1];
 			const stat = parts[2];
 			const serverOnly = parts[3] === "true";
@@ -96,18 +91,18 @@ module.exports = {
 
 			const serverId = interaction.guild.id;
 
-			// Generate leaderboard based on time filter
+			// Generate leaderboard using optimized system
 			const result = await this.generateLeaderboard(interaction, serverId, stat, serverOnly, squads, timeFilter);
 
 			if (result) {
-				// Create action row with three buttons (current one disabled)
+				// Create action row with current button disabled
 				const row = new ActionRowBuilder()
 					.addComponents(
 						new ButtonBuilder()
-							.setCustomId(`leaderboard_alltime_${stat}_${serverOnly}_${squads}`)
+							.setCustomId(`leaderboard_all_${stat}_${serverOnly}_${squads}`)
 							.setLabel("all time")
 							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "alltime"),
+							.setDisabled(timeFilter === "all"),
 						new ButtonBuilder()
 							.setCustomId(`leaderboard_weekly_${stat}_${serverOnly}_${squads}`)
 							.setLabel("past week")
@@ -131,237 +126,50 @@ module.exports = {
 		}
 	},
 
-	// Generate leaderboard data
-	async generateLeaderboard(interaction, serverId, stat, serverOnly, squads, timeFilter = "alltime") {
+	// Generate leaderboard using optimized cache system
+	async generateLeaderboard(interaction, serverId, stat, serverOnly, squads, timeFilter = "all") {
 		try {
-			// Get server data
-			const serverData = await database.getServerData(serverId);
-			if (!serverData || !serverData.users) {
-				return null;
-			}
+			console.log(`Generating optimized leaderboard: ${stat}, ${timeFilter}, server-only: ${serverOnly}, squads: ${squads}`);
 
-			const playerStats = [];
+			// Get optimized leaderboard data from cache
+			const leaderboardData = await optimizedLeaderboard.getLeaderboard(
+				serverId,
+				stat,
+				timeFilter,
+				serverOnly,
+				squads,
+			);
 
-			// Process each user in the server
-			for (const [userId, userData] of Object.entries(serverData.users)) {
-				try {
-					let statValue = null;
-					let loungeUser = null;
-
-					if (stat === "mMR") {
-						if (timeFilter === "weekly") {
-							// Get weekly MMR change
-							statValue = await LoungeApi.getWeeklyMMRChange(userId);
-						}
-						else if (timeFilter === "season") {
-							// Get season MMR change
-							statValue = await LoungeApi.getSeasonMMRChange(userId);
-						}
-						else {
-							// Get current MMR from API
-							statValue = await LoungeApi.getCurrentMMR(userId);
-						}
-					}
-					else {
-						// For other stats, get lounge user data first
-						loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
-
-						if (loungeUser) {
-							// Get tables and apply time filter
-							let userTables = await LoungeApi.getAllPlayerTables(userId, serverId);
-
-							if (timeFilter === "weekly") {
-								userTables = PlayerStats.filterTablesByWeek(userTables, true);
-							}
-							else if (timeFilter === "season") {
-								userTables = PlayerStats.filterTablesBySeason(userTables, true);
-							}
-
-							// Apply server-only and squad filters
-							if (serverOnly !== false || squads !== null) {
-								const filteredTables = {};
-								for (const [tableId, table] of Object.entries(userTables)) {
-									let includeTable = true;
-
-									// Server-only filter
-									if (serverOnly) {
-										const isServerTable = await PlayerStats.checkIfServerTable(userId, table, serverId);
-										if (!isServerTable) {
-											includeTable = false;
-										}
-									}
-
-									// Squad filter
-									if (includeTable && squads !== null) {
-										if (squads && table.tier !== "SQ") {
-											includeTable = false;
-										}
-										else if (!squads && table.tier === "SQ") {
-											includeTable = false;
-										}
-									}
-
-									if (includeTable) {
-										filteredTables[tableId] = table;
-									}
-								}
-								userTables = filteredTables;
-							}
-
-							// Calculate the stat
-							switch (stat) {
-							case "tWR": {
-								const winRate = PlayerStats.getWinRate(userTables, loungeUser.name);
-								statValue = winRate;
-								break;
-							}
-							case "aS": {
-								const avgScore = PlayerStats.getAverageScore(userTables, loungeUser.name);
-								statValue = avgScore;
-								break;
-							}
-							case "hS": {
-								const bestScoreResult = PlayerStats.getBestScore(userTables, loungeUser.name);
-								statValue = bestScoreResult ? bestScoreResult.score : null;
-								break;
-							}
-							case "eP": {
-								const eventsPlayed = PlayerStats.getMatchesPlayed(userTables, loungeUser.name);
-								statValue = eventsPlayed;
-								break;
-							}
-							}
-						}
-					}
-
-					if (statValue !== null && statValue !== undefined && statValue !== -1) {
-						// Try to get Discord user for proper display
-						let displayName = userData.loungePlayerName || `User ${userId}`;
-						let discordUser = null;
-						let loungeUserForDisplay = null;
-
-						try {
-							discordUser = await interaction.client.users.fetch(userId);
-							displayName = discordUser.displayName || discordUser.username || displayName;
-						}
-						catch (error) {
-							// Use lounge name if Discord user fetch fails
-						}
-
-						// Get lounge user data for country flag
-						if (stat !== "mMR" && loungeUser) {
-							loungeUserForDisplay = loungeUser;
-						}
-						else if (stat === "mMR") {
-							try {
-								loungeUserForDisplay = await LoungeApi.getPlayerByDiscordId(userId);
-							}
-							catch (error) {
-								console.warn(`failed to get lounge user for ${userId}:`, error);
-							}
-						}
-
-						// Format name with country flag
-						const formattedName = embedEnhancer.formatPlayerNameWithFlag(displayName, loungeUserForDisplay?.countryCode);
-
-						playerStats.push({
-							userId,
-							displayName: formattedName,
-							statValue,
-							discordUser,
-						});
-					}
-				}
-				catch (error) {
-					console.warn(`Error processing user ${userId}:`, error);
-				}
-			}
-
-			// Sort by stat value and get top 10
-			let top10;
-			if (stat === "mMR" && (timeFilter === "weekly" || timeFilter === "season")) {
-				// For MMR changes, only keep positive changes and sort by value
-				const positiveChanges = playerStats.filter(player => player.statValue > 0);
-				positiveChanges.sort((a, b) => b.statValue - a.statValue);
-				top10 = positiveChanges.slice(0, 10);
-			}
-			else {
-				playerStats.sort((a, b) => b.statValue - a.statValue);
-				top10 = playerStats.slice(0, 10);
-			}
-
-			if (top10.length === 0) {
+			if (!leaderboardData || leaderboardData.length === 0) {
 				const embed = new EmbedBuilder()
-					.setTitle("no data found")
-					.setDescription("no players found with the specified filters.")
-					.setColor("#ff0000")
-					.setTimestamp();
+					.setTitle("Leaderboard")
+					.setDescription("no data available for the selected criteria.")
+					.setColor("#FF6B6B");
 
-				// Cycle through time filters: alltime -> weekly -> season -> alltime
-				let nextFilter, buttonLabel;
-				if (timeFilter === "alltime") {
-					nextFilter = "weekly";
-					buttonLabel = "past week";
-				}
-				else if (timeFilter === "weekly") {
-					nextFilter = "season";
-					buttonLabel = "this season";
-				}
-				else {
-					nextFilter = "alltime";
-					buttonLabel = "all time";
-				}
-
-				const buttonId = `leaderboard_${nextFilter}_${stat}_${serverOnly}_${squads}`;
-
-				return { embed, buttonLabel, buttonId };
+				return { embed };
 			}
 
 			// Create embed
+			const embed = new EmbedBuilder()
+				.setColor("#00ff00")
+				.setTimestamp();
+
+			// Set title based on stat and time filter (simple lowercase style)
 			const statNames = {
 				"mMR": timeFilter === "weekly" ? "weekly mmr change" : timeFilter === "season" ? "season mmr change" : "mmr",
 				"tWR": "team win rate",
-				"aS": "average Score",
-				"hS": "highest Score",
+				"aS": "average score",
+				"hS": "highest score",
 				"eP": "events played",
 			};
 
 			const timePrefix = timeFilter === "weekly" ? "weekly " : timeFilter === "season" ? "season " : "";
+			const title = `${serverOnly ? "server " : ""}${squads ? "squad " : squads === false ? "soloq " : ""}${timePrefix}leaderboard - ${statNames[stat]}`;
 
-			const embed = new EmbedBuilder()
-				.setTitle(`${serverOnly ? "server " : ""}${squads ? "squad " : squads === false ? "soloq " : ""}${timePrefix}leaderboard - ${statNames[stat]}`)
-				.setColor("#00ff00")
-				.setTimestamp();
+			embed.setTitle(title);
 
-			// Build description
-			let description = "";
-			for (let i = 0; i < top10.length; i++) {
-				const player = top10[i];
-				const rank = i + 1;
-
-				let formattedValue;
-				if (stat === "tWR") {
-					formattedValue = `${(player.statValue * 100).toFixed(1)}%`;
-				}
-				else if (stat === "aS") {
-					formattedValue = player.statValue.toFixed(1);
-				}
-				else if (stat === "mMR" && (timeFilter === "weekly" || timeFilter === "season")) {
-					// Show + for MMR changes (only positive values are included)
-					const change = Math.round(player.statValue);
-					formattedValue = `+${change}`;
-				}
-				else {
-					formattedValue = Math.round(player.statValue);
-				}
-
-				description += `${rank}. **${player.displayName}**: ${formattedValue}\n`;
-			}
-
-			embed.setDescription(description);
-
-			// Set footer with appropriate time context
-			let footerText = `showing top ${top10.length} players`;
+			// Add simple footer
+			let footerText = `showing top ${Math.min(leaderboardData.length, 10)} players`;
 			if (timeFilter === "weekly") {
 				footerText += " (past 7 days)";
 			}
@@ -370,54 +178,64 @@ module.exports = {
 			}
 			embed.setFooter({ text: footerText });
 
-			// Add top player's avatar as thumbnail
-			if (top10.length > 0 && top10[0].discordUser) {
-				const avatarUrl = embedEnhancer.getPlayerAvatarUrl(top10[0].discordUser);
-				if (avatarUrl) {
-					embed.setThumbnail(avatarUrl);
+			// Fetch Discord display names for all users in parallel
+			const userFetches = leaderboardData.slice(0, 10).map(async (entry) => {
+				try {
+					const discordUser = await interaction.client.users.fetch(entry.userId);
+					return {
+						...entry,
+						discordDisplayName: discordUser.displayName || discordUser.username,
+					};
 				}
+				catch (error) {
+					return entry;
+				}
+			});
+
+			const entriesWithDiscordNames = await Promise.all(userFetches);
+
+			// Format leaderboard entries (simple style, no emojis)
+			let description = "";
+			for (let i = 0; i < Math.min(entriesWithDiscordNames.length, 10); i++) {
+				const entry = entriesWithDiscordNames[i];
+				const rank = i + 1;
+
+				// Use Discord display name first, then lounge name, then cached name
+				const displayName = entry.discordDisplayName || entry.loungeUser?.name || entry.displayName;
+
+				// Format player name with country flag
+				const formattedName = embedEnhancer.formatPlayerNameWithFlag(
+					displayName,
+					entry.loungeUser?.countryCode,
+				);
+
+				// Format stat value
+				let formattedValue;
+				if (stat === "tWR") {
+					formattedValue = `${(entry.statValue * 100).toFixed(1)}%`;
+				}
+				else if (stat === "aS") {
+					formattedValue = entry.statValue.toFixed(1);
+				}
+				else if (stat === "mMR" && (timeFilter === "weekly" || timeFilter === "season")) {
+					// Show + for MMR changes (only positive values are included)
+					const change = Math.round(entry.statValue);
+					formattedValue = `+${change}`;
+				}
+				else {
+					formattedValue = Math.round(entry.statValue);
+				}
+
+				description += `${rank}. **${formattedName}**: ${formattedValue}\n`;
 			}
+
+			embed.setDescription(description);
 
 			return { embed };
 		}
 		catch (error) {
-			console.error("Error generating leaderboard:", error);
+			console.error("Error generating optimized leaderboard:", error);
 			return null;
 		}
-	},
-
-	// Helper function to filter tables by week (moved from inline)
-	filterTablesByWeek(tables, weeklyOnly = false) {
-		if (!weeklyOnly) return tables;
-
-		const oneWeekAgo = new Date();
-		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-		const filtered = {};
-		for (const [tableId, table] of Object.entries(tables)) {
-			if (table && table.createdOn) {
-				const tableDate = new Date(table.createdOn);
-				if (tableDate >= oneWeekAgo) {
-					filtered[tableId] = table;
-				}
-			}
-		}
-		return filtered;
-	},
-
-	// Helper function to filter tables by current season
-	filterTablesBySeason(tables, seasonOnly = false) {
-		if (!seasonOnly) return tables;
-
-		// Get current season from LoungeApi (DEFAULT_SEASON = 1)
-		const currentSeason = 1;
-
-		const filtered = {};
-		for (const [tableId, table] of Object.entries(tables)) {
-			if (table && table.season === currentSeason) {
-				filtered[tableId] = table;
-			}
-		}
-		return filtered;
 	},
 };

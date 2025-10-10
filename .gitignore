@@ -40,3 +40,5 @@ MIGRATION_INSTRUCTIONS.md
 MIGRATION_NOTES.md
 
 commands/testing/
+
+leaderboard-backup.js.bak
