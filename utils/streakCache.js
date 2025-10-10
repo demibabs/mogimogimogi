@@ -435,5 +435,5 @@ class StreakCache {
 	}
 }
 
-// Export the class
-module.exports = StreakCache;
+// Export singleton instance
+module.exports = new StreakCache();
