@@ -1,8 +1,9 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const DataManager = require("../../utils/dataManager");
 const database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
+const embedEnhancer = require("../../utils/embedEnhancer");
 
 const getRandomMessage = function(messages) {
 	const randInt = Math.floor(Math.random() * messages.length);
@@ -12,35 +13,137 @@ const getRandomMessage = function(messages) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("notables")
-		.setDescription("Your worst and best mogis.")
+		.setDescription("your best and worst mogis.")
 		.addUserOption(option =>
 			option.setName("user")
-				.setDescription("Yourself if left blank.")
+				.setDescription("yourself if left blank.")
 				.setRequired(false))
 		.addBooleanOption(option =>
 			option.setName("server-only")
-				.setDescription("True = include only mogis with other server members."))
+				.setDescription("true = include only mogis with other server members."))
 		.addBooleanOption(option =>
 			option.setName("squads")
-				.setDescription("True = sq only, false = soloq only."),
+				.setDescription("true = sq only, false = soloq only."),
 		),
 
 	async execute(interaction) {
 		try {
 			await interaction.deferReply();
-			await interaction.editReply("Loading player data...");
 
 			const discordUser = interaction.options.getUser("user") || interaction.user;
-			const serverId = interaction.guild.id;
-			const serverOnly = interaction.options.getBoolean("server-only");
+			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
 			const squads = interaction.options.getBoolean("squads");
+			const serverId = interaction.guildId;
 
+			// Use generateNotables for consistency with button interactions
+			const result = await this.generateNotables(interaction, discordUser, serverId, serverOnly, squads, "alltime");
+
+			if (!result) {
+				return await interaction.editReply({
+					content: "an error occurred while generating notables. please try again later.",
+				});
+			}
+
+			// Create action row with three buttons (current one disabled)
+			const row = new ActionRowBuilder()
+				.addComponents(
+					// Current view is disabled
+					new ButtonBuilder()
+						.setCustomId(`notables_alltime_${discordUser.id}_${serverOnly}_${squads}`)
+						.setLabel("all time")
+						.setStyle(ButtonStyle.Secondary)
+						.setDisabled(true),
+					new ButtonBuilder()
+						.setCustomId(`notables_weekly_${discordUser.id}_${serverOnly}_${squads}`)
+						.setLabel("past week")
+						.setStyle(ButtonStyle.Secondary),
+					new ButtonBuilder()
+						.setCustomId(`notables_season_${discordUser.id}_${serverOnly}_${squads}`)
+						.setLabel("this season")
+						.setStyle(ButtonStyle.Secondary),
+				);
+
+			await interaction.editReply({
+				content: "",
+				embeds: [result.embed],
+				components: [row],
+			});
+
+		}
+		catch (error) {
+			console.error("notables command error:", error);
+			try {
+				await interaction.editReply({
+					content: "error: something went wrong while calculating notables.",
+				});
+			}
+			catch (editError) {
+				console.error("failed to edit reply with error message:", editError);
+			}
+		}
+	},
+
+	// Handle button interactions
+	async handleButtonInteraction(interaction) {
+		if (!interaction.customId.startsWith("notables_")) return false;
+
+		try {
+			await interaction.deferUpdate();
+
+			const parts = interaction.customId.split("_");
+			// "weekly", "alltime", or "season"
+			const timeFilter = parts[1];
+			const userId = parts[2];
+			const serverOnly = parts[3] === "true";
+			const squads = parts[4] === "null" ? null : parts[4] === "true";
+
+			const serverId = interaction.guild.id;
+			const discordUser = await interaction.client.users.fetch(userId);
+
+			// Generate notables based on time filter
+			const result = await this.generateNotables(interaction, discordUser, serverId, serverOnly, squads, timeFilter);
+
+			if (result) {
+				// Create action row with three buttons (current one disabled)
+				const row = new ActionRowBuilder()
+					.addComponents(
+						new ButtonBuilder()
+							.setCustomId(`notables_alltime_${userId}_${serverOnly}_${squads}`)
+							.setLabel("all time")
+							.setStyle(ButtonStyle.Secondary)
+							.setDisabled(timeFilter === "alltime"),
+						new ButtonBuilder()
+							.setCustomId(`notables_weekly_${userId}_${serverOnly}_${squads}`)
+							.setLabel("past week")
+							.setStyle(ButtonStyle.Secondary)
+							.setDisabled(timeFilter === "weekly"),
+						new ButtonBuilder()
+							.setCustomId(`notables_season_${userId}_${serverOnly}_${squads}`)
+							.setLabel("this season")
+							.setStyle(ButtonStyle.Secondary)
+							.setDisabled(timeFilter === "season"),
+					);
+
+				await interaction.editReply({ embeds: [result.embed], components: [row] });
+			}
+
+			return true;
+		}
+		catch (error) {
+			console.error("Error in notables button interaction:", error);
+			return false;
+		}
+	},
+
+	// Generate notables data (simplified version)
+	async generateNotables(interaction, discordUser, serverId, serverOnly, squads, timeFilter = "alltime") {
+		try {
 			// Validate server data and user
 			const serverData = await database.getServerData(serverId);
 			const userData = serverData?.users?.[discordUser.id];
 
 			if (!userData) {
-				return await interaction.editReply("ERROR: Not a valid user. Use `/setup` to add all server members.");
+				return null;
 			}
 
 			// Get user's Lounge account
@@ -48,28 +151,33 @@ module.exports = {
 			const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
 
 			if (!loungeUser) {
-				return await interaction.editReply("ERROR: Unable to find Lounge account for this user.");
+				return null;
 			}
 
 			try {
 				await DataManager.updateServerUser(serverId, userId, interaction.client);
 			}
 			catch (error) {
-				console.warn(`Failed to update user data for ${userId}:`, error);
+				console.warn(`failed to update user data for ${userId}:`, error);
 			}
-
-			await interaction.editReply("Loading match history...");
 
 			// Get user's tables
 			let userTables = await LoungeApi.getAllPlayerTables(userId, serverId);
 
 			if (!userTables || Object.keys(userTables).length === 0) {
-				return await interaction.editReply("No match history found for this user. :('");
+				return null;
+			}
+
+			// Apply time filter using PlayerStats methods
+			if (timeFilter === "weekly") {
+				userTables = PlayerStats.filterTablesByWeek(userTables, true);
+			}
+			else if (timeFilter === "season") {
+				userTables = PlayerStats.filterTablesBySeason(userTables, true);
 			}
 
 			// Filter tables based on options
 			if (serverOnly) {
-				await interaction.editReply("Filtering server-only matches...");
 				const filteredEntries = [];
 				for (const [tableId, table] of Object.entries(userTables)) {
 					try {
@@ -78,7 +186,7 @@ module.exports = {
 						}
 					}
 					catch (error) {
-						console.warn(`Error checking table ${tableId}:`, error);
+						console.warn(`error checking table ${tableId}:`, error);
 					}
 				}
 				userTables = Object.fromEntries(filteredEntries);
@@ -100,12 +208,8 @@ module.exports = {
 
 			// Check if any tables remain after filtering
 			if (Object.keys(userTables).length === 0) {
-				const filterType = serverOnly ? "server-only " : "";
-				const squadType = squads ? "squad " : squads === false ? "soloQ " : "";
-				return await interaction.editReply(`No ${filterType}${squadType}matches found for this user. :('`);
+				return null;
 			}
-
-			await interaction.editReply("Calculating notables...");
 
 			// Calculate statistics
 			const bS = PlayerStats.getBestScore(userTables, loungeUser.name);
@@ -117,162 +221,171 @@ module.exports = {
 
 			// Validate that statistics were calculated successfully
 			if (!bS || !wS || !oP || !uP || !bC || !bA) {
-				return await interaction.editReply("Unable to calculate statistics from match data. Something went wrong. :('");
+				return null;
 			}
+
+			// Messages for random selection
 			const goodBSMessages = [
-				"Nice!",
-				"Excellent work!",
-				"Can you do even better?",
-				"Skill was on your side that day. (Or luck...)",
-				"Typical mogi for the GOAT.",
-				"Why can't every mogi be this good?",
-				"Cheating?",
-				"Luck was on your side that day. (Or skill...)",
-				"Isn't this game so good when you win?",
+				"nice!",
+				"excellent work!",
+				"can you do even better?",
+				"skill was on your side that day. (or luck...)",
+				"typical mogi for the goat.",
+				"why can't every mogi be this good?",
+				"cheating?",
+				"luck was on your side that day. (or skill...)",
+				"isn't this game so good when you win?",
 			];
 			const badBSMessages = [
-				"Great score, but not good enough for 1st :(",
-				"Guess someone else was having an even better mogi.",
-				"Not first? Shortrat must have been in your room.",
-				"Someone had to steal your thunder I guess.",
-				"Nice, but I know you have at least 10 more points in you. Maybe 15.",
-				"Solid showing.",
+				"great score, but not good enough for 1st :(",
+				"guess someone else was having an even better mogi.",
+				"not first? shortrat must have been in your room.",
+				"someone had to steal your thunder i guess.",
+				"nice, but i know you have at least 10 more points in you. maybe 15.",
+				"solid showing.",
 			];
 
 			const goodWSMessages = [
-				"If you think that mogi sucked, think about whoever you beat.",
-				"Your worst ever and you still didn't get last? We take it.",
-				"Ouch.",
-				"At least you beat somebody!",
-				"Hey, losing makes winning feel even better!",
-				"Sometimes when you gamble, you lose.",
-				"You suck. (JK.)",
+				"if you think that mogi sucked, think about whoever you beat.",
+				"your worst ever and you still didn't get last? We take it.",
+				"ouch.",
+				"at least you beat somebody!",
+				"hey, losing makes winning feel even better!",
+				"sometimes when you gamble, you lose.",
+				"you suck. (jk.)",
 			];
 			const badWSMessages = [
-				"This is the ype of mogi I have when I'm about to promote.",
-				"Video games aren't for everyone. Maybe try sports?",
-				"Yowch.",
-				"At least you beat somebody! Wait, no you didn't.",
-				"Thanks for graciously donating your MMR to those other players.",
-				"Can't blame any teammates for THIS one.",
-				"You suck.",
+				"this is the ype of mogi i have when i'm about to promote.",
+				"video games aren't for everyone. maybe try sports?",
+				"yowch.",
+				"at least you beat somebody! wait, no you didn't.",
+				"thanks for graciously donating your mmr to those other players.",
+				"can't blame any teammates for that one.",
+				"you suck.",
 			];
 
 			const oPMessages = [
-				"Against all odds!",
-				"They never saw it coming.",
-				"They underestimated you, but I knew you were like that.",
-				"Great job!",
-				"Holy W.",
-				"How does he do it?",
-				"The up and coming GOAT.",
+				"against all odds!",
+				"they never saw it coming.",
+				"they underestimated you, but i knew you were like that.",
+				"great job!",
+				"holy w.",
+				"how does he do it?",
+				"the up and coming goat.",
 			];
 
 			const uPMessages = [
-				"Well, even Lightning McQueen has lost races.",
-				"But you were just unlucky, right?",
-				"Oof.",
-				"Guess the room was punching above its weight.",
-				"Washed?",
-				"Yikes.",
-				"Everyone was silently judging you.",
-				"Not your mogi.",
+				"well, even lightning mcqueen has lost races before.",
+				"but you were just unlucky, right?",
+				"oof.",
+				"guess the room was punching above its weight.",
+				"washed?",
+				"yikes.",
+				"everyone was silently judging you.",
+				"not your mogi.",
 			];
 
 			const bCMessages = [
-				"Someone had to pick up the slack.",
-				"Does your back hurt?",
-				"You did everything you could.",
-				"Impressive!",
-				"Did the rest of your team suck or are you just that good?",
-				"You're the type of mate we all need.",
-				"Holy carry.",
+				"someone had to pick up the slack.",
+				"does your back hurt?",
+				"you did everything you could.",
+				"impressive!",
+				"did the rest of your team suck or are you just that good?",
+				"you're the type of mate we all need.",
+				"holy carry.",
 			];
 
 			const bAMessages = [
-				"SMH.",
-				"Your team needed you, but you vanished.",
-				"Someone had to pick up the slack, and it wasn't you.",
-				"Ow.",
-				"Thank god for teammates.",
-				"Bad day?",
+				"smh.",
+				"your team needed you, but you vanished.",
+				"someone had to pick up the slack, and it wasn't you.",
+				"ow.",
+				"thank god for teammates.",
+				"bad day?",
 			];
+
+			const playerNameWithFlag = embedEnhancer.formatPlayerNameWithFlag(discordUser.displayName, loungeUser.countryCode);
+
+			// Create time-aware title
+			const timePrefix = timeFilter === "weekly" ? "weekly " : timeFilter === "season" ? "season " : "";
 
 			const notablesEmbed = new EmbedBuilder()
 				.setColor("Gold")
-				.setTitle(`${discordUser.displayName}'s ${serverOnly ? "server " : ""}${
-					squads ? "squad " : squads === false ? "soloQ " : ""}notables`)
+				.setTitle(`${playerNameWithFlag}'s ${serverOnly ? "server " : ""}${
+					squads ? "squad " : squads === false ? "soloQ " : ""}${timePrefix}notables`)
+				.setTimestamp()
 				.addFields(
-					{ name: "Best score:", value: `[In this ${userTables[bS.tableId].numPlayers}p ${
+					{ name: "best score:", value: `[in this ${userTables[bS.tableId].numPlayers}p ${
 						userTables[bS.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${bS.tableId})`
-                + ` you scored ${bS.score} ${
-                	bS.placement === 1 ? "and" : "but"} were rank ${
-                	bS.placement}. ${
+                + ` you scored **${bS.score}** ${
+                	bS.placement === 1 ? "and" : "but"} were rank **${
+                	bS.placement}**. ${
                 	getRandomMessage(bS.placement === 1 ? goodBSMessages : badBSMessages)}`,
 					},
-					{ name: "Worst score:", value: `[In this ${userTables[wS.tableId].numPlayers}p ${
+					{ name: "worst score:", value: `[in this ${userTables[wS.tableId].numPlayers}p ${
 						userTables[wS.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${wS.tableId})`
-                + ` you scored ${wS.score} and were rank ${
-                	wS.placement}. ${
+                + ` you scored **${wS.score}** and were rank **${
+                	wS.placement}**. ${
                 	getRandomMessage(wS.placement === userTables[wS.tableId].numPlayers ? badWSMessages : goodWSMessages)}`,
 					},
-					{ name: "Biggest overperformance:", value: `[In this ${userTables[oP.tableId].numPlayers}p ${
+					{ name: "biggest overperformance:", value: `[in this ${userTables[oP.tableId].numPlayers}p ${
 						userTables[oP.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${oP.tableId})`
-                + ` you were seed ${
-                	oP.placement + oP.overperformance} but scored ${
-                	oP.score} and managed to get rank ${
-                	oP.placement}. ${getRandomMessage(oPMessages)}`,
+                + ` you were seed **${
+                	oP.placement + oP.overperformance}** but scored **${
+                	oP.score}** and managed to get rank **${
+                	oP.placement}**. ${getRandomMessage(oPMessages)}`,
 					},
-					{ name: "Biggest underperformance:", value: `[In this ${userTables[uP.tableId].numPlayers}p ${
+					{ name: "biggest underperformance:", value: `[in this ${userTables[uP.tableId].numPlayers}p ${
 						userTables[uP.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${uP.tableId})`
-                + ` you were seed ${
-                	uP.placement + uP.underperformance} but scored ${
-                	uP.score} and ended up rank ${
-                	uP.placement}. ${getRandomMessage(uPMessages)}`,
+                + ` you were seed **${
+                	uP.placement + uP.underperformance}** but scored **${
+                	uP.score}** and ended up rank **${
+                	uP.placement}**. ${getRandomMessage(uPMessages)}`,
 					},
-					{ name: "Biggest carry:", value: `[In this ${userTables[bC.tableId].numPlayers}p ${
+					{ name: "biggest carry:", value: `[in this ${userTables[bC.tableId].numPlayers}p ${
 						userTables[bC.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${bC.tableId})`
-                + ` you were rank ${
-                	bC.placement} and scored ${
-                	bC.score} while your ${
+                + ` you were rank **${
+                	bC.placement}** and scored **${
+                	bC.score}** while your ${
                 	userTables[bC.tableId].format === "2v2" ?
-                	"mate scored" : "teammates averaged"} ${
-                	bC.score - bC.carryAmount}. `
+                	"mate scored" : "teammates averaged"} **${
+                	bC.score - bC.carryAmount}**. `
                 + getRandomMessage(bCMessages),
 					},
-					{ name: "Biggest anchor:", value: `[In this ${userTables[bA.tableId].numPlayers}p ${
+					{ name: "biggest anchor:", value: `[in this ${userTables[bA.tableId].numPlayers}p ${
 						userTables[bA.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${bA.tableId})`
-                + ` you were rank ${
-                	bA.placement} and scored ${
-                	bA.score} while your ${
+                + ` you were rank **${
+                	bA.placement}** and scored **${
+                	bA.score}** while your ${
                 	userTables[bA.tableId].format === "2v2" ?
-                	"mate scored" : "teammates averaged"} ${
-                	bA.score - bA.anchorAmount}. `
+                	"mate scored" : "teammates averaged"} **${
+                	bA.score - bA.anchorAmount}**. `
                 + getRandomMessage(bAMessages),
 					},
 				);
-			try {
-				await interaction.editReply({ content: "", embeds: [notablesEmbed] });
+
+			// Add player avatar as thumbnail
+			const avatarUrl = embedEnhancer.getPlayerAvatarUrl(discordUser);
+			if (avatarUrl) {
+				notablesEmbed.setThumbnail(avatarUrl);
 			}
-			catch (error) {
-				console.error("Failed to send embed:", error);
-				await interaction.editReply("ERROR: Something went wrong while sending the results.");
+
+			// Add time-aware footer
+			const eventCount = Object.keys(userTables).length;
+			let footerText = `your most notable moments from ${eventCount} event${eventCount !== 1 ? "s" : ""}`;
+			if (timeFilter === "weekly") {
+				footerText += " (past 7 days)";
 			}
+			else if (timeFilter === "season") {
+				footerText += " (current season)";
+			}
+			notablesEmbed.setFooter({ text: footerText });
+
+			return { embed: notablesEmbed };
 		}
 		catch (error) {
-			console.error("Notables command error:", error);
-
-			if (error.message?.includes("Unknown interaction")) {
-				console.error("Interaction expired during notables calculation");
-				return;
-			}
-
-			try {
-				await interaction.editReply("ERROR: An error occurred while calculating notables. Please try again.");
-			}
-			catch (editError) {
-				console.error("Failed to edit reply:", editError);
-			}
+			console.error("Error generating notables:", error);
+			return null;
 		}
 	},
 };

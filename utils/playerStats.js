@@ -645,6 +645,49 @@ class PlayerStats {
 
 		return worstResult;
 	}
+
+	/**
+	 * Filter tables to only include those from the past week
+	 * @param {Object} tables - Object of tables indexed by tableId
+	 * @param {boolean} weeklyOnly - Whether to filter to past week only
+	 * @returns {Object} Filtered tables object
+	 */
+	static filterTablesByWeek(tables, weeklyOnly = false) {
+		if (!weeklyOnly) return tables;
+		
+		const oneWeekAgo = new Date();
+		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+		
+		const filtered = {};
+		for (const [tableId, table] of Object.entries(tables)) {
+			if (table && table.createdOn) {
+				const tableDate = new Date(table.createdOn);
+				if (tableDate >= oneWeekAgo) {
+					filtered[tableId] = table;
+				}
+			}
+		}
+		return filtered;
+	}
+
+	/**
+	 * Filter tables to only include those from the current season
+	 * @param {Object} tables - Object of tables indexed by tableId
+	 * @param {boolean} seasonOnly - Whether to filter to current season only
+	 * @param {number} currentSeason - The current season number (defaults to 1)
+	 * @returns {Object} Filtered tables object
+	 */
+	static filterTablesBySeason(tables, seasonOnly = false, currentSeason = 1) {
+		if (!seasonOnly) return tables;
+		
+		const filtered = {};
+		for (const [tableId, table] of Object.entries(tables)) {
+			if (table && table.season === currentSeason) {
+				filtered[tableId] = table;
+			}
+		}
+		return filtered;
+	}
 }
 
 module.exports = PlayerStats;

@@ -229,12 +229,139 @@ async function getAllPlayerTables(userId, serverId) {
  * @returns {Promise<Array>} Array of strikes/penalties
  */
 
+/**
+ * Get current MMR for a player by Discord ID
+ * @param {string} discordId - Discord user ID
+ * @param {number} season - Season number (optional, defaults to current season)
+ * @returns {Promise<number|null>} Current MMR or null if not found
+ */
+async function getCurrentMMR(discordId, season = DEFAULT_SEASON) {
+	try {
+		const player = await getPlayerByDiscordId(discordId, season);
+		if (!player) {
+			return null;
+		}
+		
+		// The player object should contain current MMR
+		return player.mmr || null;
+	}
+	catch (error) {
+		console.error(`Error getting current MMR for Discord ID ${discordId}:`, error);
+		return null;
+	}
+}
+
+/**
+ * Get weekly MMR change for a player
+ * @param {string} userId - Discord user ID
+ * @returns {Promise<number|null>} Weekly MMR change or null if not found
+ */
+async function getWeeklyMMRChange(userId) {
+	try {
+		const oneWeekAgo = new Date();
+		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+		const params = {
+			discordId: userId,
+			game: "mkworld",
+		};
+
+		let totalChange = 0;
+		let hasChanges = false;
+
+		for (let season = 0; season <= DEFAULT_SEASON; season++) {
+			params.season = season;
+			try {
+				const details = await apiGet("/player/details", params);
+				
+				if (details.mmrChanges) {
+					// Filter changes from the past week that are from tables
+					const weeklyChanges = details.mmrChanges.filter(change => {
+						if (change.reason !== "Table") return false;
+						
+						// Check if the change is from the past week
+						const changeDate = new Date(change.time);
+						return changeDate >= oneWeekAgo;
+					});
+
+					for (const change of weeklyChanges) {
+						// Add the MMR delta
+						if (change.mmrDelta !== undefined) {
+							totalChange += change.mmrDelta;
+							hasChanges = true;
+						}
+					}
+				}
+			}
+			catch (error) {
+				console.warn(`API call failed for season ${season}, user ${userId}:`, error);
+			}
+		}
+
+		return hasChanges ? totalChange : null;
+	}
+	catch (error) {
+		console.error(`Error getting weekly MMR change for user ${userId}:`, error);
+		return null;
+	}
+}
+
+/**
+ * Get season MMR change for a player
+ * @param {string} userId - Discord user ID
+ * @param {number} season - Season to check (defaults to current season)
+ * @returns {Promise<number|null>} Season MMR change or null if not found
+ */
+async function getSeasonMMRChange(userId, season = DEFAULT_SEASON) {
+	try {
+		const params = {
+			discordId: userId,
+			game: "mkworld",
+			season: season,
+		};
+
+		let totalChange = 0;
+		let hasChanges = false;
+
+		try {
+			const details = await apiGet("/player/details", params);
+			
+			if (details.mmrChanges) {
+				// Filter changes that are from tables (actual games, not manual adjustments)
+				const seasonChanges = details.mmrChanges.filter(change => {
+					return change.reason === "Table";
+				});
+
+				for (const change of seasonChanges) {
+					// Add the MMR delta
+					if (change.mmrDelta !== undefined) {
+						totalChange += change.mmrDelta;
+						hasChanges = true;
+					}
+				}
+			}
+		}
+		catch (error) {
+			console.warn(`API call failed for season ${season}, user ${userId}:`, error);
+		}
+
+		return hasChanges ? totalChange : null;
+	}
+	catch (error) {
+		console.error(`Error getting season MMR change for user ${userId}:`, error);
+		return null;
+	}
+}
+
 
 module.exports = {
 	getPlayer,
 	getPlayerByDiscordId,
 	getTable,
 	getAllPlayerTables,
+	getCurrentMMR,
+	getWeeklyMMRChange,
+	getSeasonMMRChange,
 	apiGet,
 	DEFAULT_SEASON,
 };

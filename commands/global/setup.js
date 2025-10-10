@@ -6,12 +6,12 @@ const database = require("../../utils/database");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("setup")
-		.setDescription("Adds every server user with a Lounge account. Takes a while."),
+		.setDescription("adds every server user with a lounge account. takes a while."),
 
 	async execute(interaction) {
 		try {
 			await interaction.deferReply();
-			await interaction.editReply("Starting setup process...");
+			await interaction.editReply("starting setup process...");
 
 			const members = await interaction.guild.members.fetch();
 			const serverData = await database.getServerData(interaction.guild.id);
@@ -20,7 +20,7 @@ module.exports = {
 			const totalMembers = members.size;
 			let processedCount = 0;
 
-			await interaction.editReply(`Processing ${totalMembers} server members...`);
+			await interaction.editReply(`processing ${totalMembers} server members...`);
 
 			// Find users with Lounge accounts who aren't already in server data
 			for (const [userId, member] of members) {
@@ -33,20 +33,20 @@ module.exports = {
 					loungers.push(userId);
 				}
 				catch (error) {
-					console.warn(`Error checking user ${userId}:`, error);
+					console.warn(`error checking user ${userId}:`, error);
 				}
 
 				processedCount++;
 
 				// Update progress every user
-				await interaction.editReply(`Processing members... (${processedCount}/${totalMembers})`);
+				await interaction.editReply(`processing members... (${processedCount}/${totalMembers})`);
 			}
 
 			if (loungers.length === 0) {
-				return await interaction.editReply("Setup complete! No new users to add. :)");
+				return await interaction.editReply("setup complete! No new users to add. :)");
 			}
 
-			await interaction.editReply(`Adding ${loungers.length} new users to server data...`);
+			await interaction.editReply(`adding ${loungers.length} new users to server data...`);
 
 			// Add new users
 			let addedCount = 0;
@@ -55,19 +55,19 @@ module.exports = {
 					await DataManager.addServerUser(interaction.guild.id, lounger, interaction.client);
 					addedCount++;
 					// Update progress every user
-					await interaction.editReply(`Adding users... (${addedCount}/${loungers.length})`);
+					await interaction.editReply(`adding users... (${addedCount}/${loungers.length})`);
 				}
 				catch (error) {
-					console.error(`Failed to add user ${lounger}:`, error);
+					console.error(`failed to add user ${lounger}:`, error);
 				}
 			}
 
-			await interaction.editReply(`Setup complete! Added ${addedCount} of ${loungers.length} user${
+			await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
 				loungers.length === 1 ? "" : "s"}.`);
 		}
 		catch (error) {
-			console.error("Setup error:", error);
-			await interaction.editReply("ERROR: An error occurred during setup. Please check the console for details.");
+			console.error("setup error:", error);
+			await interaction.editReply("an error occurred during setup. please check the console for details.");
 		}
 	},
 };

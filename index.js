@@ -53,26 +53,68 @@ client.once(Events.ClientReady, readyClient => {
 
 client.on(Events.InteractionCreate, async interaction => {
 	console.log(`Received interaction: ${interaction.type}`);
-	if (!interaction.isChatInputCommand()) return;
-	console.log(`Chat input command: ${interaction.commandName}`);
+	
+	// Handle slash commands
+	if (interaction.isChatInputCommand()) {
+		console.log(`Chat input command: ${interaction.commandName}`);
 
-	const command = interaction.client.commands.get(interaction.commandName);
+		const command = interaction.client.commands.get(interaction.commandName);
 
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
-
-	try {
-		await command.execute(interaction);
-	}
-	catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: "There was an error while executing this command!", flags: MessageFlags.Ephemeral });
+		if (!command) {
+			console.error(`No command matching ${interaction.commandName} was found.`);
+			return;
 		}
-		else {
-			await interaction.reply({ content: "There was an error while executing this command!", flags: MessageFlags.Ephemeral });
+
+		try {
+			await command.execute(interaction);
+		}
+		catch (error) {
+			console.error(error);
+			if (interaction.replied || interaction.deferred) {
+				await interaction.followUp({ content: "There was an error while executing this command!", flags: MessageFlags.Ephemeral });
+			}
+			else {
+				await interaction.reply({ content: "There was an error while executing this command!", flags: MessageFlags.Ephemeral });
+			}
+		}
+	}
+	// Handle button interactions
+	else if (interaction.isButton()) {
+		console.log(`Button interaction: ${interaction.customId}`);
+		
+		// Check if any command can handle this button interaction
+		let handled = false;
+		for (const command of interaction.client.commands.values()) {
+			if (command.handleButtonInteraction && typeof command.handleButtonInteraction === "function") {
+				try {
+					const result = await command.handleButtonInteraction(interaction);
+					if (result) {
+						handled = true;
+						break;
+					}
+				}
+				catch (error) {
+					console.error(`Error in button handler for ${command.data.name}:`, error);
+					if (!interaction.replied && !interaction.deferred) {
+						await interaction.reply({
+							content: "There was an error while handling this button interaction!",
+							flags: MessageFlags.Ephemeral,
+						});
+					}
+					handled = true;
+					break;
+				}
+			}
+		}
+		
+		if (!handled) {
+			console.warn(`No handler found for button interaction: ${interaction.customId}`);
+			if (!interaction.replied && !interaction.deferred) {
+				await interaction.reply({
+					content: "This button interaction is no longer available.",
+					flags: MessageFlags.Ephemeral,
+				});
+			}
 		}
 	}
 });
