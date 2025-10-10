@@ -10,12 +10,6 @@ module.exports = {
 		try {
 			await interaction.deferReply();
 
-			if (!interaction.guild) {
-				return await interaction.editReply({
-					content: "❌ This command can only be used in a server.",
-				});
-			}
-
 			const serverId = interaction.guild.id;
 			
 			// Get cached leaderboard data (use mmr, all time, no filters for streak base data)
@@ -46,14 +40,6 @@ module.exports = {
 
 	async showStreaks(interaction, leaderboardData, type) {
 		try {
-			if (!interaction.guild) {
-				return await interaction.editReply({
-					content: "❌ This command can only be used in a server.",
-					embeds: [],
-					components: [],
-				});
-			}
-
 			const serverId = interaction.guild.id;
 			
 			// Get streak data from cache
@@ -84,12 +70,12 @@ module.exports = {
 
 			// Create embed
 			const embed = new EmbedBuilder()
-				.setTitle(`🏆 Win Streaks - ${type}`)
+				.setTitle(`winstreaks - ${type}`)
 				.setColor("#4ECDC4")
 				.setTimestamp();
 
 			if (playersWithStreaks.length === 0) {
-				embed.setDescription("No active win streaks found.");
+				embed.setDescription("no active win streaks found.");
 			}
 			else {
 				// Build leaderboard description (top 5 only)
@@ -142,7 +128,7 @@ module.exports = {
 						embed.setThumbnail(firstPlaceUser.displayAvatarURL());
 					}
 					catch (error) {
-						console.warn("Could not set thumbnail for first place user:", error);
+						console.warn("could not set thumbnail for first place user:", error);
 					}
 				}
 				
@@ -199,14 +185,6 @@ module.exports = {
 
 		try {
 			await interaction.deferUpdate();
-
-			if (!interaction.guild) {
-				return await interaction.editReply({
-					content: "❌ This command can only be used in a server.",
-					embeds: [],
-					components: [],
-				});
-			}
 
 			const serverId = interaction.guild.id;
 			const leaderboardData = await optimizedLeaderboard.getLeaderboard(

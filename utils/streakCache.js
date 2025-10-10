@@ -26,9 +26,17 @@ class StreakCache {
 			console.log("Loading streak cache from database...");
 			const database = require("./database");
 			
-			// For now, we'll use a simple approach and rebuild cache as needed
-			// In the future, could add dedicated database tables for streak cache
-			console.log("Streak cache will be built on demand");
+			// Load cache for all servers
+			const allCacheInfo = await database.getAllServerCacheInfo();
+			for (const serverInfo of allCacheInfo) {
+				const serverCache = await database.loadStreakCache(serverInfo.serverId);
+				if (serverCache.size > 0) {
+					this.cache.set(serverInfo.serverId, serverCache);
+					this.lastUpdate.set(serverInfo.serverId, Date.now());
+				}
+			}
+			
+			console.log(`Loaded streak cache for ${allCacheInfo.length} servers`);
 		}
 		catch (error) {
 			console.error("Failed to load streak cache from database:", error);
@@ -40,9 +48,13 @@ class StreakCache {
 	 */
 	async saveCacheToDatabase(serverId) {
 		try {
-			// For now, we don't persist streak cache to database
-			// It will be rebuilt as needed since it's derived from table data
-			console.log(`Streak cache for server ${serverId} updated in memory`);
+			const database = require("./database");
+			const serverCache = this.cache.get(serverId);
+			
+			if (serverCache) {
+				await database.saveStreakCache(serverId, serverCache);
+				console.log(`Streak cache saved to database for server ${serverId}`);
+			}
 		}
 		catch (error) {
 			console.error(`Failed to save streak cache for server ${serverId}:`, error);
@@ -145,6 +157,9 @@ class StreakCache {
 			// Update cache
 			this.cache.set(serverId, serverCache);
 			this.lastUpdate.set(serverId, Date.now());
+			
+			// Save to database for persistence
+			await this.saveCacheToDatabase(serverId);
 			
 			console.log(`Streak cache updated for server ${serverId} with ${serverCache.size} users`);
 		}
@@ -384,9 +399,22 @@ class StreakCache {
 	 * Clear streak cache for a server
 	 * @param {string} serverId - Server ID
 	 */
-	clearServerStreaks(serverId) {
-		this.cache.delete(serverId);
-		this.lastUpdate.delete(serverId);
+	async clearServerStreaks(serverId) {
+		try {
+			const database = require("./database");
+			
+			// Clear from memory
+			this.cache.delete(serverId);
+			this.lastUpdate.delete(serverId);
+			
+			// Clear from database
+			await database.clearStreakCache(serverId);
+			
+			console.log(`Cleared streak cache for server ${serverId}`);
+		}
+		catch (error) {
+			console.error(`Error clearing streak cache for server ${serverId}:`, error);
+		}
 	}
 
 	/**

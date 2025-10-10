@@ -28,12 +28,6 @@ module.exports = {
 		try {
 			await interaction.deferReply();
 
-			if (!interaction.guild) {
-				return await interaction.editReply({
-					content: "❌ This command can only be used in a server.",
-				});
-			}
-
 			const stat = interaction.options.getString("stat");
 			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
 			const squads = interaction.options.getBoolean("squads");
@@ -94,14 +88,6 @@ module.exports = {
 			const stat = parts[2];
 			const serverOnly = parts[3] === "true";
 			const squads = parts[4] === "null" ? null : parts[4] === "true";
-
-			if (!interaction.guild) {
-				return await interaction.update({
-					content: "❌ This command can only be used in a server.",
-					embeds: [],
-					components: [],
-				});
-			}
 
 			const serverId = interaction.guild.id;
 

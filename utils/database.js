@@ -557,6 +557,115 @@ class Database {
 			return [];
 		}
 	}
+
+	async saveStreakCache(serverId, streakCache) {
+		if (!this.useDatabase) {
+			return;
+		}
+
+		try {
+			// Begin transaction for atomic updates
+			const client = await this.pool.connect();
+			
+			try {
+				await client.query("BEGIN");
+
+				// Clear existing streak cache for this server
+				await client.query(
+					"DELETE FROM streak_cache WHERE server_id = $1",
+					[serverId],
+				);
+
+				// Insert new streak cache data
+				for (const [userId, streakData] of streakCache) {
+					await client.query(
+						`INSERT INTO streak_cache (server_id, user_id, cache_data, updated_at)
+						 VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
+						[serverId, userId, JSON.stringify(streakData)],
+					);
+				}
+
+				await client.query("COMMIT");
+				console.log(`Saved streak cache for server ${serverId} (${streakCache.size} users)`);
+			}
+			catch (error) {
+				await client.query("ROLLBACK");
+				throw error;
+			}
+			finally {
+				client.release();
+			}
+		}
+		catch (error) {
+			console.error("Error saving streak cache:", error);
+		}
+	}
+
+	async loadStreakCache(serverId) {
+		if (!this.useDatabase) {
+			return new Map();
+		}
+
+		try {
+			const result = await this.pool.query(
+				"SELECT user_id, cache_data FROM streak_cache WHERE server_id = $1",
+				[serverId],
+			);
+
+			const cache = new Map();
+			for (const row of result.rows) {
+				try {
+					cache.set(row.user_id, JSON.parse(row.cache_data));
+				}
+				catch (parseError) {
+					console.warn(`Failed to parse streak cache data for user ${row.user_id}:`, parseError);
+				}
+			}
+
+			console.log(`Loaded streak cache for server ${serverId} (${cache.size} users)`);
+			return cache;
+		}
+		catch (error) {
+			console.error("Error loading streak cache:", error);
+			return new Map();
+		}
+	}
+
+	async clearStreakCache(serverId) {
+		if (!this.useDatabase) {
+			return;
+		}
+
+		try {
+			await this.pool.query(
+				"DELETE FROM streak_cache WHERE server_id = $1",
+				[serverId],
+			);
+			console.log(`Cleared streak cache for server ${serverId}`);
+		}
+		catch (error) {
+			console.error("Error clearing streak cache:", error);
+		}
+	}
+
+	async getStreakCacheAge(serverId) {
+		if (!this.useDatabase) {
+			return null;
+		}
+
+		try {
+			const result = await this.pool.query(
+				"SELECT MAX(updated_at) as last_update FROM streak_cache WHERE server_id = $1",
+				[serverId],
+			);
+
+			return result.rows[0]?.last_update || null;
+		}
+		catch (error) {
+			console.error("Error getting streak cache age:", error);
+			return null;
+		}
+	}
 }
 
 module.exports = new Database();
