@@ -137,7 +137,7 @@ class StreakCache {
 
 						const streakStats = await this.calculatePlayerStreaksFromTables(allTables, loungeUser.name);
 						if (streakStats) {
-							serverCache.set(userId, {
+							serverCache.set(loungeUser.name.toLowerCase(), {
 								userId,
 								loungeUser,
 								...streakStats,
