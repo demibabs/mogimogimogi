@@ -5,7 +5,7 @@ const streakCache = require("../../utils/streakCache");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("streaks")
-		.setDescription("Shows win streak leaderboard for the current season."),
+		.setDescription("shows win streak leaderboard for the current season."),
 
 	async execute(interaction) {
 		try {
@@ -71,7 +71,7 @@ module.exports = {
 
 			// Create embed
 			const embed = new EmbedBuilder()
-				.setTitle(`winstreaks - ${type}`)
+				.setTitle(`win streaks - ${type}`)
 				.setColor("#4ECDC4")
 				.setTimestamp();
 
@@ -117,7 +117,7 @@ module.exports = {
 						}
 					}
 					
-					description += `${rank}. ${flagEmoji} ${displayName}: ${streakText} ${mmrText}${dateText}\n`;
+					description += `${rank}. ${flagEmoji} **${displayName}**: ${streakText} ${mmrText}${dateText}\n`;
 				}
 
 				embed.setDescription(description);

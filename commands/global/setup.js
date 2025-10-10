@@ -80,7 +80,7 @@ module.exports = {
 					const newCacheInfo = optimizedLeaderboard.getCacheInfo(serverId);
 					
 					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
-						loungers.length === 1 ? "" : "s"}.\n\nleaderboard cache created with ${newCacheInfo.userCount} users!\n\nbuilding streak cache...`);
+						loungers.length === 1 ? "" : "s"}.\n\nleaderboard cache created!\n\nbuilding streak cache...`);
 					
 					// Also create streak cache
 					await streakCache.refreshServerStreaksFromDB(serverId);
