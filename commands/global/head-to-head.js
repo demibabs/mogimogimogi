@@ -254,8 +254,8 @@ module.exports = {
 				fields.push({
 					name: `${player1NameWithFlag}'s biggest victory:`,
 					value: `[in this ${table1.numPlayers}p ${table1.format}](https://lounge.mkcentral.com/mkworld/TableDetails/${biggestWin1.tableId}) ` +
-						`${discordUser1.toString()} scored ${biggestWin1.player1Score} (rank ${biggestWin1.player1Rank}) ` +
-						`while ${discordUser2.toString()} scored ${biggestWin1.player1Score - biggestWin1.scoreDifference} (rank ${biggestWin1.player2Rank}). `,
+						`${discordUser1.displayName} scored ${biggestWin1.player1Score} (rank ${biggestWin1.player1Rank}) ` +
+						`while ${discordUser2.displayName} scored ${biggestWin1.player1Score - biggestWin1.scoreDifference} (rank ${biggestWin1.player2Rank}). `,
 				});
 			}
 
