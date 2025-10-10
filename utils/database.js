@@ -640,14 +640,10 @@ class Database {
 				[serverId],
 			);
 
-			console.log(`DEBUG: Loading streak cache for server ${serverId}, found ${result.rows.length} entries`);
-
 			const cache = new Map();
 			const corruptedUserIds = [];
 			
 			for (const row of result.rows) {
-				console.log(`DEBUG: Loading entry - UserId: ${row.user_id}, Data type: ${typeof row.cache_data}`);
-				
 				// PostgreSQL JSONB data is already parsed, no need for JSON.parse()
 				if (row.cache_data && typeof row.cache_data === "object") {
 					// The cache expects player names as keys, not userIds
@@ -665,16 +661,14 @@ class Database {
 						}
 						
 						cache.set(playerName, streakData);
-						console.log(`DEBUG: Successfully loaded data for player ${playerName} (userId: ${row.user_id})`);
 					}
 					else {
-						console.warn(`Streak data missing loungeUser.name for user ${row.user_id}:`, row.cache_data);
+						console.warn(`Streak data missing loungeUser.name for user ${row.user_id}`);
 						corruptedUserIds.push(row.user_id);
 					}
 				}
 				else {
-					console.warn(`Invalid streak cache data for user ${row.user_id}:`, row.cache_data);
-					console.warn("Data type:", typeof row.cache_data);
+					console.warn(`Invalid streak cache data for user ${row.user_id}`);
 					// Track invalid entries to clean them up
 					corruptedUserIds.push(row.user_id);
 				}

@@ -3,6 +3,7 @@ const DataManager = require("../../utils/dataManager");
 const LoungeApi = require("../../utils/loungeApi");
 const database = require("../../utils/database");
 const optimizedLeaderboard = require("../../utils/optimizedLeaderboard");
+const streakCache = require("../../utils/streakCache");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -44,7 +45,7 @@ module.exports = {
 			}
 
 			if (loungers.length === 0) {
-				return await interaction.editReply("setup complete! No new users to add. :)");
+				return await interaction.editReply("setup complete! no new users to add. :)");
 			}
 
 			await interaction.editReply(`adding ${loungers.length} new users to server data...`);
@@ -79,12 +80,35 @@ module.exports = {
 					const newCacheInfo = optimizedLeaderboard.getCacheInfo(serverId);
 					
 					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
-						loungers.length === 1 ? "" : "s"}.\n\n✅ leaderboard cache created with ${newCacheInfo.userCount} users!`);
+						loungers.length === 1 ? "" : "s"}.\n\nleaderboard cache created with ${newCacheInfo.userCount} users!\n\nbuilding streak cache...`);
+					
+					// Also create streak cache
+					await streakCache.refreshServerStreaksFromDB(serverId);
+					
+					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
+						loungers.length === 1 ? "" : "s"}.\n\nleaderboard cache created with ${newCacheInfo.userCount} users!\nstreak cache created!`);
 				}
 				catch (error) {
 					console.error("failed to create cache during setup:", error);
 					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
-						loungers.length === 1 ? "" : "s"}.\n\n⚠️ cache creation failed, but you can manually create it with /cache refresh.`);
+						loungers.length === 1 ? "" : "s"}.\n\ncache creation failed.`);
+				}
+			}
+			else {
+				// If leaderboard cache exists, still check and create streak cache if needed
+				try {
+					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
+						loungers.length === 1 ? "" : "s"}.\n\nbuilding streak cache...`);
+					
+					await streakCache.refreshServerStreaksFromDB(serverId);
+					
+					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
+						loungers.length === 1 ? "" : "s"}.\n\nstreak cache created!`);
+				}
+				catch (error) {
+					console.error("failed to create streak cache during setup:", error);
+					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
+						loungers.length === 1 ? "" : "s"}.\n\nstreak cache creation failed.`);
 				}
 			}
 		}
