@@ -20,7 +20,7 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName("refresh-all")
-				.setDescription("force refresh cache for all servers."))
+				.setDescription("force refresh cache for all servers the bot is in."))
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName("clear")
@@ -255,8 +255,25 @@ module.exports = {
 			await interaction.editReply({ embeds: [embed] });
 			console.log("Initial embed sent, starting cache refresh...");
 
+			// Get all servers the bot is in
+			const allGuilds = interaction.client.guilds.cache;
+			const serverIds = Array.from(allGuilds.keys());
+			
+			console.log(`Found ${serverIds.length} servers to refresh cache for`);
+
 			const startTime = Date.now();
-			await optimizedLeaderboard.refreshAllCaches();
+			
+			// Refresh cache for each server the bot is in
+			for (const serverId of serverIds) {
+				try {
+					await optimizedLeaderboard.updateServerCache(serverId);
+					console.log(`✅ Refreshed cache for server ${serverId}`);
+				}
+				catch (error) {
+					console.error(`❌ Failed to refresh cache for server ${serverId}:`, error);
+				}
+			}
+			
 			const endTime = Date.now();
 			const duration = ((endTime - startTime) / 1000).toFixed(1);
 
@@ -270,7 +287,7 @@ module.exports = {
 
 			const successEmbed = new EmbedBuilder()
 				.setTitle("✅ All Server Caches Refreshed")
-				.setDescription(`Successfully refreshed caches for **${serverCount}** servers in **${duration}s**`)
+				.setDescription(`Successfully refreshed caches for **${serverIds.length}** servers in **${duration}s**\n\nBuilt cache for servers: **${serverCount}** with data`)
 				.setColor("#4ECDC4")
 				.setTimestamp();
 
