@@ -156,7 +156,7 @@ module.exports = {
 
 			// Set title based on stat and time filter (simple lowercase style)
 			const statNames = {
-				"mMR": timeFilter === "weekly" ? "weekly mmr change" : timeFilter === "season" ? "season mmr change" : "mmr",
+				"mMR": timeFilter === "all" ? "mmr" : "mmr change",
 				"tWR": "team win rate",
 				"aS": "average score",
 				"hS": "highest score",
@@ -234,7 +234,7 @@ module.exports = {
 			return { embed };
 		}
 		catch (error) {
-			console.error("Error generating optimized leaderboard:", error);
+			console.error("error generating optimized leaderboard:", error);
 			return null;
 		}
 	},

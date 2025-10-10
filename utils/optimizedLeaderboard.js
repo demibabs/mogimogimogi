@@ -70,22 +70,21 @@ class LeaderboardCache {
 			const now = Date.now();
 			const timeSinceUpdate = now - lastUpdate;
 			
-			// Only force refresh if cache is completely missing or very stale (2+ hours)
-			const forceRefresh = !this.cache.has(serverId) || timeSinceUpdate > (2 * 60 * 60 * 1000);
-			
-			if (forceRefresh) {
-				console.log(`Force refreshing cache for server ${serverId} (${Math.round(timeSinceUpdate / 60000)} minutes old)`);
+			// Force refresh only if cache is missing
+			if (!this.cache.has(serverId)) {
+				console.log(`No cache found for server ${serverId}, building initial cache`);
 				await this.updateServerCache(serverId);
 			}
 			else if (timeSinceUpdate > this.updateInterval) {
-				// Cache is expired but not critically old - use existing cache and trigger background refresh
+				// Cache is expired - use existing cache and trigger background refresh if not already running
 				if (!this.backgroundRefreshes.get(serverId)) {
-					console.log(`Using stale cache for server ${serverId}, refreshing in background`);
+					console.log(`Cache expired for server ${serverId} (${Math.round(timeSinceUpdate / 60000)} minutes old), refreshing in background`);
 					this.backgroundRefreshes.set(serverId, true);
 					
 					// Non-blocking background refresh
 					this.updateServerCache(serverId).then(() => {
 						this.backgroundRefreshes.delete(serverId);
+						console.log(`Background refresh completed for server ${serverId}`);
 					}).catch(error => {
 						console.error("Background refresh failed:", error);
 						this.backgroundRefreshes.delete(serverId);
@@ -470,16 +469,38 @@ class LeaderboardCache {
 	clearCache(serverId) {
 		this.cache.delete(serverId);
 		this.lastUpdate.delete(serverId);
+		this.backgroundRefreshes.delete(serverId);
 		console.log(`Cache cleared for server ${serverId}`);
 	}
 
 	/**
-	 * Clear all caches
+	 * Clear all caches for all servers
 	 */
 	clearAllCaches() {
+		const serverCount = this.cache.size;
 		this.cache.clear();
 		this.lastUpdate.clear();
-		console.log("All caches cleared");
+		this.backgroundRefreshes.clear();
+		console.log(`All caches cleared for ${serverCount} servers`);
+	}
+
+	/**
+	 * Force refresh all server caches
+	 */
+	async refreshAllCaches() {
+		const servers = Array.from(this.cache.keys());
+		console.log(`Force refreshing caches for ${servers.length} servers...`);
+		
+		for (const serverId of servers) {
+			try {
+				await this.updateServerCache(serverId);
+				console.log(`✅ Refreshed cache for server ${serverId}`);
+			} catch (error) {
+				console.error(`❌ Failed to refresh cache for server ${serverId}:`, error);
+			}
+		}
+		
+		console.log(`Completed refresh for all ${servers.length} servers`);
 	}
 
 	/**
