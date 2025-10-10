@@ -646,17 +646,17 @@ class Database {
 			const corruptedUserIds = [];
 			
 			for (const row of result.rows) {
-				console.log(`DEBUG: Loading entry - UserId: ${row.user_id}, Data type: ${typeof row.cache_data}, Raw data:`, row.cache_data);
-				try {
-					const parsedData = JSON.parse(row.cache_data);
-					console.log("DEBUG: Successfully parsed data:", parsedData);
-					cache.set(row.user_id, parsedData);
+				console.log(`DEBUG: Loading entry - UserId: ${row.user_id}, Data type: ${typeof row.cache_data}`);
+				
+				// PostgreSQL JSONB data is already parsed, no need for JSON.parse()
+				if (row.cache_data && typeof row.cache_data === "object") {
+					cache.set(row.user_id, row.cache_data);
+					console.log(`DEBUG: Successfully loaded data for user ${row.user_id}`);
 				}
-				catch (parseError) {
-					console.warn(`Failed to parse streak cache data for user ${row.user_id}:`, parseError);
-					console.warn("Raw data:", row.cache_data);
+				else {
+					console.warn(`Invalid streak cache data for user ${row.user_id}:`, row.cache_data);
 					console.warn("Data type:", typeof row.cache_data);
-					// Track corrupted entries to clean them up
+					// Track invalid entries to clean them up
 					corruptedUserIds.push(row.user_id);
 				}
 			}
