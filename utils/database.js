@@ -588,9 +588,6 @@ class Database {
 		}
 
 		try {
-			console.log(`DEBUG: Saving streak cache for server ${serverId}, size: ${streakCache.size}`);
-			console.log("DEBUG: Sample of what's being saved:", Array.from(streakCache.entries()).slice(0, 2));
-			
 			// Begin transaction for atomic updates
 			const client = await this.pool.connect();
 			
@@ -608,19 +605,11 @@ class Database {
 					// The key is now playerName.toLowerCase(), but we need userId for database
 					// The streakData contains userId, so extract it
 					if (streakData.userId) {
-						console.log(`DEBUG: Inserting - Key: ${playerNameKey}, UserId: ${streakData.userId}, Data type: ${typeof streakData}`);
-						console.log("DEBUG: Data to stringify:", streakData);
-						const jsonString = JSON.stringify(streakData);
-						console.log("DEBUG: JSON string:", jsonString);
-						
 						await client.query(
 							`INSERT INTO streak_cache (server_id, user_id, cache_data, updated_at)
 							 VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
-							[serverId, streakData.userId, jsonString],
+							[serverId, streakData.userId, JSON.stringify(streakData)],
 						);
-					}
-					else {
-						console.warn("DEBUG: Skipping entry with no userId - Key:", playerNameKey, "Data:", streakData);
 					}
 				}
 
@@ -651,12 +640,17 @@ class Database {
 				[serverId],
 			);
 
+			console.log(`DEBUG: Loading streak cache for server ${serverId}, found ${result.rows.length} entries`);
+
 			const cache = new Map();
 			const corruptedUserIds = [];
 			
 			for (const row of result.rows) {
+				console.log(`DEBUG: Loading entry - UserId: ${row.user_id}, Data type: ${typeof row.cache_data}, Raw data:`, row.cache_data);
 				try {
-					cache.set(row.user_id, JSON.parse(row.cache_data));
+					const parsedData = JSON.parse(row.cache_data);
+					console.log("DEBUG: Successfully parsed data:", parsedData);
+					cache.set(row.user_id, parsedData);
 				}
 				catch (parseError) {
 					console.warn(`Failed to parse streak cache data for user ${row.user_id}:`, parseError);
