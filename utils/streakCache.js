@@ -256,9 +256,10 @@ class StreakCache {
 
 	/**
 	 * Calculate win streaks for a player from their table data (using LoungeApi format)
+	 * Win streaks are calculated only for the current season (Season 1)
 	 * @param {Object} tables - Tables object from LoungeApi.getAllPlayerTables
 	 * @param {string} playerName - Player name
-	 * @returns {Object} Streak data
+	 * @returns {Object} Streak data for current season
 	 */
 	calculatePlayerStreaksFromTables(tables, playerName) {
 		console.log(`Calculating streaks for ${playerName} from ${Object.keys(tables).length} tables`);

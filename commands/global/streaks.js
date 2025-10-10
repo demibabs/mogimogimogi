@@ -4,7 +4,7 @@ const optimizedLeaderboard = require("../../utils/optimizedLeaderboard");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("streaks")
-		.setDescription("shows win streak leaderboard for the server."),
+		.setDescription("Shows win streak leaderboard for the current season."),
 
 	async execute(interaction) {
 		try {
@@ -84,12 +84,12 @@ module.exports = {
 
 			// Create embed
 			const embed = new EmbedBuilder()
-				.setTitle(`win streaks - ${type}`)
+				.setTitle(`🏆 Season 1 Win Streaks - ${type}`)
 				.setColor("#4ECDC4")
 				.setTimestamp();
 
 			if (playersWithStreaks.length === 0) {
-				embed.setDescription("no active win streaks found.");
+				embed.setDescription("No active win streaks found in Season 1.");
 			}
 			else {
 				// Build leaderboard description (top 5 only)
