@@ -650,8 +650,17 @@ class Database {
 				
 				// PostgreSQL JSONB data is already parsed, no need for JSON.parse()
 				if (row.cache_data && typeof row.cache_data === "object") {
-					cache.set(row.user_id, row.cache_data);
-					console.log(`DEBUG: Successfully loaded data for user ${row.user_id}`);
+					// The cache expects player names as keys, not userIds
+					// Extract the loungeUser name from the stored data
+					if (row.cache_data.loungeUser && row.cache_data.loungeUser.name) {
+						const playerName = row.cache_data.loungeUser.name.toLowerCase();
+						cache.set(playerName, row.cache_data);
+						console.log(`DEBUG: Successfully loaded data for player ${playerName} (userId: ${row.user_id})`);
+					}
+					else {
+						console.warn(`Streak data missing loungeUser.name for user ${row.user_id}:`, row.cache_data);
+						corruptedUserIds.push(row.user_id);
+					}
 				}
 				else {
 					console.warn(`Invalid streak cache data for user ${row.user_id}:`, row.cache_data);
