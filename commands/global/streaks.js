@@ -84,12 +84,12 @@ module.exports = {
 
 			// Create embed
 			const embed = new EmbedBuilder()
-				.setTitle(`🏆 Season 1 Win Streaks - ${type}`)
+				.setTitle(`🏆 Win Streaks - ${type}`)
 				.setColor("#4ECDC4")
 				.setTimestamp();
 
 			if (playersWithStreaks.length === 0) {
-				embed.setDescription("No active win streaks found in Season 1.");
+				embed.setDescription("No active win streaks found.");
 			}
 			else {
 				// Build leaderboard description (top 5 only)

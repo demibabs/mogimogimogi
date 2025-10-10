@@ -271,6 +271,8 @@ class StreakCache {
 			const table = tables[tableId];
 			if (!table || !table.teams || !table.createdOn) continue;
 
+			console.log(`Processing table ${tableId} for ${playerName}, season: ${table.season}, created: ${table.createdOn}`);
+
 			// Find player in this table
 			let playerData = null;
 			for (const team of table.teams) {
@@ -284,6 +286,7 @@ class StreakCache {
 						date: new Date(table.createdOn),
 						tableId: parseInt(tableId),
 					};
+					console.log(`Found ${playerName} in table ${tableId}: rank ${team.rank}, score ${player.score}, season ${table.season}`);
 					break;
 				}
 			}
