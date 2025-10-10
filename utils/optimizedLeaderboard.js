@@ -11,7 +11,48 @@ class LeaderboardCache {
 	constructor() {
 		this.cache = new Map();
 		this.lastUpdate = new Map();
-		this.updateInterval = 5 * 60 * 1000;
+		this.updateInterval = 60 * 60 * 1000;
+		this.backgroundRefreshes = new Map();
+		
+		// Start background refresh timers for active servers
+		this.startBackgroundRefresh();
+	}
+
+	/**
+	 * Start background refresh for active servers
+	 */
+	startBackgroundRefresh() {
+		// Check every 10 minutes for servers that need background refresh
+		setInterval(() => {
+			this.performBackgroundRefreshes();
+		}, 10 * 60 * 1000);
+	}
+
+	/**
+	 * Perform background refreshes for servers with active users
+	 */
+	async performBackgroundRefreshes() {
+		for (const [serverId, lastUpdate] of this.lastUpdate) {
+			const now = Date.now();
+			const timeSinceUpdate = now - lastUpdate;
+			
+			// If cache is 50 minutes old, refresh in background (before 1 hour expiry)
+			if (timeSinceUpdate > (50 * 60 * 1000) && timeSinceUpdate < this.updateInterval) {
+				if (!this.backgroundRefreshes.get(serverId)) {
+					this.backgroundRefreshes.set(serverId, true);
+					console.log(`Starting background refresh for server ${serverId}`);
+					
+					// Refresh in background without blocking
+					this.updateServerCache(serverId).then(() => {
+						this.backgroundRefreshes.delete(serverId);
+						console.log(`Background refresh completed for server ${serverId}`);
+					}).catch(error => {
+						console.error(`Background refresh failed for server ${serverId}:`, error);
+						this.backgroundRefreshes.delete(serverId);
+					});
+				}
+			}
+		}
 	}
 
 	/**
@@ -25,12 +66,31 @@ class LeaderboardCache {
 	 */
 	async getLeaderboard(serverId, stat, timeFilter = "all", serverOnly = false, squads = null) {
 		try {
-			// Check if we need to update cache
 			const lastUpdate = this.lastUpdate.get(serverId) || 0;
 			const now = Date.now();
+			const timeSinceUpdate = now - lastUpdate;
 			
-			if (now - lastUpdate > this.updateInterval || !this.cache.has(serverId)) {
+			// Only force refresh if cache is completely missing or very stale (2+ hours)
+			const forceRefresh = !this.cache.has(serverId) || timeSinceUpdate > (2 * 60 * 60 * 1000);
+			
+			if (forceRefresh) {
+				console.log(`Force refreshing cache for server ${serverId} (${Math.round(timeSinceUpdate / 60000)} minutes old)`);
 				await this.updateServerCache(serverId);
+			}
+			else if (timeSinceUpdate > this.updateInterval) {
+				// Cache is expired but not critically old - use existing cache and trigger background refresh
+				if (!this.backgroundRefreshes.get(serverId)) {
+					console.log(`Using stale cache for server ${serverId}, refreshing in background`);
+					this.backgroundRefreshes.set(serverId, true);
+					
+					// Non-blocking background refresh
+					this.updateServerCache(serverId).then(() => {
+						this.backgroundRefreshes.delete(serverId);
+					}).catch(error => {
+						console.error("Background refresh failed:", error);
+						this.backgroundRefreshes.delete(serverId);
+					});
+				}
 			}
 
 			const serverCache = this.cache.get(serverId);
