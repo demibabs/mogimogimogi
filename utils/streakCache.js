@@ -323,7 +323,8 @@ class StreakCache {
 		// Track streaks going through tables chronologically
 		for (let i = 0; i < playerTables.length; i++) {
 			const table = playerTables[i];
-			const isWin = table.rank === 1;
+			// Win = positive MMR gain
+			const isWin = table.delta > 0;
 
 			console.log(`Table ${table.tableId}: rank ${table.rank}, isWin: ${isWin}, delta: ${table.delta}`);
 
