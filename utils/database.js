@@ -654,7 +654,17 @@ class Database {
 					// Extract the loungeUser name from the stored data
 					if (row.cache_data.loungeUser && row.cache_data.loungeUser.name) {
 						const playerName = row.cache_data.loungeUser.name.toLowerCase();
-						cache.set(playerName, row.cache_data);
+						
+						// Convert date strings back to Date objects
+						const streakData = { ...row.cache_data };
+						if (streakData.longestStreakStart) {
+							streakData.longestStreakStart = new Date(streakData.longestStreakStart);
+						}
+						if (streakData.longestStreakEnd) {
+							streakData.longestStreakEnd = new Date(streakData.longestStreakEnd);
+						}
+						
+						cache.set(playerName, streakData);
 						console.log(`DEBUG: Successfully loaded data for player ${playerName} (userId: ${row.user_id})`);
 					}
 					else {
