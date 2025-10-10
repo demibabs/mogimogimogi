@@ -5,7 +5,7 @@ const streakCache = require("../../utils/streakCache");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("streaks")
-		.setDescription("shows win streak leaderboard for the current season."),
+		.setDescription("shows who's been on a hot streak of mogis."),
 
 	async execute(interaction) {
 		try {
