@@ -594,6 +594,32 @@ class LeaderboardCache {
 			isStale: lastUpdate ? (Date.now() - lastUpdate > this.updateInterval) : true,
 		};
 	}
+
+	/**
+	 * Get all cached server IDs
+	 * @returns {string[]} Array of server IDs
+	 */
+	getAllCachedServerIds() {
+		return Array.from(this.cache.keys());
+	}
+
+	/**
+	 * Get cache information for all servers
+	 * @returns {Object[]} Array of cache info for all servers
+	 */
+	getAllCacheInfo() {
+		const cacheInfo = [];
+		
+		for (const serverId of this.cache.keys()) {
+			const info = this.getCacheInfo(serverId);
+			cacheInfo.push({
+				serverId,
+				...info,
+			});
+		}
+
+		return cacheInfo;
+	}
 }
 
 // Export singleton instance
