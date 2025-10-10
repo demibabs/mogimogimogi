@@ -152,6 +152,9 @@ module.exports = {
 			const userValidation = await AutoUserManager.validateUserForCommand(discordUser.id, serverId, interaction.client);
 			
 			if (!userValidation.success) {
+				if (userValidation.needsSetup) {
+					return { success: false, message: "this server hasn't been set up yet. run `/setup` first." };
+				}
 				return { success: false, message: userValidation.message };
 			}
 

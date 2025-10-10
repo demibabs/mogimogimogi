@@ -157,13 +157,19 @@ module.exports = {
 			const user1Validation = await AutoUserManager.validateUserForCommand(userId1, serverId, interaction.client);
 			const user2Validation = await AutoUserManager.validateUserForCommand(userId2, serverId, interaction.client);
 			
-			if (!user1Validation.success) {
-				return { success: false, message: `player 1: ${user1Validation.message}` };
-			}
-			
-			if (!user2Validation.success) {
-				return { success: false, message: `player 2: ${user2Validation.message}` };
-			}
+	       if (!user1Validation.success) {
+		       if (user1Validation.needsSetup) {
+			       return { success: false, message: "this server hasn't been set up yet. run `/setup` first." };
+		       }
+		       return { success: false, message: `player 1: ${user1Validation.message}` };
+	       }
+
+	       if (!user2Validation.success) {
+		       if (user2Validation.needsSetup) {
+			       return { success: false, message: "this server hasn't been set up yet. run `/setup` first." };
+		       }
+		       return { success: false, message: `player 2: ${user2Validation.message}` };
+	       }
 
 			// Update user data in background
 			try {

@@ -17,50 +17,49 @@ class AutoUserManager {
 	 */
 	static async ensureUserExists(userId, serverId, client) {
 		try {
-			// First check if server has any data at all
-			const serverData = await database.getServerData(serverId);
-			
-			if (!serverData || !serverData.users) {
-				return {
-					success: false,
-					needsSetup: true,
-					message: "this server hasn't been set up yet. please ask an admin to run `/setup` first.",
-				};
-			}
-			
-			// Check if user already exists in server data
-			if (serverData.users[userId]) {
-				return {
-					success: true,
-					message: "user already exists in server data",
-				};
-			}
-			
-			// User doesn't exist - check if they have a lounge account
-			console.log(`User ${userId} not found in server ${serverId}, checking for lounge account...`);
-			
-			const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
-			
-			if (!loungeUser) {
-				return {
-					success: false,
-					needsSetup: false,
-					message: "you don't have a mario kart wii lounge account linked to your discord. please link your account at https://www.mariokartcentral.com/mkw/lounge/ and try again.",
-				};
-			}
-			
-			// User has a lounge account - add them automatically
-			console.log(`Found lounge account for ${userId} (${loungeUser.name}), adding to server...`);
-			
-			await DataManager.addServerUser(serverId, userId, client);
-			
-			console.log(`Successfully added user ${userId} (${loungeUser.name}) to server ${serverId}`);
-			
-			return {
-				success: true,
-				wasAdded: true,
-				message: `automatically added you to the server! welcome, ${loungeUser.name}! 🎉`,
-			};
+	       // First check if server has any data at all
+	       const serverData = await database.getServerData(serverId);
+	       if (!serverData || !serverData.users || Object.keys(serverData.users).length === 0) {
+		       return {
+			       success: false,
+			       needsSetup: true,
+			       message: "this server hasn't been set up yet. please ask an admin to run `/setup` first.",
+		       };
+	       }
+
+	       // Check if user already exists in server data
+	       if (serverData.users[userId]) {
+		       return {
+			       success: true,
+			       message: "user already exists in server data",
+		       };
+	       }
+
+	       // User doesn't exist - check if they have a lounge account
+	       console.log(`User ${userId} not found in server ${serverId}, checking for lounge account...`);
+
+	       const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
+
+	       if (!loungeUser) {
+		       return {
+			       success: false,
+			       needsSetup: false,
+			       message: "you don't have a mario kart wii lounge account linked to your discord. please link your account at https://www.mariokartcentral.com/mkw/lounge/ and try again.",
+		       };
+	       }
+
+	       // User has a lounge account - add them automatically
+	       console.log(`Found lounge account for ${userId} (${loungeUser.name}), adding to server...`);
+
+	       await DataManager.addServerUser(serverId, userId, client);
+
+	       console.log(`Successfully added user ${userId} (${loungeUser.name}) to server ${serverId}`);
+
+	       return {
+		       success: true,
+		       wasAdded: true,
+		       message: `automatically added you to the server! welcome, ${loungeUser.name}! 🎉`,
+	       };
 			
 		}
 		catch (error) {
@@ -105,7 +104,11 @@ class AutoUserManager {
 			return { success: true };
 		}
 		
-		return { success: false, message: result.message };
+		return {
+			success: false,
+			message: result.message,
+			needsSetup: result.needsSetup || false,
+		};
 	}
 }
 
