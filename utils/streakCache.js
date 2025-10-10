@@ -110,7 +110,7 @@ class StreakCache {
 			const database = require("./database");
 			const LoungeApi = require("./loungeApi");
 			
-			console.log(`Refreshing streak cache for server ${serverId} from database...`);
+			console.log(`Refreshing streak cache for server ${serverId}...`);
 			
 			const serverData = await database.getServerData(serverId);
 			if (!serverData || !serverData.users) {
@@ -120,8 +120,6 @@ class StreakCache {
 
 			const serverCache = new Map();
 			const userEntries = Object.entries(serverData.users);
-			
-			console.log(`Calculating streaks for ${userEntries.length} users...`);
 
 			// Process users in batches
 			const batchSize = 5;
@@ -134,11 +132,8 @@ class StreakCache {
 						const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
 						if (!loungeUser?.name) return;
 
-						console.log(`Calculating streaks for player: ${loungeUser.name} (ID: ${userId})`);
-						
 						// Get player's table data
 						const allTables = await LoungeApi.getAllPlayerTables(userId, serverId);
-						console.log(`Found ${Object.keys(allTables).length} tables for ${loungeUser.name}`);
 
 						const streakStats = await this.calculatePlayerStreaksFromTables(allTables, loungeUser.name);
 						if (streakStats) {
@@ -283,41 +278,28 @@ class StreakCache {
 	 * @returns {Object} Streak data for current season
 	 */
 	calculatePlayerStreaksFromTables(tables, playerName) {
-		console.log(`Calculating streaks for ${playerName} from ${Object.keys(tables).length} tables`);
-
 		const playerTables = [];
 
-		// Convert LoungeApi table format to our format
+		// Convert LoungeApi table format to our format - optimized for streak calculation
 		for (const tableId in tables) {
 			const table = tables[tableId];
 			if (!table || !table.teams || !table.createdOn) continue;
 
-			console.log(`Processing table ${tableId} for ${playerName}, season: ${table.season}, created: ${table.createdOn}`);
-
-			// Find player in this table
-			let playerData = null;
+			// Flatten all players from all teams to find our target player efficiently
 			for (const team of table.teams) {
-				const player = team.scores.find(p =>
-					p.playerName.toLowerCase() === playerName.toLowerCase(),
-				);
-				if (player) {
-					playerData = {
-						...player,
-						rank: team.rank,
-						date: new Date(table.createdOn),
-						tableId: parseInt(tableId),
-					};
-					console.log(`Found ${playerName} in table ${tableId}: rank ${team.rank}, score ${player.score}, season ${table.season}`);
-					break;
+				for (const player of team.scores) {
+					if (player.playerName.toLowerCase() === playerName.toLowerCase()) {
+						playerTables.push({
+							delta: player.delta,
+							date: new Date(table.createdOn),
+							tableId: parseInt(tableId),
+						});
+						// Found player, no need to check more players in this table
+						break;
+					}
 				}
 			}
-
-			if (playerData) {
-				playerTables.push(playerData);
-			}
 		}
-
-		console.log(`Found ${playerTables.length} tables where ${playerName} participated`);
 
 		// Sort by date (oldest first)
 		playerTables.sort((a, b) => a.date - b.date);
@@ -346,8 +328,6 @@ class StreakCache {
 			const table = playerTables[i];
 			// Win = positive MMR gain
 			const isWin = table.delta > 0;
-
-			console.log(`Table ${table.tableId}: rank ${table.rank}, isWin: ${isWin}, delta: ${table.delta}`);
 
 			if (isWin) {
 				if (currentStreak === 0) {
@@ -387,7 +367,6 @@ class StreakCache {
 			longestStreakEnd: longestStreakEnd,
 		};
 
-		console.log(`Final streak results for ${playerName}:`, result);
 		return result;
 	}
 
