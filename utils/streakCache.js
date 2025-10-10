@@ -28,15 +28,31 @@ class StreakCache {
 			
 			// Load cache for all servers (if table exists)
 			const allCacheInfo = await database.getAllServerCacheInfo();
+			let loadedCount = 0;
+			
 			for (const serverInfo of allCacheInfo) {
-				const serverCache = await database.loadStreakCache(serverInfo.serverId);
-				if (serverCache.size > 0) {
-					this.cache.set(serverInfo.serverId, serverCache);
-					this.lastUpdate.set(serverInfo.serverId, Date.now());
+				try {
+					const serverCache = await database.loadStreakCache(serverInfo.serverId);
+					if (serverCache.size > 0) {
+						this.cache.set(serverInfo.serverId, serverCache);
+						this.lastUpdate.set(serverInfo.serverId, Date.now());
+						loadedCount++;
+					}
+				}
+				catch (error) {
+					console.warn(`Failed to load streak cache for server ${serverInfo.serverId}, will rebuild on demand:`, error.message);
+					// Clear corrupted data for this server
+					try {
+						await database.clearStreakCache(serverInfo.serverId);
+						console.log(`Cleared corrupted streak cache for server ${serverInfo.serverId}`);
+					}
+					catch (clearError) {
+						console.warn(`Failed to clear corrupted cache for server ${serverInfo.serverId}:`, clearError.message);
+					}
 				}
 			}
 			
-			console.log(`Loaded streak cache for ${allCacheInfo.length} servers`);
+			console.log(`Loaded streak cache for ${loadedCount} servers`);
 		}
 		catch (error) {
 			// If streak_cache table doesn't exist yet, just continue
@@ -45,6 +61,15 @@ class StreakCache {
 			}
 			else {
 				console.error("Failed to load streak cache from database:", error);
+				// If there are widespread corruption issues, consider clearing all data
+				try {
+					const database = require("./database");
+					await database.pool.query("DELETE FROM streak_cache");
+					console.log("Cleared all corrupted streak cache data");
+				}
+				catch (clearAllError) {
+					console.warn("Failed to clear all streak cache data:", clearAllError.message);
+				}
 			}
 		}
 	}

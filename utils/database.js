@@ -601,12 +601,16 @@ class Database {
 				);
 
 				// Insert new streak cache data
-				for (const [userId, streakData] of streakCache) {
-					await client.query(
-						`INSERT INTO streak_cache (server_id, user_id, cache_data, updated_at)
-						 VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
-						[serverId, userId, JSON.stringify(streakData)],
-					);
+				for (const [playerNameKey, streakData] of streakCache) {
+					// The key is now playerName.toLowerCase(), but we need userId for database
+					// The streakData contains userId, so extract it
+					if (streakData.userId) {
+						await client.query(
+							`INSERT INTO streak_cache (server_id, user_id, cache_data, updated_at)
+							 VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
+							[serverId, streakData.userId, JSON.stringify(streakData)],
+						);
+					}
 				}
 
 				await client.query("COMMIT");
@@ -637,6 +641,8 @@ class Database {
 			);
 
 			const cache = new Map();
+			const corruptedUserIds = [];
+			
 			for (const row of result.rows) {
 				try {
 					cache.set(row.user_id, JSON.parse(row.cache_data));
@@ -645,7 +651,25 @@ class Database {
 					console.warn(`Failed to parse streak cache data for user ${row.user_id}:`, parseError);
 					console.warn("Raw data:", row.cache_data);
 					console.warn("Data type:", typeof row.cache_data);
-					// Skip this corrupted entry
+					// Track corrupted entries to clean them up
+					corruptedUserIds.push(row.user_id);
+				}
+			}
+
+			// Clean up corrupted entries
+			if (corruptedUserIds.length > 0) {
+				console.log(`Cleaning up ${corruptedUserIds.length} corrupted streak cache entries for server ${serverId}`);
+				try {
+					for (const userId of corruptedUserIds) {
+						await this.pool.query(
+							"DELETE FROM streak_cache WHERE server_id = $1 AND user_id = $2",
+							[serverId, userId],
+						);
+					}
+					console.log(`Cleaned up corrupted entries for server ${serverId}`);
+				}
+				catch (cleanupError) {
+					console.warn("Failed to clean up corrupted entries:", cleanupError);
 				}
 			}
 
