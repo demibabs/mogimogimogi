@@ -688,6 +688,159 @@ class PlayerStats {
 		}
 		return filtered;
 	}
+
+	/**
+	 * Calculate win streaks for a player
+	 * @param {Object} tables - Object containing table data (tableId -> table)
+	 * @param {string} playerName - Name of the player
+	 * @returns {Object} Streak data including current and longest streaks
+	 */
+	static calculateWinStreaks(tables, playerName) {
+		const playerTables = [];
+
+		// Collect all tables where player participated
+		for (const tableId in tables) {
+			const table = tables[tableId];
+			if (!table || !table.teams || !table.createdOn) continue;
+
+			// Find player in this table
+			let playerData = null;
+			for (const team of table.teams) {
+				const player = team.scores.find(p =>
+					p.playerName.toLowerCase() === playerName.toLowerCase(),
+				);
+				if (player) {
+					playerData = {
+						...player,
+						rank: team.rank,
+						date: new Date(table.createdOn),
+						tableId: parseInt(tableId),
+					};
+					break;
+				}
+			}
+
+			if (playerData) {
+				playerTables.push(playerData);
+			}
+		}
+
+		// Sort by date (oldest first)
+		playerTables.sort((a, b) => a.date - b.date);
+
+		if (playerTables.length === 0) {
+			return {
+				currentWinStreak: 0,
+				currentStreakMmrGain: 0,
+				longestWinStreak: 0,
+				longestStreakMmrGain: 0,
+				longestStreakStart: null,
+				longestStreakEnd: null,
+			};
+		}
+
+		let currentStreak = 0;
+		let currentStreakMmr = 0;
+		let longestStreak = 0;
+		let longestStreakMmr = 0;
+		let longestStreakStart = null;
+		let longestStreakEnd = null;
+		let currentStreakStart = null;
+
+		// Track streaks going through tables chronologically
+		for (let i = 0; i < playerTables.length; i++) {
+			const table = playerTables[i];
+			const isWin = table.rank === 1;
+
+			if (isWin) {
+				if (currentStreak === 0) {
+					currentStreakStart = table.date;
+				}
+				currentStreak++;
+				currentStreakMmr += table.delta || 0;
+
+				// Check if this is our new longest streak
+				if (currentStreak > longestStreak) {
+					longestStreak = currentStreak;
+					longestStreakMmr = currentStreakMmr;
+					longestStreakStart = currentStreakStart;
+					longestStreakEnd = table.date;
+				}
+				else if (currentStreak === longestStreak && currentStreakMmr > longestStreakMmr) {
+					// Same length but more MMR gained
+					longestStreakMmr = currentStreakMmr;
+					longestStreakStart = currentStreakStart;
+					longestStreakEnd = table.date;
+				}
+			}
+			else {
+				// Streak broken
+				currentStreak = 0;
+				currentStreakMmr = 0;
+				currentStreakStart = null;
+			}
+		}
+
+		return {
+			currentWinStreak: currentStreak,
+			currentStreakMmrGain: currentStreakMmr,
+			longestWinStreak: longestStreak,
+			longestStreakMmrGain: longestStreakMmr,
+			longestStreakStart: longestStreakStart,
+			longestStreakEnd: longestStreakEnd,
+		};
+	}
+
+	/**
+	 * Get comprehensive player statistics including streaks
+	 * @param {string} playerName - Name of the player
+	 * @param {string} serverId - Server ID to get tables for
+	 * @returns {Object} Player statistics including streak data
+	 */
+	static async getPlayerStats(playerName, serverId) {
+		try {
+			// Get all tables for this server
+			const serverData = await database.getServerData(serverId);
+			if (!serverData || !serverData.tables) {
+				return null;
+			}
+
+			const tables = {};
+			for (const tableId of serverData.tables) {
+				try {
+					const tableData = await database.getTableData(tableId);
+					if (tableData) {
+						tables[tableId] = tableData;
+					}
+				}
+				catch (error) {
+					console.warn(`Failed to load table ${tableId}:`, error);
+				}
+			}
+
+			// Calculate all stats
+			const streakData = this.calculateWinStreaks(tables, playerName);
+			const matchesPlayed = this.getMatchesPlayed(tables, playerName);
+			const winRate = this.getWinRate(tables, playerName);
+			const avgPlacement = this.getAveragePlacement(tables, playerName);
+			const avgScore = this.getAverageScore(tables, playerName);
+			const avgSeed = this.getAverageSeed(tables, playerName);
+
+			return {
+				playerName,
+				matchesPlayed,
+				winRate,
+				avgPlacement,
+				avgScore,
+				avgSeed,
+				...streakData,
+			};
+		}
+		catch (error) {
+			console.error(`Error getting player stats for ${playerName}:`, error);
+			return null;
+		}
+	}
 }
 
 module.exports = PlayerStats;

@@ -6,6 +6,7 @@
 const LoungeApi = require("./loungeApi");
 const PlayerStats = require("./playerStats");
 const database = require("./database");
+const StreakCache = require("./streakCache");
 
 class LeaderboardCache {
 	constructor() {
@@ -13,6 +14,7 @@ class LeaderboardCache {
 		this.lastUpdate = new Map();
 		this.updateInterval = 60 * 60 * 1000;
 		this.backgroundRefreshes = new Map();
+		this.streakCache = new StreakCache();
 		
 		// Start background refresh timers for active servers
 		this.startBackgroundRefresh();
@@ -316,6 +318,16 @@ class LeaderboardCache {
 			}
 			
 			console.log(`Cache updated for server ${serverId} with ${userCache.size} users`);
+			
+			// Also update streak cache when leaderboard cache updates
+			try {
+				console.log(`Updating streak cache for server ${serverId}...`);
+				await this.streakCache.updateServerStreaks(serverId);
+				console.log(`Streak cache updated for server ${serverId}`);
+			}
+			catch (error) {
+				console.error(`Failed to update streak cache for server ${serverId}:`, error);
+			}
 		}
 		catch (error) {
 			console.error(`Error updating cache for server ${serverId}:`, error);
@@ -619,6 +631,14 @@ class LeaderboardCache {
 		}
 
 		return cacheInfo;
+	}
+
+	/**
+	 * Get the streak cache instance
+	 * @returns {StreakCache} The streak cache instance
+	 */
+	getStreakCache() {
+		return this.streakCache;
 	}
 }
 

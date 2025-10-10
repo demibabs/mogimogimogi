@@ -2,11 +2,12 @@ const { SlashCommandBuilder } = require("discord.js");
 const DataManager = require("../../utils/dataManager");
 const LoungeApi = require("../../utils/loungeApi");
 const database = require("../../utils/database");
+const optimizedLeaderboard = require("../../utils/optimizedLeaderboard");
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("setup")
-		.setDescription("adds every server user with a lounge account. takes a while."),
+		.setDescription("adds every server user with a lounge account and builds leaderboard cache."),
 
 	async execute(interaction) {
 		try {
@@ -64,6 +65,28 @@ module.exports = {
 
 			await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
 				loungers.length === 1 ? "" : "s"}.`);
+
+			// Check if server has cache, and create it if it doesn't
+			const serverId = interaction.guild.id;
+			const cacheInfo = optimizedLeaderboard.getCacheInfo(serverId);
+			
+			if (!cacheInfo.exists) {
+				await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
+					loungers.length === 1 ? "" : "s"}.\n\nbuilding leaderboard cache...`);
+				
+				try {
+					await optimizedLeaderboard.updateServerCache(serverId);
+					const newCacheInfo = optimizedLeaderboard.getCacheInfo(serverId);
+					
+					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
+						loungers.length === 1 ? "" : "s"}.\n\n✅ leaderboard cache created with ${newCacheInfo.userCount} users!`);
+				}
+				catch (error) {
+					console.error("failed to create cache during setup:", error);
+					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
+						loungers.length === 1 ? "" : "s"}.\n\n⚠️ cache creation failed, but you can manually create it with /cache refresh.`);
+				}
+			}
 		}
 		catch (error) {
 			console.error("setup error:", error);

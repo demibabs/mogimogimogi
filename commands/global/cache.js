@@ -148,13 +148,14 @@ module.exports = {
 
 	async showCacheInfo(interaction, serverId) {
 		const cacheInfo = optimizedLeaderboard.getCacheInfo(serverId);
+		const streakCacheInfo = optimizedLeaderboard.getStreakCache().getCacheInfo(serverId);
 
 		const embed = new EmbedBuilder()
-			.setTitle("📊 Leaderboard Cache Information")
+			.setTitle("📊 Cache Information")
 			.setColor("#4ECDC4")
 			.setTimestamp();
 
-		let description = "";
+		let description = "**Leaderboard Cache:**\n";
 
 		if (cacheInfo.lastUpdate) {
 			const timeSinceUpdate = Date.now() - cacheInfo.lastUpdate.getTime();
@@ -169,12 +170,27 @@ module.exports = {
 		}
 
 		description += `**Cached Users:** ${cacheInfo.userCount}\n`;
-		description += `**Cache Status:** ${cacheInfo.isStale ? "🟡 Stale" : "🟢 Fresh"}\n`;
-		description += "**Update Interval:** 1 hour\n\n";
+		description += `**Status:** ${cacheInfo.isStale ? "🟡 Stale" : "🟢 Fresh"}\n\n`;
+
+		description += "**Streak Cache:**\n";
+		if (streakCacheInfo.lastUpdate) {
+			const timeSinceUpdate = Date.now() - streakCacheInfo.lastUpdate.getTime();
+			const minutes = Math.floor(timeSinceUpdate / (1000 * 60));
+			const seconds = Math.floor((timeSinceUpdate % (1000 * 60)) / 1000);
+
+			description += `**Last Update:** ${streakCacheInfo.lastUpdate.toLocaleString()}\n`;
+			description += `**Time Since Update:** ${minutes}m ${seconds}s ago\n`;
+		}
+		else {
+			description += "**Last Update:** Never\n";
+		}
+
+		description += `**Cached Players:** ${streakCacheInfo.playerCount}\n`;
+		description += `**Status:** ${streakCacheInfo.isStale ? "🟡 Stale" : "🟢 Fresh"}\n\n`;
 
 		description += "**Benefits of Caching:**\n";
-		description += "• ⚡ 10-20x faster leaderboard generation\n";
-		description += "• 📊 Pre-computed statistics\n";
+		description += "• ⚡ 10-20x faster generation\n";
+		description += "• 📊 Pre-computed statistics & streaks\n";
 		description += "• 🔄 Automatic updates every hour\n";
 		description += "• 💾 Reduced API load\n";
 
@@ -186,28 +202,50 @@ module.exports = {
 	async refreshCache(interaction, serverId) {
 		const embed = new EmbedBuilder()
 			.setTitle("🔄 Refreshing Cache")
-			.setDescription("Please wait while the cache is being updated...")
+			.setDescription("Please wait while both leaderboard and streak caches are being updated...")
 			.setColor("#FFA726");
 
 		await interaction.editReply({ embeds: [embed] });
 
 		try {
 			const startTime = Date.now();
+			
+			// Refresh leaderboard cache first
 			await optimizedLeaderboard.refreshCache(serverId);
+			
+			// Get updated leaderboard data for streak calculation
+			const leaderboardData = await optimizedLeaderboard.getLeaderboard(
+				serverId,
+				"mMR",
+				"all",
+				false,
+				null,
+			);
+			
+			// Refresh streak cache
+			if (leaderboardData && leaderboardData.length > 0) {
+				await optimizedLeaderboard.getStreakCache().refreshServerStreaks(serverId, leaderboardData);
+			}
+			
 			const endTime = Date.now();
 			const duration = ((endTime - startTime) / 1000).toFixed(1);
 
 			const cacheInfo = optimizedLeaderboard.getCacheInfo(serverId);
+			const streakCacheInfo = optimizedLeaderboard.getStreakCache().getCacheInfo(serverId);
 
 			const successEmbed = new EmbedBuilder()
 				.setTitle("✅ Cache Refreshed Successfully")
 				.setColor("#4ECDC4")
 				.setTimestamp();
 
-			let description = `**Refresh Duration:** ${duration} seconds\n`;
-			description += `**Cached Users:** ${cacheInfo.userCount}\n`;
-			description += `**Updated At:** ${new Date().toLocaleString()}\n\n`;
-			description += "The leaderboard cache has been updated with the latest data!";
+			let description = `**Refresh Duration:** ${duration} seconds\n\n`;
+			description += "**Leaderboard Cache:**\n";
+			description += `• Cached Users: ${cacheInfo.userCount}\n`;
+			description += `• Updated At: ${new Date().toLocaleString()}\n\n`;
+			description += "**Streak Cache:**\n";
+			description += `• Cached Players: ${streakCacheInfo.playerCount}\n`;
+			description += `• Updated At: ${new Date().toLocaleString()}\n\n`;
+			description += "Both caches have been updated with the latest data!";
 
 			successEmbed.setDescription(description);
 
@@ -228,11 +266,12 @@ module.exports = {
 	async clearCache(interaction, serverId) {
 		const embed = new EmbedBuilder()
 			.setTitle("🗑️ Cache Cleared")
-			.setDescription("The cache has been cleared. It will be rebuilt on the next leaderboard request.")
+			.setDescription("Both leaderboard and streak caches have been cleared. They will be rebuilt on the next request.")
 			.setColor("#FFA726");
 
 		try {
 			await optimizedLeaderboard.clearCache(serverId);
+			await optimizedLeaderboard.getStreakCache().clearServerStreaks(serverId);
 			await interaction.editReply({ embeds: [embed] });
 		}
 		catch (error) {
