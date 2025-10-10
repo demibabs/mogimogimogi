@@ -210,17 +210,17 @@ module.exports = {
 
 			// Calculate statistics
 			const h2hEventsPlayed = Object.keys(h2hTables).length;
-			const h2hRecord = PlayerStats.getH2H(h2hTables, loungeUser1.name, loungeUser2.name);
+			const h2hRecord = PlayerStats.getH2H(h2hTables, userId1, userId2);
 
 			// Individual stats from H2H tables only
-			const user1AvgScore = PlayerStats.getAverageScore(h2hTables, loungeUser1.name);
-			const user2AvgScore = PlayerStats.getAverageScore(h2hTables, loungeUser2.name);
-			const user1AvgPlacement = PlayerStats.getAveragePlacement(h2hTables, loungeUser1.name);
-			const user2AvgPlacement = PlayerStats.getAveragePlacement(h2hTables, loungeUser2.name);
+			const user1AvgScore = PlayerStats.getAverageScore(h2hTables, userId1);
+			const user2AvgScore = PlayerStats.getAverageScore(h2hTables, userId2);
+			const user1AvgPlacement = PlayerStats.getAveragePlacement(h2hTables, userId1);
+			const user2AvgPlacement = PlayerStats.getAveragePlacement(h2hTables, userId2);
 
 			// Get biggest differences (notables-style)
-			const biggestWin1 = PlayerStats.getBiggestDifference(h2hTables, loungeUser1.name, loungeUser2.name);
-			const biggestWin2 = PlayerStats.getBiggestDifference(h2hTables, loungeUser2.name, loungeUser1.name);
+			const biggestWin1 = PlayerStats.getBiggestDifference(h2hTables, userId1, userId2);
+			const biggestWin2 = PlayerStats.getBiggestDifference(h2hTables, userId2, userId1);
 
 			// Format player names with flags
 			const player1NameWithFlag = embedEnhancer.formatPlayerNameWithFlag(discordUser1.displayName, loungeUser1.countryCode);

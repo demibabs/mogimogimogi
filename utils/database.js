@@ -646,10 +646,10 @@ class Database {
 			for (const row of result.rows) {
 				// PostgreSQL JSONB data is already parsed, no need for JSON.parse()
 				if (row.cache_data && typeof row.cache_data === "object") {
-					// The cache expects player names as keys, not userIds
-					// Extract the loungeUser name from the stored data
-					if (row.cache_data.loungeUser && row.cache_data.loungeUser.name) {
-						const playerName = row.cache_data.loungeUser.name.toLowerCase();
+					// The cache expects Discord IDs as keys
+					// Extract the userId from the stored data
+					if (row.cache_data.userId) {
+						const userId = row.cache_data.userId;
 						
 						// Convert date strings back to Date objects
 						const streakData = { ...row.cache_data };
@@ -660,10 +660,10 @@ class Database {
 							streakData.longestStreakEnd = new Date(streakData.longestStreakEnd);
 						}
 						
-						cache.set(playerName, streakData);
+						cache.set(userId, streakData);
 					}
 					else {
-						console.warn(`Streak data missing loungeUser.name for user ${row.user_id}`);
+						console.warn(`Streak data missing userId for user ${row.user_id}`);
 						corruptedUserIds.push(row.user_id);
 					}
 				}

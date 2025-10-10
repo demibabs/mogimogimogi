@@ -212,14 +212,14 @@ module.exports = {
 				return null;
 			}
 
-			const eP = PlayerStats.getMatchesPlayed(userTables, loungeUser.name);
-			const tWR = PlayerStats.getWinRate(userTables, loungeUser.name);
-			const aSc = PlayerStats.getAverageScore(userTables, loungeUser.name);
-			const bS = PlayerStats.getBestScore(userTables, loungeUser.name);
-			const wS = PlayerStats.getWorstScore(userTables, loungeUser.name);
-			const aSe = PlayerStats.getAverageSeed(userTables, loungeUser.name);
-			const aP = PlayerStats.getAveragePlacement(userTables, loungeUser.name);
-			const tH2H = await PlayerStats.getTotalH2H(userTables, loungeUser.name, serverId);
+			const eP = PlayerStats.getMatchesPlayed(userTables, userId);
+			const tWR = PlayerStats.getWinRate(userTables, userId);
+			const aSc = PlayerStats.getAverageScore(userTables, userId);
+			const bS = PlayerStats.getBestScore(userTables, userId);
+			const wS = PlayerStats.getWorstScore(userTables, userId);
+			const aSe = PlayerStats.getAverageSeed(userTables, userId);
+			const aP = PlayerStats.getAveragePlacement(userTables, userId);
+			const tH2H = await PlayerStats.getTotalH2H(userTables, userId, serverId);
 
 			const playerNameWithFlag = embedEnhancer.formatPlayerNameWithFlag(discordUser.displayName, loungeUser.countryCode);
 

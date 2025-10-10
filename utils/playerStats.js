@@ -59,13 +59,13 @@ class PlayerStats {
 	/**
 	 * Get a specific player's individual ranking from a table
 	 * @param {Object} table - Table object from the API
-	 * @param {string} playerName - Name of the player to find
+	 * @param {string} playerDiscordId - Discord ID of the player to find
 	 * @returns {Object|null} Player object with ranking info, or null if not found
 	 */
-	static getPlayerRankingInTable(table, playerName) {
+	static getPlayerRankingInTable(table, playerDiscordId) {
 		const rankings = PlayerStats.getIndividualPlayerRankings(table);
 		return rankings.find(player =>
-			player.playerName.toLowerCase() === playerName.toLowerCase(),
+			player.playerDiscordId === playerDiscordId,
 		) || null;
 	}
 
@@ -97,10 +97,10 @@ class PlayerStats {
 	/**
 	 * Calculate number of matches played by a player
 	 * @param {Object} tables - Object containing table data (tableId -> table)
-	 * @param {string} playerName - Name of the player
+	 * @param {string} playerDiscordId - Discord ID of the player
 	 * @returns {number} Number of matches played
 	 */
-	static getMatchesPlayed(tables, playerName) {
+	static getMatchesPlayed(tables, playerDiscordId) {
 		let matches = 0;
 		for (const tableId in tables) {
 			const table = tables[tableId];
@@ -109,7 +109,7 @@ class PlayerStats {
 			const players = PlayerStats.getPlayersFromTable(table);
 
 			for (const player of players) {
-				if (player.playerName === playerName) {
+				if (player.playerDiscordId === playerDiscordId) {
 					matches++;
 					// Found player in this table, move to next table
 					break;
@@ -123,10 +123,10 @@ class PlayerStats {
 	/**
 	 * Calculate win rate for a player
 	 * @param {Object} tables - Object containing table data (tableId -> table)
-	 * @param {string} playerName - Name of the player
+	 * @param {string} playerDiscordId - Discord ID of the player
 	 * @returns {number} Win rate (0-1) or -1 if no matches played
 	 */
-	static getWinRate(tables, playerName) {
+	static getWinRate(tables, playerDiscordId) {
 		let wins = 0;
 		let losses = 0;
 
@@ -137,7 +137,7 @@ class PlayerStats {
 			const players = PlayerStats.getPlayersFromTable(table);
 
 			for (const player of players) {
-				if (player.playerName === playerName) {
+				if (player.playerDiscordId === playerDiscordId) {
 					if (player.delta > 0) {
 						wins++;
 					}
@@ -158,10 +158,10 @@ class PlayerStats {
 	/**
 	 * Calculate average placement for a player
 	 * @param {Object} tables - Object containing table data (tableId -> table)
-	 * @param {string} playerName - Name of the player
+	 * @param {string} playerDiscordId - Discord ID of the player
 	 * @returns {number} Average placement or -1 if no matches played
 	 */
-	static getAveragePlacement(tables, playerName) {
+	static getAveragePlacement(tables, playerDiscordId) {
 		let totalPlacement = 0;
 		let matchesFound = 0;
 
@@ -169,7 +169,7 @@ class PlayerStats {
 			const table = tables[tableId];
 			if (!table || !table.teams) continue;
 
-			const playerRanking = PlayerStats.getPlayerRankingInTable(table, playerName);
+			const playerRanking = PlayerStats.getPlayerRankingInTable(table, playerDiscordId);
 			if (playerRanking) {
 				totalPlacement += playerRanking.individualRank;
 				matchesFound++;
@@ -180,7 +180,7 @@ class PlayerStats {
 		return totalPlacement / matchesFound;
 	}
 
-	static getAverageScore(tables, playerName) {
+	static getAverageScore(tables, playerDiscordId) {
 		let totalScore = 0;
 		let matchesFound = 0;
 
@@ -189,7 +189,7 @@ class PlayerStats {
 			if (!table || !table.teams) continue;
 			const players = PlayerStats.getPlayersFromTable(table);
 			for (const player of players) {
-				if (player.playerName === playerName) {
+				if (player.playerDiscordId === playerDiscordId) {
 					totalScore += player.score;
 					matchesFound++;
 				}
@@ -199,7 +199,7 @@ class PlayerStats {
 		return totalScore / matchesFound;
 	}
 
-	static getAverageSeed(tables, playerName) {
+	static getAverageSeed(tables, playerDiscordId) {
 		let totalSeed = 0;
 		let matchesFound = 0;
 
@@ -207,7 +207,7 @@ class PlayerStats {
 			const table = tables[tableId];
 			const players = PlayerStats.getIndividualPlayerSeeds(table);
 			for (const player of players) {
-				if (player.playerName === playerName) {
+				if (player.playerDiscordId === playerDiscordId) {
 					totalSeed += player.individualSeed;
 					matchesFound++;
 				}
@@ -248,7 +248,7 @@ class PlayerStats {
 		return tables;
 	}
 
-	static async getTotalH2H(tables, playerName, serverId) {
+	static async getTotalH2H(tables, playerDiscordId, serverId) {
 		const serverData = await database.getServerData(serverId);
 		const record = {
 			wins: 0,
@@ -260,13 +260,13 @@ class PlayerStats {
 			const players = PlayerStats.getPlayersFromTable(table);
 			for (const player of players) {
 				if (serverData.users[player.playerDiscordId]) {
-					if (PlayerStats.getPlayerRankingInTable(table, playerName).individualRank < PlayerStats.getPlayerRankingInTable(table, player.playerName).individualRank) {
+					if (PlayerStats.getPlayerRankingInTable(table, playerDiscordId).individualRank < PlayerStats.getPlayerRankingInTable(table, player.playerDiscordId).individualRank) {
 						record.wins++;
 					}
-					else if (PlayerStats.getPlayerRankingInTable(table, playerName).individualRank > PlayerStats.getPlayerRankingInTable(table, player.playerName).individualRank) {
+					else if (PlayerStats.getPlayerRankingInTable(table, playerDiscordId).individualRank > PlayerStats.getPlayerRankingInTable(table, player.playerDiscordId).individualRank) {
 						record.losses++;
 					}
-					else if (playerName !== player.playerName) {
+					else if (playerDiscordId !== player.playerDiscordId) {
 						record.ties++;
 					}
 				}
@@ -278,11 +278,11 @@ class PlayerStats {
 	/**
 	 * Get head-to-head record between two specific players across all tables
 	 * @param {Object} tables - Object containing table data
-	 * @param {string} player1Name - Name of the first player
-	 * @param {string} player2Name - Name of the second player
+	 * @param {string} player1DiscordId - Discord ID of the first player
+	 * @param {string} player2DiscordId - Discord ID of the second player
 	 * @returns {Object} Record object with {wins, losses, ties} from player1's perspective
 	 */
-	static getH2H(tables, player1Name, player2Name) {
+	static getH2H(tables, player1DiscordId, player2DiscordId) {
 		const record = {
 			wins: 0,
 			losses: 0,
@@ -290,7 +290,7 @@ class PlayerStats {
 		};
 
 		// Return empty record if same player
-		if (player1Name.toLowerCase() === player2Name.toLowerCase()) {
+		if (player1DiscordId === player2DiscordId) {
 			return record;
 		}
 
@@ -298,8 +298,8 @@ class PlayerStats {
 			const table = tables[tableId];
 
 			// Get rankings for both players in this table
-			const player1Ranking = PlayerStats.getPlayerRankingInTable(table, player1Name);
-			const player2Ranking = PlayerStats.getPlayerRankingInTable(table, player2Name);
+			const player1Ranking = PlayerStats.getPlayerRankingInTable(table, player1DiscordId);
+			const player2Ranking = PlayerStats.getPlayerRankingInTable(table, player2DiscordId);
 
 			// Skip table if either player isn't found
 			if (!player1Ranking || !player2Ranking) {
@@ -324,16 +324,16 @@ class PlayerStats {
 	/**
 	 * Get the biggest score difference where the first player beat the second player
 	 * @param {Object} tables - Object containing table data
-	 * @param {string} player1Name - Name of the first player
-	 * @param {string} player2Name - Name of the second player
+	 * @param {string} player1DiscordId - Discord ID of the first player
+	 * @param {string} player2DiscordId - Discord ID of the second player
 	 * @returns {Object|null} Object with {tableId, player1Score, scoreDifference, player1Rank, rankDifference} or null if player1 never beat player2
 	 */
-	static getBiggestDifference(tables, player1Name, player2Name) {
+	static getBiggestDifference(tables, player1DiscordId, player2DiscordId) {
 		let biggestDifference = null;
 		let bestResult = null;
 
 		// Return null if same player
-		if (player1Name.toLowerCase() === player2Name.toLowerCase()) {
+		if (player1DiscordId === player2DiscordId) {
 			return null;
 		}
 
@@ -341,8 +341,8 @@ class PlayerStats {
 			const table = tables[tableId];
 
 			// Get rankings for both players in this table
-			const player1Ranking = PlayerStats.getPlayerRankingInTable(table, player1Name);
-			const player2Ranking = PlayerStats.getPlayerRankingInTable(table, player2Name);
+			const player1Ranking = PlayerStats.getPlayerRankingInTable(table, player1DiscordId);
+			const player2Ranking = PlayerStats.getPlayerRankingInTable(table, player2DiscordId);
 
 			// Skip table if either player isn't found
 			if (!player1Ranking || !player2Ranking) {
@@ -383,10 +383,10 @@ class PlayerStats {
 	/**
 	 * Get a player's best (highest) score across all tables
 	 * @param {Object} tables - Object containing table data
-	 * @param {string} playerName - Name of the player to find
+	 * @param {string} playerDiscordId - Discord ID of the player to find
 	 * @returns {Object|null} Object with {score, placement, tableId} or null if no matches found
 	 */
-	static getBestScore(tables, playerName) {
+	static getBestScore(tables, playerDiscordId) {
 		let bestScore = null;
 		let bestResult = null;
 
@@ -396,8 +396,8 @@ class PlayerStats {
 			const rankings = PlayerStats.getIndividualPlayerRankings(table);
 
 			for (const player of players) {
-				if (player.playerName === playerName) {
-					const playerRanking = rankings.find(p => p.playerName === playerName);
+				if (player.playerDiscordId === playerDiscordId) {
+					const playerRanking = rankings.find(p => p.playerDiscordId === playerDiscordId);
 					if (bestScore === null || player.score > bestScore) {
 						bestScore = player.score;
 						bestResult = {
@@ -417,10 +417,10 @@ class PlayerStats {
 	/**
 	 * Get a player's worst (lowest) score across all tables
 	 * @param {Object} tables - Object containing table data
-	 * @param {string} playerName - Name of the player to find
+	 * @param {string} playerDiscordId - Discord ID of the player to find
 	 * @returns {Object|null} Object with {score, placement, tableId} or null if no matches found
 	 */
-	static getWorstScore(tables, playerName) {
+	static getWorstScore(tables, playerDiscordId) {
 		let worstScore = null;
 		let worstResult = null;
 
@@ -430,8 +430,8 @@ class PlayerStats {
 			const rankings = PlayerStats.getIndividualPlayerRankings(table);
 
 			for (const player of players) {
-				if (player.playerName === playerName) {
-					const playerRanking = rankings.find(p => p.playerName === playerName);
+				if (player.playerDiscordId === playerDiscordId) {
+					const playerRanking = rankings.find(p => p.playerDiscordId === playerDiscordId);
 					if (worstScore === null || player.score < worstScore) {
 						worstScore = player.score;
 						worstResult = {
@@ -451,10 +451,10 @@ class PlayerStats {
 	/**
 	 * Get a player's biggest overperformance (seed minus ranking, higher is better)
 	 * @param {Object} tables - Object containing table data
-	 * @param {string} playerName - Name of the player to find
+	 * @param {string} playerDiscordId - Discord ID of the player to find
 	 * @returns {Object|null} Object with {tableId, score, placement, overperformance} or null
 	 */
-	static getBiggestOverperformance(tables, playerName) {
+	static getBiggestOverperformance(tables, playerDiscordId) {
 		let bestOverperformance = null;
 		let bestResult = null;
 
@@ -465,8 +465,8 @@ class PlayerStats {
 			const rankings = PlayerStats.getIndividualPlayerRankings(table);
 
 			// Find the player in this table
-			const playerRanking = rankings.find(p => p.playerName === playerName);
-			const playerSeed = seeds.find(p => p.playerName === playerName);
+			const playerRanking = rankings.find(p => p.playerDiscordId === playerDiscordId);
+			const playerSeed = seeds.find(p => p.playerDiscordId === playerDiscordId);
 
 			if (playerRanking && playerSeed) {
 				const overperformance = playerSeed.individualSeed - playerRanking.individualRank;
@@ -495,10 +495,10 @@ class PlayerStats {
 	/**
 	 * Get a player's biggest underperformance (seed minus ranking, lower is worse)
 	 * @param {Object} tables - Object containing table data
-	 * @param {string} playerName - Name of the player to find
+	 * @param {string} playerDiscordId - Discord ID of the player to find
 	 * @returns {Object|null} Object with {tableId, score, placement, underperformance} or null
 	 */
-	static getBiggestUnderperformance(tables, playerName) {
+	static getBiggestUnderperformance(tables, playerDiscordId) {
 		let worstUnderperformance = null;
 		let worstResult = null;
 
@@ -509,8 +509,8 @@ class PlayerStats {
 			const rankings = PlayerStats.getIndividualPlayerRankings(table);
 
 			// Find the player in this table
-			const playerRanking = rankings.find(p => p.playerName === playerName);
-			const playerSeed = seeds.find(p => p.playerName === playerName);
+			const playerRanking = rankings.find(p => p.playerDiscordId === playerDiscordId);
+			const playerSeed = seeds.find(p => p.playerDiscordId === playerDiscordId);
 
 			if (playerRanking && playerSeed) {
 				const underperformance = playerSeed.individualSeed - playerRanking.individualRank;
@@ -539,10 +539,10 @@ class PlayerStats {
 	/**
 	 * Get when a player carried their team the most (best performance relative to teammates)
 	 * @param {Object} tables - Object containing table data
-	 * @param {string} playerName - Name of the player to find
+	 * @param {string} playerDiscordId - Discord ID of the player to find
 	 * @returns {Object|null} Object with {tableId, score, placement, carryAmount} or null
 	 */
-	static getBiggestCarry(tables, playerName) {
+	static getBiggestCarry(tables, playerDiscordId) {
 		let bestCarry = null;
 		let bestResult = null;
 
@@ -552,16 +552,16 @@ class PlayerStats {
 			const rankings = PlayerStats.getIndividualPlayerRankings(table);
 
 			// Find the player in this table
-			const playerRanking = rankings.find(p => p.playerName === playerName);
+			const playerRanking = rankings.find(p => p.playerDiscordId === playerDiscordId);
 			if (!playerRanking) continue;
 
-			const targetPlayer = players.find(p => p.playerName === playerName);
+			const targetPlayer = players.find(p => p.playerDiscordId === playerDiscordId);
 			if (!targetPlayer) continue;
 
 			// Find teammates (same teamIndex)
 			const teammates = rankings.filter(p =>
-				p.playerName !== playerName &&
-				players.find(player => player.playerName === p.playerName)?.teamIndex === targetPlayer.teamIndex,
+				p.playerDiscordId !== playerDiscordId &&
+				players.find(player => player.playerDiscordId === p.playerDiscordId)?.teamIndex === targetPlayer.teamIndex,
 			);
 
 			// Skip if no teammates (not a team event)
@@ -594,10 +594,10 @@ class PlayerStats {
 	/**
 	 * Get when a player anchored their team the most (worst performance relative to teammates)
 	 * @param {Object} tables - Object containing table data
-	 * @param {string} playerName - Name of the player to find
+	 * @param {string} playerDiscordId - Discord ID of the player to find
 	 * @returns {Object|null} Object with {tableId, score, placement, anchorAmount} or null
 	 */
-	static getBiggestAnchor(tables, playerName) {
+	static getBiggestAnchor(tables, playerDiscordId) {
 		let worstAnchor = null;
 		let worstResult = null;
 
@@ -607,16 +607,16 @@ class PlayerStats {
 			const rankings = PlayerStats.getIndividualPlayerRankings(table);
 
 			// Find the player in this table
-			const playerRanking = rankings.find(p => p.playerName === playerName);
+			const playerRanking = rankings.find(p => p.playerDiscordId === playerDiscordId);
 			if (!playerRanking) continue;
 
-			const targetPlayer = players.find(p => p.playerName === playerName);
+			const targetPlayer = players.find(p => p.playerDiscordId === playerDiscordId);
 			if (!targetPlayer) continue;
 
 			// Find teammates (same teamIndex)
 			const teammates = rankings.filter(p =>
-				p.playerName !== playerName &&
-				players.find(player => player.playerName === p.playerName)?.teamIndex === targetPlayer.teamIndex,
+				p.playerDiscordId !== playerDiscordId &&
+				players.find(player => player.playerDiscordId === p.playerDiscordId)?.teamIndex === targetPlayer.teamIndex,
 			);
 
 			// Skip if no teammates (not a team event)
@@ -692,10 +692,10 @@ class PlayerStats {
 	/**
 	 * Calculate win streaks for a player
 	 * @param {Object} tables - Object containing table data (tableId -> table)
-	 * @param {string} playerName - Name of the player
+	 * @param {string} playerDiscordId - Discord ID of the player
 	 * @returns {Object} Streak data including current and longest streaks
 	 */
-	static calculateWinStreaks(tables, playerName) {
+	static calculateWinStreaks(tables, playerDiscordId) {
 		const playerTables = [];
 
 		// Collect all tables where player participated
@@ -707,7 +707,7 @@ class PlayerStats {
 			let playerData = null;
 			for (const team of table.teams) {
 				const player = team.scores.find(p =>
-					p.playerName.toLowerCase() === playerName.toLowerCase(),
+					p.playerDiscordId === playerDiscordId,
 				);
 				if (player) {
 					playerData = {
@@ -793,11 +793,11 @@ class PlayerStats {
 
 	/**
 	 * Get comprehensive player statistics including streaks
-	 * @param {string} playerName - Name of the player
+	 * @param {string} playerDiscordId - Discord ID of the player
 	 * @param {string} serverId - Server ID to get tables for
 	 * @returns {Object} Player statistics including streak data
 	 */
-	static async getPlayerStats(playerName, serverId) {
+	static async getPlayerStats(playerDiscordId, serverId) {
 		try {
 			// Get all tables for this server
 			const serverData = await database.getServerData(serverId);
@@ -819,15 +819,15 @@ class PlayerStats {
 			}
 
 			// Calculate all stats
-			const streakData = this.calculateWinStreaks(tables, playerName);
-			const matchesPlayed = this.getMatchesPlayed(tables, playerName);
-			const winRate = this.getWinRate(tables, playerName);
-			const avgPlacement = this.getAveragePlacement(tables, playerName);
-			const avgScore = this.getAverageScore(tables, playerName);
-			const avgSeed = this.getAverageSeed(tables, playerName);
+			const streakData = this.calculateWinStreaks(tables, playerDiscordId);
+			const matchesPlayed = this.getMatchesPlayed(tables, playerDiscordId);
+			const winRate = this.getWinRate(tables, playerDiscordId);
+			const avgPlacement = this.getAveragePlacement(tables, playerDiscordId);
+			const avgScore = this.getAverageScore(tables, playerDiscordId);
+			const avgSeed = this.getAverageSeed(tables, playerDiscordId);
 
 			return {
-				playerName,
+				playerDiscordId,
 				matchesPlayed,
 				winRate,
 				avgPlacement,
@@ -837,7 +837,7 @@ class PlayerStats {
 			};
 		}
 		catch (error) {
-			console.error(`Error getting player stats for ${playerName}:`, error);
+			console.error(`Error getting player stats for ${playerDiscordId}:`, error);
 			return null;
 		}
 	}

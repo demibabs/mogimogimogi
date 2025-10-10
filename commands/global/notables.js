@@ -212,12 +212,12 @@ module.exports = {
 			}
 
 			// Calculate statistics
-			const bS = PlayerStats.getBestScore(userTables, loungeUser.name);
-			const wS = PlayerStats.getWorstScore(userTables, loungeUser.name);
-			const oP = PlayerStats.getBiggestOverperformance(userTables, loungeUser.name);
-			const uP = PlayerStats.getBiggestUnderperformance(userTables, loungeUser.name);
-			const bC = PlayerStats.getBiggestCarry(userTables, loungeUser.name);
-			const bA = PlayerStats.getBiggestAnchor(userTables, loungeUser.name);
+			const bS = PlayerStats.getBestScore(userTables, userId);
+			const wS = PlayerStats.getWorstScore(userTables, userId);
+			const oP = PlayerStats.getBiggestOverperformance(userTables, userId);
+			const uP = PlayerStats.getBiggestUnderperformance(userTables, userId);
+			const bC = PlayerStats.getBiggestCarry(userTables, userId);
+			const bA = PlayerStats.getBiggestAnchor(userTables, userId);
 
 			// Validate that statistics were calculated successfully
 			if (!bS || !wS || !oP || !uP || !bC || !bA) {

@@ -113,8 +113,8 @@ class StreakCache {
 		const result = [];
 
 		for (const userData of leaderboardData) {
-			if (!userData.loungeUser?.name) continue;
-			const streakData = serverCache.get(userData.loungeUser.name.toLowerCase());
+			if (!userData.userId) continue;
+			const streakData = serverCache.get(userData.userId);
 			if (streakData) {
 				result.push({
 					...userData,
@@ -160,9 +160,9 @@ class StreakCache {
 						// Get player's table data
 						const allTables = await LoungeApi.getAllPlayerTables(userId, serverId);
 
-						const streakStats = await this.calculatePlayerStreaksFromTables(allTables, loungeUser.name);
+						const streakStats = await this.calculatePlayerStreaksFromTables(allTables, userId);
 						if (streakStats) {
-							serverCache.set(loungeUser.name.toLowerCase(), {
+							serverCache.set(userId, {
 								userId,
 								loungeUser,
 								...streakStats,
@@ -216,11 +216,13 @@ class StreakCache {
 				console.log(`Found ${Object.keys(allTables).length} tables for ${userData.loungeUser.name}`);
 				
 				if (Object.keys(allTables).length > 0) {
-					const streakData = this.calculatePlayerStreaksFromTables(allTables, userData.loungeUser.name);
+					const streakData = this.calculatePlayerStreaksFromTables(allTables, userData.userId);
 					console.log(`Streak data for ${userData.loungeUser.name}:`, streakData);
 					
 					if (streakData) {
-						serverCache.set(userData.loungeUser.name.toLowerCase(), {
+						serverCache.set(userData.userId, {
+							userId: userData.userId,
+							loungeUser: userData.loungeUser,
 							currentWinStreak: streakData.currentWinStreak || 0,
 							currentStreakMmrGain: streakData.currentStreakMmrGain || 0,
 							longestWinStreak: streakData.longestWinStreak || 0,
@@ -299,10 +301,10 @@ class StreakCache {
 	 * Calculate win streaks for a player from their table data (using LoungeApi format)
 	 * Win streaks are calculated only for the current season (Season 1)
 	 * @param {Object} tables - Tables object from LoungeApi.getAllPlayerTables
-	 * @param {string} playerName - Player name
+	 * @param {string} playerDiscordId - Player Discord ID
 	 * @returns {Object} Streak data for current season
 	 */
-	calculatePlayerStreaksFromTables(tables, playerName) {
+	calculatePlayerStreaksFromTables(tables, playerDiscordId) {
 		const playerTables = [];
 
 		// Convert LoungeApi table format to our format - optimized for streak calculation
@@ -313,7 +315,7 @@ class StreakCache {
 			// Flatten all players from all teams to find our target player efficiently
 			for (const team of table.teams) {
 				for (const player of team.scores) {
-					if (player.playerName.toLowerCase() === playerName.toLowerCase()) {
+					if (player.playerDiscordId === playerDiscordId) {
 						playerTables.push({
 							delta: player.delta,
 							date: new Date(table.createdOn),
