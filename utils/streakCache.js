@@ -26,7 +26,7 @@ class StreakCache {
 			console.log("Loading streak cache from database...");
 			const database = require("./database");
 			
-			// Load cache for all servers
+			// Load cache for all servers (if table exists)
 			const allCacheInfo = await database.getAllServerCacheInfo();
 			for (const serverInfo of allCacheInfo) {
 				const serverCache = await database.loadStreakCache(serverInfo.serverId);
@@ -39,7 +39,13 @@ class StreakCache {
 			console.log(`Loaded streak cache for ${allCacheInfo.length} servers`);
 		}
 		catch (error) {
-			console.error("Failed to load streak cache from database:", error);
+			// If streak_cache table doesn't exist yet, just continue
+			if (error.code === "42P01") {
+				console.log("Streak cache table doesn't exist yet, will be created on next database init");
+			}
+			else {
+				console.error("Failed to load streak cache from database:", error);
+			}
 		}
 	}
 

@@ -75,6 +75,30 @@ class Database {
 				ON leaderboard_cache(updated_at)
 			`);
 
+			// Streak cache table for persistent streak cache across deploys
+			await this.pool.query(`
+				CREATE TABLE IF NOT EXISTS streak_cache (
+					id SERIAL PRIMARY KEY,
+					server_id VARCHAR(20) NOT NULL,
+					user_id VARCHAR(20) NOT NULL,
+					cache_data JSONB NOT NULL,
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					UNIQUE(server_id, user_id)
+				)
+			`);
+
+			// Index for faster streak cache lookups
+			await this.pool.query(`
+				CREATE INDEX IF NOT EXISTS idx_streak_cache_server 
+				ON streak_cache(server_id)
+			`);
+
+			await this.pool.query(`
+				CREATE INDEX IF NOT EXISTS idx_streak_cache_updated 
+				ON streak_cache(updated_at)
+			`);
+
 			console.log("Database initialized successfully");
 		}
 		catch (error) {
@@ -626,6 +650,11 @@ class Database {
 			return cache;
 		}
 		catch (error) {
+			// If table doesn't exist yet, return empty cache
+			if (error.code === "42P01") {
+				console.log(`Streak cache table doesn't exist yet for server ${serverId}`);
+				return new Map();
+			}
 			console.error("Error loading streak cache:", error);
 			return new Map();
 		}
