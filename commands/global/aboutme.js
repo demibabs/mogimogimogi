@@ -9,14 +9,11 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		   // Query database for stats
-		   let serverCount = 0;
+
+		   // Query database for user and table stats
 		   let userCount = 0;
 		   let tableCount = 0;
 		   try {
-			   // Servers
-			   const serverRes = await database.pool.query("SELECT COUNT(*) FROM server_data");
-			   serverCount = parseInt(serverRes.rows[0].count);
 			   // Users
 			   const userRes = await database.pool.query("SELECT COUNT(DISTINCT user_id) FROM user_tables");
 			   userCount = parseInt(userRes.rows[0].count);
@@ -27,15 +24,18 @@ module.exports = {
 			   // fallback to 0s
 		   }
 
+		   // Get server count directly from Discord client
+		   const serverCount = interaction.client.guilds.cache.size;
+
 		   const embed = new EmbedBuilder()
 			   .setTitle("about me")
 			   .setColor("Aqua")
 			   .setDescription("bot for tracking server-wide lounge stats.")
-			   .addFields(
-				   { name: "servers:", value: String(serverCount), inline: true },
-				   { name: "users tracked:", value: String(userCount), inline: true },
-				   { name: "tables tracked:", value: String(tableCount), inline: true },
-			   )
+			  .addFields(
+				  { name: "servers:", value: String(serverCount), inline: true },
+				  { name: "users tracked:", value: String(userCount), inline: true },
+				  { name: "tables tracked:", value: String(tableCount), inline: true },
+			  )
 			   .setFooter({ text: "by @crashwy (contact me for any issues)" })
 			   .setTimestamp();
 
