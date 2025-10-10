@@ -1,0 +1,169 @@
+{
+  "id": 980807,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-11T02:50:58.1931582Z",
+  "verifiedOn": "2025-09-11T03:03:15.5429203Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/980807.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 99,
+          "multiplier": 1,
+          "prevMmr": 5539,
+          "newMmr": 5721,
+          "delta": 182,
+          "playerId": 12222,
+          "playerName": "Akagi",
+          "playerDiscordId": "209136575735529472",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 107,
+          "multiplier": 1,
+          "prevMmr": 5773,
+          "newMmr": 5955,
+          "delta": 182,
+          "playerId": 16167,
+          "playerName": "KT DAVID",
+          "playerDiscordId": "251786011850440705",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 5577,
+          "newMmr": 5759,
+          "delta": 182,
+          "playerId": 74735,
+          "playerName": "Alesito",
+          "playerDiscordId": "290669375260983297",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 6082,
+          "newMmr": 6142,
+          "delta": 60,
+          "playerId": 14328,
+          "playerName": "Process",
+          "playerDiscordId": "332271983242903555",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 118,
+          "multiplier": 1,
+          "prevMmr": 6022,
+          "newMmr": 6082,
+          "delta": 60,
+          "playerId": 66525,
+          "playerName": "Silver",
+          "playerDiscordId": "733539197029318667",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 51,
+          "multiplier": 1,
+          "prevMmr": 4870,
+          "newMmr": 4930,
+          "delta": 60,
+          "playerId": 66926,
+          "playerName": "Camden",
+          "playerDiscordId": "209727093716549633",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 4961,
+          "newMmr": 4910,
+          "delta": -51,
+          "playerId": 17166,
+          "playerName": "Gassy Snortle",
+          "playerDiscordId": "413591819281104906",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 6120,
+          "newMmr": 6069,
+          "delta": -51,
+          "playerId": 34148,
+          "playerName": "TKDropBear",
+          "playerDiscordId": "146143462524321792",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 54,
+          "multiplier": 1,
+          "prevMmr": 5539,
+          "newMmr": 5488,
+          "delta": -51,
+          "playerId": 44448,
+          "playerName": "Aronified",
+          "playerDiscordId": "722008774486786051",
+          "playerCountryCode": "AU"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 6404,
+          "newMmr": 6214,
+          "delta": -190,
+          "playerId": 69384,
+          "playerName": "Delphi",
+          "playerDiscordId": "414690354487492611",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 6545,
+          "newMmr": 6355,
+          "delta": -190,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 4396,
+          "newMmr": 4206,
+          "delta": -190,
+          "playerId": 74731,
+          "playerName": "Loscomical",
+          "playerDiscordId": "1085390833072746558",
+          "playerCountryCode": "CA"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1415530036710215825",
+  "updateMessageId": "1415533133796872234",
+  "authorId": "733539197029318667"
+}

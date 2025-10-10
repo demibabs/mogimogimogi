@@ -1,0 +1,321 @@
+{
+  "id": 982095,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-14T02:58:14.2859736Z",
+  "verifiedOn": "2025-09-14T03:17:13.8501797Z",
+  "numTeams": 8,
+  "numPlayers": 24,
+  "format": "3v3",
+  "url": "/TableImage/982095.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 8082,
+          "newMmr": 8144,
+          "delta": 62,
+          "playerId": 11883,
+          "playerName": "kazane",
+          "playerDiscordId": "519457900456837120",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 99,
+          "multiplier": 1,
+          "prevMmr": 11910,
+          "newMmr": 11972,
+          "delta": 62,
+          "playerId": 21138,
+          "playerName": "kurtn",
+          "playerDiscordId": "666258230426730506",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 105,
+          "multiplier": 1,
+          "prevMmr": 11592,
+          "newMmr": 11654,
+          "delta": 62,
+          "playerId": 41771,
+          "playerName": "okashi",
+          "playerDiscordId": "1099188696760201247",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 7857,
+          "newMmr": 7988,
+          "delta": 131,
+          "playerId": 8750,
+          "playerName": "Akagane",
+          "playerDiscordId": "703972462294990899",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 7601,
+          "newMmr": 7732,
+          "delta": 131,
+          "playerId": 14820,
+          "playerName": "MOltNEXT",
+          "playerDiscordId": "384281018586365954",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 7933,
+          "newMmr": 8064,
+          "delta": 131,
+          "playerId": 27370,
+          "playerName": "hct_b",
+          "playerDiscordId": "386547824587833355",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 8274,
+          "newMmr": 8323,
+          "delta": 49,
+          "playerId": 31833,
+          "playerName": "Raheesh Patel",
+          "playerDiscordId": "711717471635374110",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 8074,
+          "newMmr": 8123,
+          "delta": 49,
+          "playerId": 33660,
+          "playerName": "tys",
+          "playerDiscordId": "769620754751946763",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 7907,
+          "newMmr": 7956,
+          "delta": 49,
+          "playerId": 36194,
+          "playerName": "Bapevc",
+          "playerDiscordId": "556650124483231754",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 6125,
+          "newMmr": 6227,
+          "delta": 102,
+          "playerId": 66955,
+          "playerName": "PCDamonD",
+          "playerDiscordId": "130741136678453248",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 5803,
+          "newMmr": 5905,
+          "delta": 102,
+          "playerId": 67764,
+          "playerName": "Imp1904",
+          "playerDiscordId": "597931655784562707",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6739,
+          "newMmr": 6841,
+          "delta": 102,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 8952,
+          "newMmr": 8832,
+          "delta": -120,
+          "playerId": 15533,
+          "playerName": "Splendy",
+          "playerDiscordId": "726193735490076742",
+          "playerCountryCode": "PE"
+        },
+        {
+          "score": 55,
+          "multiplier": 1,
+          "prevMmr": 9022,
+          "newMmr": 8902,
+          "delta": -120,
+          "playerId": 31630,
+          "playerName": "Genocide Jack",
+          "playerDiscordId": "427628126252826654",
+          "playerCountryCode": "VE"
+        },
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 7920,
+          "newMmr": 7800,
+          "delta": -120,
+          "playerId": 45342,
+          "playerName": "Timo",
+          "playerDiscordId": "302065086489690113",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 6260,
+          "newMmr": 6249,
+          "delta": -11,
+          "playerId": 49332,
+          "playerName": "Rikka Takanashi",
+          "playerDiscordId": "762285403569913876",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5903,
+          "newMmr": 5892,
+          "delta": -11,
+          "playerId": 66458,
+          "playerName": "Pluto City",
+          "playerDiscordId": "177600682948296704",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 5358,
+          "newMmr": 5347,
+          "delta": -11,
+          "playerId": 74365,
+          "playerName": "Park Avenoo",
+          "playerDiscordId": "308035632968499200",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 6189,
+          "newMmr": 6114,
+          "delta": -75,
+          "playerId": 68469,
+          "playerName": "Minh",
+          "playerDiscordId": "482893290266427422",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 52,
+          "multiplier": 1,
+          "prevMmr": 5146,
+          "newMmr": 5071,
+          "delta": -75,
+          "playerId": 69193,
+          "playerName": "aquaa",
+          "playerDiscordId": "787431047783776276",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 6136,
+          "newMmr": 6061,
+          "delta": -75,
+          "playerId": 72343,
+          "playerName": "Pamperinos",
+          "playerDiscordId": "597963333093687296",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6496,
+          "newMmr": 6358,
+          "delta": -138,
+          "playerId": 67720,
+          "playerName": "Chintu",
+          "playerDiscordId": "82830375121846272",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 6940,
+          "newMmr": 6802,
+          "delta": -138,
+          "playerId": 68318,
+          "playerName": "Convicted Felon",
+          "playerDiscordId": "755656786467618836",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 37,
+          "multiplier": 1,
+          "prevMmr": 3964,
+          "newMmr": 3826,
+          "delta": -138,
+          "playerId": 75287,
+          "playerName": "Themothy",
+          "playerDiscordId": "161306841102548992",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1416619031477354667",
+  "updateMessageId": "1416623820768284713",
+  "authorId": "769620754751946763"
+}

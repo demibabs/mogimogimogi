@@ -1,0 +1,169 @@
+{
+  "id": 970699,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-08-15T02:01:48.9997522Z",
+  "verifiedOn": "2025-08-15T02:04:57.5325018Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/970699.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 119,
+          "multiplier": 1,
+          "prevMmr": 7144,
+          "newMmr": 7323,
+          "delta": 179,
+          "playerId": 55410,
+          "playerName": "JAMES EventsKing",
+          "playerDiscordId": "182653137788600330",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 119,
+          "multiplier": 1,
+          "prevMmr": 6124,
+          "newMmr": 6303,
+          "delta": 179,
+          "playerId": 67993,
+          "playerName": "Umbre",
+          "playerDiscordId": "86110615881412608",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 4587,
+          "newMmr": 4766,
+          "delta": 179,
+          "playerId": 72953,
+          "playerName": "Chilo G",
+          "playerDiscordId": "163043900276080640",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 5736,
+          "newMmr": 5797,
+          "delta": 61,
+          "playerId": 67764,
+          "playerName": "Imp1904",
+          "playerDiscordId": "597931655784562707",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 5823,
+          "newMmr": 5884,
+          "delta": 61,
+          "playerId": 69384,
+          "playerName": "Delphi",
+          "playerDiscordId": "414690354487492611",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6233,
+          "newMmr": 6294,
+          "delta": 61,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 50,
+          "multiplier": 1,
+          "prevMmr": 5843,
+          "newMmr": 5783,
+          "delta": -60,
+          "playerId": 11632,
+          "playerName": "Joro",
+          "playerDiscordId": "339140995314614272",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6591,
+          "newMmr": 6531,
+          "delta": -60,
+          "playerId": 27150,
+          "playerName": "Mekurume",
+          "playerDiscordId": "504627940823269396",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 5375,
+          "newMmr": 5315,
+          "delta": -60,
+          "playerId": 43912,
+          "playerName": "Campus mode",
+          "playerDiscordId": "499902202769440788",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 58,
+          "multiplier": 1,
+          "prevMmr": 5938,
+          "newMmr": 5757,
+          "delta": -181,
+          "playerId": 66644,
+          "playerName": "MaestroPastelero",
+          "playerDiscordId": "414345524016054293",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 47,
+          "multiplier": 1,
+          "prevMmr": 5518,
+          "newMmr": 5337,
+          "delta": -181,
+          "playerId": 67518,
+          "playerName": "Chocowasa",
+          "playerDiscordId": "375399473456742410",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 100,
+          "multiplier": 1,
+          "prevMmr": 6403,
+          "newMmr": 6222,
+          "delta": -181,
+          "playerId": 70288,
+          "playerName": "Aleek",
+          "playerDiscordId": "866706277328617480",
+          "playerCountryCode": "ES"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1405733193402945596",
+  "updateMessageId": "1405733985941979329",
+  "authorId": "414690354487492611"
+}

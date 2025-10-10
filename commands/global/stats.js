@@ -4,6 +4,7 @@ const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
 const DataManager = require("../../utils/dataManager");
 const embedEnhancer = require("../../utils/embedEnhancer");
+const AutoUserManager = require("../../utils/autoUserManager");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -31,9 +32,9 @@ module.exports = {
 			// Use generateStats for consistency with button interactions
 			const result = await this.generateStats(interaction, discordUser, serverId, serverOnly, squads, "alltime");
 
-			if (!result) {
+			if (!result.success) {
 				return await interaction.editReply({
-					content: "an error occurred while generating stats. please try again later.",
+					content: result.message,
 				});
 			}
 
@@ -108,7 +109,7 @@ module.exports = {
 			// Generate stats based on time filter
 			const result = await this.generateStats(interaction, discordUser, serverId, serverOnly, squads, timeFilter);
 
-			if (result) {
+			if (result && result.success) {
 				// Create action row with three buttons (current one disabled)
 				const row = new ActionRowBuilder()
 					.addComponents(
@@ -131,6 +132,10 @@ module.exports = {
 
 				await interaction.editReply({ embeds: [result.embed], components: [row] });
 			}
+			else {
+				// Handle error case for button interactions
+				await interaction.editReply({ content: result.message || "unable to load stats data." });
+			}
 
 			return true;
 		}
@@ -143,12 +148,11 @@ module.exports = {
 	// Generate stats data
 	async generateStats(interaction, discordUser, serverId, serverOnly, squads, timeFilter = "alltime") {
 		try {
-			// Validate user exists in server data
-			const serverData = await database.getServerData(serverId);
-			const userData = serverData?.users?.[discordUser.id];
-
-			if (!userData) {
-				return null;
+			// Validate user exists and add them if they have a lounge account
+			const userValidation = await AutoUserManager.validateUserForCommand(discordUser.id, serverId, interaction.client);
+			
+			if (!userValidation.success) {
+				return { success: false, message: userValidation.message };
 			}
 
 			// Get user data from Lounge API
@@ -166,7 +170,7 @@ module.exports = {
 			let userTables = await LoungeApi.getAllPlayerTables(discordUser.id, serverId);
 
 			if (!userTables || Object.keys(userTables).length === 0) {
-				return null;
+				return { success: false, message: "no events found for this player." };
 			}
 
 			// Apply time filter using PlayerStats methods
@@ -209,7 +213,7 @@ module.exports = {
 
 			// Check if any tables remain after filtering
 			if (Object.keys(userTables).length === 0) {
-				return null;
+				return { success: false, message: "no events found matching the specified filters." };
 			}
 
 			const eP = PlayerStats.getMatchesPlayed(userTables, userId);
@@ -270,11 +274,11 @@ module.exports = {
 			}
 			statsEmbed.setFooter({ text: footerText });
 
-			return { embed: statsEmbed };
+			return { success: true, embed: statsEmbed };
 		}
 		catch (error) {
 			console.error("error generating stats:", error);
-			return null;
+			return { success: false, message: "an error occurred while generating stats. please try again later." };
 		}
 	},
 };

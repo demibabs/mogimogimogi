@@ -1,0 +1,169 @@
+{
+  "id": 977251,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-09-01T03:03:41.2530862Z",
+  "verifiedOn": "2025-09-01T03:35:00.9010707Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/977251.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5462,
+          "newMmr": 5636,
+          "delta": 174,
+          "playerId": 66955,
+          "playerName": "PCDamonD",
+          "playerDiscordId": "130741136678453248",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 5267,
+          "newMmr": 5441,
+          "delta": 174,
+          "playerId": 67764,
+          "playerName": "Imp1904",
+          "playerDiscordId": "597931655784562707",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 106,
+          "multiplier": 1,
+          "prevMmr": 6214,
+          "newMmr": 6388,
+          "delta": 174,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 5397,
+          "newMmr": 5453,
+          "delta": 56,
+          "playerId": 35721,
+          "playerName": "Silksong",
+          "playerDiscordId": "756105118218321931",
+          "playerCountryCode": "NL"
+        },
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6040,
+          "newMmr": 6096,
+          "delta": 56,
+          "playerId": 45768,
+          "playerName": "DEMISE",
+          "playerDiscordId": "689322694520602753",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 5412,
+          "newMmr": 5468,
+          "delta": 56,
+          "playerId": 47000,
+          "playerName": "Roxas XIII",
+          "playerDiscordId": "276175780222992385",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6224,
+          "newMmr": 6167,
+          "delta": -57,
+          "playerId": 12222,
+          "playerName": "Akagi",
+          "playerDiscordId": "209136575735529472",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 62,
+          "multiplier": 1,
+          "prevMmr": 4723,
+          "newMmr": 4666,
+          "delta": -57,
+          "playerId": 15477,
+          "playerName": "Sorriso",
+          "playerDiscordId": "256221766769180674",
+          "playerCountryCode": "CO"
+        },
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 5646,
+          "newMmr": 5589,
+          "delta": -57,
+          "playerId": 74735,
+          "playerName": "Alesito",
+          "playerDiscordId": "290669375260983297",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 5357,
+          "newMmr": 5184,
+          "delta": -173,
+          "playerId": 9589,
+          "playerName": "Playboi",
+          "playerDiscordId": "426496071741603861",
+          "playerCountryCode": "VE"
+        },
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 4844,
+          "newMmr": 4671,
+          "delta": -173,
+          "playerId": 49670,
+          "playerName": "Lalo62",
+          "playerDiscordId": "567281877954723840",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 6239,
+          "newMmr": 6066,
+          "delta": -173,
+          "playerId": 54677,
+          "playerName": "devuelvaneloro",
+          "playerDiscordId": "546466098955157555",
+          "playerCountryCode": "VE"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1411909358715146291",
+  "updateMessageId": "1411917243624853604",
+  "authorId": "130741136678453248"
+}

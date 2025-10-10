@@ -1,0 +1,169 @@
+{
+  "id": 981547,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-12T23:00:56.274549Z",
+  "verifiedOn": "2025-09-12T23:14:34.3948287Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/981547.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 6336,
+          "newMmr": 6519,
+          "delta": 183,
+          "playerId": 9828,
+          "playerName": "Freddy Fishbone",
+          "playerDiscordId": "82796494939226112",
+          "playerCountryCode": "GB"
+        },
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6649,
+          "newMmr": 6832,
+          "delta": 183,
+          "playerId": 12227,
+          "playerName": "Ktpg",
+          "playerDiscordId": "239832882808487946",
+          "playerCountryCode": "BR"
+        },
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6468,
+          "newMmr": 6651,
+          "delta": 183,
+          "playerId": 16333,
+          "playerName": "FallOff",
+          "playerDiscordId": "558307664518447116",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 6623,
+          "newMmr": 6684,
+          "delta": 61,
+          "playerId": 20611,
+          "playerName": "squirrel",
+          "playerDiscordId": "626784154637565972",
+          "playerCountryCode": "GB"
+        },
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 6669,
+          "newMmr": 6730,
+          "delta": 61,
+          "playerId": 47158,
+          "playerName": "Harukaa",
+          "playerDiscordId": "164618806537355273",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6212,
+          "newMmr": 6273,
+          "delta": 61,
+          "playerId": 68678,
+          "playerName": "sofquipeut",
+          "playerDiscordId": "343811804851339264",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6595,
+          "newMmr": 6528,
+          "delta": -67,
+          "playerId": 26639,
+          "playerName": "alhen",
+          "playerDiscordId": "344419268538007553",
+          "playerCountryCode": "SE"
+        },
+        {
+          "score": 40,
+          "multiplier": 1,
+          "prevMmr": 6557,
+          "newMmr": 6490,
+          "delta": -67,
+          "playerId": 45434,
+          "playerName": "Sneaky Golem",
+          "playerDiscordId": "680513507367583825",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 118,
+          "multiplier": 1,
+          "prevMmr": 6681,
+          "newMmr": 6614,
+          "delta": -67,
+          "playerId": 66994,
+          "playerName": "foolycl",
+          "playerDiscordId": "178365002149920768",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 6609,
+          "newMmr": 6432,
+          "delta": -177,
+          "playerId": 65385,
+          "playerName": "Toopa",
+          "playerDiscordId": "142601274884489216",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 6428,
+          "newMmr": 6251,
+          "delta": -177,
+          "playerId": 71313,
+          "playerName": "Aguerrido",
+          "playerDiscordId": "217072306067996676",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 6394,
+          "newMmr": 6217,
+          "delta": -177,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1416196921583992852",
+  "updateMessageId": "1416200362863624263",
+  "authorId": "239832882808487946"
+}

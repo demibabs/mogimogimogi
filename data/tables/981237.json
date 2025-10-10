@@ -1,0 +1,341 @@
+{
+  "id": 981237,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-12T03:58:05.2450641Z",
+  "verifiedOn": "2025-09-12T04:17:51.8866824Z",
+  "numTeams": 12,
+  "numPlayers": 24,
+  "format": "2v2",
+  "url": "/TableImage/981237.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 6217,
+          "newMmr": 6521,
+          "delta": 304,
+          "playerId": 29596,
+          "playerName": "KNShun",
+          "playerDiscordId": "531418782850351115",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6862,
+          "newMmr": 7166,
+          "delta": 304,
+          "playerId": 71027,
+          "playerName": "Carbuncle24",
+          "playerDiscordId": "665943254012788765",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6502,
+          "newMmr": 6752,
+          "delta": 250,
+          "playerId": 37826,
+          "playerName": "KOne",
+          "playerDiscordId": "1077919587384967199",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6792,
+          "newMmr": 7042,
+          "delta": 250,
+          "playerId": 59964,
+          "playerName": "AK2KI",
+          "playerDiscordId": "1236611945055129623",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 61,
+          "multiplier": 1,
+          "prevMmr": 8196,
+          "newMmr": 8311,
+          "delta": 115,
+          "playerId": 24081,
+          "playerName": "Mus",
+          "playerDiscordId": "705558296995561472",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 7431,
+          "newMmr": 7546,
+          "delta": 115,
+          "playerId": 26528,
+          "playerName": "ViVA LA MiDALA",
+          "playerDiscordId": "816899672894341151",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 9038,
+          "newMmr": 9072,
+          "delta": 34,
+          "playerId": 27536,
+          "playerName": "yezy",
+          "playerDiscordId": "358306692141678594",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 7604,
+          "newMmr": 7638,
+          "delta": 34,
+          "playerId": 56207,
+          "playerName": "COOK yezy",
+          "playerDiscordId": "916490499936907274",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 8080,
+          "newMmr": 8132,
+          "delta": 52,
+          "playerId": 18299,
+          "playerName": "akappa",
+          "playerDiscordId": "804349174874112010",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 6776,
+          "newMmr": 6828,
+          "delta": 52,
+          "playerId": 31973,
+          "playerName": "wakabayashi",
+          "playerDiscordId": "443000957165371392",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 61,
+          "multiplier": 1,
+          "prevMmr": 8516,
+          "newMmr": 8346,
+          "delta": -170,
+          "playerId": 11883,
+          "playerName": "kazane",
+          "playerDiscordId": "519457900456837120",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 11608,
+          "newMmr": 11438,
+          "delta": -170,
+          "playerId": 41771,
+          "playerName": "okashi",
+          "playerDiscordId": "1099188696760201247",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 7435,
+          "newMmr": 7445,
+          "delta": 10,
+          "playerId": 12609,
+          "playerName": "LX",
+          "playerDiscordId": "89578560955633664",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 5858,
+          "newMmr": 5868,
+          "delta": 10,
+          "playerId": 15508,
+          "playerName": "Sparky",
+          "playerDiscordId": "175058546965086208",
+          "playerCountryCode": "PR"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 5790,
+          "newMmr": 5709,
+          "delta": -81,
+          "playerId": 20279,
+          "playerName": "Cetitan",
+          "playerDiscordId": "1031696536096210955",
+          "playerCountryCode": "CL"
+        },
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 8791,
+          "newMmr": 8710,
+          "delta": -81,
+          "playerId": 25817,
+          "playerName": "Greninja",
+          "playerDiscordId": "561968179790741520",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 54,
+          "multiplier": 1,
+          "prevMmr": 5331,
+          "newMmr": 5302,
+          "delta": -29,
+          "playerId": 42342,
+          "playerName": "kijicha",
+          "playerDiscordId": "756489088416088130",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6383,
+          "newMmr": 6354,
+          "delta": -29,
+          "playerId": 54225,
+          "playerName": "Rineyagu",
+          "playerDiscordId": "521352808021360657",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 62,
+          "multiplier": 1,
+          "prevMmr": 6130,
+          "newMmr": 6025,
+          "delta": -105,
+          "playerId": 66955,
+          "playerName": "PCDamonD",
+          "playerDiscordId": "130741136678453248",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 6499,
+          "newMmr": 6394,
+          "delta": -105,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 6046,
+          "newMmr": 5938,
+          "delta": -108,
+          "playerId": 28873,
+          "playerName": "short 225",
+          "playerDiscordId": "711906039469047828",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 58,
+          "multiplier": 1,
+          "prevMmr": 5289,
+          "newMmr": 5181,
+          "delta": -108,
+          "playerId": 32966,
+          "playerName": "Puzzline",
+          "playerDiscordId": "948492625781088317",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 7592,
+          "newMmr": 7322,
+          "delta": -270,
+          "playerId": 26416,
+          "playerName": "Fortune",
+          "playerDiscordId": "956666591297302568",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 7032,
+          "newMmr": 6762,
+          "delta": -270,
+          "playerId": 73184,
+          "playerName": "WiiSAN",
+          "playerDiscordId": "916666764232904714",
+          "playerCountryCode": "JP"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1415909316581396601",
+  "updateMessageId": "1415914301910286417",
+  "authorId": "916490499936907274"
+}

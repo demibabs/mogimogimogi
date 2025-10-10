@@ -1,0 +1,169 @@
+{
+  "id": 982823,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-15T15:56:38.1618323Z",
+  "verifiedOn": "2025-09-15T16:01:54.857312Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/982823.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6727,
+          "newMmr": 6912,
+          "delta": 185,
+          "playerId": 9514,
+          "playerName": "Shin Haein",
+          "playerDiscordId": "499479821777371136",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6652,
+          "newMmr": 6837,
+          "delta": 185,
+          "playerId": 10580,
+          "playerName": "Hysilens",
+          "playerDiscordId": "257998194766512129",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 6610,
+          "newMmr": 6795,
+          "delta": 185,
+          "playerId": 53007,
+          "playerName": "Y Que Fue",
+          "playerDiscordId": "1008285876591276062",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 56,
+          "multiplier": 1,
+          "prevMmr": 6592,
+          "newMmr": 6650,
+          "delta": 58,
+          "playerId": 61536,
+          "playerName": "Moondancer",
+          "playerDiscordId": "358847555594878978",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 6843,
+          "newMmr": 6901,
+          "delta": 58,
+          "playerId": 67113,
+          "playerName": "Kevino811",
+          "playerDiscordId": "767411528651112448",
+          "playerCountryCode": "DE"
+        },
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 6841,
+          "newMmr": 6899,
+          "delta": 58,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6632,
+          "newMmr": 6570,
+          "delta": -62,
+          "playerId": 20115,
+          "playerName": "eren",
+          "playerDiscordId": "739092302341079100",
+          "playerCountryCode": "GT"
+        },
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6805,
+          "newMmr": 6743,
+          "delta": -62,
+          "playerId": 39685,
+          "playerName": "Ace",
+          "playerDiscordId": "756311085543325707",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 6842,
+          "newMmr": 6780,
+          "delta": -62,
+          "playerId": 60733,
+          "playerName": "RayOS",
+          "playerDiscordId": "224186019786784768",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6534,
+          "newMmr": 6353,
+          "delta": -181,
+          "playerId": 11862,
+          "playerName": "Cheez-It",
+          "playerDiscordId": "439257620025573376",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 51,
+          "multiplier": 1,
+          "prevMmr": 6618,
+          "newMmr": 6437,
+          "delta": -181,
+          "playerId": 12400,
+          "playerName": "Give me GTA VI",
+          "playerDiscordId": "658700066042806313",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 103,
+          "multiplier": 1,
+          "prevMmr": 7066,
+          "newMmr": 6885,
+          "delta": -181,
+          "playerId": 72716,
+          "playerName": "let-me-tilt",
+          "playerDiscordId": "1369705481039380540",
+          "playerCountryCode": "FR"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1417177306035916951",
+  "updateMessageId": "1417178645688221829",
+  "authorId": "257998194766512129"
+}

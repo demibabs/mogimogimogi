@@ -4,6 +4,7 @@ const database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
 const embedEnhancer = require("../../utils/embedEnhancer");
+const AutoUserManager = require("../../utils/autoUserManager");
 
 const getRandomMessage = function(messages) {
 	const randInt = Math.floor(Math.random() * messages.length);
@@ -38,9 +39,9 @@ module.exports = {
 			// Use generateNotables for consistency with button interactions
 			const result = await this.generateNotables(interaction, discordUser, serverId, serverOnly, squads, "alltime");
 
-			if (!result) {
+			if (!result.success) {
 				return await interaction.editReply({
-					content: "an error occurred while generating notables. please try again later.",
+					content: result.message,
 				});
 			}
 
@@ -103,7 +104,7 @@ module.exports = {
 			// Generate notables based on time filter
 			const result = await this.generateNotables(interaction, discordUser, serverId, serverOnly, squads, timeFilter);
 
-			if (result) {
+			if (result && result.success) {
 				// Create action row with three buttons (current one disabled)
 				const row = new ActionRowBuilder()
 					.addComponents(
@@ -126,6 +127,10 @@ module.exports = {
 
 				await interaction.editReply({ embeds: [result.embed], components: [row] });
 			}
+			else {
+				// Handle error case for button interactions
+				await interaction.editReply({ content: result.message || "unable to load notables data." });
+			}
 
 			return true;
 		}
@@ -138,12 +143,11 @@ module.exports = {
 	// Generate notables data (simplified version)
 	async generateNotables(interaction, discordUser, serverId, serverOnly, squads, timeFilter = "alltime") {
 		try {
-			// Validate server data and user
-			const serverData = await database.getServerData(serverId);
-			const userData = serverData?.users?.[discordUser.id];
-
-			if (!userData) {
-				return null;
+			// Validate user exists and add them if they have a lounge account
+			const userValidation = await AutoUserManager.validateUserForCommand(discordUser.id, serverId, interaction.client);
+			
+			if (!userValidation.success) {
+				return { success: false, message: userValidation.message };
 			}
 
 			// Get user's Lounge account
@@ -165,7 +169,7 @@ module.exports = {
 			let userTables = await LoungeApi.getAllPlayerTables(userId, serverId);
 
 			if (!userTables || Object.keys(userTables).length === 0) {
-				return null;
+				return { success: false, message: "no events found for this player." };
 			}
 
 			// Apply time filter using PlayerStats methods
@@ -208,7 +212,7 @@ module.exports = {
 
 			// Check if any tables remain after filtering
 			if (Object.keys(userTables).length === 0) {
-				return null;
+				return { success: false, message: "no events found matching the specified filters." };
 			}
 
 			// Calculate statistics
@@ -221,7 +225,7 @@ module.exports = {
 
 			// Validate that statistics were calculated successfully
 			if (!bS || !wS || !oP || !uP || !bC || !bA) {
-				return null;
+				return { success: false, message: "insufficient data to calculate notables for this player." };
 			}
 
 			// Messages for random selection
@@ -255,7 +259,7 @@ module.exports = {
 				"you suck. (jk.)",
 			];
 			const badWSMessages = [
-				"this is the ype of mogi i have when i'm about to promote.",
+				"this is the type of mogi i have when i'm about to promote.",
 				"video games aren't for everyone. maybe try sports?",
 				"yowch.",
 				"at least you beat somebody! wait, no you didn't.",
@@ -381,11 +385,11 @@ module.exports = {
 			}
 			notablesEmbed.setFooter({ text: footerText });
 
-			return { embed: notablesEmbed };
+			return { success: true, embed: notablesEmbed };
 		}
 		catch (error) {
 			console.error("Error generating notables:", error);
-			return null;
+			return { success: false, message: "an error occurred while generating notables. please try again later." };
 		}
 	},
 };

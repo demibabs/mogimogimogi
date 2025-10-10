@@ -1,0 +1,321 @@
+{
+  "id": 978287,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-09-04T02:55:46.0699839Z",
+  "verifiedOn": "2025-09-04T03:04:44.7542705Z",
+  "numTeams": 8,
+  "numPlayers": 24,
+  "format": "3v3",
+  "url": "/TableImage/978287.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 11488,
+          "newMmr": 11563,
+          "delta": 75,
+          "playerId": 21138,
+          "playerName": "kurtn",
+          "playerDiscordId": "666258230426730506",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 9368,
+          "newMmr": 9443,
+          "delta": 75,
+          "playerId": 41771,
+          "playerName": "okashi",
+          "playerDiscordId": "1099188696760201247",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 8501,
+          "newMmr": 8576,
+          "delta": 75,
+          "playerId": 74768,
+          "playerName": "captaro",
+          "playerDiscordId": "1296086212137848884",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 7585,
+          "newMmr": 7729,
+          "delta": 144,
+          "playerId": 33660,
+          "playerName": "tys",
+          "playerDiscordId": "769620754751946763",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 7661,
+          "newMmr": 7805,
+          "delta": 144,
+          "playerId": 36194,
+          "playerName": "Bapevc",
+          "playerDiscordId": "556650124483231754",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6794,
+          "newMmr": 6938,
+          "delta": 144,
+          "playerId": 40774,
+          "playerName": "sliced oxy",
+          "playerDiscordId": "965703593325887488",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 6619,
+          "newMmr": 6678,
+          "delta": 59,
+          "playerId": 8379,
+          "playerName": "405DopeBoi",
+          "playerDiscordId": "157963718179815424",
+          "playerCountryCode": "PR"
+        },
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 8229,
+          "newMmr": 8288,
+          "delta": 59,
+          "playerId": 13025,
+          "playerName": "MikeUSA",
+          "playerDiscordId": "127183114865737728",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 80,
+          "multiplier": 1,
+          "prevMmr": 8107,
+          "newMmr": 8166,
+          "delta": 59,
+          "playerId": 51313,
+          "playerName": "May",
+          "playerDiscordId": "1193559900274577501",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 6134,
+          "newMmr": 6214,
+          "delta": 80,
+          "playerId": 66955,
+          "playerName": "PCDamonD",
+          "playerDiscordId": "130741136678453248",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 6497,
+          "newMmr": 6577,
+          "delta": 80,
+          "playerId": 69384,
+          "playerName": "Delphi",
+          "playerDiscordId": "414690354487492611",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6560,
+          "newMmr": 6640,
+          "delta": 80,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 5574,
+          "newMmr": 5606,
+          "delta": 32,
+          "playerId": 68469,
+          "playerName": "Minh",
+          "playerDiscordId": "482893290266427422",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 6166,
+          "newMmr": 6198,
+          "delta": 32,
+          "playerId": 68892,
+          "playerName": "Eeepy",
+          "playerDiscordId": "166969688511741952",
+          "playerCountryCode": "GB"
+        },
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 6776,
+          "newMmr": 6808,
+          "delta": 32,
+          "playerId": 69193,
+          "playerName": "aquaa",
+          "playerDiscordId": "787431047783776276",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6830,
+          "newMmr": 6708,
+          "delta": -122,
+          "playerId": 14496,
+          "playerName": "Raul FG5",
+          "playerDiscordId": "462290643692290058",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 9528,
+          "newMmr": 9406,
+          "delta": -122,
+          "playerId": 31069,
+          "playerName": "Maario",
+          "playerDiscordId": "743563630733295708",
+          "playerCountryCode": "ES"
+        },
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 5865,
+          "newMmr": 5743,
+          "delta": -122,
+          "playerId": 44588,
+          "playerName": "Dmky",
+          "playerDiscordId": "394145026252472320",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 9280,
+          "newMmr": 9148,
+          "delta": -132,
+          "playerId": 24431,
+          "playerName": "Mythra",
+          "playerDiscordId": "95534960219267072",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6865,
+          "newMmr": 6733,
+          "delta": -132,
+          "playerId": 67302,
+          "playerName": "Jhay",
+          "playerDiscordId": "255364750186119168",
+          "playerCountryCode": "GB"
+        },
+        {
+          "score": 31,
+          "multiplier": 1,
+          "prevMmr": 3807,
+          "newMmr": 3675,
+          "delta": -132,
+          "playerId": 74124,
+          "playerName": "Poofesure",
+          "playerDiscordId": "402224054175531008",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 50,
+          "multiplier": 1,
+          "prevMmr": 4660,
+          "newMmr": 4524,
+          "delta": -136,
+          "playerId": 71984,
+          "playerName": "bbcool7",
+          "playerDiscordId": "982714484827234374",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 7381,
+          "newMmr": 7245,
+          "delta": -136,
+          "playerId": 72923,
+          "playerName": "Term",
+          "playerDiscordId": "707428557327958066",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 5103,
+          "newMmr": 4967,
+          "delta": -136,
+          "playerId": 73908,
+          "playerName": "Jixcs",
+          "playerDiscordId": "543940328990703633",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1412994530210484375",
+  "updateMessageId": "1412996800847155252",
+  "authorId": "982714484827234374"
+}

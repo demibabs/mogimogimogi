@@ -4,6 +4,7 @@ const LoungeApi = require("../../utils/loungeApi");
 const DataManager = require("../../utils/dataManager");
 const PlayerStats = require("../../utils/playerStats");
 const embedEnhancer = require("../../utils/embedEnhancer");
+const AutoUserManager = require("../../utils/autoUserManager");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -32,9 +33,9 @@ module.exports = {
 			// Use generateHeadToHead for consistency with button interactions
 			const result = await this.generateHeadToHead(interaction, discordUser1, discordUser2, serverId, squads, "alltime");
 
-			if (!result) {
+			if (!result.success) {
 				return await interaction.editReply({
-					content: "an error occurred while generating head-to-head stats. please try again later.",
+					content: result.message,
 				});
 			}
 
@@ -110,7 +111,7 @@ module.exports = {
 			// Generate head-to-head based on time filter
 			const result = await this.generateHeadToHead(interaction, discordUser1, discordUser2, serverId, squads, timeFilter);
 
-			if (result) {
+			if (result && result.success) {
 				// Create action row with three buttons (current one disabled)
 				const row = new ActionRowBuilder()
 					.addComponents(
@@ -133,6 +134,10 @@ module.exports = {
 
 				await interaction.editReply({ embeds: [result.embed], components: [row] });
 			}
+			else {
+				// Handle error case for button interactions
+				await interaction.editReply({ content: result.message || "unable to load head-to-head data." });
+			}
 
 			return true;
 		}
@@ -148,13 +153,16 @@ module.exports = {
 			const userId1 = discordUser1.id;
 			const userId2 = discordUser2.id;
 
-			// Validate users exist in server data
-			const serverData = await database.getServerData(serverId);
-			const user1Data = serverData?.users?.[userId1];
-			const user2Data = serverData?.users?.[userId2];
-
-			if (!user1Data || !user2Data) {
-				return null;
+			// Validate both users exist and add them if they have lounge accounts
+			const user1Validation = await AutoUserManager.validateUserForCommand(userId1, serverId, interaction.client);
+			const user2Validation = await AutoUserManager.validateUserForCommand(userId2, serverId, interaction.client);
+			
+			if (!user1Validation.success) {
+				return { success: false, message: `player 1: ${user1Validation.message}` };
+			}
+			
+			if (!user2Validation.success) {
+				return { success: false, message: `player 2: ${user2Validation.message}` };
 			}
 
 			// Update user data in background
@@ -178,7 +186,7 @@ module.exports = {
 			let h2hTables = await PlayerStats.getH2HTables(userId1, userId2, serverId);
 
 			if (!h2hTables || Object.keys(h2hTables).length === 0) {
-				return null;
+				return { success: false, message: "no shared events found between these players." };
 			}
 
 			// Apply time filter using PlayerStats methods
@@ -205,7 +213,7 @@ module.exports = {
 
 			// Check if any tables remain after filtering
 			if (Object.keys(h2hTables).length === 0) {
-				return null;
+				return { success: false, message: "no shared events found matching the specified filters." };
 			}
 
 			// Calculate statistics
@@ -288,11 +296,11 @@ module.exports = {
 			}
 			h2hEmbed.setFooter({ text: footerText });
 
-			return { embed: h2hEmbed };
+			return { success: true, embed: h2hEmbed };
 		}
 		catch (error) {
 			console.error("Error generating head-to-head:", error);
-			return null;
+			return { success: false, message: "an error occurred while generating head-to-head stats. please try again later." };
 		}
 	},
 };

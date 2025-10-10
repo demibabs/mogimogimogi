@@ -1,0 +1,169 @@
+{
+  "id": 973091,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-08-21T03:11:10.3356401Z",
+  "verifiedOn": "2025-08-21T03:11:59.0277388Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/973091.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5650,
+          "newMmr": 5834,
+          "delta": 184,
+          "playerId": 66955,
+          "playerName": "PCDamonD",
+          "playerDiscordId": "130741136678453248",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 5726,
+          "newMmr": 5910,
+          "delta": 184,
+          "playerId": 69384,
+          "playerName": "Delphi",
+          "playerDiscordId": "414690354487492611",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 5938,
+          "newMmr": 6122,
+          "delta": 184,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 5787,
+          "newMmr": 5838,
+          "delta": 51,
+          "playerId": 36711,
+          "playerName": "Redrock733",
+          "playerDiscordId": "581366609411571712",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 5570,
+          "newMmr": 5621,
+          "delta": 51,
+          "playerId": 67051,
+          "playerName": "Derpz",
+          "playerDiscordId": "586696906881761307",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 6486,
+          "newMmr": 6537,
+          "delta": 51,
+          "playerId": 69472,
+          "playerName": "Alien Pi",
+          "playerDiscordId": "1380928784278093836",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 60,
+          "multiplier": 1,
+          "prevMmr": 5332,
+          "newMmr": 5267,
+          "delta": -65,
+          "playerId": 18030,
+          "playerName": "Rumi",
+          "playerDiscordId": "511687176644329473",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 54,
+          "multiplier": 1,
+          "prevMmr": 5447,
+          "newMmr": 5382,
+          "delta": -65,
+          "playerId": 19314,
+          "playerName": "Capn",
+          "playerDiscordId": "310654932112113665",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 125,
+          "multiplier": 1,
+          "prevMmr": 6898,
+          "newMmr": 6833,
+          "delta": -65,
+          "playerId": 24305,
+          "playerName": "Bruno Biggs",
+          "playerDiscordId": "457532286481465366",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 5624,
+          "newMmr": 5453,
+          "delta": -171,
+          "playerId": 9771,
+          "playerName": "DU PLESSIS",
+          "playerDiscordId": "814389737284567041",
+          "playerCountryCode": "MX"
+        },
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 5792,
+          "newMmr": 5621,
+          "delta": -171,
+          "playerId": 29596,
+          "playerName": "KNShun",
+          "playerDiscordId": "531418782850351115",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 5706,
+          "newMmr": 5535,
+          "delta": -171,
+          "playerId": 32877,
+          "playerName": "Lovemachine",
+          "playerDiscordId": "929993432896770048",
+          "playerCountryCode": "JP"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1407924974915813397",
+  "updateMessageId": "1407925179933528175",
+  "authorId": "457532286481465366"
+}

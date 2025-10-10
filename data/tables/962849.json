@@ -1,0 +1,209 @@
+{
+  "id": 962849,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-27T16:49:12.9945225Z",
+  "verifiedOn": "2025-07-27T17:03:43.3288966Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/962849.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 115,
+          "multiplier": 1,
+          "prevMmr": 5833,
+          "newMmr": 6048,
+          "delta": 215,
+          "playerId": 47747,
+          "playerName": "Mikuel",
+          "playerDiscordId": "476421812096598016",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 109,
+          "multiplier": 1,
+          "prevMmr": 5820,
+          "newMmr": 5996,
+          "delta": 176,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 5618,
+          "newMmr": 5762,
+          "delta": 144,
+          "playerId": 20385,
+          "playerName": "mio_min",
+          "playerDiscordId": "309306447869640704",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 5665,
+          "newMmr": 5767,
+          "delta": 102,
+          "playerId": 12270,
+          "playerName": "Kuroe",
+          "playerDiscordId": "473618939562426368",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 5638,
+          "newMmr": 5701,
+          "delta": 63,
+          "playerId": 68648,
+          "playerName": "Aurukel",
+          "playerDiscordId": "283822560116867074",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 5632,
+          "newMmr": 5655,
+          "delta": 23,
+          "playerId": 14149,
+          "playerName": "Kirua",
+          "playerDiscordId": "1012366451308515358",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5638,
+          "newMmr": 5621,
+          "delta": -17,
+          "playerId": 11632,
+          "playerName": "Joro",
+          "playerDiscordId": "339140995314614272",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5820,
+          "newMmr": 5756,
+          "delta": -64,
+          "playerId": 72271,
+          "playerName": "Luminaria",
+          "playerDiscordId": "1381570603042996307",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 5630,
+          "newMmr": 5533,
+          "delta": -97,
+          "playerId": 56923,
+          "playerName": "Jannibox",
+          "playerDiscordId": "1014964449339248702",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 61,
+          "multiplier": 1,
+          "prevMmr": 5645,
+          "newMmr": 5508,
+          "delta": -137,
+          "playerId": 71278,
+          "playerName": "Grotazz",
+          "playerDiscordId": "1391106337324142703",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 57,
+          "multiplier": 1,
+          "prevMmr": 5768,
+          "newMmr": 5586,
+          "delta": -182,
+          "playerId": 69870,
+          "playerName": "Der Erpel",
+          "playerDiscordId": "804863676234465290",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 53,
+          "multiplier": 1,
+          "prevMmr": 5820,
+          "newMmr": 5596,
+          "delta": -224,
+          "playerId": 67410,
+          "playerName": "Krypton",
+          "playerDiscordId": "693769087129485403",
+          "playerCountryCode": "FR"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1399071144296054848",
+  "updateMessageId": "1399074798080098335",
+  "authorId": "476421812096598016"
+}

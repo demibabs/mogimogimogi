@@ -1,0 +1,169 @@
+{
+  "id": 991223,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-10-08T03:53:14.4795831Z",
+  "verifiedOn": "2025-10-08T04:24:08.7179947Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/991223.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 7217,
+          "newMmr": 7377,
+          "delta": 160,
+          "playerId": 29161,
+          "playerName": "Ulquiorra",
+          "playerDiscordId": "986617105891868712",
+          "playerCountryCode": "IT"
+        },
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 5423,
+          "newMmr": 5583,
+          "delta": 160,
+          "playerId": 70075,
+          "playerName": "LadroPigro",
+          "playerDiscordId": "415544105423077395",
+          "playerCountryCode": "IT"
+        },
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 6129,
+          "newMmr": 6289,
+          "delta": 160,
+          "playerId": 70116,
+          "playerName": "Lollenzo",
+          "playerDiscordId": "294157000680407041",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 2979,
+          "newMmr": 2986,
+          "delta": 7,
+          "playerId": 19740,
+          "playerName": "vv",
+          "playerDiscordId": "813785411431825409",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 119,
+          "multiplier": 1,
+          "prevMmr": 10522,
+          "newMmr": 10529,
+          "delta": 7,
+          "playerId": 30973,
+          "playerName": "notitle",
+          "playerDiscordId": "1051853484682662039",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 4179,
+          "newMmr": 4186,
+          "delta": 7,
+          "playerId": 56967,
+          "playerName": "Shape of You",
+          "playerDiscordId": "732805179208105984",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 100,
+          "multiplier": 1,
+          "prevMmr": 7799,
+          "newMmr": 7789,
+          "delta": -10,
+          "playerId": 53192,
+          "playerName": "GLEISON BREMER",
+          "playerDiscordId": "316645071875211265",
+          "playerCountryCode": "IT"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6231,
+          "newMmr": 6221,
+          "delta": -10,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 4324,
+          "newMmr": 4314,
+          "delta": -10,
+          "playerId": 74731,
+          "playerName": "Loscomical",
+          "playerDiscordId": "1085390833072746558",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 6456,
+          "newMmr": 6299,
+          "delta": -157,
+          "playerId": 20535,
+          "playerName": "Catma",
+          "playerDiscordId": "158210573987741696",
+          "playerCountryCode": "AU"
+        },
+        {
+          "score": 45,
+          "multiplier": 1,
+          "prevMmr": 5269,
+          "newMmr": 5112,
+          "delta": -157,
+          "playerId": 42084,
+          "playerName": "sharpmk",
+          "playerDiscordId": "738403370733273089",
+          "playerCountryCode": "PH"
+        },
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 5294,
+          "newMmr": 5137,
+          "delta": -157,
+          "playerId": 68002,
+          "playerName": "Luna_47",
+          "playerDiscordId": "200281483577917450",
+          "playerCountryCode": "CA"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1425330180674682890",
+  "updateMessageId": "1425337959338606653",
+  "authorId": "732805179208105984"
+}

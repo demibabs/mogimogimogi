@@ -1,0 +1,179 @@
+{
+  "id": 978612,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-09-05T03:49:07.4512692Z",
+  "verifiedOn": "2025-09-05T03:54:24.7869613Z",
+  "numTeams": 6,
+  "numPlayers": 12,
+  "format": "2v2",
+  "url": "/TableImage/978612.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 94,
+          "multiplier": 1,
+          "prevMmr": 6945,
+          "newMmr": 7140,
+          "delta": 195,
+          "playerId": 23577,
+          "playerName": "KAXA",
+          "playerDiscordId": "716529592734711809",
+          "playerCountryCode": "KR"
+        },
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 7132,
+          "newMmr": 7327,
+          "delta": 195,
+          "playerId": 32838,
+          "playerName": ".9gg",
+          "playerDiscordId": "424555631329017856",
+          "playerCountryCode": "KR"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 6001,
+          "newMmr": 6088,
+          "delta": 87,
+          "playerId": 12845,
+          "playerName": "Matt",
+          "playerDiscordId": "170012932950720513",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 7719,
+          "newMmr": 7806,
+          "delta": 87,
+          "playerId": 13395,
+          "playerName": "mylesdg",
+          "playerDiscordId": "296745496318443531",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 8167,
+          "newMmr": 8225,
+          "delta": 58,
+          "playerId": 46032,
+          "playerName": "macaronimonster5",
+          "playerDiscordId": "265052102449954816",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6413,
+          "newMmr": 6471,
+          "delta": 58,
+          "playerId": 53015,
+          "playerName": "pizzapirate7",
+          "playerDiscordId": "365244376454266881",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 6842,
+          "newMmr": 6783,
+          "delta": -59,
+          "playerId": 29596,
+          "playerName": "KNShun",
+          "playerDiscordId": "531418782850351115",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 7640,
+          "newMmr": 7581,
+          "delta": -59,
+          "playerId": 71027,
+          "playerName": "Carbuncle24",
+          "playerDiscordId": "665943254012788765",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 6514,
+          "newMmr": 6423,
+          "delta": -91,
+          "playerId": 69384,
+          "playerName": "Delphi",
+          "playerDiscordId": "414690354487492611",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6527,
+          "newMmr": 6436,
+          "delta": -91,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6808,
+          "newMmr": 6618,
+          "delta": -190,
+          "playerId": 69193,
+          "playerName": "aquaa",
+          "playerDiscordId": "787431047783776276",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 6827,
+          "newMmr": 6637,
+          "delta": -190,
+          "playerId": 72343,
+          "playerName": "Pamperinos",
+          "playerDiscordId": "597963333093687296",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1413370344026411060",
+  "updateMessageId": "1413371676288225351",
+  "authorId": "716529592734711809"
+}

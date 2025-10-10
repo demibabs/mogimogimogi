@@ -1,0 +1,209 @@
+{
+  "id": 962086,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-26T03:46:40.0268696Z",
+  "verifiedOn": "2025-07-26T05:37:17.6488323Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/962086.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 109,
+          "multiplier": 1,
+          "prevMmr": 5600,
+          "newMmr": 5797,
+          "delta": 197,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 104,
+          "multiplier": 1,
+          "prevMmr": 5036,
+          "newMmr": 5215,
+          "delta": 179,
+          "playerId": 67621,
+          "playerName": "ShigureSMM2",
+          "playerDiscordId": "642934562162212885",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 99,
+          "multiplier": 1,
+          "prevMmr": 5179,
+          "newMmr": 5312,
+          "delta": 133,
+          "playerId": 69588,
+          "playerName": "Stevenz1030",
+          "playerDiscordId": "1273740601614925968",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 4862,
+          "newMmr": 4968,
+          "delta": 106,
+          "playerId": 73370,
+          "playerName": "Bao",
+          "playerDiscordId": "941126939022880778",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 5058,
+          "newMmr": 5116,
+          "delta": 58,
+          "playerId": 48872,
+          "playerName": "Breezyy",
+          "playerDiscordId": "379555822642003968",
+          "playerCountryCode": "AU"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 4800,
+          "newMmr": 4828,
+          "delta": 28,
+          "playerId": 13760,
+          "playerName": "leciel",
+          "playerDiscordId": "731655634633883710",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5117,
+          "newMmr": 5093,
+          "delta": -24,
+          "playerId": 9877,
+          "playerName": "ETH4N",
+          "playerDiscordId": "302476999815856130",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 5044,
+          "newMmr": 4982,
+          "delta": -62,
+          "playerId": 68266,
+          "playerName": "Tstoves",
+          "playerDiscordId": "979021613615956060",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 4702,
+          "newMmr": 4614,
+          "delta": -88,
+          "playerId": 71727,
+          "playerName": "Hex",
+          "playerDiscordId": "1277018269160833055",
+          "playerCountryCode": "AS"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 5010,
+          "newMmr": 4870,
+          "delta": -140,
+          "playerId": 66782,
+          "playerName": "TC",
+          "playerDiscordId": "740298407666516038",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 56,
+          "multiplier": 1,
+          "prevMmr": 4800,
+          "newMmr": 4628,
+          "delta": -172,
+          "playerId": 72945,
+          "playerName": "ThiccBones",
+          "playerDiscordId": "397178693832933376",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 49,
+          "multiplier": 1,
+          "prevMmr": 4882,
+          "newMmr": 4667,
+          "delta": -215,
+          "playerId": 73424,
+          "playerName": "Gramps00",
+          "playerDiscordId": "688364195523461175",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1398511821505298525",
+  "updateMessageId": "1398539664280915999",
+  "authorId": "1273740601614925968"
+}

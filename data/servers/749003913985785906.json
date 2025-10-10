@@ -1,12 +1,18 @@
 {
   "serverId": "749003913985785906",
   "users": {
+    "565628872503066624": {
+      "username": "ace031196",
+      "loungeName": "Ace.",
+      "lastUpdated": "2025-10-10T22:26:36.878Z"
+    },
     "437813284981309441": {
       "username": "crashwy",
       "loungeName": "crash.",
-      "lastUpdated": "2025-10-10T05:58:12.009Z"
+      "lastUpdated": "2025-10-10T22:26:48.026Z"
     }
   },
-  "createdAt": "2025-10-09T17:55:22.192Z",
-  "updatedAt": "2025-10-10T05:58:12.013Z"
+  "tables": {},
+  "createdAt": "2025-10-10T22:26:36.298Z",
+  "updatedAt": "2025-10-10T22:26:48.027Z"
 }

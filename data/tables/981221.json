@@ -1,0 +1,169 @@
+{
+  "id": 981221,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-12T02:56:35.1136385Z",
+  "verifiedOn": "2025-09-12T03:05:09.6003465Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/981221.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6181,
+          "newMmr": 6354,
+          "delta": 173,
+          "playerId": 18296,
+          "playerName": "Chippy",
+          "playerDiscordId": "299042516831830017",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6234,
+          "newMmr": 6407,
+          "delta": 173,
+          "playerId": 65731,
+          "playerName": "Obiyo",
+          "playerDiscordId": "83003008425656320",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 114,
+          "multiplier": 1,
+          "prevMmr": 6326,
+          "newMmr": 6499,
+          "delta": 173,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 86,
+          "multiplier": 1,
+          "prevMmr": 6484,
+          "newMmr": 6537,
+          "delta": 53,
+          "playerId": 27016,
+          "playerName": "Shiny Greninja",
+          "playerDiscordId": "772624737767260160",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 6164,
+          "newMmr": 6217,
+          "delta": 53,
+          "playerId": 29596,
+          "playerName": "KNShun",
+          "playerDiscordId": "531418782850351115",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6081,
+          "newMmr": 6134,
+          "delta": 53,
+          "playerId": 67300,
+          "playerName": "cocona",
+          "playerDiscordId": "202411546058555393",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 6336,
+          "newMmr": 6281,
+          "delta": -55,
+          "playerId": 41885,
+          "playerName": "SixSeven",
+          "playerDiscordId": "745089071272951888",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 6305,
+          "newMmr": 6250,
+          "delta": -55,
+          "playerId": 42553,
+          "playerName": "qtKovs",
+          "playerDiscordId": "518637296438738945",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5603,
+          "newMmr": 5548,
+          "delta": -55,
+          "playerId": 70165,
+          "playerName": "Hayley",
+          "playerDiscordId": "1389648030407594036",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 5996,
+          "newMmr": 5825,
+          "delta": -171,
+          "playerId": 58451,
+          "playerName": "Xerneas.exe",
+          "playerDiscordId": "296626533513166858",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 5955,
+          "newMmr": 5784,
+          "delta": -171,
+          "playerId": 66046,
+          "playerName": "W13RDGUY",
+          "playerDiscordId": "558789937093279747",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 59,
+          "multiplier": 1,
+          "prevMmr": 6142,
+          "newMmr": 5971,
+          "delta": -171,
+          "playerId": 70495,
+          "playerName": "A-milly",
+          "playerDiscordId": "1147653835901386863",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1415893836370280580",
+  "updateMessageId": "1415896000274501772",
+  "authorId": "772624737767260160"
+}

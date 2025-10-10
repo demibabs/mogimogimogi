@@ -1,0 +1,209 @@
+{
+  "id": 964802,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-31T23:53:33.3524883Z",
+  "verifiedOn": "2025-07-31T23:56:55.2078992Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/964802.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 6213,
+          "newMmr": 6437,
+          "delta": 224,
+          "playerId": 44290,
+          "playerName": "Tonight Tonight",
+          "playerDiscordId": "1069490593148981318",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 104,
+          "multiplier": 1,
+          "prevMmr": 6214,
+          "newMmr": 6398,
+          "delta": 184,
+          "playerId": 54387,
+          "playerName": "Astro_Toad",
+          "playerDiscordId": "1209123471729369128",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 6192,
+          "newMmr": 6337,
+          "delta": 145,
+          "playerId": 17651,
+          "playerName": "Player Estonia",
+          "playerDiscordId": "259341923851042816",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 6431,
+          "newMmr": 6526,
+          "delta": 95,
+          "playerId": 68034,
+          "playerName": "Neibafu",
+          "playerDiscordId": "264763746025472000",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6466,
+          "newMmr": 6500,
+          "delta": 34,
+          "playerId": 18906,
+          "playerName": "Xx_UnLuNkY_xX",
+          "playerDiscordId": "800151331804938321",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6075,
+          "newMmr": 6125,
+          "delta": 50,
+          "playerId": 52529,
+          "playerName": "Zach4567",
+          "playerDiscordId": "655639303896170497",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 6382,
+          "newMmr": 6359,
+          "delta": -23,
+          "playerId": 24655,
+          "playerName": "Miku",
+          "playerDiscordId": "865168333061881866",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 84,
+          "multiplier": 1,
+          "prevMmr": 6653,
+          "newMmr": 6579,
+          "delta": -74,
+          "playerId": 20049,
+          "playerName": "Manu Del Quazzo",
+          "playerDiscordId": "598502622768398344",
+          "playerCountryCode": "RO"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 63,
+          "multiplier": 1,
+          "prevMmr": 6504,
+          "newMmr": 6396,
+          "delta": -108,
+          "playerId": 55510,
+          "playerName": "Aslan",
+          "playerDiscordId": "210171777702166529",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 62,
+          "multiplier": 1,
+          "prevMmr": 6240,
+          "newMmr": 6103,
+          "delta": -137,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 57,
+          "multiplier": 1,
+          "prevMmr": 6425,
+          "newMmr": 6241,
+          "delta": -184,
+          "playerId": 67430,
+          "playerName": "HPXX",
+          "playerDiscordId": "1264682073902419968",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 56,
+          "multiplier": 1,
+          "prevMmr": 5995,
+          "newMmr": 5788,
+          "delta": -207,
+          "playerId": 71551,
+          "playerName": "Takomari",
+          "playerDiscordId": "534599378703351828",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1400627484273410068",
+  "updateMessageId": "1400628332663410729",
+  "authorId": "800151331804938321"
+}

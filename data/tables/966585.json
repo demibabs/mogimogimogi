@@ -1,0 +1,169 @@
+{
+  "id": 966585,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-08-05T02:16:14.6210341Z",
+  "verifiedOn": "2025-08-05T02:18:12.4831733Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/966585.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 117,
+          "multiplier": 1,
+          "prevMmr": 7382,
+          "newMmr": 7572,
+          "delta": 190,
+          "playerId": 18960,
+          "playerName": "dasu",
+          "playerDiscordId": "652791061323841568",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 4496,
+          "newMmr": 4686,
+          "delta": 190,
+          "playerId": 33098,
+          "playerName": "Mitsubachi8",
+          "playerDiscordId": "990319759193145436",
+          "playerCountryCode": "JP"
+        },
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 4787,
+          "newMmr": 4977,
+          "delta": 190,
+          "playerId": 48185,
+          "playerName": "puni",
+          "playerDiscordId": "1371058198450278430",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5849,
+          "newMmr": 5902,
+          "delta": 53,
+          "playerId": 66955,
+          "playerName": "PCDamonD",
+          "playerDiscordId": "130741136678453248",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 115,
+          "multiplier": 1,
+          "prevMmr": 5512,
+          "newMmr": 5565,
+          "delta": 53,
+          "playerId": 69384,
+          "playerName": "Delphi",
+          "playerDiscordId": "414690354487492611",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 5997,
+          "newMmr": 6050,
+          "delta": 53,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5762,
+          "newMmr": 5701,
+          "delta": -61,
+          "playerId": 67807,
+          "playerName": "sophiegirl",
+          "playerDiscordId": "1385118460807221320",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 5866,
+          "newMmr": 5805,
+          "delta": -61,
+          "playerId": 69504,
+          "playerName": "diegomkw",
+          "playerDiscordId": "205971824947757056",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 5469,
+          "newMmr": 5408,
+          "delta": -61,
+          "playerId": 70417,
+          "playerName": "SushiYoshi",
+          "playerDiscordId": "849024522488643634",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5099,
+          "newMmr": 4916,
+          "delta": -183,
+          "playerId": 9571,
+          "playerName": "Cam",
+          "playerDiscordId": "167802943553273856",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 12,
+          "multiplier": 1,
+          "prevMmr": 5795,
+          "newMmr": 5612,
+          "delta": -183,
+          "playerId": 15508,
+          "playerName": "Sparky",
+          "playerDiscordId": "175058546965086208",
+          "playerCountryCode": "PR"
+        },
+        {
+          "score": 102,
+          "multiplier": 1,
+          "prevMmr": 6283,
+          "newMmr": 6100,
+          "delta": -183,
+          "playerId": 46996,
+          "playerName": "Kod49",
+          "playerDiscordId": "790448839709949972",
+          "playerCountryCode": "AU"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1402112946238394368",
+  "updateMessageId": "1402113441707065395",
+  "authorId": "790448839709949972"
+}

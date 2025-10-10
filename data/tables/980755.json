@@ -1,0 +1,209 @@
+{
+  "id": 980755,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-10T21:59:01.4740041Z",
+  "verifiedOn": "2025-09-10T22:01:14.9900755Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/980755.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 6544,
+          "newMmr": 6765,
+          "delta": 221,
+          "playerId": 33582,
+          "playerName": "GodOfLagTommy",
+          "playerDiscordId": "296085851715403776",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 94,
+          "multiplier": 1,
+          "prevMmr": 6607,
+          "newMmr": 6766,
+          "delta": 159,
+          "playerId": 44290,
+          "playerName": "Tonight Tonight",
+          "playerDiscordId": "1069490593148981318",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 94,
+          "multiplier": 1,
+          "prevMmr": 6636,
+          "newMmr": 6794,
+          "delta": 158,
+          "playerId": 54379,
+          "playerName": "M4E",
+          "playerDiscordId": "133833882406617088",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6647,
+          "newMmr": 6744,
+          "delta": 97,
+          "playerId": 68276,
+          "playerName": "Naldo",
+          "playerDiscordId": "278028620516294656",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6987,
+          "newMmr": 7010,
+          "delta": 23,
+          "playerId": 15592,
+          "playerName": "Steez",
+          "playerDiscordId": "754947179545624667",
+          "playerCountryCode": "PR"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 89,
+          "multiplier": 1,
+          "prevMmr": 6249,
+          "newMmr": 6302,
+          "delta": 53,
+          "playerId": 71576,
+          "playerName": "agovr",
+          "playerDiscordId": "569186082160246787",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 82,
+          "multiplier": 1,
+          "prevMmr": 6320,
+          "newMmr": 6310,
+          "delta": -10,
+          "playerId": 45574,
+          "playerName": "Guitarman",
+          "playerDiscordId": "692943321219334155",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 6521,
+          "newMmr": 6463,
+          "delta": -58,
+          "playerId": 67720,
+          "playerName": "Chintu",
+          "playerDiscordId": "82830375121846272",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 76,
+          "multiplier": 1,
+          "prevMmr": 6600,
+          "newMmr": 6499,
+          "delta": -101,
+          "playerId": 68675,
+          "playerName": "Caysiii",
+          "playerDiscordId": "307174356600225792",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 6458,
+          "newMmr": 6323,
+          "delta": -135,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 6843,
+          "newMmr": 6652,
+          "delta": -191,
+          "playerId": 50116,
+          "playerName": "fraudsire",
+          "playerDiscordId": "867122747226587136",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 55,
+          "multiplier": 1,
+          "prevMmr": 6495,
+          "newMmr": 6278,
+          "delta": -217,
+          "playerId": 66524,
+          "playerName": "yukino00000",
+          "playerDiscordId": "855139669145681931",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1415456565623787684",
+  "updateMessageId": "1415457133486674112",
+  "authorId": "754947179545624667"
+}

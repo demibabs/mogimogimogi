@@ -1,0 +1,169 @@
+{
+  "id": 973367,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-08-21T21:51:44.4797106Z",
+  "verifiedOn": "2025-08-21T22:17:23.3296297Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/973367.png",
+  "tier": "SQ",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 133,
+          "multiplier": 1,
+          "prevMmr": 6746,
+          "newMmr": 6924,
+          "delta": 178,
+          "playerId": 12927,
+          "playerName": "Melonz",
+          "playerDiscordId": "176126710989717505",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5620,
+          "newMmr": 5798,
+          "delta": 178,
+          "playerId": 69399,
+          "playerName": "Snnuy",
+          "playerDiscordId": "182953412860706816",
+          "playerCountryCode": "NL"
+        },
+        {
+          "score": 72,
+          "multiplier": 1,
+          "prevMmr": 5450,
+          "newMmr": 5628,
+          "delta": 178,
+          "playerId": 72032,
+          "playerName": "Snowboar",
+          "playerDiscordId": "164787564316852224",
+          "playerCountryCode": "NL"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 6268,
+          "newMmr": 6330,
+          "delta": 62,
+          "playerId": 16257,
+          "playerName": "Tylerrr",
+          "playerDiscordId": "305240630400122880",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 5036,
+          "newMmr": 5098,
+          "delta": 62,
+          "playerId": 45099,
+          "playerName": "EvanDragxn",
+          "playerDiscordId": "522244861328359425",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 101,
+          "multiplier": 1,
+          "prevMmr": 6348,
+          "newMmr": 6410,
+          "delta": 62,
+          "playerId": 56207,
+          "playerName": "COOK yezy",
+          "playerDiscordId": "916490499936907274",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 61,
+          "multiplier": 1,
+          "prevMmr": 5834,
+          "newMmr": 5771,
+          "delta": -63,
+          "playerId": 66955,
+          "playerName": "PCDamonD",
+          "playerDiscordId": "130741136678453248",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 71,
+          "multiplier": 1,
+          "prevMmr": 5910,
+          "newMmr": 5847,
+          "delta": -63,
+          "playerId": 69384,
+          "playerName": "Delphi",
+          "playerDiscordId": "414690354487492611",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 6122,
+          "newMmr": 6059,
+          "delta": -63,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 65,
+          "multiplier": 1,
+          "prevMmr": 6259,
+          "newMmr": 6082,
+          "delta": -177,
+          "playerId": 44605,
+          "playerName": "Galactic Parade",
+          "playerDiscordId": "1013180520328335464",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 83,
+          "multiplier": 1,
+          "prevMmr": 6352,
+          "newMmr": 6175,
+          "delta": -177,
+          "playerId": 49235,
+          "playerName": "irregular player",
+          "playerDiscordId": "973977328050905188",
+          "playerCountryCode": "GB"
+        },
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 5008,
+          "newMmr": 4831,
+          "delta": -177,
+          "playerId": 56447,
+          "playerName": "SmokeyonMK",
+          "playerDiscordId": "888213822689640458",
+          "playerCountryCode": "CA"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1408206976210702336",
+  "updateMessageId": "1408213430053240965",
+  "authorId": "973977328050905188"
+}

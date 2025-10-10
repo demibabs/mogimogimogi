@@ -43,6 +43,12 @@ class DataManager {
 	static async updateServerUser(serverId, userId, client) {
 		try {
 			const serverData = await database.getServerData(serverId);
+			
+			// Check if server data exists
+			if (!serverData) {
+				console.warn(`Server data not found for ${serverId} when updating user ${userId}`);
+				return false;
+			}
 
 			// Fetch user info from Discord
 			const user = await client.users.fetch(userId);

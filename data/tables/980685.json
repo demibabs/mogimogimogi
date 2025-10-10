@@ -1,0 +1,209 @@
+{
+  "id": 980685,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-10T18:54:16.9208847Z",
+  "verifiedOn": "2025-09-10T18:57:49.0269262Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/980685.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 106,
+          "multiplier": 1,
+          "prevMmr": 6078,
+          "newMmr": 6291,
+          "delta": 213,
+          "playerId": 71576,
+          "playerName": "agovr",
+          "playerDiscordId": "569186082160246787",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 98,
+          "multiplier": 1,
+          "prevMmr": 6293,
+          "newMmr": 6458,
+          "delta": 165,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 5749,
+          "newMmr": 5875,
+          "delta": 126,
+          "playerId": 11532,
+          "playerName": "je4nne",
+          "playerDiscordId": "304260520158953483",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 97,
+          "multiplier": 1,
+          "prevMmr": 5973,
+          "newMmr": 6090,
+          "delta": 117,
+          "playerId": 61536,
+          "playerName": "Moondancer",
+          "playerDiscordId": "358847555594878978",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 93,
+          "multiplier": 1,
+          "prevMmr": 5838,
+          "newMmr": 5901,
+          "delta": 63,
+          "playerId": 67459,
+          "playerName": "SayHarry",
+          "playerDiscordId": "321744519404191757",
+          "playerCountryCode": "GB"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 81,
+          "multiplier": 1,
+          "prevMmr": 5979,
+          "newMmr": 5996,
+          "delta": 17,
+          "playerId": 53409,
+          "playerName": "64PointAverage",
+          "playerDiscordId": "844328279556489267",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 6153,
+          "newMmr": 6123,
+          "delta": -30,
+          "playerId": 9820,
+          "playerName": "Doomey",
+          "playerDiscordId": "590250114606432304",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 5695,
+          "newMmr": 5643,
+          "delta": -52,
+          "playerId": 17803,
+          "playerName": "zackdfilms",
+          "playerDiscordId": "541247656500920330",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 5454,
+          "newMmr": 5372,
+          "delta": -82,
+          "playerId": 44434,
+          "playerName": "Ampharos",
+          "playerDiscordId": "856959170078572544",
+          "playerCountryCode": "IE"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 69,
+          "multiplier": 1,
+          "prevMmr": 5944,
+          "newMmr": 5802,
+          "delta": -142,
+          "playerId": 48406,
+          "playerName": "Try",
+          "playerDiscordId": "361556275705675776",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 5795,
+          "newMmr": 5619,
+          "delta": -176,
+          "playerId": 70200,
+          "playerName": "Hikotsu",
+          "playerDiscordId": "130344007971635201",
+          "playerCountryCode": "ES"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 49,
+          "multiplier": 1,
+          "prevMmr": 5909,
+          "newMmr": 5689,
+          "delta": -220,
+          "playerId": 55021,
+          "playerName": "Yusuke Kitagawa",
+          "playerDiscordId": "757588690385109084",
+          "playerCountryCode": "IT"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1415410072036835410",
+  "updateMessageId": "1415410964693651468",
+  "authorId": "541247656500920330"
+}

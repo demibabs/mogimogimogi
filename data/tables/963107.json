@@ -1,0 +1,209 @@
+{
+  "id": 963107,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-28T04:58:57.5622055Z",
+  "verifiedOn": "2025-07-28T04:59:16.7922208Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/963107.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 5849,
+          "newMmr": 6055,
+          "delta": 206,
+          "playerId": 68013,
+          "playerName": "Thurmos",
+          "playerDiscordId": "147310238393958400",
+          "playerCountryCode": "FR"
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 108,
+          "multiplier": 1,
+          "prevMmr": 5991,
+          "newMmr": 6191,
+          "delta": 200,
+          "playerId": 70029,
+          "playerName": "Nix",
+          "playerDiscordId": "225015494099468288",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 103,
+          "multiplier": 1,
+          "prevMmr": 5794,
+          "newMmr": 5942,
+          "delta": 148,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 92,
+          "multiplier": 1,
+          "prevMmr": 6131,
+          "newMmr": 6225,
+          "delta": 94,
+          "playerId": 46010,
+          "playerName": "Plat",
+          "playerDiscordId": "983180860012523561",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 85,
+          "multiplier": 1,
+          "prevMmr": 5960,
+          "newMmr": 6021,
+          "delta": 61,
+          "playerId": 32838,
+          "playerName": ".9gg",
+          "playerDiscordId": "424555631329017856",
+          "playerCountryCode": "KR"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 79,
+          "multiplier": 1,
+          "prevMmr": 5922,
+          "newMmr": 5945,
+          "delta": 23,
+          "playerId": 36627,
+          "playerName": "Ego Rock",
+          "playerDiscordId": "1331579344954462249",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 74,
+          "multiplier": 1,
+          "prevMmr": 5802,
+          "newMmr": 5789,
+          "delta": -13,
+          "playerId": 37303,
+          "playerName": "ItsCJ",
+          "playerDiscordId": "1058586310916448336",
+          "playerCountryCode": "BR"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 73,
+          "multiplier": 1,
+          "prevMmr": 6080,
+          "newMmr": 6016,
+          "delta": -64,
+          "playerId": 54103,
+          "playerName": "In da Club",
+          "playerDiscordId": "922123007504306186",
+          "playerCountryCode": "JP"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 6028,
+          "newMmr": 5926,
+          "delta": -102,
+          "playerId": 24602,
+          "playerName": "B3rns",
+          "playerDiscordId": "564770457530662922",
+          "playerCountryCode": "CA"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "scores": [
+        {
+          "score": 68,
+          "multiplier": 1,
+          "prevMmr": 6108,
+          "newMmr": 5963,
+          "delta": -145,
+          "playerId": 67524,
+          "playerName": "fade away",
+          "playerDiscordId": "239637950579736577",
+          "playerCountryCode": "MX"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 62,
+          "multiplier": 1,
+          "prevMmr": 6030,
+          "newMmr": 5828,
+          "delta": -202,
+          "playerId": 13025,
+          "playerName": "MikeUSA",
+          "playerDiscordId": "127183114865737728",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 62,
+          "multiplier": 1,
+          "prevMmr": 6124,
+          "newMmr": 5918,
+          "delta": -206,
+          "playerId": 72271,
+          "playerName": "Luminaria",
+          "playerDiscordId": "1381570603042996307",
+          "playerCountryCode": "ES"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1399254791909019749",
+  "updateMessageId": "1399254873933090877",
+  "authorId": "564770457530662922"
+}

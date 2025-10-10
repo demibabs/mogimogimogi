@@ -1,0 +1,209 @@
+{
+  "id": 962531,
+  "game": "mkworld",
+  "season": 0,
+  "createdOn": "2025-07-27T00:50:54.062666Z",
+  "verifiedOn": "2025-07-27T00:54:22.8946167Z",
+  "numTeams": 12,
+  "numPlayers": 12,
+  "format": "FFA",
+  "url": "/TableImage/962531.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 104,
+          "multiplier": 1,
+          "prevMmr": 5913,
+          "newMmr": 6131,
+          "delta": 218,
+          "playerId": 46010,
+          "playerName": "Plat",
+          "playerDiscordId": "983180860012523561",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 96,
+          "multiplier": 1,
+          "prevMmr": 5900,
+          "newMmr": 6079,
+          "delta": 179,
+          "playerId": 16984,
+          "playerName": "Marlon",
+          "playerDiscordId": "339517124026302465",
+          "playerCountryCode": "CL"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 5725,
+          "newMmr": 5871,
+          "delta": 146,
+          "playerId": 68706,
+          "playerName": "Fallgg",
+          "playerDiscordId": "1164263485748805712",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 5979,
+          "newMmr": 6075,
+          "delta": 96,
+          "playerId": 70267,
+          "playerName": "m4rley",
+          "playerDiscordId": "193233712115220481",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "scores": [
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 5932,
+          "newMmr": 5990,
+          "delta": 58,
+          "playerId": 72078,
+          "playerName": "Nolano",
+          "playerDiscordId": "654429248685211670",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "scores": [
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 5797,
+          "newMmr": 5820,
+          "delta": 23,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "scores": [
+        {
+          "score": 78,
+          "multiplier": 1,
+          "prevMmr": 5889,
+          "newMmr": 5868,
+          "delta": -21,
+          "playerId": 68318,
+          "playerName": "Convicted Felon",
+          "playerDiscordId": "755656786467618836",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "scores": [
+        {
+          "score": 75,
+          "multiplier": 1,
+          "prevMmr": 5899,
+          "newMmr": 5838,
+          "delta": -61,
+          "playerId": 67319,
+          "playerName": "zorys",
+          "playerDiscordId": "320178940637347840",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 5845,
+          "newMmr": 5726,
+          "delta": -119,
+          "playerId": 42743,
+          "playerName": "Comet0307",
+          "playerDiscordId": "926443832369905714",
+          "playerCountryCode": "KR"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "scores": [
+        {
+          "score": 70,
+          "multiplier": 1,
+          "prevMmr": 5790,
+          "newMmr": 5673,
+          "delta": -117,
+          "playerId": 68136,
+          "playerName": "Dodo25",
+          "playerDiscordId": "1093194916844273774",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "scores": [
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5897,
+          "newMmr": 5716,
+          "delta": -181,
+          "playerId": 67180,
+          "playerName": "TheMagicalLoaf",
+          "playerDiscordId": "701558468280320150",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "scores": [
+        {
+          "score": 64,
+          "multiplier": 1,
+          "prevMmr": 5895,
+          "newMmr": 5674,
+          "delta": -221,
+          "playerId": 10330,
+          "playerName": "pigy",
+          "playerDiscordId": "379033691395194890",
+          "playerCountryCode": "US"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1398829976513675314",
+  "updateMessageId": "1398830854674972813",
+  "authorId": "654429248685211670"
+}

@@ -1,0 +1,169 @@
+{
+  "id": 982039,
+  "game": "mkworld",
+  "season": 1,
+  "createdOn": "2025-09-13T23:56:44.7598794Z",
+  "verifiedOn": "2025-09-14T00:02:24.2107608Z",
+  "numTeams": 4,
+  "numPlayers": 12,
+  "format": "3v3",
+  "url": "/TableImage/982039.png",
+  "tier": "Q",
+  "teams": [
+    {
+      "rank": 1,
+      "scores": [
+        {
+          "score": 94,
+          "multiplier": 1,
+          "prevMmr": 6112,
+          "newMmr": 6290,
+          "delta": 178,
+          "playerId": 9124,
+          "playerName": "Saquon Barkley",
+          "playerDiscordId": "812540506252509214",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 95,
+          "multiplier": 1,
+          "prevMmr": 5757,
+          "newMmr": 5935,
+          "delta": 178,
+          "playerId": 66414,
+          "playerName": "Meowser",
+          "playerDiscordId": "82805658990153728",
+          "playerCountryCode": "US"
+        },
+        {
+          "score": 91,
+          "multiplier": 1,
+          "prevMmr": 6349,
+          "newMmr": 6527,
+          "delta": 178,
+          "playerId": 73352,
+          "playerName": "Ace.",
+          "playerDiscordId": "565628872503066624",
+          "playerCountryCode": "US"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "scores": [
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 6282,
+          "newMmr": 6335,
+          "delta": 53,
+          "playerId": 32901,
+          "playerName": "cant",
+          "playerDiscordId": "785819226589888513",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 87,
+          "multiplier": 1,
+          "prevMmr": 6073,
+          "newMmr": 6126,
+          "delta": 53,
+          "playerId": 40744,
+          "playerName": "Addison Barger",
+          "playerDiscordId": "446395793067343882",
+          "playerCountryCode": "CA"
+        },
+        {
+          "score": 100,
+          "multiplier": 1,
+          "prevMmr": 6057,
+          "newMmr": 6110,
+          "delta": 53,
+          "playerId": 67300,
+          "playerName": "cocona",
+          "playerDiscordId": "202411546058555393",
+          "playerCountryCode": "DE"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "scores": [
+        {
+          "score": 90,
+          "multiplier": 1,
+          "prevMmr": 6192,
+          "newMmr": 6133,
+          "delta": -59,
+          "playerId": 38120,
+          "playerName": "ekitikefanboy",
+          "playerDiscordId": "543885438402822148",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 67,
+          "multiplier": 1,
+          "prevMmr": 6064,
+          "newMmr": 6005,
+          "delta": -59,
+          "playerId": 65819,
+          "playerName": "miercolboy",
+          "playerDiscordId": "761275337819947038",
+          "playerCountryCode": "FR"
+        },
+        {
+          "score": 88,
+          "multiplier": 1,
+          "prevMmr": 5837,
+          "newMmr": 5778,
+          "delta": -59,
+          "playerId": 70116,
+          "playerName": "Lollenzo",
+          "playerDiscordId": "294157000680407041",
+          "playerCountryCode": "IT"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "scores": [
+        {
+          "score": 77,
+          "multiplier": 1,
+          "prevMmr": 5869,
+          "newMmr": 5696,
+          "delta": -173,
+          "playerId": 52769,
+          "playerName": "Kleenar",
+          "playerDiscordId": "485880924664365057",
+          "playerCountryCode": "NL"
+        },
+        {
+          "score": 62,
+          "multiplier": 1,
+          "prevMmr": 6133,
+          "newMmr": 5960,
+          "delta": -173,
+          "playerId": 56455,
+          "playerName": "Najman",
+          "playerDiscordId": "400701445135007744",
+          "playerCountryCode": "GB"
+        },
+        {
+          "score": 66,
+          "multiplier": 1,
+          "prevMmr": 5871,
+          "newMmr": 5698,
+          "delta": -173,
+          "playerId": 67566,
+          "playerName": "Tobz",
+          "playerDiscordId": "554802351546826837",
+          "playerCountryCode": "GB"
+        }
+      ]
+    }
+  ],
+  "tableMessageId": "1416573354428862576",
+  "updateMessageId": "1416574782803153006",
+  "authorId": "446395793067343882"
+}
