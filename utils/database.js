@@ -643,6 +643,9 @@ class Database {
 				}
 				catch (parseError) {
 					console.warn(`Failed to parse streak cache data for user ${row.user_id}:`, parseError);
+					console.warn("Raw data:", row.cache_data);
+					console.warn("Data type:", typeof row.cache_data);
+					// Skip this corrupted entry
 				}
 			}
 
