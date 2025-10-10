@@ -16,6 +16,38 @@ class LeaderboardCache {
 		
 		// Start background refresh timers for active servers
 		this.startBackgroundRefresh();
+		
+		// Load cache from database on startup
+		this.loadCacheFromDatabase();
+	}
+
+	/**
+	 * Load existing cache from database on startup
+	 */
+	async loadCacheFromDatabase() {
+		try {
+			const allCacheInfo = await database.getAllServerCacheInfo();
+			console.log(`Loading cache for ${allCacheInfo.length} servers from database...`);
+			
+			for (const cacheInfo of allCacheInfo) {
+				try {
+					const serverCache = await database.getLeaderboardCache(cacheInfo.serverId);
+					if (serverCache.size > 0) {
+						this.cache.set(cacheInfo.serverId, serverCache);
+						this.lastUpdate.set(cacheInfo.serverId, cacheInfo.lastUpdate.getTime());
+						console.log(`Loaded cache for server ${cacheInfo.serverId} (${serverCache.size} users)`);
+					}
+				}
+				catch (error) {
+					console.error(`Failed to load cache for server ${cacheInfo.serverId}:`, error);
+				}
+			}
+			
+			console.log(`Cache loaded from database for ${this.cache.size} servers`);
+		}
+		catch (error) {
+			console.error("Failed to load cache from database:", error);
+		}
 	}
 
 	/**
@@ -274,6 +306,15 @@ class LeaderboardCache {
 			this.cache.set(serverId, userCache);
 			this.lastUpdate.set(serverId, now);
 			
+			// Save cache to database for persistence across deploys
+			try {
+				await database.saveLeaderboardCache(serverId, userCache);
+				console.log(`Cache saved to database for server ${serverId} with ${userCache.size} users`);
+			}
+			catch (error) {
+				console.error(`Failed to save cache to database for server ${serverId}:`, error);
+			}
+			
 			console.log(`Cache updated for server ${serverId} with ${userCache.size} users`);
 		}
 		catch (error) {
@@ -466,21 +507,42 @@ class LeaderboardCache {
 	 * Clear cache for a server
 	 * @param {string} serverId - Discord server ID
 	 */
-	clearCache(serverId) {
+	async clearCache(serverId) {
 		this.cache.delete(serverId);
 		this.lastUpdate.delete(serverId);
 		this.backgroundRefreshes.delete(serverId);
+		
+		// Also clear from database
+		try {
+			await database.clearLeaderboardCache(serverId);
+		}
+		catch (error) {
+			console.error(`Failed to clear database cache for server ${serverId}:`, error);
+		}
+		
 		console.log(`Cache cleared for server ${serverId}`);
 	}
 
 	/**
 	 * Clear all caches for all servers
 	 */
-	clearAllCaches() {
+	async clearAllCaches() {
 		const serverCount = this.cache.size;
 		this.cache.clear();
 		this.lastUpdate.clear();
 		this.backgroundRefreshes.clear();
+		
+		// Also clear all database cache
+		try {
+			if (database.useDatabase) {
+				await database.pool.query("DELETE FROM leaderboard_cache");
+				console.log("Cleared all database cache");
+			}
+		}
+		catch (error) {
+			console.error("Failed to clear all database cache:", error);
+		}
+		
 		console.log(`All caches cleared for ${serverCount} servers`);
 	}
 
@@ -488,19 +550,33 @@ class LeaderboardCache {
 	 * Force refresh all server caches
 	 */
 	async refreshAllCaches() {
-		const servers = Array.from(this.cache.keys());
-		console.log(`Force refreshing caches for ${servers.length} servers...`);
+		// Get servers from both in-memory cache and database
+		const memoryServers = Array.from(this.cache.keys());
+		let dbServers = [];
 		
-		for (const serverId of servers) {
+		try {
+			const dbCacheInfo = await database.getAllServerCacheInfo();
+			dbServers = dbCacheInfo.map(info => info.serverId);
+		}
+		catch (error) {
+			console.error("Failed to get database cache servers:", error);
+		}
+		
+		// Combine and deduplicate servers
+		const allServers = [...new Set([...memoryServers, ...dbServers])];
+		console.log(`Force refreshing caches for ${allServers.length} servers...`);
+		
+		for (const serverId of allServers) {
 			try {
 				await this.updateServerCache(serverId);
 				console.log(`✅ Refreshed cache for server ${serverId}`);
-			} catch (error) {
+			}
+			catch (error) {
 				console.error(`❌ Failed to refresh cache for server ${serverId}:`, error);
 			}
 		}
 		
-		console.log(`Completed refresh for all ${servers.length} servers`);
+		console.log(`Completed refresh for all ${allServers.length} servers`);
 	}
 
 	/**

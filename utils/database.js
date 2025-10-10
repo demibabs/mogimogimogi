@@ -51,6 +51,30 @@ class Database {
 				)
 			`);
 
+			// Leaderboard cache table for persistent cache across deploys
+			await this.pool.query(`
+				CREATE TABLE IF NOT EXISTS leaderboard_cache (
+					id SERIAL PRIMARY KEY,
+					server_id VARCHAR(20) NOT NULL,
+					user_id VARCHAR(20) NOT NULL,
+					cache_data JSONB NOT NULL,
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					UNIQUE(server_id, user_id)
+				)
+			`);
+
+			// Index for faster cache lookups
+			await this.pool.query(`
+				CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_server 
+				ON leaderboard_cache(server_id)
+			`);
+
+			await this.pool.query(`
+				CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_updated 
+				ON leaderboard_cache(updated_at)
+			`);
+
 			console.log("Database initialized successfully");
 		}
 		catch (error) {
@@ -393,6 +417,143 @@ class Database {
 			if (error.code !== "ENOENT") {
 				console.error(`Error getting user tables for ${userId}:`, error);
 			}
+			return [];
+		}
+	}
+
+	// Leaderboard cache methods
+	async getLeaderboardCache(serverId) {
+		if (!this.useDatabase) {
+			return new Map();
+		}
+
+		try {
+			const result = await this.pool.query(
+				"SELECT user_id, cache_data, updated_at FROM leaderboard_cache WHERE server_id = $1",
+				[serverId],
+			);
+
+			const cache = new Map();
+			for (const row of result.rows) {
+				cache.set(row.user_id, {
+					...row.cache_data,
+					lastUpdated: row.updated_at,
+				});
+			}
+
+			return cache;
+		}
+		catch (error) {
+			console.error("Error getting leaderboard cache:", error);
+			return new Map();
+		}
+	}
+
+	async saveLeaderboardCache(serverId, userCache) {
+		if (!this.useDatabase) {
+			return;
+		}
+
+		try {
+			// Begin transaction for atomic updates
+			const client = await this.pool.connect();
+			
+			try {
+				await client.query("BEGIN");
+
+				// Clear existing cache for this server
+				await client.query(
+					"DELETE FROM leaderboard_cache WHERE server_id = $1",
+					[serverId],
+				);
+
+				// Insert new cache data
+				for (const [userId, cacheData] of userCache) {
+					await client.query(
+						`INSERT INTO leaderboard_cache (server_id, user_id, cache_data, updated_at)
+						 VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
+						[serverId, userId, JSON.stringify(cacheData)],
+					);
+				}
+
+				await client.query("COMMIT");
+				console.log(`Saved leaderboard cache for server ${serverId} (${userCache.size} users)`);
+			}
+			catch (error) {
+				await client.query("ROLLBACK");
+				throw error;
+			}
+			finally {
+				client.release();
+			}
+		}
+		catch (error) {
+			console.error("Error saving leaderboard cache:", error);
+		}
+	}
+
+	async getLeaderboardCacheAge(serverId) {
+		if (!this.useDatabase) {
+			return null;
+		}
+
+		try {
+			const result = await this.pool.query(
+				"SELECT MAX(updated_at) as last_update FROM leaderboard_cache WHERE server_id = $1",
+				[serverId],
+			);
+
+			return result.rows[0]?.last_update || null;
+		}
+		catch (error) {
+			console.error("Error getting cache age:", error);
+			return null;
+		}
+	}
+
+	async clearLeaderboardCache(serverId) {
+		if (!this.useDatabase) {
+			return;
+		}
+
+		try {
+			await this.pool.query(
+				"DELETE FROM leaderboard_cache WHERE server_id = $1",
+				[serverId],
+			);
+			console.log(`Cleared leaderboard cache for server ${serverId}`);
+		}
+		catch (error) {
+			console.error("Error clearing cache:", error);
+		}
+	}
+
+	async getAllServerCacheInfo() {
+		if (!this.useDatabase) {
+			return [];
+		}
+
+		try {
+			const result = await this.pool.query(`
+				SELECT 
+					server_id,
+					COUNT(*) as user_count,
+					MAX(updated_at) as last_update,
+					MIN(updated_at) as oldest_update
+				FROM leaderboard_cache 
+				GROUP BY server_id
+				ORDER BY last_update DESC
+			`);
+
+			return result.rows.map(row => ({
+				serverId: row.server_id,
+				userCount: parseInt(row.user_count),
+				lastUpdate: row.last_update,
+				oldestUpdate: row.oldest_update,
+			}));
+		}
+		catch (error) {
+			console.error("Error getting all cache info:", error);
 			return [];
 		}
 	}
