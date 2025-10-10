@@ -277,17 +277,18 @@ module.exports = {
 				}
 			}
 
-			// Sort by stat value (descending for most stats, but MMR change can be negative)
-			if (stat === "mMR" && timeFilter === "weekly") {
-				// For weekly MMR change, sort by absolute change, but keep the sign
-				playerStats.sort((a, b) => Math.abs(b.statValue) - Math.abs(a.statValue));
+			// Sort by stat value and get top 10
+			let top10;
+			if (stat === "mMR" && (timeFilter === "weekly" || timeFilter === "season")) {
+				// For MMR changes, only keep positive changes and sort by value
+				const positiveChanges = playerStats.filter(player => player.statValue > 0);
+				positiveChanges.sort((a, b) => b.statValue - a.statValue);
+				top10 = positiveChanges.slice(0, 10);
 			}
 			else {
 				playerStats.sort((a, b) => b.statValue - a.statValue);
+				top10 = playerStats.slice(0, 10);
 			}
-
-			// Get top 10
-			const top10 = playerStats.slice(0, 10);
 
 			if (top10.length === 0) {
 				const embed = new EmbedBuilder()
@@ -346,15 +347,15 @@ module.exports = {
 					formattedValue = player.statValue.toFixed(1);
 				}
 				else if (stat === "mMR" && (timeFilter === "weekly" || timeFilter === "season")) {
-					// Show + or - for MMR changes
+					// Show + for MMR changes (only positive values are included)
 					const change = Math.round(player.statValue);
-					formattedValue = change > 0 ? `+${change}` : `${change}`;
+					formattedValue = `+${change}`;
 				}
 				else {
 					formattedValue = Math.round(player.statValue);
 				}
 
-				description += `${rank}. **${player.displayName}** - ${formattedValue}\n`;
+				description += `${rank}. **${player.displayName}**: ${formattedValue}\n`;
 			}
 
 			embed.setDescription(description);

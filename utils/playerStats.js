@@ -654,10 +654,10 @@ class PlayerStats {
 	 */
 	static filterTablesByWeek(tables, weeklyOnly = false) {
 		if (!weeklyOnly) return tables;
-		
+
 		const oneWeekAgo = new Date();
 		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-		
+
 		const filtered = {};
 		for (const [tableId, table] of Object.entries(tables)) {
 			if (table && table.createdOn) {
@@ -679,7 +679,7 @@ class PlayerStats {
 	 */
 	static filterTablesBySeason(tables, seasonOnly = false, currentSeason = 1) {
 		if (!seasonOnly) return tables;
-		
+
 		const filtered = {};
 		for (const [tableId, table] of Object.entries(tables)) {
 			if (table && table.season === currentSeason) {

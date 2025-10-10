@@ -11,13 +11,13 @@ function getCountryFlag(countryCode) {
 	if (!countryCode || countryCode.length !== 2) {
 		return "";
 	}
-	
+
 	// Convert country code to regional indicator symbols (flag emojis)
 	const codePoints = countryCode
 		.toUpperCase()
 		.split("")
 		.map(char => 127397 + char.charCodeAt(0));
-	
+
 	return String.fromCodePoint(...codePoints);
 }
 
@@ -39,7 +39,7 @@ function formatPlayerNameWithFlag(playerName, countryCode) {
  */
 function getPlayerAvatarUrl(discordUser) {
 	if (!discordUser) return null;
-	
+
 	// Get Discord avatar URL
 	return discordUser.displayAvatarURL({ dynamic: true, size: 256 });
 }
@@ -54,16 +54,16 @@ function getPlayerAvatarUrl(discordUser) {
 function enhanceEmbedWithPlayerInfo(embed, loungeUser, originalTitle) {
 	const flag = getCountryFlag(loungeUser?.countryCode);
 	const avatarUrl = getPlayerAvatarUrl(loungeUser);
-	
+
 	// Add flag to title if available
 	const enhancedTitle = flag ? `${flag} ${originalTitle}` : originalTitle;
 	embed.setTitle(enhancedTitle);
-	
+
 	// Set thumbnail to player avatar if available
 	if (avatarUrl) {
 		embed.setThumbnail(avatarUrl);
 	}
-	
+
 	return embed;
 }
 

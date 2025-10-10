@@ -241,7 +241,7 @@ async function getCurrentMMR(discordId, season = DEFAULT_SEASON) {
 		if (!player) {
 			return null;
 		}
-		
+
 		// The player object should contain current MMR
 		return player.mmr || null;
 	}
@@ -273,12 +273,12 @@ async function getWeeklyMMRChange(userId) {
 			params.season = season;
 			try {
 				const details = await apiGet("/player/details", params);
-				
+
 				if (details.mmrChanges) {
 					// Filter changes from the past week that are from tables
 					const weeklyChanges = details.mmrChanges.filter(change => {
 						if (change.reason !== "Table") return false;
-						
+
 						// Check if the change is from the past week
 						const changeDate = new Date(change.time);
 						return changeDate >= oneWeekAgo;
@@ -325,7 +325,7 @@ async function getSeasonMMRChange(userId, season = DEFAULT_SEASON) {
 
 		try {
 			const details = await apiGet("/player/details", params);
-			
+
 			if (details.mmrChanges) {
 				// Filter changes that are from tables (actual games, not manual adjustments)
 				const seasonChanges = details.mmrChanges.filter(change => {
