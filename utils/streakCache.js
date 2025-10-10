@@ -84,6 +84,76 @@ class StreakCache {
 	}
 
 	/**
+	 * Refresh streak cache for a server using server data
+	 * @param {string} serverId - Server ID
+	 */
+	async refreshServerStreaksFromDB(serverId) {
+		try {
+			const database = require("./database");
+			const LoungeApi = require("./loungeApi");
+			
+			console.log(`Refreshing streak cache for server ${serverId} from database...`);
+			
+			const serverData = await database.getServerData(serverId);
+			if (!serverData || !serverData.users) {
+				console.log(`No server data found for ${serverId}`);
+				return;
+			}
+
+			const serverCache = new Map();
+			const userEntries = Object.entries(serverData.users);
+			
+			console.log(`Calculating streaks for ${userEntries.length} users...`);
+
+			// Process users in batches
+			const batchSize = 5;
+			for (let i = 0; i < userEntries.length; i += batchSize) {
+				const batch = userEntries.slice(i, i + batchSize);
+				
+				await Promise.all(batch.map(async ([userId, userData]) => {
+					try {
+						// Get lounge user info
+						const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
+						if (!loungeUser?.name) return;
+
+						console.log(`Calculating streaks for player: ${loungeUser.name} (ID: ${userId})`);
+						
+						// Get player's table data
+						const allTables = await LoungeApi.getAllPlayerTables(userId, serverId);
+						console.log(`Found ${Object.keys(allTables).length} tables for ${loungeUser.name}`);
+
+						const streakStats = await this.calculatePlayerStreaksFromTables(allTables, loungeUser.name);
+						if (streakStats) {
+							serverCache.set(userId, {
+								userId,
+								loungeUser,
+								...streakStats,
+							});
+						}
+					}
+					catch (error) {
+						console.warn(`Error calculating streaks for user ${userId}:`, error);
+					}
+				}));
+
+				// Small delay between batches
+				if (i + batchSize < userEntries.length) {
+					await new Promise(resolve => setTimeout(resolve, 100));
+				}
+			}
+
+			// Update cache
+			this.cache.set(serverId, serverCache);
+			this.lastUpdate.set(serverId, Date.now());
+			
+			console.log(`Streak cache updated for server ${serverId} with ${serverCache.size} users`);
+		}
+		catch (error) {
+			console.error(`Error refreshing streak cache for server ${serverId}:`, error);
+		}
+	}
+
+	/**
 	 * Update streak cache for a server
 	 * @param {string} serverId - Server ID
 	 * @param {Array} leaderboardData - Leaderboard data

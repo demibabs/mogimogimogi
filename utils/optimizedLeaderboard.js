@@ -322,7 +322,7 @@ class LeaderboardCache {
 			// Also update streak cache when leaderboard cache updates
 			try {
 				console.log(`Updating streak cache for server ${serverId}...`);
-				await this.streakCache.updateServerStreaks(serverId);
+				await this.streakCache.refreshServerStreaksFromDB(serverId);
 				console.log(`Streak cache updated for server ${serverId}`);
 			}
 			catch (error) {
