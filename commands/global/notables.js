@@ -30,6 +30,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			await interaction.deferReply();
+			await interaction.editReply("validating user...");
 
 			const discordUser = interaction.options.getUser("user") || interaction.user;
 			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
@@ -224,7 +225,7 @@ module.exports = {
 			}
 
 			// Calculate statistics
-			await interaction.editReply("finding the most interesting ones...");
+			await interaction.editReply("filtering...");
 			const bS = PlayerStats.getBestScore(userTables, userId);
 			const wS = PlayerStats.getWorstScore(userTables, userId);
 			const oP = PlayerStats.getBiggestOverperformance(userTables, userId);

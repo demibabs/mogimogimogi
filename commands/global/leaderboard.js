@@ -27,6 +27,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			await interaction.deferReply();
+			await interaction.editReply("fetching leaderboard data..");
 
 			const stat = interaction.options.getString("stat");
 			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
@@ -169,15 +170,8 @@ module.exports = {
 
 			embed.setTitle(title);
 
-			// Add simple footer
-			let footerText = `showing top ${Math.min(leaderboardData.length, 10)} players`;
-			if (timeFilter === "weekly") {
-				footerText += " (past 7 days)";
-			}
-			else if (timeFilter === "season") {
-				footerText += " (current season)";
-			}
-			embed.setFooter({ text: footerText });
+
+			embed.setFooter({ text: "updates every hour" });
 
 			// Fetch Discord display names for all users in parallel
 			const userFetches = leaderboardData.slice(0, 10).map(async (entry) => {

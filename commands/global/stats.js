@@ -24,6 +24,7 @@ module.exports = {
 		try {
 			await interaction.deferReply();
 
+			await interaction.editReply("validating user...");
 			const discordUser = interaction.options.getUser("user") || interaction.user;
 			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
 			const squads = interaction.options.getBoolean("squads");

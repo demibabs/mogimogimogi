@@ -23,6 +23,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			await interaction.deferReply();
+			await interaction.editReply("validating users...");
 
 			// Swap users if user2 isn't selected, since it'd be weird for yourself to be 2nd
 			const discordUser1 = interaction.options.getUser("user2") ? interaction.options.getUser("user1") : interaction.user;

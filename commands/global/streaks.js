@@ -10,6 +10,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			await interaction.deferReply();
+			await interaction.editReply("counting streaks...");
 
 			const serverId = interaction.guild.id;
 
@@ -26,7 +27,7 @@ module.exports = {
 				   const embed = new EmbedBuilder()
 					   .setColor("Red")
 					   .setDescription("no leaderboard data available for this server. try running /setup first.");
-				   return await interaction.editReply({content: "", embeds: [embed] });
+				   return await interaction.editReply({ content: "", embeds: [embed] });
 			   }
 
 			// Show current streaks by default
