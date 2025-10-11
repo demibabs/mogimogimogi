@@ -41,10 +41,9 @@ module.exports = {
 
 			   if (!result.success) {
 				   const embed = new EmbedBuilder()
-					   .setTitle(`${discordUser.username}'s notables`)
 					   .setColor("Red")
 					   .setDescription(result.message || "insufficient data to calculate notables for this player.");
-				   return await interaction.editReply({ embeds: [embed] });
+				   return await interaction.editReply({ content: "", embeds: [embed] });
 			   }
 
 			// Create action row with three buttons (current one disabled)
@@ -127,15 +126,14 @@ module.exports = {
 							.setDisabled(timeFilter === "season"),
 					);
 
-				await interaction.editReply({ embeds: [result.embed], components: [row] });
+				await interaction.editReply({ content: "", embeds: [result.embed], components: [row] });
 			}
 			   else {
 				   // Handle error case for button interactions
 				   const embed = new EmbedBuilder()
-					   .setTitle(`${userId ? `<@${userId}>` : "user"}'s notables`)
 					   .setColor("Red")
 					   .setDescription(result.message || "unable to load notables data.");
-				   await interaction.editReply({ embeds: [embed] });
+				   await interaction.editReply({ content: "", embeds: [embed] });
 			   }
 
 			return true;
@@ -175,7 +173,7 @@ module.exports = {
 			}
 
 			// Get user's tables
-			await interaction.editReply("fetching tables...")
+			await interaction.editReply("searching for tables...");
 			let userTables = await LoungeApi.getAllPlayerTables(userId, serverId);
 
 			if (!userTables || Object.keys(userTables).length === 0) {
@@ -226,6 +224,7 @@ module.exports = {
 			}
 
 			// Calculate statistics
+			await interaction.editReply("finding the most interesting ones...");
 			const bS = PlayerStats.getBestScore(userTables, userId);
 			const wS = PlayerStats.getWorstScore(userTables, userId);
 			const oP = PlayerStats.getBiggestOverperformance(userTables, userId);

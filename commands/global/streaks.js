@@ -24,10 +24,9 @@ module.exports = {
 
 			   if (!leaderboardData || leaderboardData.length === 0) {
 				   const embed = new EmbedBuilder()
-					   .setTitle("win streaks")
 					   .setColor("Red")
 					   .setDescription("no leaderboard data available for this server. try running /setup first.");
-				   return await interaction.editReply({ embeds: [embed] });
+				   return await interaction.editReply({content: "", embeds: [embed] });
 			   }
 
 			// Show current streaks by default
@@ -37,6 +36,7 @@ module.exports = {
 			console.error("error in streaks command:", error);
 			await interaction.editReply({
 				content: "an error occurred while fetching streak data.",
+				embeds: [],
 			});
 		}
 	},
@@ -154,6 +154,7 @@ module.exports = {
 				);
 
 			await interaction.editReply({
+				content: "",
 				embeds: [embed],
 				components: [row],
 			});
@@ -162,6 +163,7 @@ module.exports = {
 			console.error("error showing streaks:", error);
 			await interaction.editReply({
 				content: "an error occurred while displaying streak data.",
+				embeds: [],
 			});
 		}
 	},
@@ -200,10 +202,9 @@ module.exports = {
 
 			   if (!leaderboardData || leaderboardData.length === 0) {
 				   const embed = new EmbedBuilder()
-					   .setTitle("win streaks")
 					   .setColor("Red")
 					   .setDescription("no leaderboard data available for this server.");
-				   return await interaction.editReply({ embeds: [embed], components: [] });
+				   return await interaction.editReply({ content: "", embeds: [embed], components: [] });
 			   }
 
 			const type = interaction.customId === "streaks_current" ? "current" : "alltime";
@@ -215,6 +216,7 @@ module.exports = {
 			console.error("error handling streaks button:", error);
 			await interaction.editReply({
 				content: "an error occurred while updating streak data.",
+				embeds: [],
 				components: [],
 			});
 			return true;

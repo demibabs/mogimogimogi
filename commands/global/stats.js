@@ -34,10 +34,9 @@ module.exports = {
 
 			   if (!result.success) {
 				   const embed = new EmbedBuilder()
-					   .setTitle(`${discordUser.displayName}'s stats`)
 					   .setColor("Red")
 					   .setDescription(result.message || "unable to load stats data.");
-				   return await interaction.editReply({ embeds: [embed] });
+				   return await interaction.editReply({ content: "", embeds: [embed] });
 			   }
 
 			// Create action row with three buttons (current one disabled)
@@ -83,7 +82,7 @@ module.exports = {
 			}
 
 			try {
-				await interaction.editReply({ content: errorMessage });
+				await interaction.editReply({ content: errorMessage, embeds: [] });
 			}
 			catch (editError) {
 				console.error("failed to edit reply with error message:", editError);
@@ -132,15 +131,14 @@ module.exports = {
 							.setDisabled(timeFilter === "season"),
 					);
 
-				await interaction.editReply({ embeds: [result.embed], components: [row] });
+				await interaction.editReply({ content: "", embeds: [result.embed], components: [row] });
 			}
 			   else {
 				   // Handle error case for button interactions
 				   const embed = new EmbedBuilder()
-					   .setTitle(`${discordUser.displayName || "user"}'s stats`)
 					   .setColor("Red")
 					   .setDescription(result.message || "unable to load stats data.");
-				   await interaction.editReply({ embeds: [embed] });
+				   await interaction.editReply({ content: "", embeds: [embed] });
 			   }
 
 			return true;
@@ -175,13 +173,13 @@ module.exports = {
 			await DataManager.updateServerUser(serverId, userId, interaction.client).catch(error => {
 				console.warn(`failed to update user ${userId}:`, error);
 			});
-
+			await interaction.editReply("getting mogis");
 			let userTables = await LoungeApi.getAllPlayerTables(discordUser.id, serverId);
 
 			if (!userTables || Object.keys(userTables).length === 0) {
 				return { success: false, message: "no events found for this player." };
 			}
-
+			await interaction.editReply("filtering...");
 			// Apply time filter using PlayerStats methods
 			if (timeFilter === "weekly") {
 				userTables = PlayerStats.filterTablesByWeek(userTables, true);
@@ -224,7 +222,7 @@ module.exports = {
 			if (Object.keys(userTables).length === 0) {
 				return { success: false, message: "no events found matching the specified filters." };
 			}
-
+			await interaction.editReply("calculating...");
 			const eP = PlayerStats.getMatchesPlayed(userTables, userId);
 			const tWR = PlayerStats.getWinRate(userTables, userId);
 			const aSc = PlayerStats.getAverageScore(userTables, userId);

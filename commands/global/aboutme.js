@@ -15,10 +15,12 @@ module.exports = {
 		   let tableCount = 0;
 		   try {
 			   // Tables
+			   await interaction.editReply("tabulating tables...");
 			   const tableRes = await database.pool.query("SELECT COUNT(*) FROM tables");
 			   tableCount = parseInt(tableRes.rows[0].count);
 
 			   // Get all server IDs
+			   await interaction.editReply("counting users...");
 			   const serverIds = await database.getAllServerIds();
 			   const uniqueUserIds = new Set();
 			   for (const serverId of serverIds) {
@@ -37,7 +39,7 @@ module.exports = {
 		catch (e) {
 			   // fallback to 0s
 		   }
-
+		   await interaction.editReply("tallying servers...");
 		   // Get server count directly from Discord client
 		   const serverCount = interaction.client.guilds.cache.size;
 
@@ -53,6 +55,6 @@ module.exports = {
 			   .setFooter({ text: "by @crashwy (contact me for any issues)" })
 			   .setTimestamp();
 
-		   await interaction.editReply({ embeds: [embed] });
+		   await interaction.editReply({ content: "", embeds: [embed] });
 	},
 };

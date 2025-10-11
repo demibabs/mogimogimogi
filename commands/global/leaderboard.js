@@ -38,10 +38,9 @@ module.exports = {
 
 			   if (!result) {
 				   const embed = new EmbedBuilder()
-					   .setTitle("Leaderboard")
 					   .setColor("Red")
 					   .setDescription("an error occurred while generating the leaderboard. please try again later.");
-				   return await interaction.editReply({ embeds: [embed] });
+				   return await interaction.editReply({ content: "", embeds: [embed] });
 			   }
 
 			// Create action row with three buttons (current one disabled)
@@ -73,6 +72,7 @@ module.exports = {
 			console.error("error in leaderboard command:", error);
 			await interaction.editReply({
 				content: "an error occurred while generating the leaderboard. please try again later.",
+				embeds: [],
 			});
 		}
 	},
@@ -117,7 +117,7 @@ module.exports = {
 							.setDisabled(timeFilter === "season"),
 					);
 
-				await interaction.editReply({ embeds: [result.embed], components: [row] });
+				await interaction.editReply({ content: "", embeds: [result.embed], components: [row] });
 			}
 
 			return true;
@@ -134,6 +134,7 @@ module.exports = {
 			console.log(`Generating optimized leaderboard: ${stat}, ${timeFilter}, server-only: ${serverOnly}, squads: ${squads}`);
 
 			// Get optimized leaderboard data from cache
+			await interaction.editReply("generating leaderboard...");
 			const leaderboardData = await optimizedLeaderboard.getLeaderboard(
 				serverId,
 				stat,
@@ -144,7 +145,6 @@ module.exports = {
 
 			   if (!leaderboardData || leaderboardData.length === 0) {
 				   const embed = new EmbedBuilder()
-					   .setTitle("Leaderboard")
 					   .setColor("Red")
 					   .setDescription("no data available for the selected criteria.");
 				   return { embed };

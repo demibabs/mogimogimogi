@@ -38,7 +38,7 @@ module.exports = {
 					   .setTitle(`${discordUser1.displayName} vs ${discordUser2.displayName}`)
 					   .setColor("Red")
 					   .setDescription(result.message || "unable to load head-to-head data.");
-				   return await interaction.editReply({ embeds: [embed] });
+				   return await interaction.editReply({ content: "", embeds: [embed] });
 			   }
 
 			// Create action row with three buttons (current one disabled)
@@ -134,7 +134,7 @@ module.exports = {
 							.setDisabled(timeFilter === "season"),
 					);
 
-				await interaction.editReply({ embeds: [result.embed], components: [row] });
+				await interaction.editReply({ content: "", embeds: [result.embed], components: [row] });
 			}
 			   else {
 				   // Handle error case for button interactions
@@ -142,13 +142,13 @@ module.exports = {
 					   .setTitle(`${discordUser1.displayName || "user 1"} vs ${discordUser2.displayName || "user 2"}`)
 					   .setColor("Red")
 					   .setDescription(result.message || "unable to load head-to-head data.");
-				   await interaction.editReply({ embeds: [embed] });
+				   await interaction.editReply({ content: "", embeds: [embed] });
 			   }
 
 			return true;
 		}
 		catch (error) {
-			console.error("Error in head-to-head button interaction:", error);
+			console.error("error in head-to-head button interaction:", error);
 			return false;
 		}
 	},
@@ -195,6 +195,7 @@ module.exports = {
 			}
 
 			// Get H2H tables (tables where both players participated)
+			await interaction.editReply("fetching tables...");
 			let h2hTables = await PlayerStats.getH2HTables(userId1, userId2, serverId);
 
 			if (!h2hTables || Object.keys(h2hTables).length === 0) {
@@ -202,6 +203,7 @@ module.exports = {
 			}
 
 			// Apply time filter using PlayerStats methods
+			await interaction.editReply("filtering events...");
 			if (timeFilter === "weekly") {
 				h2hTables = PlayerStats.filterTablesByWeek(h2hTables, true);
 			}
@@ -229,6 +231,7 @@ module.exports = {
 			}
 
 			// Calculate statistics
+			await interaction.editReply("calculating stats...");
 			const h2hEventsPlayed = Object.keys(h2hTables).length;
 			const h2hRecord = PlayerStats.getH2H(h2hTables, userId1, userId2);
 
