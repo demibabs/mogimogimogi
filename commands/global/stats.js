@@ -173,7 +173,7 @@ module.exports = {
 			await DataManager.updateServerUser(serverId, userId, interaction.client).catch(error => {
 				console.warn(`failed to update user ${userId}:`, error);
 			});
-			await interaction.editReply("getting mogis");
+			await interaction.editReply(`getting ${discordUser.displayName}'s mogis...`);
 			let userTables = await LoungeApi.getAllPlayerTables(discordUser.id, serverId);
 
 			if (!userTables || Object.keys(userTables).length === 0) {
