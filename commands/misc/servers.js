@@ -12,7 +12,7 @@ module.exports = {
 		// Fetch all guilds the bot is in
 		const guilds = interaction.client.guilds.cache;
 
-		// Fetch all user_tables entries
+		// Fetch all user_tables entries (for users with tables)
 		let userTableRows = [];
 		try {
 			const userRes = await database.pool.query("SELECT user_id, server_id FROM user_tables");
@@ -22,18 +22,25 @@ module.exports = {
 			return;
 		}
 
-		// Map: server_id -> Set of user_ids
+		// Map: server_id -> Set of user_ids (users with tables)
 		const dbMembersByServer = {};
 		for (const row of userTableRows) {
 			if (!dbMembersByServer[row.server_id]) dbMembersByServer[row.server_id] = new Set();
 			dbMembersByServer[row.server_id].add(row.user_id);
 		}
 
-		// Build server info list
-		const serverInfos = guilds.map(guild => {
+		// Build server info list using serverData.users for tracked users
+		const serverInfos = await Promise.all(guilds.map(async guild => {
+			let trackedCount = 0;
+			try {
+				const serverData = await database.getServerData(guild.id);
+				trackedCount = serverData && serverData.users ? Object.keys(serverData.users).length : 0;
+			} catch (e) {
+				trackedCount = 0;
+			}
 			const dbCount = dbMembersByServer[guild.id]?.size || 0;
-			return `**${guild.name}**\nMembers in DB: ${dbCount}\nTotal Members: ${guild.memberCount}`;
-		});
+			return `**${guild.name}**\nTracked Users: ${trackedCount}\nUsers with Tables: ${dbCount}\nTotal Members: ${guild.memberCount}`;
+		}));
 
 		const embed = new EmbedBuilder()
 			.setTitle("Deployed Servers (Testing)")

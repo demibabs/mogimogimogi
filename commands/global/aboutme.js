@@ -10,16 +10,28 @@ module.exports = {
 		await interaction.deferReply();
 
 
-		   // Query database for user and table stats
+		   // Query database for table stats
 		   let userCount = 0;
 		   let tableCount = 0;
 		   try {
-			   // Users
-			   const userRes = await database.pool.query("SELECT COUNT(DISTINCT user_id) FROM user_tables");
-			   userCount = parseInt(userRes.rows[0].count);
 			   // Tables
 			   const tableRes = await database.pool.query("SELECT COUNT(*) FROM tables");
 			   tableCount = parseInt(tableRes.rows[0].count);
+
+			   // Get all server IDs
+			   const serverIds = await database.getAllServerIds();
+			   const uniqueUserIds = new Set();
+			   for (const serverId of serverIds) {
+				   try {
+					   const serverData = await database.getServerData(serverId);
+					   if (serverData && serverData.users) {
+						   for (const userId of Object.keys(serverData.users)) {
+							   uniqueUserIds.add(userId);
+						   }
+					   }
+				   } catch (e) {}
+			   }
+			   userCount = uniqueUserIds.size;
 		   } catch (e) {
 			   // fallback to 0s
 		   }
