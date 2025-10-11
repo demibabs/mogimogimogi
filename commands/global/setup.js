@@ -70,23 +70,23 @@ module.exports = {
 			// Check if server has cache, and create it if it doesn't
 			const serverId = interaction.guild.id;
 			const cacheInfo = optimizedLeaderboard.getCacheInfo(serverId);
-			
+
 			if (!cacheInfo.exists) {
 				await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
 					loungers.length === 1 ? "" : "s"}.\n\nbuilding leaderboard cache...`);
-				
+
 				try {
 					await optimizedLeaderboard.updateServerCache(serverId);
 					const newCacheInfo = optimizedLeaderboard.getCacheInfo(serverId);
-					
+
 					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
 						loungers.length === 1 ? "" : "s"}.\n\nleaderboard cache created!\n\nbuilding streak cache...`);
-					
+
 					// Also create streak cache
 					await streakCache.refreshServerStreaksFromDB(serverId);
-					
+
 					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
-						loungers.length === 1 ? "" : "s"}.\n\nleaderboard cache created with ${newCacheInfo.userCount} users!\nstreak cache created!`);
+						loungers.length === 1 ? "" : "s"}.\n\nleaderboard cache created!\nstreak cache created!`);
 				}
 				catch (error) {
 					console.error("failed to create cache during setup:", error);
@@ -99,9 +99,9 @@ module.exports = {
 				try {
 					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
 						loungers.length === 1 ? "" : "s"}.\n\nbuilding streak cache...`);
-					
+
 					await streakCache.refreshServerStreaksFromDB(serverId);
-					
+
 					await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
 						loungers.length === 1 ? "" : "s"}.\n\nstreak cache created!`);
 				}

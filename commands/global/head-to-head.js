@@ -9,14 +9,14 @@ const AutoUserManager = require("../../utils/autoUserManager");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("head-to-head")
-		.setDescription("tompare head-to-head stats of two users.")
+		.setDescription("compare head-to-head stats of two users.")
 		.addUserOption(option =>
 			option.setName("user1")
 			    .setDescription("the first user.")
 				.setRequired(true))
 		.addUserOption(option =>
 			option.setName("user2")
-				.setDescription("the second user. Yourself if left blank."))
+				.setDescription("the second user. yourself if left blank."))
 		.addBooleanOption(option =>
 			option.setName("squads")
 				.setDescription("true = squad only, false = solo only.")),
@@ -33,11 +33,13 @@ module.exports = {
 			// Use generateHeadToHead for consistency with button interactions
 			const result = await this.generateHeadToHead(interaction, discordUser1, discordUser2, serverId, squads, "alltime");
 
-			if (!result.success) {
-				return await interaction.editReply({
-					content: result.message,
-				});
-			}
+			   if (!result.success) {
+				   const embed = new EmbedBuilder()
+					   .setTitle(`${discordUser1.displayName} vs ${discordUser2.displayName}`)
+					   .setColor("Red")
+					   .setDescription(result.message || "unable to load head-to-head data.");
+				   return await interaction.editReply({ embeds: [embed] });
+			   }
 
 			// Create action row with three buttons (current one disabled)
 			const row = new ActionRowBuilder()
@@ -134,10 +136,14 @@ module.exports = {
 
 				await interaction.editReply({ embeds: [result.embed], components: [row] });
 			}
-			else {
-				// Handle error case for button interactions
-				await interaction.editReply({ content: result.message || "unable to load head-to-head data." });
-			}
+			   else {
+				   // Handle error case for button interactions
+				   const embed = new EmbedBuilder()
+					   .setTitle(`${discordUser1.displayName || "user 1"} vs ${discordUser2.displayName || "user 2"}`)
+					   .setColor("Red")
+					   .setDescription(result.message || "unable to load head-to-head data.");
+				   await interaction.editReply({ embeds: [embed] });
+			   }
 
 			return true;
 		}
@@ -156,7 +162,7 @@ module.exports = {
 			// Validate both users exist and add them if they have lounge accounts
 			const user1Validation = await AutoUserManager.validateUserForCommand(userId1, serverId, interaction.client);
 			const user2Validation = await AutoUserManager.validateUserForCommand(userId2, serverId, interaction.client);
-			
+
 	       if (!user1Validation.success) {
 		       if (user1Validation.needsSetup) {
 			       return { success: false, message: "this server hasn't been set up yet. run `/setup` first." };
@@ -305,7 +311,7 @@ module.exports = {
 			return { success: true, embed: h2hEmbed };
 		}
 		catch (error) {
-			console.error("Error generating head-to-head:", error);
+			console.error("error generating head-to-head:", error);
 			return { success: false, message: "an error occurred while generating head-to-head stats. please try again later." };
 		}
 	},

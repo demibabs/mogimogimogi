@@ -39,11 +39,13 @@ module.exports = {
 			// Use generateNotables for consistency with button interactions
 			const result = await this.generateNotables(interaction, discordUser, serverId, serverOnly, squads, "alltime");
 
-			if (!result.success) {
-				return await interaction.editReply({
-					content: result.message,
-				});
-			}
+			   if (!result.success) {
+				   const embed = new EmbedBuilder()
+					   .setTitle(`${discordUser.username}'s notables`)
+					   .setColor("Red")
+					   .setDescription(result.message || "insufficient data to calculate notables for this player.");
+				   return await interaction.editReply({ embeds: [embed] });
+			   }
 
 			// Create action row with three buttons (current one disabled)
 			const row = new ActionRowBuilder()
@@ -127,15 +129,19 @@ module.exports = {
 
 				await interaction.editReply({ embeds: [result.embed], components: [row] });
 			}
-			else {
-				// Handle error case for button interactions
-				await interaction.editReply({ content: result.message || "unable to load notables data." });
-			}
+			   else {
+				   // Handle error case for button interactions
+				   const embed = new EmbedBuilder()
+					   .setTitle(`${userId ? `<@${userId}>` : "user"}'s notables`)
+					   .setColor("Red")
+					   .setDescription(result.message || "unable to load notables data.");
+				   await interaction.editReply({ embeds: [embed] });
+			   }
 
 			return true;
 		}
 		catch (error) {
-			console.error("Error in notables button interaction:", error);
+			console.error("error in notables button interaction:", error);
 			return false;
 		}
 	},
@@ -145,7 +151,7 @@ module.exports = {
 		try {
 			// Validate user exists and add them if they have a lounge account
 			const userValidation = await AutoUserManager.validateUserForCommand(discordUser.id, serverId, interaction.client);
-			
+
 			if (!userValidation.success) {
 				if (userValidation.needsSetup) {
 					return { success: false, message: "this server hasn't been set up yet. run `/setup` first." };
@@ -169,6 +175,7 @@ module.exports = {
 			}
 
 			// Get user's tables
+			await interaction.editReply("fetching tables...")
 			let userTables = await LoungeApi.getAllPlayerTables(userId, serverId);
 
 			if (!userTables || Object.keys(userTables).length === 0) {
@@ -391,7 +398,7 @@ module.exports = {
 			return { success: true, embed: notablesEmbed };
 		}
 		catch (error) {
-			console.error("Error generating notables:", error);
+			console.error("error generating notables:", error);
 			return { success: false, message: "an error occurred while generating notables. please try again later." };
 		}
 	},

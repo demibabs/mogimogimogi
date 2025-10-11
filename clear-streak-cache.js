@@ -8,18 +8,18 @@ const database = require("./utils/database");
 async function clearCorruptedStreakCache() {
 	try {
 		console.log("Clearing all streak cache data...");
-		
+
 		// Clear all streak cache data
 		await database.pool.query("DELETE FROM streak_cache");
-		
+
 		console.log("✅ All streak cache data cleared!");
 		console.log("The streak cache will rebuild automatically when users run /streaks");
-		
+
 		// Close the database connection
 		if (database.pool) {
 			await database.pool.end();
 		}
-		
+
 		process.exit(0);
 	}
 	catch (error) {

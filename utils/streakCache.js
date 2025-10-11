@@ -13,7 +13,7 @@ class StreakCache {
 		this.lastUpdate = new Map();
 		// 1 hour
 		this.updateInterval = 60 * 60 * 1000;
-		
+
 		// Load cache from database on startup
 		this.loadCacheFromDatabase();
 	}
@@ -25,11 +25,11 @@ class StreakCache {
 		try {
 			console.log("Loading streak cache from database...");
 			const database = require("./database");
-			
+
 			// Load cache for all servers (if table exists)
 			const allCacheInfo = await database.getAllServerCacheInfo();
 			let loadedCount = 0;
-			
+
 			for (const serverInfo of allCacheInfo) {
 				try {
 					const serverCache = await database.loadStreakCache(serverInfo.serverId);
@@ -51,7 +51,7 @@ class StreakCache {
 					}
 				}
 			}
-			
+
 			console.log(`Loaded streak cache for ${loadedCount} servers`);
 		}
 		catch (error) {
@@ -81,7 +81,7 @@ class StreakCache {
 		try {
 			const database = require("./database");
 			const serverCache = this.cache.get(serverId);
-			
+
 			if (serverCache) {
 				await database.saveStreakCache(serverId, serverCache);
 				console.log(`Streak cache saved to database for server ${serverId}`);
@@ -134,9 +134,9 @@ class StreakCache {
 		try {
 			const database = require("./database");
 			const LoungeApi = require("./loungeApi");
-			
+
 			console.log(`Refreshing streak cache for server ${serverId}...`);
-			
+
 			const serverData = await database.getServerData(serverId);
 			if (!serverData || !serverData.users) {
 				console.log(`No server data found for ${serverId}`);
@@ -150,7 +150,7 @@ class StreakCache {
 			const batchSize = 5;
 			for (let i = 0; i < userEntries.length; i += batchSize) {
 				const batch = userEntries.slice(i, i + batchSize);
-				
+
 				await Promise.all(batch.map(async ([userId, userData]) => {
 					try {
 						// Get lounge user info
@@ -183,10 +183,10 @@ class StreakCache {
 			// Update cache
 			this.cache.set(serverId, serverCache);
 			this.lastUpdate.set(serverId, Date.now());
-			
+
 			// Save to database for persistence
 			await this.saveCacheToDatabase(serverId);
-			
+
 			console.log(`Streak cache updated for server ${serverId} with ${serverCache.size} users`);
 		}
 		catch (error) {
@@ -210,15 +210,15 @@ class StreakCache {
 			try {
 				if (!userData.loungeUser?.name || !userData.userId) continue;
 				console.log(`Calculating streaks for player: ${userData.loungeUser.name} (ID: ${userData.userId})`);
-				
+
 				// Get player's table data using the same method as leaderboard
 				const allTables = await LoungeApi.getAllPlayerTables(userData.userId, serverId);
 				console.log(`Found ${Object.keys(allTables).length} tables for ${userData.loungeUser.name}`);
-				
+
 				if (Object.keys(allTables).length > 0) {
 					const streakData = this.calculatePlayerStreaksFromTables(allTables, userData.userId);
 					console.log(`Streak data for ${userData.loungeUser.name}:`, streakData);
-					
+
 					if (streakData) {
 						serverCache.set(userData.userId, {
 							userId: userData.userId,
@@ -414,14 +414,14 @@ class StreakCache {
 	async clearServerStreaks(serverId) {
 		try {
 			const database = require("./database");
-			
+
 			// Clear from memory
 			this.cache.delete(serverId);
 			this.lastUpdate.delete(serverId);
-			
+
 			// Clear from database
 			await database.clearStreakCache(serverId);
-			
+
 			console.log(`Cleared streak cache for server ${serverId}`);
 		}
 		catch (error) {

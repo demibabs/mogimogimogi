@@ -36,11 +36,13 @@ module.exports = {
 			// Generate leaderboard using optimized cache system
 			const result = await this.generateLeaderboard(interaction, serverId, stat, serverOnly, squads, "all");
 
-			if (!result) {
-				return await interaction.editReply({
-					content: "an error occurred while generating the leaderboard. please try again later.",
-				});
-			}
+			   if (!result) {
+				   const embed = new EmbedBuilder()
+					   .setTitle("Leaderboard")
+					   .setColor("Red")
+					   .setDescription("an error occurred while generating the leaderboard. please try again later.");
+				   return await interaction.editReply({ embeds: [embed] });
+			   }
 
 			// Create action row with three buttons (current one disabled)
 			const row = new ActionRowBuilder()
@@ -140,14 +142,13 @@ module.exports = {
 				squads,
 			);
 
-			if (!leaderboardData || leaderboardData.length === 0) {
-				const embed = new EmbedBuilder()
-					.setTitle("Leaderboard")
-					.setDescription("no data available for the selected criteria.")
-					.setColor("#FF6B6B");
-
-				return { embed };
-			}
+			   if (!leaderboardData || leaderboardData.length === 0) {
+				   const embed = new EmbedBuilder()
+					   .setTitle("Leaderboard")
+					   .setColor("Red")
+					   .setDescription("no data available for the selected criteria.");
+				   return { embed };
+			   }
 
 			// Create embed
 			const embed = new EmbedBuilder()

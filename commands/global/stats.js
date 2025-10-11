@@ -32,11 +32,13 @@ module.exports = {
 			// Use generateStats for consistency with button interactions
 			const result = await this.generateStats(interaction, discordUser, serverId, serverOnly, squads, "alltime");
 
-			if (!result.success) {
-				return await interaction.editReply({
-					content: result.message,
-				});
-			}
+			   if (!result.success) {
+				   const embed = new EmbedBuilder()
+					   .setTitle(`${discordUser.displayName}'s stats`)
+					   .setColor("Red")
+					   .setDescription(result.message || "unable to load stats data.");
+				   return await interaction.editReply({ embeds: [embed] });
+			   }
 
 			// Create action row with three buttons (current one disabled)
 			const row = new ActionRowBuilder()
@@ -132,10 +134,14 @@ module.exports = {
 
 				await interaction.editReply({ embeds: [result.embed], components: [row] });
 			}
-			else {
-				// Handle error case for button interactions
-				await interaction.editReply({ content: result.message || "unable to load stats data." });
-			}
+			   else {
+				   // Handle error case for button interactions
+				   const embed = new EmbedBuilder()
+					   .setTitle(`${discordUser.displayName || "user"}'s stats`)
+					   .setColor("Red")
+					   .setDescription(result.message || "unable to load stats data.");
+				   await interaction.editReply({ embeds: [embed] });
+			   }
 
 			return true;
 		}
@@ -150,7 +156,7 @@ module.exports = {
 		try {
 			// Validate user exists and add them if they have a lounge account
 			const userValidation = await AutoUserManager.validateUserForCommand(discordUser.id, serverId, interaction.client);
-			
+
 			if (!userValidation.success) {
 				if (userValidation.needsSetup) {
 					return { success: false, message: "this server hasn't been set up yet. run `/setup` first." };

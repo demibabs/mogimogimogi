@@ -8,7 +8,7 @@ const database = require("./utils/database");
 async function createStreakTable() {
 	try {
 		console.log("Creating streak_cache table...");
-		
+
 		// Streak cache table for persistent streak cache across deploys
 		await database.pool.query(`
 			CREATE TABLE IF NOT EXISTS streak_cache (
@@ -34,12 +34,12 @@ async function createStreakTable() {
 		`);
 
 		console.log("✅ streak_cache table created successfully!");
-		
+
 		// Close the database connection
 		if (database.pool) {
 			await database.pool.end();
 		}
-		
+
 		process.exit(0);
 	}
 	catch (error) {

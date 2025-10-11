@@ -17,16 +17,10 @@ module.exports = {
 		try {
 			const userRes = await database.pool.query("SELECT user_id, server_id FROM user_tables");
 			userTableRows = userRes.rows;
-		} catch (e) {
+		}
+		catch (e) {
 			await interaction.editReply("Failed to fetch user data from database.");
 			return;
-		}
-
-		// Map: server_id -> Set of user_ids (users with tables)
-		const dbMembersByServer = {};
-		for (const row of userTableRows) {
-			if (!dbMembersByServer[row.server_id]) dbMembersByServer[row.server_id] = new Set();
-			dbMembersByServer[row.server_id].add(row.user_id);
 		}
 
 		// Build server info list using serverData.users for tracked users
@@ -35,11 +29,11 @@ module.exports = {
 			try {
 				const serverData = await database.getServerData(guild.id);
 				trackedCount = serverData && serverData.users ? Object.keys(serverData.users).length : 0;
-			} catch (e) {
+			}
+			catch (e) {
 				trackedCount = 0;
 			}
-			const dbCount = dbMembersByServer[guild.id]?.size || 0;
-			return `**${guild.name}**\nTracked Users: ${trackedCount}\nUsers with Tables: ${dbCount}\nTotal Members: ${guild.memberCount}`;
+			return `**${guild.name}**\nTracked Users: ${trackedCount}\nTotal Members: ${guild.memberCount}`;
 		}));
 
 		const embed = new EmbedBuilder()

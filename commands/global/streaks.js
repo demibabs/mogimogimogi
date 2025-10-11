@@ -12,7 +12,7 @@ module.exports = {
 			await interaction.deferReply();
 
 			const serverId = interaction.guild.id;
-			
+
 			// Get cached leaderboard data (use mmr, all time, no filters for streak base data)
 			const leaderboardData = await optimizedLeaderboard.getLeaderboard(
 				serverId,
@@ -21,12 +21,14 @@ module.exports = {
 				false,
 				null,
 			);
-			
-			if (!leaderboardData || leaderboardData.length === 0) {
-				return await interaction.editReply({
-					content: "no leaderboard data available for this server. try running /setup first.",
-				});
-			}
+
+			   if (!leaderboardData || leaderboardData.length === 0) {
+				   const embed = new EmbedBuilder()
+					   .setTitle("win streaks")
+					   .setColor("Red")
+					   .setDescription("no leaderboard data available for this server. try running /setup first.");
+				   return await interaction.editReply({ embeds: [embed] });
+			   }
 
 			// Show current streaks by default
 			await this.showStreaks(interaction, leaderboardData, "current");
@@ -42,10 +44,10 @@ module.exports = {
 	async showStreaks(interaction, leaderboardData, type) {
 		try {
 			const serverId = interaction.guild.id;
-			
+
 			// Get streak data from cache
 			const streakData = await streakCache.getServerStreaks(serverId, leaderboardData);
-			
+
 			// Filter to only players with active streaks
 			const playersWithStreaks = streakData.filter(player => {
 				if (type === "current") {
@@ -62,7 +64,7 @@ module.exports = {
 				const bStreak = type === "current" ? b.currentWinStreak : b.longestWinStreak;
 				const aMmr = type === "current" ? a.currentStreakMmrGain : a.longestStreakMmrGain;
 				const bMmr = type === "current" ? b.currentStreakMmrGain : b.longestStreakMmrGain;
-				
+
 				if (bStreak === aStreak) {
 					return bMmr - aMmr;
 				}
@@ -82,14 +84,14 @@ module.exports = {
 				// Build leaderboard description (top 5 only)
 				let description = "";
 				const maxUsers = Math.min(playersWithStreaks.length, 5);
-				
+
 				for (let i = 0; i < maxUsers; i++) {
 					const user = playersWithStreaks[i];
 					const rank = i + 1;
-					
+
 					// Get country flag emoji
 					const flagEmoji = this.getCountryFlag(user.loungeUser?.countryCode);
-					
+
 					// Get Discord display name
 					let displayName = "unknown";
 					try {
@@ -99,7 +101,7 @@ module.exports = {
 					catch (error) {
 						displayName = user.loungeUser?.name || "unknown";
 					}
-					
+
 					let streakText, mmrText, dateText = "";
 					if (type === "current") {
 						streakText = `${user.currentWinStreak} win streak`;
@@ -108,7 +110,7 @@ module.exports = {
 					else {
 						streakText = `${user.longestWinStreak} win streak`;
 						mmrText = user.longestStreakMmrGain > 0 ? `(+${user.longestStreakMmrGain} mmr)` : "(+0 mmr)";
-						
+
 						// Add dates for all-time streaks on separate line
 						if (user.longestStreakStart && user.longestStreakEnd) {
 							const startDate = user.longestStreakStart.toLocaleDateString();
@@ -116,12 +118,12 @@ module.exports = {
 							dateText = `\n   ${startDate} - ${endDate}`;
 						}
 					}
-					
+
 					description += `${rank}. ${flagEmoji} **${displayName}**: ${streakText} ${mmrText}${dateText}\n`;
 				}
 
 				embed.setDescription(description);
-				
+
 				// Set thumbnail to first place player's profile picture
 				if (playersWithStreaks.length > 0) {
 					try {
@@ -132,7 +134,7 @@ module.exports = {
 						console.warn("could not set thumbnail for first place user:", error);
 					}
 				}
-				
+
 				if (playersWithStreaks.length > 5) {
 					embed.setFooter({ text: `showing top 5 of ${playersWithStreaks.length} users with streaks` });
 				}
@@ -169,13 +171,13 @@ module.exports = {
 			// Default flag for unknown countries
 			return "🏳️";
 		}
-		
+
 		// Convert country code to flag emoji
 		const codePoints = countryCode
 			.toUpperCase()
 			.split("")
 			.map(char => 127397 + char.charCodeAt());
-		
+
 		return String.fromCodePoint(...codePoints);
 	},
 
@@ -195,17 +197,18 @@ module.exports = {
 				false,
 				null,
 			);
-			
-			if (!leaderboardData || leaderboardData.length === 0) {
-				return await interaction.editReply({
-					content: "no leaderboard data available for this server.",
-					components: [],
-				});
-			}
+
+			   if (!leaderboardData || leaderboardData.length === 0) {
+				   const embed = new EmbedBuilder()
+					   .setTitle("win streaks")
+					   .setColor("Red")
+					   .setDescription("no leaderboard data available for this server.");
+				   return await interaction.editReply({ embeds: [embed], components: [] });
+			   }
 
 			const type = interaction.customId === "streaks_current" ? "current" : "alltime";
 			await this.showStreaks(interaction, leaderboardData, type);
-			
+
 			return true;
 		}
 		catch (error) {

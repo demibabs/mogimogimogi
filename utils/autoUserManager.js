@@ -44,7 +44,7 @@ class AutoUserManager {
 		       return {
 			       success: false,
 			       needsSetup: false,
-			       message: "you don't have a mario kart wii lounge account linked to your discord. please link your account at https://www.mariokartcentral.com/mkw/lounge/ and try again.",
+			       message: "you don't have a mario kart world lounge account linked to your discord.",
 		       };
 	       }
 
@@ -60,11 +60,11 @@ class AutoUserManager {
 		       wasAdded: true,
 		       message: `automatically added you to the server! welcome, ${loungeUser.name}! 🎉`,
 	       };
-			
+
 		}
 		catch (error) {
 			console.error(`Error ensuring user exists: ${userId} in server ${serverId}:`, error);
-			
+
 			// Handle specific error cases
 			if (error.message?.includes("404")) {
 				return {
@@ -80,7 +80,7 @@ class AutoUserManager {
 					message: "couldn't connect to the mkw lounge api. please try again later.",
 				};
 			}
-			
+
 			return {
 				success: false,
 				needsSetup: false,
@@ -88,7 +88,7 @@ class AutoUserManager {
 			};
 		}
 	}
-	
+
 	/**
 	 * Helper method specifically for command validation
 	 * Returns a consistent object format for command usage
@@ -99,11 +99,11 @@ class AutoUserManager {
 	 */
 	static async validateUserForCommand(userId, serverId, client) {
 		const result = await this.ensureUserExists(userId, serverId, client);
-		
+
 		if (result.success) {
 			return { success: true };
 		}
-		
+
 		return {
 			success: false,
 			message: result.message,

@@ -29,10 +29,12 @@ module.exports = {
 							   uniqueUserIds.add(userId);
 						   }
 					   }
-				   } catch (e) {}
+				   }
+				catch (e) {}
 			   }
 			   userCount = uniqueUserIds.size;
-		   } catch (e) {
+		   }
+		catch (e) {
 			   // fallback to 0s
 		   }
 

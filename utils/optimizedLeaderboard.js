@@ -14,10 +14,10 @@ class LeaderboardCache {
 		this.lastUpdate = new Map();
 		this.updateInterval = 60 * 60 * 1000;
 		this.backgroundRefreshes = new Map();
-		
+
 		// Start hourly scheduled refresh for all servers
 		this.startHourlyRefresh();
-		
+
 		// Load cache from database on startup
 		this.loadCacheFromDatabase();
 	}
@@ -29,7 +29,7 @@ class LeaderboardCache {
 		try {
 			const allCacheInfo = await database.getAllServerCacheInfo();
 			console.log(`Loading cache for ${allCacheInfo.length} servers from database...`);
-			
+
 			for (const cacheInfo of allCacheInfo) {
 				try {
 					const serverCache = await database.getLeaderboardCache(cacheInfo.serverId);
@@ -43,7 +43,7 @@ class LeaderboardCache {
 					console.error(`Failed to load cache for server ${cacheInfo.serverId}:`, error);
 				}
 			}
-			
+
 			console.log(`Cache loaded from database for ${this.cache.size} servers`);
 		}
 		catch (error) {
@@ -58,19 +58,19 @@ class LeaderboardCache {
 		// Calculate milliseconds until next hour mark (:00)
 		const now = new Date();
 		const msUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - now.getSeconds() * 1000 - now.getMilliseconds();
-		
+
 		console.log(`Scheduling first cache refresh in ${Math.round(msUntilNextHour / 1000 / 60)} minutes at ${new Date(Date.now() + msUntilNextHour).toLocaleTimeString()}`);
-		
+
 		// Set initial timeout to sync with hour mark
 		setTimeout(() => {
 			// Perform initial refresh
 			this.refreshAllServerCaches();
-			
+
 			// Then set up interval to refresh every hour
 			setInterval(() => {
 				this.refreshAllServerCaches();
 			}, 60 * 60 * 1000);
-			
+
 		}, msUntilNextHour);
 	}
 
@@ -81,19 +81,19 @@ class LeaderboardCache {
 		try {
 			const now = new Date();
 			console.log(`🔄 Starting scheduled cache refresh for all servers at ${now.toLocaleTimeString()}`);
-			
+
 			// Get all servers that have cache data
 			const allCacheInfo = await database.getAllServerCacheInfo();
 			console.log(`Found ${allCacheInfo.length} servers with existing cache data`);
-			
+
 			let refreshed = 0;
 			let failed = 0;
-			
+
 			// Refresh each server cache in parallel (with some concurrency control)
 			const batchSize = 3;
 			for (let i = 0; i < allCacheInfo.length; i += batchSize) {
 				const batch = allCacheInfo.slice(i, i + batchSize);
-				
+
 				await Promise.all(batch.map(async (cacheInfo) => {
 					try {
 						console.log(`Refreshing cache for server ${cacheInfo.serverId}...`);
@@ -106,37 +106,37 @@ class LeaderboardCache {
 						failed++;
 					}
 				}));
-				
+
 				// Small delay between batches to be nice to the API
 				if (i + batchSize < allCacheInfo.length) {
 					await new Promise(resolve => setTimeout(resolve, 2000));
 				}
 			}
-			
+
 			console.log(`✅ Scheduled refresh complete: ${refreshed} refreshed, ${failed} failed`);
-			
+
 			// Also refresh streak caches
 			await this.refreshAllStreakCaches();
-			
+
 		}
 		catch (error) {
 			console.error("Error during scheduled cache refresh:", error);
 		}
 	}
-	
+
 	/**
 	 * Refresh streak caches for all servers
 	 */
 	async refreshAllStreakCaches() {
 		try {
 			console.log("🏁 Refreshing streak caches for all servers...");
-			
+
 			// Get all servers that have cache data
 			const allCacheInfo = await database.getAllServerCacheInfo();
-			
+
 			let refreshed = 0;
 			let failed = 0;
-			
+
 			for (const cacheInfo of allCacheInfo) {
 				try {
 					await streakCache.refreshServerStreaksFromDB(cacheInfo.serverId);
@@ -148,7 +148,7 @@ class LeaderboardCache {
 					failed++;
 				}
 			}
-			
+
 			console.log(`✅ Streak cache refresh complete: ${refreshed} refreshed, ${failed} failed`);
 		}
 		catch (error) {
@@ -170,7 +170,7 @@ class LeaderboardCache {
 			const lastUpdate = this.lastUpdate.get(serverId) || 0;
 			const now = Date.now();
 			const timeSinceUpdate = now - lastUpdate;
-			
+
 			// Force refresh only if cache is missing
 			if (!this.cache.has(serverId)) {
 				console.log(`No cache found for server ${serverId}, building initial cache`);
@@ -181,7 +181,7 @@ class LeaderboardCache {
 				if (!this.backgroundRefreshes.get(serverId)) {
 					console.log(`Cache expired for server ${serverId} (${Math.round(timeSinceUpdate / 60000)} minutes old), refreshing in background`);
 					this.backgroundRefreshes.set(serverId, true);
-					
+
 					// Non-blocking background refresh
 					this.updateServerCache(serverId).then(() => {
 						this.backgroundRefreshes.delete(serverId);
@@ -225,7 +225,7 @@ class LeaderboardCache {
 					else {
 						// Get pre-computed table statistics
 						const stats = this.getFilteredStats(userCache, timeFilter, serverOnly, squads);
-						
+
 						switch (stat) {
 						case "tWR":
 							statValue = stats?.winRate;
@@ -326,7 +326,7 @@ class LeaderboardCache {
 	async updateServerCache(serverId) {
 		try {
 			console.log(`Updating leaderboard cache for server ${serverId}...`);
-			
+
 			const serverData = await database.getServerData(serverId);
 			if (!serverData || !serverData.users) {
 				console.log(`No server data found for ${serverId}`);
@@ -343,10 +343,10 @@ class LeaderboardCache {
 			// Process users in batches to avoid overwhelming the API
 			const userEntries = Object.entries(serverData.users);
 			const batchSize = 5;
-			
+
 			for (let i = 0; i < userEntries.length; i += batchSize) {
 				const batch = userEntries.slice(i, i + batchSize);
-				
+
 				await Promise.all(batch.map(async ([userId, userData]) => {
 					try {
 						const userStats = await this.computeUserStats(
@@ -356,7 +356,7 @@ class LeaderboardCache {
 							oneWeekAgo,
 							seasonStartTimestamp,
 						);
-						
+
 						if (userStats) {
 							userCache.set(userId, userStats);
 						}
@@ -374,7 +374,7 @@ class LeaderboardCache {
 
 			this.cache.set(serverId, userCache);
 			this.lastUpdate.set(serverId, now);
-			
+
 			// Save cache to database for persistence across deploys
 			try {
 				await database.saveLeaderboardCache(serverId, userCache);
@@ -383,9 +383,9 @@ class LeaderboardCache {
 			catch (error) {
 				console.error(`Failed to save cache to database for server ${serverId}:`, error);
 			}
-			
+
 			console.log(`Cache updated for server ${serverId} with ${userCache.size} users`);
-			
+
 			// Also update streak cache when leaderboard cache updates
 			try {
 				console.log(`Updating streak cache for server ${serverId}...`);
@@ -437,7 +437,7 @@ class LeaderboardCache {
 
 			// Get all user tables once
 			const allTables = await LoungeApi.getAllPlayerTables(userId, serverId);
-			
+
 			// Pre-filter tables by time periods
 			const weeklyTables = PlayerStats.filterTablesByWeek(allTables, true);
 			const seasonTables = PlayerStats.filterTablesBySeason(allTables, true);
@@ -450,13 +450,13 @@ class LeaderboardCache {
 				currentMMR,
 				weeklyMMRChange,
 				seasonMMRChange,
-				
+
 				// All-time stats
 				all: this.computeTimeFilteredStats(allTables, userId, serverId),
-				
+
 				// Weekly stats
 				weekly: this.computeTimeFilteredStats(weeklyTables, userId, serverId),
-				
+
 				// Season stats
 				season: this.computeTimeFilteredStats(seasonTables, userId, serverId),
 			};
@@ -493,7 +493,7 @@ class LeaderboardCache {
 		// This can be enhanced later with proper server table detection
 		for (const serverFilter of [true, false]) {
 			const key = serverFilter ? "serverOnly" : "allTables";
-			
+
 			// Compute for all, squads only, and regular only
 			stats[key].all = this.computeBasicStats(tables, playerDiscordId);
 			stats[key].squads = this.computeBasicStats(
@@ -590,7 +590,7 @@ class LeaderboardCache {
 		this.cache.delete(serverId);
 		this.lastUpdate.delete(serverId);
 		this.backgroundRefreshes.delete(serverId);
-		
+
 		// Also clear from database
 		try {
 			await database.clearLeaderboardCache(serverId);
@@ -598,7 +598,7 @@ class LeaderboardCache {
 		catch (error) {
 			console.error(`Failed to clear database cache for server ${serverId}:`, error);
 		}
-		
+
 		console.log(`Cache cleared for server ${serverId}`);
 	}
 
@@ -610,7 +610,7 @@ class LeaderboardCache {
 		this.cache.clear();
 		this.lastUpdate.clear();
 		this.backgroundRefreshes.clear();
-		
+
 		// Also clear all database cache
 		try {
 			if (database.useDatabase) {
@@ -621,7 +621,7 @@ class LeaderboardCache {
 		catch (error) {
 			console.error("Failed to clear all database cache:", error);
 		}
-		
+
 		console.log(`All caches cleared for ${serverCount} servers`);
 	}
 
@@ -632,7 +632,7 @@ class LeaderboardCache {
 		// Get servers from both in-memory cache and database
 		const memoryServers = Array.from(this.cache.keys());
 		let dbServers = [];
-		
+
 		try {
 			const dbCacheInfo = await database.getAllServerCacheInfo();
 			dbServers = dbCacheInfo.map(info => info.serverId);
@@ -640,11 +640,11 @@ class LeaderboardCache {
 		catch (error) {
 			console.error("Failed to get database cache servers:", error);
 		}
-		
+
 		// Combine and deduplicate servers
 		const allServers = [...new Set([...memoryServers, ...dbServers])];
 		console.log(`Force refreshing caches for ${allServers.length} servers...`);
-		
+
 		for (const serverId of allServers) {
 			try {
 				await this.updateServerCache(serverId);
@@ -654,7 +654,7 @@ class LeaderboardCache {
 				console.error(`❌ Failed to refresh cache for server ${serverId}:`, error);
 			}
 		}
-		
+
 		console.log(`Completed refresh for all ${allServers.length} servers`);
 	}
 
@@ -666,7 +666,7 @@ class LeaderboardCache {
 	getCacheInfo(serverId) {
 		const lastUpdate = this.lastUpdate.get(serverId);
 		const userCount = this.cache.get(serverId)?.size || 0;
-		
+
 		return {
 			lastUpdate: lastUpdate ? new Date(lastUpdate) : null,
 			userCount,
@@ -688,7 +688,7 @@ class LeaderboardCache {
 	 */
 	getAllCacheInfo() {
 		const cacheInfo = [];
-		
+
 		for (const serverId of this.cache.keys()) {
 			const info = this.getCacheInfo(serverId);
 			cacheInfo.push({

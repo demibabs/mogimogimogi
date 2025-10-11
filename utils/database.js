@@ -481,7 +481,7 @@ class Database {
 		try {
 			// Begin transaction for atomic updates
 			const client = await this.pool.connect();
-			
+
 			try {
 				await client.query("BEGIN");
 
@@ -590,7 +590,7 @@ class Database {
 		try {
 			// Begin transaction for atomic updates
 			const client = await this.pool.connect();
-			
+
 			try {
 				await client.query("BEGIN");
 
@@ -642,7 +642,7 @@ class Database {
 
 			const cache = new Map();
 			const corruptedUserIds = [];
-			
+
 			for (const row of result.rows) {
 				// PostgreSQL JSONB data is already parsed, no need for JSON.parse()
 				if (row.cache_data && typeof row.cache_data === "object") {
@@ -650,7 +650,7 @@ class Database {
 					// Extract the userId from the stored data
 					if (row.cache_data.userId) {
 						const userId = row.cache_data.userId;
-						
+
 						// Convert date strings back to Date objects
 						const streakData = { ...row.cache_data };
 						if (streakData.longestStreakStart) {
@@ -659,7 +659,7 @@ class Database {
 						if (streakData.longestStreakEnd) {
 							streakData.longestStreakEnd = new Date(streakData.longestStreakEnd);
 						}
-						
+
 						cache.set(userId, streakData);
 					}
 					else {
