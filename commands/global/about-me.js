@@ -3,7 +3,7 @@ const database = require("../../utils/database");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("aboutme")
+		.setName("about-me")
 		.setDescription("show bot deployment stats: servers, users, tables."),
 
 	async execute(interaction) {

@@ -3,8 +3,6 @@
  * Caches streak data for fast retrieval
  */
 
-const PlayerStats = require("./playerStats");
-
 class StreakCache {
 	constructor() {
 		// serverId -> Map(playerName -> streakData)
@@ -12,7 +10,7 @@ class StreakCache {
 		// serverId -> timestamp
 		this.lastUpdate = new Map();
 		// 1 hour
-		this.updateInterval = 60 * 60 * 1000;
+		this.updateInterval = 24 * 60 * 60 * 1000;
 
 		// Load cache from database on startup
 		this.loadCacheFromDatabase();

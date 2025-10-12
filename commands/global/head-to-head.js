@@ -36,7 +36,6 @@ module.exports = {
 
 			   if (!result.success) {
 				   const embed = new EmbedBuilder()
-					   .setTitle(`${discordUser1.displayName} vs ${discordUser2.displayName}`)
 					   .setColor("Red")
 					   .setDescription(result.message || "unable to load head-to-head data.");
 				   return await interaction.editReply({ content: "", embeds: [embed] });

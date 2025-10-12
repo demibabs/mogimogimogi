@@ -12,11 +12,11 @@ class LeaderboardCache {
 	constructor() {
 		this.cache = new Map();
 		this.lastUpdate = new Map();
-		this.updateInterval = 60 * 60 * 1000;
+		this.updateInterval = 24 * 60 * 60 * 1000;
 		this.backgroundRefreshes = new Map();
 
-		// Start hourly scheduled refresh for all servers
-		this.startHourlyRefresh();
+		// Start daily scheduled refresh for all servers
+		this.startDailyRefresh();
 
 		// Load cache from database on startup
 		this.loadCacheFromDatabase();
@@ -28,7 +28,7 @@ class LeaderboardCache {
 	async loadCacheFromDatabase() {
 		try {
 			const allCacheInfo = await database.getAllServerCacheInfo();
-			console.log(`Loading cache for ${allCacheInfo.length} servers from database...`);
+			console.log(`loading cache for ${allCacheInfo.length} servers from database...`);
 
 			for (const cacheInfo of allCacheInfo) {
 				try {
@@ -36,40 +36,40 @@ class LeaderboardCache {
 					if (serverCache.size > 0) {
 						this.cache.set(cacheInfo.serverId, serverCache);
 						this.lastUpdate.set(cacheInfo.serverId, cacheInfo.lastUpdate.getTime());
-						console.log(`Loaded cache for server ${cacheInfo.serverId} (${serverCache.size} users)`);
+						console.log(`loaded cache for server ${cacheInfo.serverId} (${serverCache.size} users)`);
 					}
 				}
 				catch (error) {
-					console.error(`Failed to load cache for server ${cacheInfo.serverId}:`, error);
+					console.error(`failed to load cache for server ${cacheInfo.serverId}:`, error);
 				}
 			}
 
-			console.log(`Cache loaded from database for ${this.cache.size} servers`);
+			console.log(`cache loaded from database for ${this.cache.size} servers`);
 		}
 		catch (error) {
-			console.error("Failed to load cache from database:", error);
+			console.error("failed to load cache from database:", error);
 		}
 	}
 
 	/**
-	 * Start hourly scheduled refresh for all servers at the top of each hour
+	 * Start daily scheduled refresh for all servers
 	 */
-	startHourlyRefresh() {
+	startDailyRefresh() {
 		// Calculate milliseconds until next hour mark (:00)
 		const now = new Date();
 		const msUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - now.getSeconds() * 1000 - now.getMilliseconds();
 
-		console.log(`Scheduling first cache refresh in ${Math.round(msUntilNextHour / 1000 / 60)} minutes at ${new Date(Date.now() + msUntilNextHour).toLocaleTimeString()}`);
+		console.log(`scheduling first cache refresh in ${Math.round(msUntilNextHour / 1000 / 60)} minutes at ${new Date(Date.now() + msUntilNextHour).toLocaleTimeString()}`);
 
 		// Set initial timeout to sync with hour mark
 		setTimeout(() => {
 			// Perform initial refresh
 			this.refreshAllServerCaches();
 
-			// Then set up interval to refresh every hour
+			// Then set up interval to refresh every day
 			setInterval(() => {
 				this.refreshAllServerCaches();
-			}, 60 * 60 * 1000);
+			}, 24 * 60 * 60 * 1000);
 
 		}, msUntilNextHour);
 	}
@@ -80,11 +80,11 @@ class LeaderboardCache {
 	async refreshAllServerCaches() {
 		try {
 			const now = new Date();
-			console.log(`🔄 Starting scheduled cache refresh for all servers at ${now.toLocaleTimeString()}`);
+			console.log(`starting scheduled cache refresh for all servers at ${now.toLocaleTimeString()}`);
 
 			// Get all servers that have cache data
 			const allCacheInfo = await database.getAllServerCacheInfo();
-			console.log(`Found ${allCacheInfo.length} servers with existing cache data`);
+			console.log(`found ${allCacheInfo.length} servers with existing cache data`);
 
 			let refreshed = 0;
 			let failed = 0;
@@ -96,13 +96,13 @@ class LeaderboardCache {
 
 				await Promise.all(batch.map(async (cacheInfo) => {
 					try {
-						console.log(`Refreshing cache for server ${cacheInfo.serverId}...`);
+						console.log(`refreshing leaderboard cache for server ${cacheInfo.serverId}...`);
 						await this.updateServerCache(cacheInfo.serverId);
 						refreshed++;
-						console.log(`✅ Cache refreshed for server ${cacheInfo.serverId}`);
+						console.log(`leaderboard cache refreshed for server ${cacheInfo.serverId}`);
 					}
 					catch (error) {
-						console.error(`❌ Failed to refresh cache for server ${cacheInfo.serverId}:`, error);
+						console.error(`failed to refresh leaderboard cache for server ${cacheInfo.serverId}:`, error);
 						failed++;
 					}
 				}));
@@ -113,14 +113,14 @@ class LeaderboardCache {
 				}
 			}
 
-			console.log(`✅ Scheduled refresh complete: ${refreshed} refreshed, ${failed} failed`);
+			console.log(`scheduled refresh complete: ${refreshed} refreshed, ${failed} failed`);
 
 			// Also refresh streak caches
 			await this.refreshAllStreakCaches();
 
 		}
 		catch (error) {
-			console.error("Error during scheduled cache refresh:", error);
+			console.error("error during scheduled cache refresh:", error);
 		}
 	}
 
@@ -129,7 +129,7 @@ class LeaderboardCache {
 	 */
 	async refreshAllStreakCaches() {
 		try {
-			console.log("🏁 Refreshing streak caches for all servers...");
+			console.log("refreshing streak caches for all servers...");
 
 			// Get all servers that have cache data
 			const allCacheInfo = await database.getAllServerCacheInfo();
@@ -141,18 +141,18 @@ class LeaderboardCache {
 				try {
 					await streakCache.refreshServerStreaksFromDB(cacheInfo.serverId);
 					refreshed++;
-					console.log(`✅ Streak cache refreshed for server ${cacheInfo.serverId}`);
+					console.log(`streak cache refreshed for server ${cacheInfo.serverId}`);
 				}
 				catch (error) {
-					console.error(`❌ Failed to refresh streak cache for server ${cacheInfo.serverId}:`, error);
+					console.error(`failed to refresh streak cache for server ${cacheInfo.serverId}:`, error);
 					failed++;
 				}
 			}
 
-			console.log(`✅ Streak cache refresh complete: ${refreshed} refreshed, ${failed} failed`);
+			console.log(`streak cache refresh complete: ${refreshed} refreshed, ${failed} failed`);
 		}
 		catch (error) {
-			console.error("Error during streak cache refresh:", error);
+			console.error("error during streak cache refresh:", error);
 		}
 	}
 
@@ -173,21 +173,21 @@ class LeaderboardCache {
 
 			// Force refresh only if cache is missing
 			if (!this.cache.has(serverId)) {
-				console.log(`No cache found for server ${serverId}, building initial cache`);
+				console.log(`no leaderboard cache found for server ${serverId}, building initial cache`);
 				await this.updateServerCache(serverId);
 			}
 			else if (timeSinceUpdate > this.updateInterval) {
 				// Cache is expired - use existing cache and trigger background refresh if not already running
 				if (!this.backgroundRefreshes.get(serverId)) {
-					console.log(`Cache expired for server ${serverId} (${Math.round(timeSinceUpdate / 60000)} minutes old), refreshing in background`);
+					console.log(`leaderboard cache expired for server ${serverId} (${Math.round(timeSinceUpdate / 60000)} minutes old), refreshing in background`);
 					this.backgroundRefreshes.set(serverId, true);
 
 					// Non-blocking background refresh
 					this.updateServerCache(serverId).then(() => {
 						this.backgroundRefreshes.delete(serverId);
-						console.log(`Background refresh completed for server ${serverId}`);
+						console.log(`cackground refresh completed for server ${serverId}`);
 					}).catch(error => {
-						console.error("Background refresh failed:", error);
+						console.error("background refresh failed:", error);
 						this.backgroundRefreshes.delete(serverId);
 					});
 				}
@@ -252,7 +252,7 @@ class LeaderboardCache {
 					}
 				}
 				catch (error) {
-					console.warn(`Error processing cached user ${userId}:`, error);
+					console.warn(`error processing cached user ${userId}:`, error);
 				}
 			}
 
@@ -268,7 +268,7 @@ class LeaderboardCache {
 			return leaderboardData.slice(0, 10);
 		}
 		catch (error) {
-			console.error(`Error generating leaderboard for server ${serverId}:`, error);
+			console.error(`error generating leaderboard for server ${serverId}:`, error);
 			return [];
 		}
 	}
@@ -314,7 +314,7 @@ class LeaderboardCache {
 			}
 		}
 		catch (error) {
-			console.warn("Error filtering cached stats:", error);
+			console.warn("error filtering cached stats:", error);
 			return null;
 		}
 	}
@@ -325,11 +325,11 @@ class LeaderboardCache {
 	 */
 	async updateServerCache(serverId) {
 		try {
-			console.log(`Updating leaderboard cache for server ${serverId}...`);
+			console.log(`updating leaderboard cache for server ${serverId}...`);
 
 			const serverData = await database.getServerData(serverId);
 			if (!serverData || !serverData.users) {
-				console.log(`No server data found for ${serverId}`);
+				console.log(`no server data found for ${serverId}`);
 				return;
 			}
 
@@ -338,7 +338,7 @@ class LeaderboardCache {
 			const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
 			const seasonStartTimestamp = this.getSeasonStartTimestamp();
 
-			console.log(`Processing ${Object.keys(serverData.users).length} users...`);
+			console.log(`processing ${Object.keys(serverData.users).length} users...`);
 
 			// Process users in batches to avoid overwhelming the API
 			const userEntries = Object.entries(serverData.users);
@@ -362,7 +362,7 @@ class LeaderboardCache {
 						}
 					}
 					catch (error) {
-						console.warn(`Error computing stats for user ${userId}:`, error);
+						console.warn(`error computing stats for user ${userId}:`, error);
 					}
 				}));
 
@@ -378,26 +378,26 @@ class LeaderboardCache {
 			// Save cache to database for persistence across deploys
 			try {
 				await database.saveLeaderboardCache(serverId, userCache);
-				console.log(`Cache saved to database for server ${serverId} with ${userCache.size} users`);
+				console.log(`cache saved to database for server ${serverId} with ${userCache.size} users`);
 			}
 			catch (error) {
-				console.error(`Failed to save cache to database for server ${serverId}:`, error);
+				console.error(`failed to save cache to database for server ${serverId}:`, error);
 			}
 
-			console.log(`Cache updated for server ${serverId} with ${userCache.size} users`);
+			console.log(`cache updated for server ${serverId} with ${userCache.size} users`);
 
 			// Also update streak cache when leaderboard cache updates
 			try {
-				console.log(`Updating streak cache for server ${serverId}...`);
+				console.log(`updating streak cache for server ${serverId}...`);
 				await streakCache.refreshServerStreaksFromDB(serverId);
-				console.log(`Streak cache updated for server ${serverId}`);
+				console.log(`streak cache updated for server ${serverId}`);
 			}
 			catch (error) {
-				console.error(`Failed to update streak cache for server ${serverId}:`, error);
+				console.error(`failed to update streak cache for server ${serverId}:`, error);
 			}
 		}
 		catch (error) {
-			console.error(`Error updating cache for server ${serverId}:`, error);
+			console.error(`error updating cache for server ${serverId}:`, error);
 		}
 	}
 
@@ -464,7 +464,7 @@ class LeaderboardCache {
 			return stats;
 		}
 		catch (error) {
-			console.warn(`Error computing user stats for ${userId}:`, error);
+			console.warn(`error computing user stats for ${userId}:`, error);
 			return null;
 		}
 	}
@@ -534,7 +534,7 @@ class LeaderboardCache {
 			};
 		}
 		catch (error) {
-			console.warn(`Error computing basic stats for ${playerDiscordId}:`, error);
+			console.warn(`error computing basic stats for ${playerDiscordId}:`, error);
 			return {
 				winRate: null,
 				averageScore: null,
@@ -570,7 +570,7 @@ class LeaderboardCache {
 	getSeasonStartTimestamp() {
 		// This should be configured based on actual season start
 		// For now, using 3 months ago as placeholder
-		return Date.now() - (90 * 24 * 60 * 60 * 1000);
+		return new Date("2025-09-07T12:00:00.000Z");
 	}
 
 	/**

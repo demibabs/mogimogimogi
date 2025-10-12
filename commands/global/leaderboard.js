@@ -171,7 +171,7 @@ module.exports = {
 			embed.setTitle(title);
 
 
-			embed.setFooter({ text: "updates every hour" });
+			embed.setFooter({ text: "updates daily" });
 
 			// Fetch Discord display names for all users in parallel
 			const userFetches = leaderboardData.slice(0, 10).map(async (entry) => {

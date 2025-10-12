@@ -137,7 +137,7 @@ module.exports = {
 				}
 
 				if (playersWithStreaks.length > 5) {
-					embed.setFooter({ text: `showing top 5 of ${playersWithStreaks.length} users with streaks` });
+					embed.setFooter({ text: "updates daily" });
 				}
 			}
 

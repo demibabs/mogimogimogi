@@ -39,10 +39,11 @@ LOUNGE_API_GUIDE.md
 MIGRATION_INSTRUCTIONS.md
 MIGRATION_NOTES.md
 LEADERBOARD_OPTIMIZATION.md
+test-cache-persistence.js
+test-setup-detection.js
+clear-streak-table.js
+clear-streak-cache.js
 
 commands/testing/
 
 leaderboard-backup.js.bak
-
-
-LEADERBOARD_OPTIMIZATION.md
