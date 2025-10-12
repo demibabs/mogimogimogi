@@ -168,7 +168,7 @@ class StreakCache {
 						}
 					}
 					catch (error) {
-						console.warn(`Error calculating streaks for user ${userId}:`, error);
+						console.warn(`error calculating streaks for user ${userId}:`, error);
 					}
 				}));
 

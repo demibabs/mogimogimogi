@@ -99,10 +99,10 @@ class Database {
 				ON streak_cache(updated_at)
 			`);
 
-			console.log("Database initialized successfully");
+			console.log("database initialized successfully");
 		}
 		catch (error) {
-			console.error("Database initialization error:", error);
+			console.error("database initialization error:", error);
 		}
 	}
 
@@ -130,7 +130,7 @@ class Database {
 			return result.rows[0].data;
 		}
 		catch (error) {
-			console.error("Database read error:", error);
+			console.error("database read error:", error);
 			throw error;
 		}
 	}
@@ -151,7 +151,7 @@ class Database {
 			);
 		}
 		catch (error) {
-			console.error("Database write error:", error);
+			console.error("database write error:", error);
 			throw error;
 		}
 	}
@@ -169,7 +169,7 @@ class Database {
 			);
 		}
 		catch (error) {
-			console.error("Database delete error:", error);
+			console.error("database delete error:", error);
 			throw error;
 		}
 	}
@@ -185,7 +185,7 @@ class Database {
 			return result.rows.map(row => row.server_id);
 		}
 		catch (error) {
-			console.error("Database query error:", error);
+			console.error("database query error:", error);
 			throw error;
 		}
 	}
@@ -207,7 +207,7 @@ class Database {
 			return true;
 		}
 		catch (error) {
-			console.error("Database table save error:", error);
+			console.error("database table save error:", error);
 			return false;
 		}
 	}
@@ -230,7 +230,7 @@ class Database {
 			return result.rows[0].table_data;
 		}
 		catch (error) {
-			console.error("Database table read error:", error);
+			console.error("database table read error:", error);
 			return null;
 		}
 	}
@@ -250,7 +250,7 @@ class Database {
 			return true;
 		}
 		catch (error) {
-			console.error("Database user-table link error:", error);
+			console.error("database user-table link error:", error);
 			return false;
 		}
 	}
@@ -275,7 +275,7 @@ class Database {
 			}));
 		}
 		catch (error) {
-			console.error("Database user tables query error:", error);
+			console.error("database user tables query error:", error);
 			return [];
 		}
 	}
@@ -286,7 +286,7 @@ class Database {
 			await fs.mkdir(this.dataDir, { recursive: true });
 		}
 		catch (error) {
-			console.error("Error creating data directory:", error);
+			console.error("error creating data directory:", error);
 		}
 	}
 
@@ -320,7 +320,7 @@ class Database {
 			return true;
 		}
 		catch (error) {
-			console.error("Error saving server data:", error);
+			console.error("error saving server data:", error);
 			return false;
 		}
 	}
@@ -332,7 +332,7 @@ class Database {
 			return true;
 		}
 		catch (error) {
-			console.error("Error deleting server data:", error);
+			console.error("error deleting server data:", error);
 			return false;
 		}
 	}
@@ -346,7 +346,7 @@ class Database {
 				.map(file => file.replace(".json", ""));
 		}
 		catch (error) {
-			console.error("Error reading data directory:", error);
+			console.error("error reading data directory:", error);
 			return [];
 		}
 	}
@@ -362,7 +362,7 @@ class Database {
 			return true;
 		}
 		catch (error) {
-			console.error(`Error saving table ${tableId} to file:`, error);
+			console.error(`error saving table ${tableId} to file:`, error);
 			return false;
 		}
 	}
@@ -375,7 +375,7 @@ class Database {
 		}
 		catch (error) {
 			if (error.code !== "ENOENT") {
-				console.error(`Error reading table ${tableId} from file:`, error);
+				console.error(`error reading table ${tableId} from file:`, error);
 			}
 			return null;
 		}
@@ -396,7 +396,7 @@ class Database {
 			}
 			catch (readError) {
 				if (readError.code !== "ENOENT") {
-					console.error("Error reading relationships file:", readError);
+					console.error("error reading relationships file:", readError);
 				}
 			}
 
@@ -414,7 +414,7 @@ class Database {
 			return true;
 		}
 		catch (error) {
-			console.error(`Error linking user ${userId} to table ${tableId}:`, error);
+			console.error(`error linking user ${userId} to table ${tableId}:`, error);
 			return false;
 		}
 	}
@@ -439,7 +439,7 @@ class Database {
 		}
 		catch (error) {
 			if (error.code !== "ENOENT") {
-				console.error(`Error getting user tables for ${userId}:`, error);
+				console.error(`error getting user tables for ${userId}:`, error);
 			}
 			return [];
 		}
@@ -468,7 +468,7 @@ class Database {
 			return cache;
 		}
 		catch (error) {
-			console.error("Error getting leaderboard cache:", error);
+			console.error("error getting leaderboard cache:", error);
 			return new Map();
 		}
 	}
@@ -501,7 +501,7 @@ class Database {
 				}
 
 				await client.query("COMMIT");
-				console.log(`Saved leaderboard cache for server ${serverId} (${userCache.size} users)`);
+				console.log(`saved leaderboard cache for server ${serverId} (${userCache.size} users)`);
 			}
 			catch (error) {
 				await client.query("ROLLBACK");
@@ -512,7 +512,7 @@ class Database {
 			}
 		}
 		catch (error) {
-			console.error("Error saving leaderboard cache:", error);
+			console.error("error saving leaderboard cache:", error);
 		}
 	}
 
@@ -530,7 +530,7 @@ class Database {
 			return result.rows[0]?.last_update || null;
 		}
 		catch (error) {
-			console.error("Error getting cache age:", error);
+			console.error("error getting cache age:", error);
 			return null;
 		}
 	}
@@ -545,10 +545,10 @@ class Database {
 				"DELETE FROM leaderboard_cache WHERE server_id = $1",
 				[serverId],
 			);
-			console.log(`Cleared leaderboard cache for server ${serverId}`);
+			console.log(`cleared leaderboard cache for server ${serverId}`);
 		}
 		catch (error) {
-			console.error("Error clearing cache:", error);
+			console.error("error clearing cache:", error);
 		}
 	}
 
@@ -577,7 +577,7 @@ class Database {
 			}));
 		}
 		catch (error) {
-			console.error("Error getting all cache info:", error);
+			console.error("error getting all cache info:", error);
 			return [];
 		}
 	}
@@ -614,7 +614,7 @@ class Database {
 				}
 
 				await client.query("COMMIT");
-				console.log(`Saved streak cache for server ${serverId} (${streakCache.size} users)`);
+				console.log(`saved streak cache for server ${serverId} (${streakCache.size} users)`);
 			}
 			catch (error) {
 				await client.query("ROLLBACK");
@@ -625,7 +625,7 @@ class Database {
 			}
 		}
 		catch (error) {
-			console.error("Error saving streak cache:", error);
+			console.error("error saving streak cache:", error);
 		}
 	}
 
@@ -668,7 +668,7 @@ class Database {
 					}
 				}
 				else {
-					console.warn(`Invalid streak cache data for user ${row.user_id}`);
+					console.warn(`invalid streak cache data for user ${row.user_id}`);
 					// Track invalid entries to clean them up
 					corruptedUserIds.push(row.user_id);
 				}
@@ -676,7 +676,7 @@ class Database {
 
 			// Clean up corrupted entries
 			if (corruptedUserIds.length > 0) {
-				console.log(`Cleaning up ${corruptedUserIds.length} corrupted streak cache entries for server ${serverId}`);
+				console.log(`cleaning up ${corruptedUserIds.length} corrupted streak cache entries for server ${serverId}`);
 				try {
 					for (const userId of corruptedUserIds) {
 						await this.pool.query(
@@ -684,23 +684,23 @@ class Database {
 							[serverId, userId],
 						);
 					}
-					console.log(`Cleaned up corrupted entries for server ${serverId}`);
+					console.log(`cleaned up corrupted entries for server ${serverId}`);
 				}
 				catch (cleanupError) {
-					console.warn("Failed to clean up corrupted entries:", cleanupError);
+					console.warn("failed to clean up corrupted entries:", cleanupError);
 				}
 			}
 
-			console.log(`Loaded streak cache for server ${serverId} (${cache.size} users)`);
+			console.log(`loaded streak cache for server ${serverId} (${cache.size} users)`);
 			return cache;
 		}
 		catch (error) {
 			// If table doesn't exist yet, return empty cache
 			if (error.code === "42P01") {
-				console.log(`Streak cache table doesn't exist yet for server ${serverId}`);
+				console.log(`streak cache table doesn't exist yet for server ${serverId}`);
 				return new Map();
 			}
-			console.error("Error loading streak cache:", error);
+			console.error("error loading streak cache:", error);
 			return new Map();
 		}
 	}
@@ -715,10 +715,10 @@ class Database {
 				"DELETE FROM streak_cache WHERE server_id = $1",
 				[serverId],
 			);
-			console.log(`Cleared streak cache for server ${serverId}`);
+			console.log(`cleared streak cache for server ${serverId}`);
 		}
 		catch (error) {
-			console.error("Error clearing streak cache:", error);
+			console.error("error clearing streak cache:", error);
 		}
 	}
 
@@ -736,7 +736,7 @@ class Database {
 			return result.rows[0]?.last_update || null;
 		}
 		catch (error) {
-			console.error("Error getting streak cache age:", error);
+			console.error("error getting streak cache age:", error);
 			return null;
 		}
 	}
