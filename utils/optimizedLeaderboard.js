@@ -596,10 +596,10 @@ class LeaderboardCache {
 			await database.clearLeaderboardCache(serverId);
 		}
 		catch (error) {
-			console.error(`Failed to clear database cache for server ${serverId}:`, error);
+			console.error(`failed to clear database cache for server ${serverId}:`, error);
 		}
 
-		console.log(`Cache cleared for server ${serverId}`);
+		console.log(`cache cleared for server ${serverId}`);
 	}
 
 	/**
@@ -615,14 +615,14 @@ class LeaderboardCache {
 		try {
 			if (database.useDatabase) {
 				await database.pool.query("DELETE FROM leaderboard_cache");
-				console.log("Cleared all database cache");
+				console.log("cleared all database cache");
 			}
 		}
 		catch (error) {
-			console.error("Failed to clear all database cache:", error);
+			console.error("failed to clear all database cache:", error);
 		}
 
-		console.log(`All caches cleared for ${serverCount} servers`);
+		console.log(`all caches cleared for ${serverCount} servers`);
 	}
 
 	/**
@@ -638,24 +638,24 @@ class LeaderboardCache {
 			dbServers = dbCacheInfo.map(info => info.serverId);
 		}
 		catch (error) {
-			console.error("Failed to get database cache servers:", error);
+			console.error("failed to get database cache servers:", error);
 		}
 
 		// Combine and deduplicate servers
 		const allServers = [...new Set([...memoryServers, ...dbServers])];
-		console.log(`Force refreshing caches for ${allServers.length} servers...`);
+		console.log(`force refreshing caches for ${allServers.length} servers...`);
 
 		for (const serverId of allServers) {
 			try {
 				await this.updateServerCache(serverId);
-				console.log(`✅ Refreshed cache for server ${serverId}`);
+				console.log(`refreshed cache for server ${serverId}`);
 			}
 			catch (error) {
-				console.error(`❌ Failed to refresh cache for server ${serverId}:`, error);
+				console.error(`failed to refresh cache for server ${serverId}:`, error);
 			}
 		}
 
-		console.log(`Completed refresh for all ${allServers.length} servers`);
+		console.log(`completed refresh for all ${allServers.length} servers`);
 	}
 
 	/**

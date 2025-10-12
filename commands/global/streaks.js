@@ -136,9 +136,7 @@ module.exports = {
 					}
 				}
 
-				if (playersWithStreaks.length > 5) {
-					embed.setFooter({ text: "updates daily" });
-				}
+				embed.setFooter({ text: "updates daily" });
 			}
 
 			// Create buttons

@@ -170,14 +170,14 @@ module.exports = {
 			const seconds = Math.floor((timeSinceUpdate % (1000 * 60)) / 1000);
 
 			description += `**last update:** ${cacheInfo.lastUpdate.toLocaleString()}\n`;
-			description += `**time Since update:** ${minutes}m ${seconds}s ago\n`;
+			description += `**time since update:** ${minutes}m ${seconds}s ago\n`;
 		}
 		else {
-			description += "**last Update:** never\n";
+			description += "**last update:** never\n";
 		}
 
-		description += `**cached Users:** ${cacheInfo.userCount}\n`;
-		description += `**status:** ${cacheInfo.isStale ? "🟡 stale" : "🟢 fresh"}\n\n`;
+		description += `**cached users:** ${cacheInfo.userCount}\n`;
+		description += `**status:** ${cacheInfo.isStale ? "stale" : "fresh"}\n\n`;
 
 		description += "**streak cache:**\n";
 		if (streakCacheInfo.lastUpdate) {
@@ -185,7 +185,7 @@ module.exports = {
 			const minutes = Math.floor(timeSinceUpdate / (1000 * 60));
 			const seconds = Math.floor((timeSinceUpdate % (1000 * 60)) / 1000);
 
-			description += `**last Update:** ${streakCacheInfo.lastUpdate.toLocaleString()}\n`;
+			description += `**last update:** ${streakCacheInfo.lastUpdate.toLocaleString()}\n`;
 			description += `**time since update:** ${minutes}m ${seconds}s ago\n`;
 		}
 		else {
@@ -339,14 +339,14 @@ module.exports = {
 					.join("\n");
 
 				successEmbed.addFields({
-					name: `refreshed Servers ${serverCount > 10 ? "(showing first 10)" : ""}`,
+					name: `refreshed servers ${serverCount > 10 ? "(showing first 10)" : ""}`,
 					value: serverSummary || "no servers found",
 					inline: false,
 				});
 
 				if (serverCount > 10) {
 					successEmbed.addFields({
-						name: "total Summary",
+						name: "total summary",
 						value: `**${serverCount}** total servers refreshed`,
 						inline: false,
 					});
@@ -402,7 +402,7 @@ module.exports = {
 			const duration = ((endTime - startTime) / 1000).toFixed(1);
 
 			const embed = new EmbedBuilder()
-				.setTitle("streak Cache Refresh Complete")
+				.setTitle("streak cache refresh complete")
 				.addFields(
 					{ name: "successful", value: `${successCount} servers`, inline: true },
 					{ name: "failed", value: `${errorCount} servers`, inline: true },
@@ -431,7 +431,7 @@ module.exports = {
 		catch (error) {
 			console.error("Error in refreshAllStreakCaches:", error);
 			const errorEmbed = new EmbedBuilder()
-				.setTitle("streak Cache Refresh Failed")
+				.setTitle("streak cache refresh failed")
 				.setDescription(`an error occurred while refreshing streak caches:\n\`\`\`${error.message}\`\`\``)
 				.setColor("#FF6B6B")
 				.setTimestamp();

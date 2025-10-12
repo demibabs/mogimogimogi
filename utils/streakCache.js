@@ -21,7 +21,7 @@ class StreakCache {
 	 */
 	async loadCacheFromDatabase() {
 		try {
-			console.log("Loading streak cache from database...");
+			console.log("loading streak cache from database...");
 			const database = require("./database");
 
 			// Load cache for all servers (if table exists)
@@ -38,14 +38,14 @@ class StreakCache {
 					}
 				}
 				catch (error) {
-					console.warn(`Failed to load streak cache for server ${serverInfo.serverId}, will rebuild on demand:`, error.message);
+					console.warn(`failed to load streak cache for server ${serverInfo.serverId}, will rebuild on demand:`, error.message);
 					// Clear corrupted data for this server
 					try {
 						await database.clearStreakCache(serverInfo.serverId);
-						console.log(`Cleared corrupted streak cache for server ${serverInfo.serverId}`);
+						console.log(`cleared corrupted streak cache for server ${serverInfo.serverId}`);
 					}
 					catch (clearError) {
-						console.warn(`Failed to clear corrupted cache for server ${serverInfo.serverId}:`, clearError.message);
+						console.warn(`failed to clear corrupted cache for server ${serverInfo.serverId}:`, clearError.message);
 					}
 				}
 			}
@@ -55,10 +55,10 @@ class StreakCache {
 		catch (error) {
 			// If streak_cache table doesn't exist yet, just continue
 			if (error.code === "42P01") {
-				console.log("Streak cache table doesn't exist yet, will be created on next database init");
+				console.log("streak cache table doesn't exist yet, will be created on next database init");
 			}
 			else {
-				console.error("Failed to load streak cache from database:", error);
+				console.error("failed to load streak cache from database:", error);
 				// If there are widespread corruption issues, consider clearing all data
 				try {
 					const database = require("./database");
@@ -66,7 +66,7 @@ class StreakCache {
 					console.log("Cleared all corrupted streak cache data");
 				}
 				catch (clearAllError) {
-					console.warn("Failed to clear all streak cache data:", clearAllError.message);
+					console.warn("failed to clear all streak cache data:", clearAllError.message);
 				}
 			}
 		}
@@ -82,11 +82,11 @@ class StreakCache {
 
 			if (serverCache) {
 				await database.saveStreakCache(serverId, serverCache);
-				console.log(`Streak cache saved to database for server ${serverId}`);
+				console.log(`streak cache saved to database for server ${serverId}`);
 			}
 		}
 		catch (error) {
-			console.error(`Failed to save streak cache for server ${serverId}:`, error);
+			console.error(`failed to save streak cache for server ${serverId}:`, error);
 		}
 	}
 
@@ -133,7 +133,7 @@ class StreakCache {
 			const database = require("./database");
 			const LoungeApi = require("./loungeApi");
 
-			console.log(`Refreshing streak cache for server ${serverId}...`);
+			console.log(`refreshing streak cache for server ${serverId}...`);
 
 			const serverData = await database.getServerData(serverId);
 			if (!serverData || !serverData.users) {
