@@ -137,7 +137,7 @@ class StreakCache {
 
 			const serverData = await database.getServerData(serverId);
 			if (!serverData || !serverData.users) {
-				console.log(`No server data found for ${serverId}`);
+				console.log(`no server data found for ${serverId}`);
 				return;
 			}
 
@@ -188,7 +188,7 @@ class StreakCache {
 			console.log(`Streak cache updated for server ${serverId} with ${serverCache.size} users`);
 		}
 		catch (error) {
-			console.error(`Error refreshing streak cache for server ${serverId}:`, error);
+			console.error(`error refreshing streak cache for server ${serverId}:`, error);
 		}
 	}
 
@@ -202,20 +202,20 @@ class StreakCache {
 		const serverCache = new Map();
 		const LoungeApi = require("./loungeApi");
 
-		console.log(`Calculating streaks for ${leaderboardData.length} players...`);
+		console.log(`calculating streaks for ${leaderboardData.length} players...`);
 
 		for (const userData of leaderboardData) {
 			try {
 				if (!userData.loungeUser?.name || !userData.userId) continue;
-				console.log(`Calculating streaks for player: ${userData.loungeUser.name} (ID: ${userData.userId})`);
+				console.log(`calculating streaks for player: ${userData.loungeUser.name} (ID: ${userData.userId})`);
 
 				// Get player's table data using the same method as leaderboard
 				const allTables = await LoungeApi.getAllPlayerTables(userData.userId, serverId);
-				console.log(`Found ${Object.keys(allTables).length} tables for ${userData.loungeUser.name}`);
+				console.log(`found ${Object.keys(allTables).length} tables for ${userData.loungeUser.name}`);
 
 				if (Object.keys(allTables).length > 0) {
 					const streakData = this.calculatePlayerStreaksFromTables(allTables, userData.userId);
-					console.log(`Streak data for ${userData.loungeUser.name}:`, streakData);
+					console.log(`streak data for ${userData.loungeUser.name}:`, streakData);
 
 					if (streakData) {
 						serverCache.set(userData.userId, {
@@ -232,7 +232,7 @@ class StreakCache {
 				}
 			}
 			catch (error) {
-				console.error(`Error calculating streaks for ${userData.loungeUser?.name}:`, error);
+				console.error(`error calculating streaks for ${userData.loungeUser?.name}:`, error);
 			}
 		}
 
@@ -243,7 +243,7 @@ class StreakCache {
 		await this.saveCacheToDatabase(serverId);
 
 		const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-		console.log(`Streak cache updated for server ${serverId} in ${duration}s`);
+		console.log(`streak cache updated for server ${serverId} in ${duration}s`);
 	}
 
 	/**
@@ -256,7 +256,7 @@ class StreakCache {
 		const database = require("./database");
 		const playerTables = [];
 
-		console.log(`Checking ${tableIds.length} tables for player ${playerName}`);
+		console.log(`checking ${tableIds.length} tables for player ${playerName}`);
 
 		// Go through each table and check if player participated
 		for (const tableId of tableIds) {
@@ -286,7 +286,7 @@ class StreakCache {
 				}
 			}
 			catch (error) {
-				console.warn(`Failed to load table ${tableId}:`, error);
+				console.warn(`failed to load table ${tableId}:`, error);
 			}
 		}
 
@@ -420,10 +420,10 @@ class StreakCache {
 			// Clear from database
 			await database.clearStreakCache(serverId);
 
-			console.log(`Cleared streak cache for server ${serverId}`);
+			console.log(`cleared streak cache for server ${serverId}`);
 		}
 		catch (error) {
-			console.error(`Error clearing streak cache for server ${serverId}:`, error);
+			console.error(`error clearing streak cache for server ${serverId}:`, error);
 		}
 	}
 
