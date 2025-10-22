@@ -227,7 +227,38 @@ module.exports = {
 			const playerStats = await PlayerStats.getPlayerStats(userId, serverId, userTables);
 			let mMR;
 			let change;
-			let emoji;
+			let emoji = "";
+			mMR = playerStats.mMR;
+			if (mMR >= 13500) {
+				emoji = "🎸";
+			}
+			else if (mMR >= 12500) {
+				emoji = "🪻";
+			}
+			else if (mMR >= 11000) {
+				emoji = "💎";
+			}
+			else if (mMR >= 9500) {
+				emoji = "🍓";
+			}
+			else if (mMR >= 8000) {
+				emoji = "🌊";
+			}
+			else if (mMR >= 6500) {
+				emoji = "🦚";
+			}
+			else if (mMR >= 5000) {
+				emoji = "⭐";
+			}
+			else if (mMR >= 3500) {
+				emoji = "💿";
+			}
+			else if (mMR >= 2000) {
+				emoji = "🧸";
+			}
+			else {
+				emoji = "⛏️";
+			}
 			switch (timeFilter) {
 			case "weekly":
 				change = await LoungeApi.getWeeklyMMRChange(userId);
@@ -237,41 +268,9 @@ module.exports = {
 				change = await LoungeApi.getSeasonMMRChange(userId);
 				mMR = change >= 0 ? "+" : "" + change;
 				break;
-			default:
-				mMR = playerStats.mMR;
-				if (mMR >= 13500) {
-					emoji = "🎸";
-				}
-				else if (mMR >= 12500) {
-					emoji = "🪻";
-				}
-				else if (mMR >= 11000) {
-					emoji = "💎";
-				}
-				else if (mMR >= 9500) {
-					emoji = "🍓";
-				}
-				else if (mMR >= 8000) {
-					emoji = "🌊";
-				}
-				else if (mMR >= 6500) {
-					emoji = "🦚";
-				}
-				else if (mMR >= 5000) {
-					emoji = "⭐";
-				}
-				else if (mMR >= 3500) {
-					emoji = "💿";
-				}
-				else if (mMR >= 2000) {
-					emoji = "🧸";
-				}
-				else {
-					emoji = "⛏️";
-				}
 			}
 			const rank = playerStats.rank;
-			const percent = Math.ceil(100 * (rank / LoungeApi.getTotalNumberOfRankedPlayers()));
+			const percent = Math.ceil(100 * (rank / await LoungeApi.getTotalNumberOfRankedPlayers()));
 			const eP = String(playerStats.matchesPlayed);
 			const tWR = (playerStats.winRate * 100).toFixed(2);
 			const aSc = playerStats.avgScore.toFixed(2);
@@ -295,8 +294,8 @@ module.exports = {
 				.setTimestamp()
 				.addFields(
 					{ name: "mmr:", value: `[${mMR}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.mkcId}) ${emoji}`, inline: true },
+					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "rank", value: `${rank} (top ${percent}%)`, inline: true },
-					{ name: "events played:", value: eP, inline: true },
 					{ name: "team win rate:", value: tWR + "%", inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "average score:", value: aSc, inline: true },
@@ -306,6 +305,8 @@ module.exports = {
 					{ name: "average seed:", value: aSe, inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "average placement:", value: aP, inline: true },
+					{ name: "events played:", value: eP, inline: true },
+					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "head-to-head vs. server members:",
 						value: `${
 							tH2H.wins
@@ -314,6 +315,7 @@ module.exports = {
 						}${
 							tH2H.ties ? "-" + tH2H.ties : ""
 						}`,
+						inline: true,
 					},
 				);
 
