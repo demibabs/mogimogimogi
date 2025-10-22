@@ -237,7 +237,8 @@ module.exports = {
 					change = await LoungeApi.getSeasonMMRChange(userId);
 				}
 				mMRText = (change >= 0 ? "+" : "") + change;
-				emojiMessage = PlayerStats.mMRToRankEmojiAndText(mMR - change).emoji + " to " + PlayerStats.mMRToRankEmojiAndText(mMR).emoji;
+				emojiMessage = PlayerStats.mMRToRankEmojiAndText(mMR - change).emoji === PlayerStats.mMRToRankEmojiAndText(mMR).emoji ?
+					PlayerStats.mMRToRankEmojiAndText(mMR).emoji + " unchanged" : PlayerStats.mMRToRankEmojiAndText(mMR - change).emoji + " to " + PlayerStats.mMRToRankEmojiAndText(mMR).emoji;
 			}
 			const rank = playerStats.rank;
 			const percent = Math.ceil(100 * (rank / await LoungeApi.getTotalNumberOfRankedPlayers()));
@@ -245,9 +246,7 @@ module.exports = {
 			const tWR = (playerStats.winRate * 100).toFixed(2);
 			const aSc = playerStats.avgScore.toFixed(2);
 			const bS = playerStats.bestScore;
-			bS.score = String(bS.score);
 			const wS = playerStats.worstScore;
-			wS.score = String(wS.score);
 			const aSe = playerStats.avgSeed.toFixed(2);
 			const aP = playerStats.avgPlacement.toFixed(2);
 			const tH2H = playerStats.tH2H;
@@ -263,9 +262,9 @@ module.exports = {
 					squads ? "squad " : squads === false ? "soloQ " : ""}${timePrefix}stats`)
 				.setTimestamp()
 				.addFields(
-					{ name: "mmr:", value: `[${mMRText}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.playerId})\n${emojiMessage}`, inline: true },
+					{ name: "mmr:", value: `[${mMRText}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.playerId})\n(${emojiMessage})`, inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "rank:", value: `${rank} (top ${percent}%)`, inline: true },
+					{ name: "rank:", value: `${rank}\n(top ${percent}%)`, inline: true },
 					{ name: "team win rate:", value: tWR + "%", inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "average score:", value: aSc, inline: true },
