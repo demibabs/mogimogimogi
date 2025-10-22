@@ -266,20 +266,6 @@ async function getCurrentMMR(discordId, season = DEFAULT_SEASON) {
 	}
 }
 
-async function getCurrentRank(discordId, season = DEFAULT_SEASON) {
-	try {
-		const player = await getPlayerByDiscordId(discordId, season);
-		if (!player) {
-			return null;
-		}
-
-		return player.overallRank || null;
-	}
-	catch (error) {
-		console.error(`Error getting current rank for Discord ID ${discordId}:`, error);
-		return null;
-	}
-}
 
 async function getTotalNumberOfRankedPlayers(season = DEFAULT_SEASON) {
 	try {
@@ -399,7 +385,6 @@ module.exports = {
 	getTable,
 	getAllPlayerTables,
 	getCurrentMMR,
-	getCurrentRank,
 	getWeeklyMMRChange,
 	getSeasonMMRChange,
 	apiGet,

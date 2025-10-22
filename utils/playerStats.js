@@ -834,8 +834,9 @@ class PlayerStats {
 	static async getPlayerStats(playerDiscordId, serverId, tables) {
 		try {
 			// Calculate all stats
-			const mMR = await LoungeApi.getCurrentMMR(playerDiscordId);
-			const rank = await LoungeApi.getCurrentRank(playerDiscordId);
+			const player = LoungeApi.getPlayerByDiscordIdDetailed(playerDiscordId);
+			const mMR = player.mmr;
+			const rank = player.overallRank;
 			const streakData = this.calculateWinStreaks(tables, playerDiscordId);
 			const matchesPlayed = this.getMatchesPlayed(tables, playerDiscordId);
 			const winRate = this.getWinRate(tables, playerDiscordId);
