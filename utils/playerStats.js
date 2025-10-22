@@ -791,39 +791,53 @@ class PlayerStats {
 			longestStreakEnd: longestStreakEnd,
 		};
 	}
-	static mMRToRankEmoji(mMR) {
+	static mMRToRankEmojiAndText(mMR) {
 		let emoji;
+		let text;
 		if (mMR >= 13500) {
 			emoji = "🎸";
+			text = "grandmaster";
 		}
 		else if (mMR >= 12500) {
 			emoji = "🪻";
+			text = "master";
 		}
 		else if (mMR >= 11000) {
 			emoji = "💎";
+			text = "diamond";
 		}
 		else if (mMR >= 9500) {
 			emoji = "🍓";
+			text = "ruby";
 		}
 		else if (mMR >= 8000) {
 			emoji = "🌊";
+			text = "sapphire";
 		}
 		else if (mMR >= 6500) {
 			emoji = "🦚";
+			text = "platinum";
 		}
 		else if (mMR >= 5000) {
 			emoji = "⭐";
+			text = "gold";
 		}
 		else if (mMR >= 3500) {
 			emoji = "💿";
+			text = "silver";
 		}
 		else if (mMR >= 2000) {
 			emoji = "🧸";
+			text = "bronze";
 		}
 		else {
 			emoji = "⛏️";
+			text = "iron";
 		}
-		return emoji;
+		return {
+			emoji: emoji,
+			text: text,
+		};
 	}
 	/**
 	 * Get comprehensive player statistics including streaks

@@ -226,12 +226,9 @@ module.exports = {
 			await interaction.editReply("calculating...");
 			const playerStats = await PlayerStats.getPlayerStats(userId, serverId, userTables);
 			const mMR = playerStats.mMR;
-			const emoji = PlayerStats.mMRToRankEmoji(mMR);
-			let mMRText;
-			if (timeFilter === "alltime") {
-				mMRText = String(mMR) + " " + emoji;
-			}
-			else {
+			let mMRText = mMR;
+			let emojiMessage = PlayerStats.mMRToRankEmojiAndText(mMR).emoji + " " + PlayerStats.mMRToRankEmojiAndText(mMR).text;
+			if (timeFilter !== "alltime") {
 				let change;
 				if (timeFilter === "weekly") {
 					change = await LoungeApi.getWeeklyMMRChange(userId);
@@ -239,8 +236,8 @@ module.exports = {
 				if (timeFilter === "season") {
 					change = await LoungeApi.getSeasonMMRChange(userId);
 				}
-				const prevEmoji = PlayerStats.mMRToRankEmoji(mMR - change);
-				mMRText = (change >= 0 ? "+" : "") + change + " " + prevEmoji + "➡️" + emoji;
+				mMRText = (change >= 0 ? "+" : "") + change;
+				emojiMessage = emojiMessage[0] + " to " + PlayerStats.mMRToRankEmojiAndText(mMR - change).emoji;
 			}
 			const rank = playerStats.rank;
 			const percent = Math.ceil(100 * (rank / await LoungeApi.getTotalNumberOfRankedPlayers()));
@@ -266,7 +263,7 @@ module.exports = {
 					squads ? "squad " : squads === false ? "soloQ " : ""}${timePrefix}stats`)
 				.setTimestamp()
 				.addFields(
-					{ name: "mmr:", value: `[${mMRText}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.playerId})`, inline: true },
+					{ name: "mmr:", value: `[${mMRText}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.playerId})\n${emojiMessage}`, inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "rank:", value: `${rank} (top ${percent}%)`, inline: true },
 					{ name: "team win rate:", value: tWR + "%", inline: true },
