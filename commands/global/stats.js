@@ -295,7 +295,6 @@ module.exports = {
 				.setTimestamp()
 				.addFields(
 					{ name: "mmr:", value: `[${mMR}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.mkcId}) ${emoji}`, inline: true },
-					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "rank", value: `${rank} (top ${percent}%)`, inline: true },
 					{ name: "events played:", value: eP, inline: true },
 					{ name: "team win rate:", value: tWR + "%", inline: true },
