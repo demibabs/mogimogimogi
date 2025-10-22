@@ -237,7 +237,7 @@ module.exports = {
 					change = await LoungeApi.getSeasonMMRChange(userId);
 				}
 				mMRText = (change >= 0 ? "+" : "") + change;
-				emojiMessage = emojiMessage[0] + " to " + PlayerStats.mMRToRankEmojiAndText(mMR - change).emoji;
+				emojiMessage = PlayerStats.mMRToRankEmojiAndText(mMR - change).emoji + " to " + PlayerStats.mMRToRankEmojiAndText(mMR).emoji;
 			}
 			const rank = playerStats.rank;
 			const percent = Math.ceil(100 * (rank / await LoungeApi.getTotalNumberOfRankedPlayers()));
