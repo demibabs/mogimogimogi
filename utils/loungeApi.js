@@ -395,6 +395,7 @@ async function getSeasonMMRChange(userId, season = DEFAULT_SEASON) {
 module.exports = {
 	getPlayer,
 	getPlayerByDiscordId,
+	getPlayerByDiscordIdDetailed,
 	getTable,
 	getAllPlayerTables,
 	getCurrentMMR,
