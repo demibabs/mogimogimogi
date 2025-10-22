@@ -229,7 +229,7 @@ module.exports = {
 			const emoji = PlayerStats.mMRToRankEmoji();
 			let mMRText;
 			if (timeFilter === "alltime") {
-				mMRText = String(mMR);
+				mMRText = String(mMR) + " " + emoji;
 			}
 			else {
 				let change;
@@ -240,7 +240,7 @@ module.exports = {
 					change = await LoungeApi.getSeasonMMRChange(userId);
 				}
 				const prevEmoji = PlayerStats.mMRToRankEmoji(mMR - change);
-				mMRText = (change >= 0 ? "+" : "") + change + prevEmoji + "→" + emoji;
+				mMRText = (change >= 0 ? "+" : "") + change + " " + prevEmoji + "→" + emoji;
 			}
 			const rank = playerStats.rank;
 			const percent = Math.ceil(100 * (rank / await LoungeApi.getTotalNumberOfRankedPlayers()));
