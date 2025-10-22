@@ -111,6 +111,23 @@ async function getPlayerByDiscordId(discordId, season = DEFAULT_SEASON) {
 			game: "mkworld",
 		};
 
+		return await apiGet("/player", params);
+	}
+	catch (error) {
+		if (error.message.includes("404")) {
+			return null;
+		}
+		throw error;
+	}
+}
+async function getPlayerByDiscordIdDetailed(discordId, season = DEFAULT_SEASON) {
+	try {
+		const params = {
+			discordId: discordId,
+			season: season,
+			game: "mkworld",
+		};
+
 		return await apiGet("/player/details", params);
 	}
 	catch (error) {

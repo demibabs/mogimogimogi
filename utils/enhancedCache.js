@@ -23,12 +23,12 @@ class EnhancedLeaderboardCache {
 		const lastUpdate = this.lastUpdate.get(serverId) || 0;
 		const lastQuickCheck = this.lastTableCheck.get(serverId) || 0;
 		const now = Date.now();
-		
+
 		// Strategy 1: Quick check for new tables (every 30 seconds)
 		if (now - lastQuickCheck > this.quickCheckInterval) {
 			await this.quickTableCheck(serverId);
 		}
-		
+
 		// Strategy 2: Full cache refresh (every 5 minutes)
 		if (now - lastUpdate > this.updateInterval || !this.cache.has(serverId)) {
 			await this.fullCacheRefresh(serverId);
@@ -52,32 +52,34 @@ class EnhancedLeaderboardCache {
 
 			// Check if any users have new tables by comparing max table IDs
 			let hasNewTables = false;
-			
+
 			for (const [userId] of Object.entries(serverData.users)) {
 				try {
 					// Get user's recent activity (last few tables)
 					const recentTables = await this.getRecentUserTables(userId);
 					const maxTableId = Math.max(...Object.keys(recentTables).map(id => parseInt(id)));
-					
+
 					const lastKnownId = this.getLastKnownTableId(userId);
 					if (maxTableId > lastKnownId) {
 						hasNewTables = true;
 						this.setLastKnownTableId(userId, maxTableId);
-						
+
 						// Update specific user's cache incrementally
 						await this.updateUserCache(serverId, userId);
 					}
-				} catch (error) {
+				}
+				catch (error) {
 					console.warn(`Quick check failed for user ${userId}:`, error);
 				}
 			}
 
 			this.lastTableCheck.set(serverId, Date.now());
-			
+
 			if (hasNewTables) {
 				console.log(`Quick update: Found new tables for server ${serverId}`);
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.warn(`Quick table check failed for server ${serverId}:`, error);
 		}
 	}
@@ -89,12 +91,12 @@ class EnhancedLeaderboardCache {
 		// This would be optimized to only fetch recent tables
 		// instead of all tables like the current system does
 		const allTables = await LoungeApi.getAllPlayerTables(userId);
-		
+
 		// Sort by table ID and get most recent
 		const sortedTables = Object.entries(allTables)
 			.sort(([a], [b]) => parseInt(b) - parseInt(a))
 			.slice(0, limit);
-			
+
 		return Object.fromEntries(sortedTables);
 	}
 
@@ -105,7 +107,7 @@ class EnhancedLeaderboardCache {
 		try {
 			const serverData = await database.getServerData(serverId);
 			const userData = serverData.users[userId];
-			
+
 			if (!userData) return;
 
 			// Recompute stats for this user only
@@ -114,17 +116,18 @@ class EnhancedLeaderboardCache {
 				serverId,
 				userData,
 				Date.now() - (7 * 24 * 60 * 60 * 1000), // One week ago
-				this.getSeasonStartTimestamp()
+				this.getSeasonStartTimestamp(),
 			);
 
 			if (userStats) {
 				const serverCache = this.cache.get(serverId) || new Map();
 				serverCache.set(userId, userStats);
 				this.cache.set(serverId, serverCache);
-				
+
 				console.log(`Updated cache for user ${userId} with new tables`);
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.warn(`Failed to update user cache for ${userId}:`, error);
 		}
 	}

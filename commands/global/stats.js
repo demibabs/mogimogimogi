@@ -165,7 +165,7 @@ module.exports = {
 
 			// Get user data from Lounge API
 			const userId = discordUser.id;
-			const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
+			const loungeUser = await LoungeApi.getPlayerByDiscordIdDetailed(userId);
 
 			if (!loungeUser) {
 				return null;
@@ -226,7 +226,7 @@ module.exports = {
 			await interaction.editReply("calculating...");
 			const playerStats = await PlayerStats.getPlayerStats(userId, serverId, userTables);
 			const mMR = playerStats.mMR;
-			const emoji = PlayerStats.mMRToRankEmoji();
+			const emoji = PlayerStats.mMRToRankEmoji(mMR);
 			let mMRText;
 			if (timeFilter === "alltime") {
 				mMRText = String(mMR) + " " + emoji;
@@ -240,7 +240,7 @@ module.exports = {
 					change = await LoungeApi.getSeasonMMRChange(userId);
 				}
 				const prevEmoji = PlayerStats.mMRToRankEmoji(mMR - change);
-				mMRText = (change >= 0 ? "+" : "") + change + " " + prevEmoji + "→" + emoji;
+				mMRText = (change >= 0 ? "+" : "") + change + " " + prevEmoji + "➡️" + emoji;
 			}
 			const rank = playerStats.rank;
 			const percent = Math.ceil(100 * (rank / await LoungeApi.getTotalNumberOfRankedPlayers()));
