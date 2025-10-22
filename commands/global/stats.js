@@ -262,11 +262,11 @@ module.exports = {
 			switch (timeFilter) {
 			case "weekly":
 				change = await LoungeApi.getWeeklyMMRChange(userId);
-				mMR = change >= 0 ? "+" : "" + change;
+				mMR = (change >= 0 ? "+" : "") + change;
 				break;
 			case "season":
 				change = await LoungeApi.getSeasonMMRChange(userId);
-				mMR = change >= 0 ? "+" : "" + change;
+				mMR = (change >= 0 ? "+" : "") + change;
 				break;
 			}
 			const rank = playerStats.rank;
@@ -293,7 +293,7 @@ module.exports = {
 					squads ? "squad " : squads === false ? "soloQ " : ""}${timePrefix}stats`)
 				.setTimestamp()
 				.addFields(
-					{ name: "mmr:", value: `[${mMR}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.mkcId}) ${emoji}`, inline: true },
+					{ name: "mmr:", value: `[${mMR}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.playerId}) ${emoji}`, inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "rank", value: `${rank} (top ${percent}%)`, inline: true },
 					{ name: "team win rate:", value: tWR + "%", inline: true },
