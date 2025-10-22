@@ -43,6 +43,7 @@ test-cache-persistence.js
 test-setup-detection.js
 clear-streak-table.js
 clear-streak-cache.js
+create-streak-table.js
 
 commands/testing/
 

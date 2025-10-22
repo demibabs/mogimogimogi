@@ -24,7 +24,7 @@ module.exports = {
 		try {
 			await interaction.deferReply();
 
-			await interaction.editReply("validating user");
+			await interaction.editReply("validating user...");
 			const discordUser = interaction.options.getUser("user") || interaction.user;
 			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
 			const squads = interaction.options.getBoolean("squads");
@@ -224,14 +224,64 @@ module.exports = {
 				return { success: false, message: "no events found matching the specified filters." };
 			}
 			await interaction.editReply("calculating...");
-			const eP = PlayerStats.getMatchesPlayed(userTables, userId);
-			const tWR = PlayerStats.getWinRate(userTables, userId);
-			const aSc = PlayerStats.getAverageScore(userTables, userId);
-			const bS = PlayerStats.getBestScore(userTables, userId);
-			const wS = PlayerStats.getWorstScore(userTables, userId);
-			const aSe = PlayerStats.getAverageSeed(userTables, userId);
-			const aP = PlayerStats.getAveragePlacement(userTables, userId);
-			const tH2H = await PlayerStats.getTotalH2H(userTables, userId, serverId);
+			const playerStats = await PlayerStats.getPlayerStats(userId, serverId, userTables);
+			let mMR;
+			let change;
+			let emoji;
+			switch (timeFilter) {
+			case "weekly":
+				change = await LoungeApi.getWeeklyMMRChange(userId);
+				mMR = change >= 0 ? "+" : "" + change;
+				break;
+			case "season":
+				change = await LoungeApi.getSeasonMMRChange(userId);
+				mMR = change >= 0 ? "+" : "" + change;
+				break;
+			default:
+				mMR = playerStats.mMR;
+				if (mMR >= 13500) {
+					emoji = "🎸";
+				}
+				else if (mMR >= 12500) {
+					emoji = "🪻";
+				}
+				else if (mMR >= 11000) {
+					emoji = "💎";
+				}
+				else if (mMR >= 9500) {
+					emoji = "🍓";
+				}
+				else if (mMR >= 8000) {
+					emoji = "🌊";
+				}
+				else if (mMR >= 6500) {
+					emoji = "🦚";
+				}
+				else if (mMR >= 5000) {
+					emoji = "⭐";
+				}
+				else if (mMR >= 3500) {
+					emoji = "💿";
+				}
+				else if (mMR >= 2000) {
+					emoji = "🧸";
+				}
+				else {
+					emoji = "⛏️";
+				}
+			}
+			const rank = playerStats.rank;
+			const percent = Math.ceil(100 * (rank / LoungeApi.getTotalNumberOfRankedPlayers()));
+			const eP = String(playerStats.matchesPlayed);
+			const tWR = (playerStats.winRate * 100).toFixed(2);
+			const aSc = playerStats.avgScore.toFixed(2);
+			const bS = playerStats.bestScore;
+			bS.score = String(bS.score);
+			const wS = playerStats.worstScore;
+			wS.score = String(wS.score);
+			const aSe = playerStats.avgSeed.toFixed(2);
+			const aP = playerStats.avgPlacement.toFixed(2);
+			const tH2H = playerStats.tH2H;
 
 			const playerNameWithFlag = embedEnhancer.formatPlayerNameWithFlag(discordUser.displayName, loungeUser.countryCode);
 
@@ -244,16 +294,19 @@ module.exports = {
 					squads ? "squad " : squads === false ? "soloQ " : ""}${timePrefix}stats`)
 				.setTimestamp()
 				.addFields(
-					{ name: "events played:", value: String(eP) },
-					{ name: "team win rate:", value: (tWR * 100).toFixed(2) + "%", inline: true },
+					{ name: "mmr:", value: `[${mMR}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.mkcId}) ${emoji}`, inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "average score:", value: aSc.toFixed(2), inline: true },
-					{ name: "best score:", value: String(bS.score), inline: true },
+					{ name: "rank", value: `${rank} (top ${percent}%)`, inline: true },
+					{ name: "events played:", value: eP, inline: true },
+					{ name: "team win rate:", value: tWR + "%", inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "worst score:", value: String(wS.score), inline: true },
-					{ name: "average seed:", value: aSe.toFixed(2), inline: true },
+					{ name: "average score:", value: aSc, inline: true },
+					{ name: "best score:", value: `[${bS.score}](https://lounge.mkcentral.com/mkworld/TableDetails/${bS.tableId})`, inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "average placement:", value: aP.toFixed(2), inline: true },
+					{ name: "worst score:", value: `[${wS.score}](https://lounge.mkcentral.com/mkworld/TableDetails/${wS.tableId})`, inline: true },
+					{ name: "average seed:", value: aSe, inline: true },
+					{ name: "\u200B", value: "\u200B", inline: true },
+					{ name: "average placement:", value: aP, inline: true },
 					{ name: "head-to-head vs. server members:",
 						value: `${
 							tH2H.wins

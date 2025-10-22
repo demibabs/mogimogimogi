@@ -3,6 +3,7 @@
  * Pure functions that calculate stats from table data without data fetching
  */
 
+const LoungeApi = require("./loungeApi");
 const database = require("./database");
 
 class PlayerStats {
@@ -795,38 +796,26 @@ class PlayerStats {
 	 * Get comprehensive player statistics including streaks
 	 * @param {string} playerDiscordId - Discord ID of the player
 	 * @param {string} serverId - Server ID to get tables for
-	 * @returns {Object} Player statistics including streak data
+	 * @returns {Promise<Object>} Player statistics including streak data
 	 */
-	static async getPlayerStats(playerDiscordId, serverId) {
+	static async getPlayerStats(playerDiscordId, serverId, tables) {
 		try {
-			// Get all tables for this server
-			const serverData = await database.getServerData(serverId);
-			if (!serverData || !serverData.tables) {
-				return null;
-			}
-
-			const tables = {};
-			for (const tableId of serverData.tables) {
-				try {
-					const tableData = await database.getTableData(tableId);
-					if (tableData) {
-						tables[tableId] = tableData;
-					}
-				}
-				catch (error) {
-					console.warn(`Failed to load table ${tableId}:`, error);
-				}
-			}
-
 			// Calculate all stats
+			const mMR = await LoungeApi.getCurrentMMR(playerDiscordId);
+			const rank = await LoungeApi.getCurrentRank(playerDiscordId);
 			const streakData = this.calculateWinStreaks(tables, playerDiscordId);
 			const matchesPlayed = this.getMatchesPlayed(tables, playerDiscordId);
 			const winRate = this.getWinRate(tables, playerDiscordId);
 			const avgPlacement = this.getAveragePlacement(tables, playerDiscordId);
 			const avgScore = this.getAverageScore(tables, playerDiscordId);
 			const avgSeed = this.getAverageSeed(tables, playerDiscordId);
+			const bestScore = this.getBestScore(tables, playerDiscordId);
+			const worstScore = this.getWorstScore(tables, playerDiscordId);
+			const tH2H = await this.getTotalH2H(tables, playerDiscordId, serverId);
 
 			return {
+				mMR,
+				rank,
 				playerDiscordId,
 				matchesPlayed,
 				winRate,
@@ -834,6 +823,9 @@ class PlayerStats {
 				avgScore,
 				avgSeed,
 				...streakData,
+				bestScore,
+				worstScore,
+				tH2H,
 			};
 		}
 		catch (error) {

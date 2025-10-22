@@ -3,8 +3,6 @@
  * Updated for Mario Kart World lounge API
  */
 
-const { DataManager } = require("discord.js");
-const ServerData = require("./serverData");
 const database = require("./database");
 
 // Use the Mario Kart World lounge API endpoint
@@ -251,6 +249,35 @@ async function getCurrentMMR(discordId, season = DEFAULT_SEASON) {
 	}
 }
 
+async function getCurrentRank(discordId, season = DEFAULT_SEASON) {
+	try {
+		const player = await getPlayerByDiscordId(discordId, season);
+		if (!player) {
+			return null;
+		}
+
+		return player.overallRank || null;
+	}
+	catch (error) {
+		console.error(`Error getting current rank for Discord ID ${discordId}:`, error);
+		return null;
+	}
+}
+
+async function getTotalNumberOfRankedPlayers(season = DEFAULT_SEASON) {
+	try {
+		const params = {
+			game: "mkworld",
+			season,
+		};
+		const stats = await apiGet("player/stats", params);
+		return stats.totalPlayers;
+	}
+	catch (error) {
+		console.error("Error getting total number of ranked players:", error);
+	}
+}
+
 /**
  * Get weekly MMR change for a player
  * @param {string} userId - Discord user ID
@@ -275,10 +302,7 @@ async function getWeeklyMMRChange(userId) {
 				const details = await apiGet("/player/details", params);
 
 				if (details.mmrChanges) {
-					// Filter changes from the past week that are from tables
 					const weeklyChanges = details.mmrChanges.filter(change => {
-						if (change.reason !== "Table") return false;
-
 						// Check if the change is from the past week
 						const changeDate = new Date(change.time);
 						return changeDate >= oneWeekAgo;
@@ -327,10 +351,7 @@ async function getSeasonMMRChange(userId, season = DEFAULT_SEASON) {
 			const details = await apiGet("/player/details", params);
 
 			if (details.mmrChanges) {
-				// Filter changes that are from tables (actual games, not manual adjustments)
-				const seasonChanges = details.mmrChanges.filter(change => {
-					return change.reason === "Table";
-				});
+				const seasonChanges = details.mmrChanges;
 
 				for (const change of seasonChanges) {
 					// Add the MMR delta
@@ -360,8 +381,10 @@ module.exports = {
 	getTable,
 	getAllPlayerTables,
 	getCurrentMMR,
+	getCurrentRank,
 	getWeeklyMMRChange,
 	getSeasonMMRChange,
 	apiGet,
+	getTotalNumberOfRankedPlayers,
 	DEFAULT_SEASON,
 };
