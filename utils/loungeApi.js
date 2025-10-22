@@ -270,7 +270,7 @@ async function getTotalNumberOfRankedPlayers(season = DEFAULT_SEASON) {
 			game: "mkworld",
 			season: season,
 		};
-		const stats = await apiGet("player/stats", params);
+		const stats = await apiGet("/player/stats", params);
 		return stats.totalPlayers;
 	}
 	catch (error) {

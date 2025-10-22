@@ -225,49 +225,22 @@ module.exports = {
 			}
 			await interaction.editReply("calculating...");
 			const playerStats = await PlayerStats.getPlayerStats(userId, serverId, userTables);
-			let mMR;
-			let change;
-			let emoji = "";
-			mMR = playerStats.mMR;
-			if (mMR >= 13500) {
-				emoji = "🎸";
-			}
-			else if (mMR >= 12500) {
-				emoji = "🪻";
-			}
-			else if (mMR >= 11000) {
-				emoji = "💎";
-			}
-			else if (mMR >= 9500) {
-				emoji = "🍓";
-			}
-			else if (mMR >= 8000) {
-				emoji = "🌊";
-			}
-			else if (mMR >= 6500) {
-				emoji = "🦚";
-			}
-			else if (mMR >= 5000) {
-				emoji = "⭐";
-			}
-			else if (mMR >= 3500) {
-				emoji = "💿";
-			}
-			else if (mMR >= 2000) {
-				emoji = "🧸";
+			const mMR = playerStats.mMR;
+			const emoji = PlayerStats.mMRToRankEmoji();
+			let mMRText;
+			if (timeFilter === "alltime") {
+				mMRText = String(mMR);
 			}
 			else {
-				emoji = "⛏️";
-			}
-			switch (timeFilter) {
-			case "weekly":
-				change = await LoungeApi.getWeeklyMMRChange(userId);
-				mMR = (change >= 0 ? "+" : "") + change;
-				break;
-			case "season":
-				change = await LoungeApi.getSeasonMMRChange(userId);
-				mMR = (change >= 0 ? "+" : "") + change;
-				break;
+				let change;
+				if (timeFilter === "weekly") {
+					change = await LoungeApi.getWeeklyMMRChange(userId);
+				}
+				if (timeFilter === "season") {
+					change = await LoungeApi.getSeasonMMRChange(userId);
+				}
+				const prevEmoji = PlayerStats.mMRToRankEmoji(mMR - change);
+				mMRText = (change >= 0 ? "+" : "") + change + prevEmoji + "→" + emoji;
 			}
 			const rank = playerStats.rank;
 			const percent = Math.ceil(100 * (rank / await LoungeApi.getTotalNumberOfRankedPlayers()));
@@ -293,9 +266,9 @@ module.exports = {
 					squads ? "squad " : squads === false ? "soloQ " : ""}${timePrefix}stats`)
 				.setTimestamp()
 				.addFields(
-					{ name: "mmr:", value: `[${mMR}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.playerId}) ${emoji}`, inline: true },
+					{ name: "mmr:", value: `[${mMRText}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.playerId})`, inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "rank", value: `${rank} (top ${percent}%)`, inline: true },
+					{ name: "rank:", value: `${rank} (top ${percent}%)`, inline: true },
 					{ name: "team win rate:", value: tWR + "%", inline: true },
 					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "average score:", value: aSc, inline: true },

@@ -791,7 +791,40 @@ class PlayerStats {
 			longestStreakEnd: longestStreakEnd,
 		};
 	}
-
+	static mMRToRankEmoji(mMR) {
+		let emoji;
+		if (mMR >= 13500) {
+			emoji = "🎸";
+		}
+		else if (mMR >= 12500) {
+			emoji = "🪻";
+		}
+		else if (mMR >= 11000) {
+			emoji = "💎";
+		}
+		else if (mMR >= 9500) {
+			emoji = "🍓";
+		}
+		else if (mMR >= 8000) {
+			emoji = "🌊";
+		}
+		else if (mMR >= 6500) {
+			emoji = "🦚";
+		}
+		else if (mMR >= 5000) {
+			emoji = "⭐";
+		}
+		else if (mMR >= 3500) {
+			emoji = "💿";
+		}
+		else if (mMR >= 2000) {
+			emoji = "🧸";
+		}
+		else {
+			emoji = "⛏️";
+		}
+		return emoji;
+	}
 	/**
 	 * Get comprehensive player statistics including streaks
 	 * @param {string} playerDiscordId - Discord ID of the player
