@@ -1,6 +1,4 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const optimizedLeaderboard = require("../../utils/optimizedLeaderboard");
-const embedEnhancer = require("../../utils/embedEnhancer");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -11,7 +9,7 @@ module.exports = {
 				.setDescription("the stat to rank by.")
 				.setRequired(true)
 				.addChoices(
-					{ name : "mmr", value: "mMR" },
+					{ name : "mmr", value: "mmr" },
 					{ name: "team win rate", value: "tWR" },
 					{ name: "average score", value: "aS" },
 					{ name: "highest score", value: "hS" },
@@ -25,57 +23,37 @@ module.exports = {
 				.setDescription("true = squad only, false = solo only.")),
 
 	async execute(interaction) {
-		try {
-			await interaction.deferReply();
-			await interaction.editReply("fetching leaderboard data..");
+		// Keep the slash command boilerplate but remove internal logic.
+		// Show a placeholder message and the navigation buttons so interactions still work.
+		await interaction.deferReply();
 
-			const stat = interaction.options.getString("stat");
-			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
-			const squads = interaction.options.getBoolean("squads");
-			const serverId = interaction.guildId;
+		const stat = interaction.options.getString("stat");
+		const serverOnly = interaction.options.getBoolean("server-only") ?? false;
+		const squads = interaction.options.getBoolean("squads");
 
-			// Generate leaderboard using optimized cache system
-			const result = await this.generateLeaderboard(interaction, serverId, stat, serverOnly, squads, "all");
+		const placeholder = new EmbedBuilder()
+			.setColor("Yellow")
+			.setTitle("leaderboard")
+			.setDescription("/leaderboard is temporarily disabled (it broke so i'm going to rewrite the code lol). check back soon.");
 
-			   if (!result) {
-				   const embed = new EmbedBuilder()
-					   .setColor("Red")
-					   .setDescription("an error occurred while generating the leaderboard. please try again later.");
-				   return await interaction.editReply({ content: "", embeds: [embed] });
-			   }
+		const row = new ActionRowBuilder()
+			.addComponents(
+				new ButtonBuilder()
+					.setCustomId(`leaderboard_all_${stat}_${serverOnly}_${squads}`)
+					.setLabel("all time")
+					.setStyle(ButtonStyle.Secondary)
+					.setDisabled(true),
+				new ButtonBuilder()
+					.setCustomId(`leaderboard_weekly_${stat}_${serverOnly}_${squads}`)
+					.setLabel("past week")
+					.setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder()
+					.setCustomId(`leaderboard_season_${stat}_${serverOnly}_${squads}`)
+					.setLabel("this season")
+					.setStyle(ButtonStyle.Secondary),
+			);
 
-			// Create action row with three buttons (current one disabled)
-			const row = new ActionRowBuilder()
-				.addComponents(
-					new ButtonBuilder()
-						.setCustomId(`leaderboard_all_${stat}_${serverOnly}_${squads}`)
-						.setLabel("all time")
-						.setStyle(ButtonStyle.Secondary)
-						.setDisabled(true),
-					new ButtonBuilder()
-						.setCustomId(`leaderboard_weekly_${stat}_${serverOnly}_${squads}`)
-						.setLabel("past week")
-						.setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder()
-						.setCustomId(`leaderboard_season_${stat}_${serverOnly}_${squads}`)
-						.setLabel("this season")
-						.setStyle(ButtonStyle.Secondary),
-				);
-
-			await interaction.editReply({
-				content: "",
-				embeds: [result.embed],
-				components: [row],
-			});
-
-		}
-		catch (error) {
-			console.error("error in leaderboard command:", error);
-			await interaction.editReply({
-				content: "an error occurred while generating the leaderboard. please try again later.",
-				embeds: [],
-			});
-		}
+		await interaction.editReply({ content: "", embeds: [placeholder], components: [row] });
 	},
 
 	// Handle button interactions
@@ -85,152 +63,43 @@ module.exports = {
 		try {
 			await interaction.deferUpdate();
 
-			// Parse the custom ID to get parameters
+			// Parse the custom ID to get parameters (kept for compatibility)
 			const parts = interaction.customId.split("_");
 			const timeFilter = parts[1];
 			const stat = parts[2];
 			const serverOnly = parts[3] === "true";
 			const squads = parts[4] === "null" ? null : parts[4] === "true";
 
-			const serverId = interaction.guild.id;
+			const placeholder = new EmbedBuilder()
+				.setColor("Yellow")
+				.setTitle("leaderboard")
+				.setDescription("this command is being rewritten. button interactions are stubbed.");
 
-			// Generate leaderboard using optimized system
-			const result = await this.generateLeaderboard(interaction, serverId, stat, serverOnly, squads, timeFilter);
+			const row = new ActionRowBuilder()
+				.addComponents(
+					new ButtonBuilder()
+						.setCustomId(`leaderboard_all_${stat}_${serverOnly}_${squads}`)
+						.setLabel("all time")
+						.setStyle(ButtonStyle.Secondary)
+						.setDisabled(timeFilter === "all"),
+					new ButtonBuilder()
+						.setCustomId(`leaderboard_weekly_${stat}_${serverOnly}_${squads}`)
+						.setLabel("past week")
+						.setStyle(ButtonStyle.Secondary)
+						.setDisabled(timeFilter === "weekly"),
+					new ButtonBuilder()
+						.setCustomId(`leaderboard_season_${stat}_${serverOnly}_${squads}`)
+						.setLabel("this season")
+						.setStyle(ButtonStyle.Secondary)
+						.setDisabled(timeFilter === "season"),
+				);
 
-			if (result) {
-				// Create action row with current button disabled
-				const row = new ActionRowBuilder()
-					.addComponents(
-						new ButtonBuilder()
-							.setCustomId(`leaderboard_all_${stat}_${serverOnly}_${squads}`)
-							.setLabel("all time")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "all"),
-						new ButtonBuilder()
-							.setCustomId(`leaderboard_weekly_${stat}_${serverOnly}_${squads}`)
-							.setLabel("past week")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "weekly"),
-						new ButtonBuilder()
-							.setCustomId(`leaderboard_season_${stat}_${serverOnly}_${squads}`)
-							.setLabel("this season")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "season"),
-					);
-
-				await interaction.editReply({ content: "", embeds: [result.embed], components: [row] });
-			}
-
+			await interaction.editReply({ content: "", embeds: [placeholder], components: [row] });
 			return true;
 		}
 		catch (error) {
 			console.error("Error in leaderboard button interaction:", error);
 			return false;
-		}
-	},
-
-	// Generate leaderboard using optimized cache system
-	async generateLeaderboard(interaction, serverId, stat, serverOnly, squads, timeFilter = "all") {
-		try {
-			console.log(`Generating optimized leaderboard: ${stat}, ${timeFilter}, server-only: ${serverOnly}, squads: ${squads}`);
-
-			// Get optimized leaderboard data from cache
-			await interaction.editReply("generating leaderboard...");
-			const leaderboardData = await optimizedLeaderboard.getLeaderboard(
-				serverId,
-				stat,
-				timeFilter,
-				serverOnly,
-				squads,
-			);
-
-			   if (!leaderboardData || leaderboardData.length === 0) {
-				   const embed = new EmbedBuilder()
-					   .setColor("Red")
-					   .setDescription("no data available for the selected criteria.");
-				   return { embed };
-			   }
-
-			// Create embed
-			const embed = new EmbedBuilder()
-				.setColor("#00ff00")
-				.setTimestamp();
-
-			// Set title based on stat and time filter (simple lowercase style)
-			const statNames = {
-				"mMR": timeFilter === "all" ? "mmr" : "mmr change",
-				"tWR": "team win rate",
-				"aS": "average score",
-				"hS": "highest score",
-				"eP": "events played",
-			};
-
-			const timePrefix = timeFilter === "weekly" ? "weekly " : timeFilter === "season" ? "season " : "";
-			const title = `${serverOnly ? "server " : ""}${squads ? "squad " : squads === false ? "soloq " : ""}${timePrefix}leaderboard - ${statNames[stat]}`;
-
-			embed.setTitle(title);
-
-
-			embed.setFooter({ text: "updates daily" });
-
-			// Fetch Discord display names for all users in parallel
-			const userFetches = leaderboardData.slice(0, 10).map(async (entry) => {
-				try {
-					const discordUser = await interaction.client.users.fetch(entry.userId);
-					return {
-						...entry,
-						discordDisplayName: discordUser.displayName || discordUser.username,
-					};
-				}
-				catch (error) {
-					return entry;
-				}
-			});
-
-			const entriesWithDiscordNames = await Promise.all(userFetches);
-
-			// Format leaderboard entries (simple style, no emojis)
-			let description = "";
-			for (let i = 0; i < Math.min(entriesWithDiscordNames.length, 10); i++) {
-				const entry = entriesWithDiscordNames[i];
-				const rank = i + 1;
-
-				// Use Discord display name first, then lounge name, then cached name
-				const displayName = entry.discordDisplayName || entry.loungeUser?.name || entry.displayName;
-
-				// Format player name with country flag
-				const formattedName = embedEnhancer.formatPlayerNameWithFlag(
-					displayName,
-					entry.loungeUser?.countryCode,
-				);
-
-				// Format stat value
-				let formattedValue;
-				if (stat === "tWR") {
-					formattedValue = `${(entry.statValue * 100).toFixed(1)}%`;
-				}
-				else if (stat === "aS") {
-					formattedValue = entry.statValue.toFixed(1);
-				}
-				else if (stat === "mMR" && (timeFilter === "weekly" || timeFilter === "season")) {
-					// Show + for MMR changes (only positive values are included)
-					const change = Math.round(entry.statValue);
-					formattedValue = `+${change}`;
-				}
-				else {
-					formattedValue = Math.round(entry.statValue);
-				}
-
-				description += `${rank}. **${formattedName}**: ${formattedValue}\n`;
-			}
-
-			embed.setDescription(description);
-
-			return { embed };
-		}
-		catch (error) {
-			console.error("error generating optimized leaderboard:", error);
-			return null;
 		}
 	},
 };
