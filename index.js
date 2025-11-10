@@ -53,7 +53,23 @@ client.once(Events.ClientReady, readyClient => {
 
 client.on(Events.InteractionCreate, async interaction => {
 	console.log(`Received interaction: ${interaction.type}`);
-	
+
+	if (interaction.isAutocomplete()) {
+		const command = interaction.client.commands.get(interaction.commandName);
+		if (!command || typeof command.autocomplete !== "function") {
+			console.warn(`No autocomplete handler for ${interaction.commandName}`);
+			return;
+		}
+
+		try {
+			await command.autocomplete(interaction);
+		}
+		catch (error) {
+			console.error(`Error in autocomplete handler for ${interaction.commandName}:`, error);
+		}
+		return;
+	}
+
 	// Handle slash commands
 	if (interaction.isChatInputCommand()) {
 		console.log(`Chat input command: ${interaction.commandName}`);

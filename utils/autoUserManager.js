@@ -23,12 +23,12 @@ class AutoUserManager {
 		       return {
 			       success: false,
 			       needsSetup: true,
-			       message: "this server hasn't been set up yet. please ask an admin to run `/setup` first.",
+			       message: "this server hasn't been set up yet. please run `/setup` first.",
 		       };
 	       }
 
 	       // Check if user already exists in server data
-	       if (serverData.users[userId]) {
+	       if (serverData.discordIndex && serverData.discordIndex[userId]) {
 		       return {
 			       success: true,
 			       message: "user already exists in server data",

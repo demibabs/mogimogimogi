@@ -29,21 +29,8 @@ Thumbs.db
 *.swo
 *~
 
-# Local data files (if you want to exclude them)
-data/servers/
-
 # Config files with sensitive data
 config.json
-
-LOUNGE_API_GUIDE.md
-MIGRATION_INSTRUCTIONS.md
-MIGRATION_NOTES.md
-LEADERBOARD_OPTIMIZATION.md
-test-cache-persistence.js
-test-setup-detection.js
-clear-streak-table.js
-clear-streak-cache.js
-create-streak-table.js
 
 commands/testing/
 

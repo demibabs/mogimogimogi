@@ -1,0 +1,3177 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Lounge_API",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/bonus": {
+      "get": {
+        "tags": [
+          "Bonuses"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Bonuses"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/bonus/list": {
+      "get": {
+        "tags": [
+          "Bonuses"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bonus/create": {
+      "post": {
+        "tags": [
+          "Bonuses"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mkcId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.BonusViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/penalty": {
+      "get": {
+        "tags": [
+          "Penalties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Penalties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/penalty/list": {
+      "get": {
+        "tags": [
+          "Penalties"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isStrike",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "includeDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/penalty/create": {
+      "post": {
+        "tags": [
+          "Penalties"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "isStrike",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/penaltyrequest": {
+      "get": {
+        "tags": [
+          "PenaltyRequests"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PenaltyRequests"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/penaltyrequest/list": {
+      "get": {
+        "tags": [
+          "PenaltyRequests"
+        ],
+        "parameters": [
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/penaltyrequest/create": {
+      "post": {
+        "tags": [
+          "PenaltyRequests"
+        ],
+        "parameters": [
+          {
+            "name": "penaltyType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "playerName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reporterName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tableID",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "numberOfRaces",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PenaltyRequestViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "mkcId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "discordId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fc",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/allgames": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "mkcId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "discordId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fc",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/details": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "discordId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fc",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerDetailsViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerDetailsViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerDetailsViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/list": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "minMmr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "maxMmr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerListViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerListViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerListViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/leaderboard": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Stats.LeaderboardSortOrder"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minMmr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "maxMmr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "minEventsPlayed",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "maxEventsPlayed",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "minCreationDateUtc",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "maxCreationDateUtc",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.LeaderboardViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.LeaderboardViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.LeaderboardViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/listPendingNameChanges": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/stats": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.StatsViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.StatsViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.StatsViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/create": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mkcId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "mmr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "discordId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/register": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "mmr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/placement": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mmr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "force",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/update/name": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "newName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/player/update/mkcId": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "newMkcId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/player/update/discordId": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "newDiscordId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/player/hide": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/player/unhide": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/player/refreshRegistryData": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/player/requestNameChange": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "newName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/setNameChangeMessageId": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "messageId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/player/acceptNameChange": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/player/rejectNameChange": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/table": {
+      "get": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/table/list": {
+      "get": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/table/unverified": {
+      "get": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/table/create": {
+      "post": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NewTableViewModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NewTableViewModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NewTableViewModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/table/setMultipliers": {
+      "post": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/table/setScores": {
+      "post": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/table/setTableMessageId": {
+      "post": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "tableMessageId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/table/setUpdateMessageId": {
+      "post": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "updateMessageId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/table/verify": {
+      "post": {
+        "tags": [
+          "Tables"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "game",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+            }
+          },
+          {
+            "name": "preview",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Lounge.Web.Models.Enums.Division": {
+        "enum": [
+          "Grandmaster",
+          "Master",
+          "Diamond",
+          "Ruby",
+          "Sapphire",
+          "Platinum",
+          "Gold",
+          "Silver",
+          "Bronze",
+          "Iron",
+          "Ranked",
+          "Placement"
+        ],
+        "type": "string"
+      },
+      "Lounge.Web.Models.Enums.Game": {
+        "enum": [
+          "mk8dx",
+          "mkworld"
+        ],
+        "type": "string"
+      },
+      "Lounge.Web.Models.ViewModels.BonusViewModel": {
+        "required": [
+          "playerName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "game": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+          },
+          "season": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "awardedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "prevMmr": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newMmr": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "deletedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playerName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.LeaderboardViewModel": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "totalPlayers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.LeaderboardViewModel+Player"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.LeaderboardViewModel+Player": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overallRank": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "mmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxMmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "winRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "winsLastTen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lossesLastTen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gainLossLastTen": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "lastWeekRankChange": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "eventsPlayed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "largestGain": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "mmrRank": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.Rank"
+          },
+          "maxMmrRank": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.Rank"
+          },
+          "accountCreationDateUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "averageScore12P": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "averageScore24P": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.NameChangeListViewModel": {
+        "required": [
+          "players"
+        ],
+        "type": "object",
+        "properties": {
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.NameChangeListViewModel+Player": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "discordId": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "newName": {
+            "type": "string",
+            "nullable": true
+          },
+          "requestedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "messageId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.NewTableViewModel": {
+        "type": "object",
+        "properties": {
+          "tier": {
+            "type": "string",
+            "nullable": true
+          },
+          "scores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.NewTableViewModel+PlayerScore"
+            },
+            "nullable": true
+          },
+          "authorId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.NewTableViewModel+PlayerScore": {
+        "type": "object",
+        "properties": {
+          "playerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "team": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "multiplier": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.PenaltyRequestViewModel": {
+        "required": [
+          "playerName",
+          "reporterName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "game": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+          },
+          "penaltyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "tableId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numberOfRaces": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "reporterId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reporterName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.PenaltyViewModel": {
+        "required": [
+          "playerName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "game": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+          },
+          "season": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "awardedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isStrike": {
+            "type": "boolean"
+          },
+          "prevMmr": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newMmr": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "deletedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playerName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.PlayerDetailsViewModel": {
+        "required": [
+          "mmrChanges",
+          "name",
+          "nameHistory"
+        ],
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "mkcId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registryId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "countryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "switchFc": {
+            "type": "string",
+            "nullable": true
+          },
+          "isHidden": {
+            "type": "boolean"
+          },
+          "game": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+          },
+          "season": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxMmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "overallRank": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "eventsPlayed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "winRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "winsLastTen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lossesLastTen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "winLossLastTen": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "gainLossLastTen": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "largestGain": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "largestLoss": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "largestLossTableId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "largestGainTableId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "noSQAverageScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "averageLastTen": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "noSQAverageLastTen": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "partnerAverage": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "noSQPartnerAverage": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "mmrChanges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerDetailsViewModel+MmrChange"
+            },
+            "nullable": true
+          },
+          "nameHistory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerDetailsViewModel+NameChange"
+            },
+            "nullable": true
+          },
+          "rank": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "registryLink": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.PlayerDetailsViewModel+MmrChange": {
+        "type": "object",
+        "properties": {
+          "changeId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "newMmr": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mmrDelta": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerDetailsViewModel+MmrChangeReason"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "partnerScores": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "partnerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "rank": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "tier": {
+            "type": "string",
+            "nullable": true
+          },
+          "numTeams": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "numPlayers": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.PlayerDetailsViewModel+MmrChangeReason": {
+        "enum": [
+          "Placement",
+          "Table",
+          "Penalty",
+          "Strike",
+          "Bonus",
+          "TableDelete",
+          "PenaltyDelete",
+          "StrikeDelete",
+          "BonusDelete"
+        ],
+        "type": "string"
+      },
+      "Lounge.Web.Models.ViewModels.PlayerDetailsViewModel+NameChange": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "changedOn": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.PlayerListViewModel": {
+        "required": [
+          "players"
+        ],
+        "type": "object",
+        "properties": {
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.PlayerListViewModel+Player"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.PlayerListViewModel+Player": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mkcId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "discordId": {
+            "type": "string",
+            "nullable": true
+          },
+          "eventsPlayed": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.PlayerViewModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "mkcId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registryId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "discordId": {
+            "type": "string",
+            "nullable": true
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "switchFc": {
+            "type": "string",
+            "nullable": true
+          },
+          "isHidden": {
+            "type": "boolean"
+          },
+          "mmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxMmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "registrations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.Rank": {
+        "type": "object",
+        "properties": {
+          "division": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Division"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.StatsViewModel": {
+        "required": [
+          "activityData",
+          "countryData",
+          "divisionData",
+          "divisionsToTier",
+          "ranks",
+          "recordsTierOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "totalPlayers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalMogis": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageMmr": {
+            "type": "number",
+            "format": "double"
+          },
+          "medianMmr": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "divisionData": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.StatsViewModel+Division"
+            },
+            "nullable": true
+          },
+          "countryData": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.StatsViewModel+Country"
+            },
+            "nullable": true
+          },
+          "activityData": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.StatsViewModel+Activity"
+          },
+          "ranks": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "recordsTierOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "divisionsToTier": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.StatsViewModel+Activity": {
+        "required": [
+          "dailyActivity",
+          "dayOfWeekActivity",
+          "formatData",
+          "tierActivity"
+        ],
+        "type": "object",
+        "properties": {
+          "formatData": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "dailyActivity": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "nullable": true
+          },
+          "dayOfWeekActivity": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "tierActivity": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.StatsViewModel+Country": {
+        "required": [
+          "topSixPlayers"
+        ],
+        "type": "object",
+        "properties": {
+          "playerTotal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalAverageMmr": {
+            "type": "number",
+            "format": "double"
+          },
+          "topSixMmr": {
+            "type": "number",
+            "format": "double"
+          },
+          "topSixPlayers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.StatsViewModel+Player"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.StatsViewModel+Division": {
+        "required": [
+          "tier"
+        ],
+        "type": "object",
+        "properties": {
+          "tier": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.StatsViewModel+Player": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "mmr": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.TableDetailsViewModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "game": {
+            "$ref": "#/components/schemas/Lounge.Web.Models.Enums.Game"
+          },
+          "season": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verifiedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "deletedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "numTeams": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numPlayers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "format": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "tier": {
+            "type": "string",
+            "nullable": true
+          },
+          "teams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel+Team"
+            },
+            "nullable": true
+          },
+          "tableMessageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "updateMessageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "authorId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.TableDetailsViewModel+TableScore": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "multiplier": {
+            "type": "number",
+            "format": "double"
+          },
+          "multiplierString": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "prevMmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "newMmr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "delta": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "readOnly": true
+          },
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "playerDiscordId": {
+            "type": "string",
+            "nullable": true
+          },
+          "playerCountryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "isNewPeakMmr": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Models.ViewModels.TableDetailsViewModel+Team": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lounge.Web.Models.ViewModels.TableDetailsViewModel+TableScore"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Lounge.Web.Stats.LeaderboardSortOrder": {
+        "enum": [
+          "Name",
+          "Mmr",
+          "MaxMmr",
+          "LastWeekRankChange",
+          "EventsPlayed",
+          "AvgScore12P",
+          "AvgScore24P"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "Basic": {
+        "type": "http",
+        "description": "Basic auth added to authorization header",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "Basic": [ ]
+    }
+  ]
+}

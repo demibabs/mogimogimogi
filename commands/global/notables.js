@@ -1,84 +1,923 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const DataManager = require("../../utils/dataManager");
-const database = require("../../utils/database");
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require("discord.js");
+const { createCanvas, loadImage } = require("canvas");
+const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
-const embedEnhancer = require("../../utils/embedEnhancer");
+const DataManager = require("../../utils/dataManager");
+const EmbedEnhancer = require("../../utils/embedEnhancer");
 const AutoUserManager = require("../../utils/autoUserManager");
+const GameData = require("../../utils/gameData");
+const ColorPalettes = require("../../utils/colorPalettes");
+const resolveTargetPlayer = require("../../utils/playerResolver");
 
-const getRandomMessage = function(messages) {
-	const randInt = Math.floor(Math.random() * messages.length);
-	return messages[randInt];
+const {
+	getPlayerAvatarUrl,
+	drawRoundedPanel,
+	drawBlurredImage,
+	drawRoundedImage,
+	loadFavoriteCharacterImage,
+	loadFavoriteVehicleImage,
+	loadWebPAsPng,
+	getCountryFlag,
+	drawEmoji,
+} = EmbedEnhancer;
+
+const EDGE_RADIUS = 30;
+const CANVAS_WIDTH = 1920;
+const CANVAS_HEIGHT = 1080;
+const NOTABLES_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
+
+const notablesSessionCache = new Map();
+const imageCache = new Map();
+const notablesRenderTokens = new Map();
+
+function beginNotablesRender(messageId) {
+	if (!messageId) {
+		return null;
+	}
+	const token = Symbol("notablesRender");
+	notablesRenderTokens.set(messageId, token);
+	return token;
+}
+
+function isNotablesRenderActive(messageId, token) {
+	if (!messageId || !token) {
+		return true;
+	}
+	return notablesRenderTokens.get(messageId) === token;
+}
+
+function endNotablesRender(messageId, token) {
+	if (!messageId || !token) {
+		return;
+	}
+	if (notablesRenderTokens.get(messageId) === token) {
+		notablesRenderTokens.delete(messageId);
+	}
+}
+
+const EVENT_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+	month: "short",
+	day: "numeric",
+	year: "numeric",
+});
+
+const LAYOUT = {
+	pagePadding: 100,
+	columnGap: 60,
+	sectionGap: 60,
+	headerHeight: 160,
+	headerPaddingHorizontal: 80,
+	headerPaddingVertical: 36,
+	headerTitleFontSize: 64,
+	headerSubtitleFontSize: 30,
+	headerSubtitleGap: 14,
+	headerEmojiSize: 54,
+	headerEmojiGap: 22,
+	headerFavoriteMaxSize: 140,
+	headerAvatarSize: 120,
+	headerAvatarRadius: 30,
+	headerAssetGap: 28,
+	columnPadding: 46,
+	eventTitleFontSize: 40,
+	eventTitleGap: 12,
+	eventBodyFontSize: 28,
+	eventGap: 44,
+	footnoteFontSize: 28,
 };
+
+const goodBSMessages = [
+	"nice!",
+	"excellent work!",
+	"can you do even better?",
+	"skill was on your side that day. (or luck...)",
+	"typical mogi for the goat.",
+	"why can't every mogi be this good?",
+	"cheating?",
+	"luck was on your side that day. (or skill...)",
+	"isn't this game so good when you win?",
+];
+
+const badBSMessages = [
+	"great score, but not good enough for 1st :(",
+	"guess someone else was having an even better mogi.",
+	"not first? shortrat must have been in your room.",
+	"someone had to steal your thunder i guess.",
+	"nice, but i know you have at least 10 more points in you. maybe 15.",
+	"solid showing.",
+];
+
+const goodWSMessages = [
+	"if you think that mogi sucked, think about whoever you beat.",
+	"your worst ever and you still didn't get last? we take it.",
+	"ouch.",
+	"at least you beat somebody!",
+	"hey, losing makes winning feel even better!",
+	"sometimes when you gamble, you lose.",
+	"you suck. (jk.)",
+];
+
+const badWSMessages = [
+	"this is the type of mogi i have when i'm about to promote.",
+	"video games aren't for everyone. maybe try sports?",
+	"yowch.",
+	"at least you beat somebody! wait, no you didn't.",
+	"thanks for graciously donating your mmr to those other players.",
+	"can't blame any teammates for that one.",
+	"you suck.",
+];
+
+const oPMessages = [
+	"against all odds!",
+	"they never saw it coming.",
+	"they underestimated you, but i knew you were like that.",
+	"great job!",
+	"holy w.",
+	"how does he do it?",
+	"the up and coming goat.",
+];
+
+const uPMessages = [
+	"well, even lightning mcqueen has lost races before.",
+	"but you were just unlucky, right?",
+	"oof.",
+	"guess the room was punching above its weight.",
+	"washed?",
+	"yikes.",
+	"everyone was silently judging you.",
+	"not your mogi.",
+];
+
+const bCMessages = [
+	"someone had to pick up the slack.",
+	"does your back hurt?",
+	"you did everything you could.",
+	"impressive!",
+	"did the rest of your team suck or are you just that good?",
+	"you're the type of mate we all need.",
+	"holy carry.",
+];
+
+const bAMessages = [
+	"smh.",
+	"your team needed you, but you vanished.",
+	"someone had to pick up the slack, and it wasn't you.",
+	"ow.",
+	"thank god for teammates.",
+	"bad day?",
+];
+
+function getRandomMessage(pool) {
+	if (!pool) return "";
+	if (Array.isArray(pool) && pool.length) {
+		const index = Math.floor(Math.random() * pool.length);
+		return pool[index];
+	}
+	if (typeof pool === "string") {
+		return pool;
+	}
+	return "";
+}
+
+async function loadCachedImage(resource) {
+	if (!resource) {
+		return null;
+	}
+	if (imageCache.has(resource)) {
+		return imageCache.get(resource);
+	}
+	try {
+		const image = await loadImage(resource);
+		imageCache.set(resource, image);
+		return image;
+	}
+	catch (error) {
+		console.warn(`failed to load image ${resource}:`, error);
+		imageCache.set(resource, null);
+		return null;
+	}
+}
+
+function wrapText(ctx, text, maxWidth) {
+	if (!text) {
+		return [];
+	}
+	const lines = [];
+	const paragraphs = String(text).split(/\n+/);
+	for (const paragraph of paragraphs) {
+		const words = paragraph.trim().split(/\s+/).filter(Boolean);
+		if (!words.length) {
+			lines.push("");
+			continue;
+		}
+		let current = words.shift();
+		for (const word of words) {
+			const candidate = `${current} ${word}`;
+			if (ctx.measureText(candidate).width <= maxWidth) {
+				current = candidate;
+			}
+			else {
+				lines.push(current);
+				current = word;
+			}
+		}
+		if (current) {
+			lines.push(current);
+		}
+	}
+	return lines;
+}
+
+function buildNotablesCustomId(action, { timeFilter, queueFilter, playerCountFilter, loungeId }) {
+	const safeAction = action || "time";
+	const safeTime = timeFilter || "alltime";
+	const safeQueue = queueFilter || "both";
+	const safePlayers = playerCountFilter || "both";
+	const safeLounge = loungeId ?? "";
+	return ["notables", safeAction, safeTime, safeQueue, safePlayers, safeLounge].join("|");
+}
+
+function buildNotablesComponentRows({ loungeId, timeFilter, queueFilter, playerCountFilter }) {
+	const safeTime = timeFilter || "alltime";
+	const safeQueue = queueFilter || "both";
+	const safePlayerCount = playerCountFilter || "both";
+	const rows = [];
+
+	const timeRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("time", { timeFilter: "alltime", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("all time")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeTime === "alltime"),
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("time", { timeFilter: "weekly", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("past week")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeTime === "weekly"),
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("time", { timeFilter: "season", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("this season")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeTime === "season"),
+		);
+	rows.push(timeRow);
+
+	const queueRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("queue", { timeFilter: safeTime, queueFilter: "soloq", playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("soloq")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeQueue === "soloq"),
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("queue", { timeFilter: safeTime, queueFilter: "squads", playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("squads")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeQueue === "squads"),
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("queue", { timeFilter: safeTime, queueFilter: "both", playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("both")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeQueue === "both"),
+		);
+	rows.push(queueRow);
+
+	const playerRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "12p", loungeId }))
+				.setLabel("12p")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safePlayerCount === "12p"),
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "24p", loungeId }))
+				.setLabel("24p")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safePlayerCount === "24p"),
+			new ButtonBuilder()
+				.setCustomId(buildNotablesCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "both", loungeId }))
+				.setLabel("both")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safePlayerCount === "both"),
+		);
+	rows.push(playerRow);
+
+	return rows;
+}
+
+function parseNotablesInteraction(customId) {
+	if (!customId?.startsWith("notables|")) {
+		return null;
+	}
+	const parts = customId.split("|");
+	if (parts.length < 6) {
+		return null;
+	}
+	const [, actionRaw, timeRaw, queueRaw, playerRaw, loungeId] = parts;
+	return {
+		action: (actionRaw || "").toLowerCase(),
+		timeFilter: (timeRaw || "alltime").toLowerCase(),
+		queueFilter: (queueRaw || "both").toLowerCase(),
+		playerCountFilter: (playerRaw || "both").toLowerCase(),
+		loungeId,
+	};
+}
+
+function getNotablesSession(messageId) {
+	if (!messageId) {
+		return null;
+	}
+	const session = notablesSessionCache.get(messageId);
+	if (!session) {
+		return null;
+	}
+	if (session.expiresAt && session.expiresAt <= Date.now()) {
+		notablesSessionCache.delete(messageId);
+		return null;
+	}
+	refreshNotablesSession(messageId);
+	return notablesSessionCache.get(messageId);
+}
+
+function storeNotablesSession(messageId, session) {
+	if (!messageId || !session) {
+		return;
+	}
+	const expiresAt = Date.now() + NOTABLES_SESSION_CACHE_TTL_MS;
+	notablesSessionCache.set(messageId, {
+		...session,
+		messageId,
+		expiresAt,
+	});
+}
+
+function refreshNotablesSession(messageId) {
+	const session = notablesSessionCache.get(messageId);
+	if (!session) {
+		return;
+	}
+	session.expiresAt = Date.now() + NOTABLES_SESSION_CACHE_TTL_MS;
+}
+
+function getTableTimestamp(table) {
+	if (!table) {
+		return null;
+	}
+	const raw = table.verifiedOn || table.createdOn || table.date || table.updatedOn;
+	if (!raw) {
+		return null;
+	}
+	const parsed = new Date(raw);
+	return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatTableDescriptor(table) {
+	if (!table) {
+		return "event details unavailable";
+	}
+	const date = getTableTimestamp(table);
+	const formattedDate = date ? EVENT_DATE_FORMATTER.format(date) : "date unknown";
+	const count = table.numPlayers ?? table.numplayers ?? table.playerCount;
+	const format = table.format || table.queue || "room";
+	return `${formattedDate} • ${count || "?"}p ${format}`;
+}
+
+function buildColumnEvents({ filteredTables, loungeId, metrics }) {
+	const { bestScore, worstScore, overperformance, underperformance, carry, anchor } = metrics;
+	const getTable = tableId => filteredTables?.[tableId] || null;
+
+	const goodEvents = [
+		bestScore && {
+			title: "best score",
+			tableId: bestScore.tableId,
+			table: getTable(bestScore.tableId),
+			description: (() => {
+				const table = getTable(bestScore.tableId);
+				if (!table) return null;
+				const descriptor = formatTableDescriptor(table);
+				const message = getRandomMessage(bestScore.placement === 1 ? goodBSMessages : badBSMessages);
+				const placementWord = bestScore.placement === 1 ? "and" : "but";
+				return `${descriptor}\nyou scored ${bestScore.score} ${placementWord} finished rank ${bestScore.placement}. ${message}`;
+			})(),
+		},
+		overperformance && {
+			title: "biggest overperformance",
+			tableId: overperformance.tableId,
+			table: getTable(overperformance.tableId),
+			description: (() => {
+				const table = getTable(overperformance.tableId);
+				if (!table) return null;
+				const descriptor = formatTableDescriptor(table);
+				const message = getRandomMessage(oPMessages);
+				return `${descriptor}\nyou were seed ${overperformance.placement + overperformance.overperformance} but scored ${overperformance.score} and finished rank ${overperformance.placement}. ${message}`;
+			})(),
+		},
+		carry && {
+			title: "biggest carry",
+			tableId: carry.tableId,
+			table: getTable(carry.tableId),
+			description: (() => {
+				const table = getTable(carry.tableId);
+				if (!table) return null;
+				const descriptor = formatTableDescriptor(table);
+				const teammateLabel = table.format === "2v2" ? "mate scored" : "teammates averaged";
+				const message = getRandomMessage(bCMessages);
+				const mateScore = carry.score - carry.carryAmount;
+				return `${descriptor}\nyou were rank ${carry.placement} and scored ${carry.score} while your ${teammateLabel} ${mateScore}. ${message}`;
+			})(),
+		},
+	].filter(Boolean);
+
+	const badEvents = [
+		worstScore && {
+			title: "worst score",
+			tableId: worstScore.tableId,
+			table: getTable(worstScore.tableId),
+			description: (() => {
+				const table = getTable(worstScore.tableId);
+				if (!table) return null;
+				const descriptor = formatTableDescriptor(table);
+				const message = getRandomMessage(worstScore.placement === table.numPlayers ? badWSMessages : goodWSMessages);
+				return `${descriptor}\nyou scored ${worstScore.score} and were rank ${worstScore.placement}. ${message}`;
+			})(),
+		},
+		underperformance && {
+			title: "biggest underperformance",
+			tableId: underperformance.tableId,
+			table: getTable(underperformance.tableId),
+			description: (() => {
+				const table = getTable(underperformance.tableId);
+				if (!table) return null;
+				const descriptor = formatTableDescriptor(table);
+				const message = getRandomMessage(uPMessages);
+				return `${descriptor}\nyou were seed ${underperformance.placement + underperformance.underperformance} but scored ${underperformance.score} and ended up rank ${underperformance.placement}. ${message}`;
+			})(),
+		},
+		anchor && {
+			title: "biggest anchor",
+			tableId: anchor.tableId,
+			table: getTable(anchor.tableId),
+			description: (() => {
+				const table = getTable(anchor.tableId);
+				if (!table) return null;
+				const descriptor = formatTableDescriptor(table);
+				const teammateLabel = table.format === "2v2" ? "mate scored" : "teammates averaged";
+				const message = getRandomMessage(bAMessages);
+				const mateScore = anchor.score - anchor.anchorAmount;
+				return `${descriptor}\nyou were rank ${anchor.placement} and scored ${anchor.score} while your ${teammateLabel} ${mateScore}. ${message}`;
+			})(),
+		},
+	].filter(Boolean);
+
+	return { goodEvents, badEvents };
+}
+
+function buildTableLinksMessage(events) {
+	const parts = [];
+	for (const event of events) {
+		const tableId = event?.tableId ?? event?.table?.id;
+		if (!tableId) continue;
+		const normalizedId = String(tableId).trim();
+		if (!normalizedId) continue;
+		const link = `https://lounge.mkcentral.com/mkworld/TableDetails/${normalizedId}`;
+		const label = event?.title ? `${event.title}` : "";
+		parts.push(`[${label}](${link})`.trim());
+	}
+	return parts.join(", ");
+}
+
+function drawEventsColumn(ctx, frame, trackColors, events) {
+	drawRoundedPanel(ctx, frame, trackColors.baseColor, EDGE_RADIUS);
+	ctx.save();
+	ctx.textAlign = "left";
+	ctx.textBaseline = "top";
+	const titleFont = `600 ${LAYOUT.eventTitleFontSize}px Lexend`;
+	const bodyFont = `${LAYOUT.eventBodyFontSize}px Lexend`;
+	const bodyLineHeight = LAYOUT.eventBodyFontSize * 1.32;
+	const contentWidth = frame.width - LAYOUT.columnPadding * 2;
+	const processed = [];
+
+	ctx.font = bodyFont;
+	for (const event of events) {
+		if (!event?.description) continue;
+		const bodyLines = wrapText(ctx, event.description, contentWidth);
+		processed.push({
+			...event,
+			bodyLines,
+			contentHeight: LAYOUT.eventTitleFontSize + LAYOUT.eventTitleGap + bodyLines.length * bodyLineHeight,
+		});
+	}
+
+	if (!processed.length) {
+		ctx.restore();
+		return;
+	}
+
+	const topY = frame.top + LAYOUT.columnPadding;
+	const bottomY = frame.top + frame.height - LAYOUT.columnPadding;
+	const availableHeight = bottomY - topY;
+	const totalContentHeight = processed.reduce((sum, event) => sum + event.contentHeight, 0);
+	let gapSize = 0;
+	let cursorY = topY;
+
+	if (processed.length === 1) {
+		const extra = Math.max(availableHeight - totalContentHeight, 0);
+		cursorY = topY + extra;
+	}
+	else if (processed.length > 1) {
+		gapSize = Math.max((availableHeight - totalContentHeight) / (processed.length - 1), 0);
+	}
+
+	for (let index = 0; index < processed.length; index++) {
+		const event = processed[index];
+		ctx.font = titleFont;
+		ctx.fillStyle = trackColors.statsTextColor || "#333333";
+		ctx.fillText(event.title, frame.left + LAYOUT.columnPadding, cursorY);
+		cursorY += LAYOUT.eventTitleFontSize;
+		cursorY += LAYOUT.eventTitleGap;
+
+		ctx.font = bodyFont;
+		ctx.fillStyle = trackColors.statsTextColor || "#333333";
+		for (const line of event.bodyLines) {
+			ctx.fillText(line, frame.left + LAYOUT.columnPadding, cursorY);
+			cursorY += bodyLineHeight;
+		}
+
+		if (index < processed.length - 1) {
+			cursorY += gapSize;
+		}
+	}
+
+	ctx.restore();
+}
+
+async function renderNotablesImage({
+	trackName,
+	trackColors,
+	displayName,
+	playerDetails,
+	discordUser,
+	favorites,
+	favoriteCharacterImage,
+	favoriteVehicleImage,
+	goodEvents,
+	badEvents,
+	timeFilter,
+	queueFilter,
+	playerCountFilter,
+	totalEvents,
+}) {
+	const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+	const ctx = canvas.getContext("2d");
+	ctx.patternQuality = "best";
+	ctx.quality = "best";
+
+	try {
+		const backgroundImage = await loadCachedImage(`images/tracks/${trackName}_notables.png`);
+		if (backgroundImage) {
+			drawBlurredImage(ctx, backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		}
+		else {
+			throw new Error("background image not available");
+		}
+	}
+	catch (error) {
+		console.warn(`failed to load background image for ${trackName}:`, error);
+		ctx.fillStyle = trackColors?.baseColor || "#000";
+		ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	}
+
+	const headerFrame = {
+		left: LAYOUT.pagePadding,
+		top: LAYOUT.pagePadding,
+		width: CANVAS_WIDTH - LAYOUT.pagePadding * 2,
+		height: LAYOUT.headerHeight,
+	};
+
+	const columnHeight = CANVAS_HEIGHT - headerFrame.top - headerFrame.height - LAYOUT.sectionGap - LAYOUT.pagePadding;
+	const columnWidth = (CANVAS_WIDTH - LAYOUT.pagePadding * 2 - LAYOUT.columnGap) / 2;
+
+	const leftColumn = {
+		left: LAYOUT.pagePadding,
+		top: headerFrame.top + headerFrame.height + LAYOUT.sectionGap,
+		width: columnWidth,
+		height: columnHeight,
+	};
+
+	const rightColumn = {
+		left: leftColumn.left + columnWidth + LAYOUT.columnGap,
+		top: leftColumn.top,
+		width: columnWidth,
+		height: columnHeight,
+	};
+
+	drawRoundedPanel(ctx, headerFrame, trackColors.baseColor, EDGE_RADIUS);
+
+	const headerTitle = `${displayName}'s notables`;
+	const timeLabels = {
+		alltime: "all time",
+		weekly: "past week",
+		season: "this season",
+	};
+	const queueLabels = {
+		soloq: "solo queue",
+		squads: "squads",
+	};
+	const subtitleParts = [];
+	const timeLabel = timeLabels[timeFilter] || timeFilter;
+	if (timeLabel) {
+		subtitleParts.push(timeLabel);
+	}
+	if (queueFilter !== "both" && queueLabels[queueFilter]) {
+		subtitleParts.push(queueLabels[queueFilter]);
+	}
+	if (playerCountFilter !== "both") {
+		subtitleParts.push(playerCountFilter);
+	}
+	const eventsLabel = `${totalEvents} event${totalEvents === 1 ? "" : "s"}`;
+	subtitleParts.push(eventsLabel);
+	const subtitleText = subtitleParts.join(" · ");
+
+	ctx.save();
+	ctx.textAlign = "left";
+	ctx.textBaseline = "alphabetic";
+	const playerEmoji = getCountryFlag(playerDetails?.countryCode);
+	const emojiSize = LAYOUT.headerEmojiSize;
+	const emojiGap = LAYOUT.headerEmojiGap;
+	const titleFontSize = LAYOUT.headerTitleFontSize;
+	const subtitleFontSize = LAYOUT.headerSubtitleFontSize;
+	const hasSubtitle = Boolean(subtitleText);
+	const textBlockHeight = titleFontSize + (hasSubtitle ? LAYOUT.headerSubtitleGap + subtitleFontSize : 0);
+	const textBlockTop = headerFrame.top + (headerFrame.height - textBlockHeight) / 2;
+	const titleBaseline = textBlockTop + titleFontSize;
+	const subtitleBaseline = hasSubtitle ? titleBaseline + LAYOUT.headerSubtitleGap + subtitleFontSize : null;
+	let textX = headerFrame.left + LAYOUT.headerPaddingHorizontal;
+
+	if (playerEmoji) {
+		const emojiY = headerFrame.top + (headerFrame.height - emojiSize) / 2;
+		try {
+			await drawEmoji(ctx, playerEmoji, textX, emojiY, emojiSize);
+		}
+		catch (emojiError) {
+			console.warn("failed to draw header emoji:", emojiError);
+		}
+		textX += emojiSize + emojiGap;
+	}
+
+	ctx.font = `700 ${titleFontSize}px Lexend`;
+	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
+	ctx.fillText(headerTitle, textX, titleBaseline);
+
+	if (hasSubtitle && subtitleBaseline !== null) {
+		ctx.font = `${subtitleFontSize}px Lexend`;
+		ctx.fillStyle = trackColors.headerSubtitleColor || trackColors.statsTextColor || "#333333";
+		ctx.fillText(subtitleText, textX, subtitleBaseline);
+	}
+	ctx.restore();
+
+	const scaleToFavoriteFrame = image => {
+		const maxSize = LAYOUT.headerFavoriteMaxSize;
+		const width = Math.max(image?.width || 1, 1);
+		const height = Math.max(image?.height || 1, 1);
+		const scale = maxSize / Math.max(width, height);
+		return {
+			width: width * scale,
+			height: height * scale,
+		};
+	};
+
+	const headerAssets = [];
+	if (favoriteCharacterImage) {
+		const dimensions = scaleToFavoriteFrame(favoriteCharacterImage);
+		headerAssets.push({
+			type: "character",
+			image: favoriteCharacterImage,
+			width: dimensions.width,
+			height: dimensions.height,
+		});
+	}
+	if (favoriteVehicleImage) {
+		const dimensions = scaleToFavoriteFrame(favoriteVehicleImage);
+		headerAssets.push({
+			type: "vehicle",
+			image: favoriteVehicleImage,
+			width: dimensions.width,
+			height: dimensions.height,
+		});
+	}
+
+	let avatarImage = null;
+	const avatarUrl = getPlayerAvatarUrl(discordUser);
+	if (avatarUrl) {
+		try {
+			avatarImage = await loadWebPAsPng(avatarUrl);
+		}
+		catch (error) {
+			console.warn("failed to load avatar image:", error);
+		}
+	}
+	if (headerAssets.length < 2 && avatarImage) {
+		headerAssets.push({
+			type: "avatar",
+			image: avatarImage,
+			width: LAYOUT.headerAvatarSize,
+			height: LAYOUT.headerAvatarSize,
+		});
+	}
+
+	let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingHorizontal;
+	for (let index = headerAssets.length - 1; index >= 0; index--) {
+		const asset = headerAssets[index];
+		assetCursor -= asset.width;
+		const drawX = assetCursor;
+		const drawY = headerFrame.top + (headerFrame.height - asset.height) / 2;
+		if (asset.type === "avatar") {
+			drawRoundedImage(ctx, asset.image, drawX, drawY, asset.width, asset.height, LAYOUT.headerAvatarRadius);
+		}
+		else {
+			ctx.drawImage(asset.image, drawX, drawY, asset.width, asset.height);
+		}
+		if (index > 0) {
+			assetCursor -= LAYOUT.headerAssetGap;
+		}
+	}
+
+	drawEventsColumn(ctx, leftColumn, trackColors, goodEvents);
+	drawEventsColumn(ctx, rightColumn, trackColors, badEvents);
+
+	const pngBuffer = canvas.toBuffer("image/png");
+	return new AttachmentBuilder(pngBuffer, { name: "notables.png" });
+}
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("notables")
 		.setDescription("your best and worst mogis.")
-		.addUserOption(option =>
-			option.setName("user")
-				.setDescription("yourself if left blank.")
-				.setRequired(false))
-		.addBooleanOption(option =>
-			option.setName("server-only")
-				.setDescription("true = include only mogis with other server members."))
-		.addBooleanOption(option =>
-			option.setName("squads")
-				.setDescription("true = sq only, false = soloq only."),
-		),
+		.addStringOption(option =>
+			option.setName("player")
+				.setDescription("lounge name or id. leave blank for yourself.")
+				.setAutocomplete(true)),
+
+	autocomplete: async interaction => {
+		const focused = interaction.options.getFocused(true);
+		if (focused.name !== "player") {
+			await interaction.respond([]);
+			return;
+		}
+
+		const guild = interaction.guild;
+		if (!guild) {
+			await interaction.respond([]);
+			return;
+		}
+
+		const rawQuery = (focused.value || "").trim();
+		const normalizedQuery = rawQuery.toLowerCase();
+		const serverLimit = 5;
+		const globalLimit = 5;
+		const maxSuggestions = serverLimit + globalLimit;
+		const suggestions = [];
+		const seenValues = new Set();
+
+		try {
+			const serverData = await Database.getServerData(guild.id);
+			const users = Object.values(serverData?.users || {});
+			const byName = users
+				.filter(entry => entry?.loungeName)
+				.sort((a, b) => a.loungeName.localeCompare(b.loungeName));
+
+			for (const entry of byName) {
+				const loungeName = entry.loungeName;
+				const normalizedName = loungeName.toLowerCase();
+				if (normalizedQuery && !normalizedName.includes(normalizedQuery)) {
+					continue;
+				}
+				const value = String(entry.loungeId ?? entry.id ?? loungeName);
+				if (seenValues.has(value)) continue;
+				suggestions.push({
+					name: loungeName,
+					value,
+				});
+				seenValues.add(value);
+				if (suggestions.length >= serverLimit) break;
+			}
+		}
+		catch (error) {
+			console.warn("notables autocomplete error:", error);
+		}
+
+		if (rawQuery && suggestions.length < maxSuggestions) {
+			try {
+				const globalResults = await LoungeApi.searchPlayers(rawQuery, { limit: globalLimit });
+				for (const player of globalResults) {
+					const loungeId = [player.id, player.playerId, player.loungeId]
+						.map(id => id === undefined || id === null ? null : String(id))
+						.find(Boolean);
+					if (!loungeId || seenValues.has(loungeId)) continue;
+
+					const displayName = player.name || player.loungeName || player.playerName || player.username;
+					if (!displayName) continue;
+
+					suggestions.push({
+						name: displayName.length > 100 ? `${displayName.slice(0, 97)}...` : displayName,
+						value: loungeId,
+					});
+					seenValues.add(loungeId);
+					if (suggestions.length >= maxSuggestions) break;
+				}
+			}
+			catch (error) {
+				console.warn("notables global autocomplete error:", error);
+			}
+		}
+
+		if (!suggestions.length && normalizedQuery) {
+			suggestions.push({
+				name: `search "${rawQuery}"`,
+				value: rawQuery,
+			});
+		}
+
+		await interaction.respond(suggestions.slice(0, maxSuggestions));
+	},
 
 	async execute(interaction) {
 		try {
 			await interaction.deferReply();
 			await interaction.editReply("validating user...");
 
-			const discordUser = interaction.options.getUser("user") || interaction.user;
-			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
-			const squads = interaction.options.getBoolean("squads");
 			const serverId = interaction.guildId;
+			const rawPlayer = interaction.options.getString("player");
+			const timeFilter = "alltime";
+			const queueFilter = "both";
+			const playerCountFilter = "both";
+			const currentFilters = { timeFilter, queueFilter, playerCountFilter };
 
-			// Use generateNotables for consistency with button interactions
-			const result = await this.generateNotables(interaction, discordUser, serverId, serverOnly, squads, "alltime");
+			const validation = await AutoUserManager.validateUserForCommand(interaction.user.id, serverId, interaction.client);
+			if (!validation.success) {
+				await interaction.editReply({
+					content: validation.message || "unable to validate command user.",
+					components: [],
+					files: [],
+				});
+				return;
+			}
 
-			   if (!result.success) {
-				   const embed = new EmbedBuilder()
-					   .setColor("Red")
-					   .setDescription(result.message || "insufficient data to calculate notables for this player.");
-				   return await interaction.editReply({ content: "", embeds: [embed] });
-			   }
-
-			// Create action row with three buttons (current one disabled)
-			const row = new ActionRowBuilder()
-				.addComponents(
-					// Current view is disabled
-					new ButtonBuilder()
-						.setCustomId(`notables_alltime_${discordUser.id}_${serverOnly}_${squads}`)
-						.setLabel("all time")
-						.setStyle(ButtonStyle.Secondary)
-						.setDisabled(true),
-					new ButtonBuilder()
-						.setCustomId(`notables_weekly_${discordUser.id}_${serverOnly}_${squads}`)
-						.setLabel("past week")
-						.setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder()
-						.setCustomId(`notables_season_${discordUser.id}_${serverOnly}_${squads}`)
-						.setLabel("this season")
-						.setStyle(ButtonStyle.Secondary),
-				);
-
-			await interaction.editReply({
-				content: "",
-				embeds: [result.embed],
-				components: [row],
+			const serverData = await Database.getServerData(serverId);
+			const target = await resolveTargetPlayer(interaction, {
+				rawInput: rawPlayer,
+				defaultToInvoker: !rawPlayer,
+				serverData,
 			});
 
+			if (target.error) {
+				await interaction.editReply({
+					content: target.error,
+					components: [],
+					files: [],
+				});
+				return;
+			}
+
+			const components = buildNotablesComponentRows({
+				loungeId: target.loungeId,
+				timeFilter,
+				queueFilter,
+				playerCountFilter,
+			});
+
+			const result = await this.generateNotables(interaction, target, serverId, queueFilter, playerCountFilter, timeFilter, serverData);
+
+			if (!result.success) {
+				await interaction.editReply({
+					content: result.message || "unable to load notables data.",
+					components,
+					files: [],
+				});
+				return;
+			}
+
+			const replyMessage = await interaction.editReply({
+				content: result.content ?? "",
+				files: result.files,
+				components,
+			});
+
+			if (replyMessage && result.session) {
+				storeNotablesSession(replyMessage.id, {
+					...result.session,
+					discordUser: target.discordUser || result.session.discordUser || null,
+					filters: currentFilters,
+					pendingFilters: null,
+					activeRequestToken: null,
+				});
+			}
 		}
 		catch (error) {
 			console.error("notables command error:", error);
 			try {
-				await interaction.editReply({
-					content: "error: something went wrong while calculating notables.",
-				});
+				await interaction.editReply({ content: "error: something went wrong while calculating notables." });
 			}
 			catch (editError) {
 				console.error("failed to edit reply with error message:", editError);
@@ -86,56 +925,122 @@ module.exports = {
 		}
 	},
 
-	// Handle button interactions
 	async handleButtonInteraction(interaction) {
-		if (!interaction.customId.startsWith("notables_")) return false;
+		const parsed = parseNotablesInteraction(interaction.customId);
+		if (!parsed) return false;
 
 		try {
 			await interaction.deferUpdate();
 
-			const parts = interaction.customId.split("_");
-			// "weekly", "alltime", or "season"
-			const timeFilter = parts[1];
-			const userId = parts[2];
-			const serverOnly = parts[3] === "true";
-			const squads = parts[4] === "null" ? null : parts[4] === "true";
+			const { action, timeFilter: rawTime, queueFilter: rawQueue, playerCountFilter: rawPlayers, loungeId } = parsed;
+			const messageId = interaction.message?.id || null;
+			const cachedSession = messageId ? getNotablesSession(messageId) : null;
+			const defaultFilters = {
+				timeFilter: "alltime",
+				queueFilter: "both",
+				playerCountFilter: "both",
+			};
+			const baseFilters = cachedSession?.pendingFilters || cachedSession?.filters || defaultFilters;
+
+			let timeFilter = baseFilters.timeFilter || defaultFilters.timeFilter;
+			let queueFilter = baseFilters.queueFilter || defaultFilters.queueFilter;
+			let playerCountFilter = baseFilters.playerCountFilter || defaultFilters.playerCountFilter;
+
+			if (action === "queue") {
+				queueFilter = rawQueue || "both";
+			}
+			else if (action === "players") {
+				playerCountFilter = rawPlayers || "both";
+			}
+			else if (action === "time") {
+				timeFilter = rawTime || "alltime";
+			}
+			else {
+				console.warn(`unknown notables action received: ${action}`);
+			}
+
+			const futureFilters = { timeFilter, queueFilter, playerCountFilter };
 
 			const serverId = interaction.guild.id;
-			const discordUser = await interaction.client.users.fetch(userId);
+			const serverData = await Database.getServerData(serverId);
+			const target = await resolveTargetPlayer(interaction, {
+				loungeId,
+				serverData,
+			});
 
-			// Generate notables based on time filter
-			const result = await this.generateNotables(interaction, discordUser, serverId, serverOnly, squads, timeFilter);
-
-			if (result && result.success) {
-				// Create action row with three buttons (current one disabled)
-				const row = new ActionRowBuilder()
-					.addComponents(
-						new ButtonBuilder()
-							.setCustomId(`notables_alltime_${userId}_${serverOnly}_${squads}`)
-							.setLabel("all time")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "alltime"),
-						new ButtonBuilder()
-							.setCustomId(`notables_weekly_${userId}_${serverOnly}_${squads}`)
-							.setLabel("past week")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "weekly"),
-						new ButtonBuilder()
-							.setCustomId(`notables_season_${userId}_${serverOnly}_${squads}`)
-							.setLabel("this season")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "season"),
-					);
-
-				await interaction.editReply({ content: "", embeds: [result.embed], components: [row] });
+			if (target.error) {
+				const components = buildNotablesComponentRows({
+					loungeId,
+					timeFilter,
+					queueFilter,
+					playerCountFilter,
+				});
+				await interaction.editReply({
+					content: target.error,
+					components,
+					files: [],
+				});
+				return true;
 			}
-			   else {
-				   // Handle error case for button interactions
-				   const embed = new EmbedBuilder()
-					   .setColor("Red")
-					   .setDescription(result.message || "unable to load notables data.");
-				   await interaction.editReply({ content: "", embeds: [embed] });
-			   }
+
+			const components = buildNotablesComponentRows({
+				loungeId: target.loungeId,
+				timeFilter,
+				queueFilter,
+				playerCountFilter,
+			});
+
+			if (cachedSession) {
+				cachedSession.pendingFilters = futureFilters;
+			}
+
+			const renderToken = beginNotablesRender(messageId);
+			if (cachedSession) {
+				cachedSession.activeRequestToken = renderToken;
+			}
+
+			let result;
+			try {
+				result = await this.generateNotables(
+					interaction,
+					target,
+					serverId,
+					queueFilter,
+					playerCountFilter,
+					timeFilter,
+					serverData,
+					{ session: cachedSession, filtersOverride: futureFilters },
+				);
+
+				if (isNotablesRenderActive(messageId, renderToken)) {
+					if (result && result.success) {
+						await interaction.editReply({ content: result.content ?? "", files: result.files, components });
+						if (messageId && result.session) {
+							storeNotablesSession(messageId, {
+								...result.session,
+								discordUser: target.discordUser || result.session.discordUser || null,
+								filters: futureFilters,
+								pendingFilters: null,
+								activeRequestToken: null,
+							});
+						}
+					}
+					else {
+						await interaction.editReply({
+							content: result?.message || "unable to load notables data.",
+							components,
+							files: [],
+						});
+					}
+				}
+			}
+			finally {
+				endNotablesRender(messageId, renderToken);
+				if (cachedSession) {
+					cachedSession.pendingFilters = null;
+					cachedSession.activeRequestToken = null;
+				}
+			}
 
 			return true;
 		}
@@ -145,257 +1050,258 @@ module.exports = {
 		}
 	},
 
-	// Generate notables data (simplified version)
-	async generateNotables(interaction, discordUser, serverId, serverOnly, squads, timeFilter = "alltime") {
+	async generateNotables(interaction, target, serverId, queueFilter, playerCountFilter, timeFilter = "alltime", serverDataOverride = null, cacheOptions = {}) {
 		try {
-			// Validate user exists and add them if they have a lounge account
-			const userValidation = await AutoUserManager.validateUserForCommand(discordUser.id, serverId, interaction.client);
+			const { loungeId } = target;
+			const normalizedLoungeId = String(loungeId);
+			const fallbackName = `player ${normalizedLoungeId}`;
+			const session = cacheOptions?.session || null;
+			const useSession = Boolean(session && session.playerDetails && session.allTables && session.trackName);
 
-			if (!userValidation.success) {
-				if (userValidation.needsSetup) {
-					return { success: false, message: "this server hasn't been set up yet. run `/setup` first." };
+			let serverData = serverDataOverride || null;
+			if (!serverData && !useSession) {
+				serverData = await Database.getServerData(serverId);
+			}
+
+			let displayName = target.displayName || target.loungeName || fallbackName;
+			let loungeName = target.loungeName || displayName || fallbackName;
+			let playerDetails = useSession ? session.playerDetails : null;
+			let allTables = useSession ? session.allTables : null;
+			let favorites = useSession ? session.favorites || {} : null;
+			let favoriteCharacterImage = useSession ? session.favoriteCharacterImage || null : null;
+			let favoriteVehicleImage = useSession ? session.favoriteVehicleImage || null : null;
+			let trackName = useSession ? session.trackName : null;
+			let discordUser = target.discordUser || (useSession ? session.discordUser : null);
+			let storedRecord = (!useSession && serverData) ? serverData?.users?.[normalizedLoungeId] : null;
+
+			if (!playerDetails) {
+				playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
+				if (!playerDetails) {
+					return { success: false, message: "couldn't find that player in mkw lounge." };
 				}
-				return { success: false, message: userValidation.message };
 			}
 
-			// Get user's Lounge account
-			const userId = discordUser.id;
-			const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
+			if (!useSession) {
+				const ensureResult = await DataManager.ensureUserRecord({
+					loungeId: normalizedLoungeId,
+					loungeName,
+					serverId,
+					client: interaction.client,
+					guild: interaction.guild ?? null,
+				});
+				if (ensureResult?.userRecord) {
+					if (!storedRecord && ensureResult.userRecord.servers?.includes(serverId)) {
+						storedRecord = ensureResult.userRecord;
+						if (serverData) {
+							serverData.users = {
+								...serverData.users,
+								[normalizedLoungeId]: ensureResult.userRecord,
+							};
+						}
+					}
+					else if (storedRecord && ensureResult.userRecord.servers?.includes(serverId)) {
+						storedRecord = ensureResult.userRecord;
+						if (serverData) {
+							serverData.users[normalizedLoungeId] = ensureResult.userRecord;
+						}
+					}
+					if (!target.loungeName && ensureResult.userRecord.loungeName) {
+						target.loungeName = ensureResult.userRecord.loungeName;
+					}
+					if (!target.displayName && ensureResult.userRecord.username) {
+						target.displayName = ensureResult.userRecord.username;
+					}
+					if (!loungeName && ensureResult.userRecord.loungeName) {
+						loungeName = ensureResult.userRecord.loungeName;
+					}
+				}
 
-			if (!loungeUser) {
-				return null;
-			}
+				if (ensureResult?.discordUser && !discordUser) {
+					discordUser = ensureResult.discordUser;
+					if (!target.displayName) {
+						target.displayName = ensureResult.discordUser.displayName || ensureResult.discordUser.username;
+					}
+				}
+				if (ensureResult?.loungeProfile?.name && (!loungeName || loungeName === fallbackName)) {
+					loungeName = ensureResult.loungeProfile.name;
+				}
+				displayName = target.displayName || loungeName || fallbackName;
+				loungeName = loungeName || fallbackName;
 
-			try {
-				await DataManager.updateServerUser(serverId, userId, interaction.client);
-			}
-			catch (error) {
-				console.warn(`failed to update user data for ${userId}:`, error);
-			}
+				const candidateDiscordIds = new Set([
+					discordUser?.id,
+					...(storedRecord?.discordIds || []),
+				]);
+				if (ensureResult?.guildMember && ensureResult.discordId) {
+					candidateDiscordIds.add(ensureResult.discordId);
+				}
 
-			// Get user's tables
-			await interaction.editReply("searching for tables...");
-			let userTables = await LoungeApi.getAllPlayerTables(userId, serverId);
-
-			if (!userTables || Object.keys(userTables).length === 0) {
-				return { success: false, message: "no events found for this player." };
-			}
-
-			// Apply time filter using PlayerStats methods
-			if (timeFilter === "weekly") {
-				userTables = PlayerStats.filterTablesByWeek(userTables, true);
-			}
-			else if (timeFilter === "season") {
-				userTables = PlayerStats.filterTablesBySeason(userTables, true);
-			}
-
-			// Filter tables based on options
-			if (serverOnly) {
-				const filteredEntries = [];
-				for (const [tableId, table] of Object.entries(userTables)) {
+				const membershipCache = new Map();
+				const guild = interaction.guild ?? null;
+				const isKnownServerMember = (discordId, record) => {
+					if (!discordId) return false;
+					if (!record) return false;
+					if (!record.servers?.includes(serverId)) return false;
+					if (!record.discordIds?.includes(discordId)) return false;
+					return true;
+				};
+				const ensureGuildMembership = async discordId => {
+					if (!guild || !discordId) return false;
+					const key = String(discordId);
+					if (membershipCache.has(key)) {
+						return membershipCache.get(key);
+					}
+					if (guild.members.cache.has(key)) {
+						membershipCache.set(key, true);
+						return true;
+					}
 					try {
-						if (await PlayerStats.checkIfServerTable(userId, table, serverId)) {
-							filteredEntries.push([tableId, table]);
+						const member = await guild.members.fetch({ user: key, cache: true, force: false });
+						const result = Boolean(member);
+						membershipCache.set(key, result);
+						return result;
+					}
+					catch (error) {
+						if (error.code === 10007 || error.status === 404) {
+							membershipCache.set(key, false);
+							return false;
+						}
+						console.warn(`failed guild membership check for ${key}:`, error);
+						membershipCache.set(key, false);
+						return false;
+					}
+				};
+
+				for (const candidateId of candidateDiscordIds) {
+					const normalizedId = candidateId ? String(candidateId) : null;
+					if (!normalizedId) continue;
+
+					let isMember = isKnownServerMember(normalizedId, storedRecord);
+					if (!isMember) {
+						isMember = await ensureGuildMembership(normalizedId);
+					}
+					if (!isMember) continue;
+
+					try {
+						const updated = await DataManager.updateServerUser(serverId, normalizedId, interaction.client);
+						if (updated) {
+							break;
 						}
 					}
 					catch (error) {
-						console.warn(`error checking table ${tableId}:`, error);
+						console.warn(`failed to update user ${normalizedId}:`, error);
 					}
 				}
-				userTables = Object.fromEntries(filteredEntries);
 			}
 
-			if (squads) {
-				userTables = Object.fromEntries(
-					Object.entries(userTables).filter(([tableId, table]) =>
-						table.tier === "SQ"),
-				);
+			displayName = target.displayName || loungeName || fallbackName;
+			loungeName = loungeName || fallbackName;
+			if (discordUser && !target.discordUser) {
+				target.discordUser = discordUser;
 			}
 
-			if (squads === false) {
-				userTables = Object.fromEntries(
-					Object.entries(userTables).filter(([tableId, table]) =>
-						table.tier !== "SQ"),
-				);
+			await interaction.editReply(`getting ${displayName}'s mogis...`);
+
+			if (!allTables) {
+				allTables = await LoungeApi.getAllPlayerTables(normalizedLoungeId, serverId);
+			}
+			if (!allTables || Object.keys(allTables).length === 0) {
+				return { success: false, message: "no events found for this player." };
 			}
 
-			// Check if any tables remain after filtering
-			if (Object.keys(userTables).length === 0) {
+			await interaction.editReply("filtering...");
+
+			const filteredTables = PlayerStats.filterTablesByControls(allTables, { timeFilter, queueFilter, playerCountFilter });
+			const filteredTableIds = Object.keys(filteredTables);
+			if (!filteredTableIds.length) {
 				return { success: false, message: "no events found matching the specified filters." };
 			}
 
-			// Calculate statistics
-			await interaction.editReply("filtering...");
-			const bS = PlayerStats.getBestScore(userTables, userId);
-			const wS = PlayerStats.getWorstScore(userTables, userId);
-			const oP = PlayerStats.getBiggestOverperformance(userTables, userId);
-			const uP = PlayerStats.getBiggestUnderperformance(userTables, userId);
-			const bC = PlayerStats.getBiggestCarry(userTables, userId);
-			const bA = PlayerStats.getBiggestAnchor(userTables, userId);
+			await interaction.editReply("calculating...");
 
-			// Validate that statistics were calculated successfully
-			if (!bS || !wS || !oP || !uP || !bC || !bA) {
+			if (!favorites) {
+				const userData = await Database.getUserData(normalizedLoungeId);
+				favorites = userData?.favorites || {};
+			}
+			if (!trackName) {
+				trackName = favorites.track || GameData.getRandomTrack();
+			}
+			if (!favoriteCharacterImage || !favoriteVehicleImage) {
+				const [characterImage, vehicleImage] = await Promise.all([
+					favoriteCharacterImage ? Promise.resolve(favoriteCharacterImage) : loadFavoriteCharacterImage(favorites),
+					favoriteVehicleImage ? Promise.resolve(favoriteVehicleImage) : loadFavoriteVehicleImage(favorites),
+				]);
+				favoriteCharacterImage = characterImage || favoriteCharacterImage;
+				favoriteVehicleImage = vehicleImage || favoriteVehicleImage;
+			}
+
+			const bestScore = PlayerStats.getBestScore(filteredTables, normalizedLoungeId);
+			const worstScore = PlayerStats.getWorstScore(filteredTables, normalizedLoungeId);
+			const overperformance = PlayerStats.getBiggestOverperformance(filteredTables, normalizedLoungeId);
+			const underperformance = PlayerStats.getBiggestUnderperformance(filteredTables, normalizedLoungeId);
+			const carry = PlayerStats.getBiggestCarry(filteredTables, normalizedLoungeId);
+			const anchor = PlayerStats.getBiggestAnchor(filteredTables, normalizedLoungeId);
+
+			if (!bestScore || !worstScore || !overperformance || !underperformance || !carry || !anchor) {
 				return { success: false, message: "insufficient data to calculate notables for this player." };
 			}
 
-			// Messages for random selection
-			const goodBSMessages = [
-				"nice!",
-				"excellent work!",
-				"can you do even better?",
-				"skill was on your side that day. (or luck...)",
-				"typical mogi for the goat.",
-				"why can't every mogi be this good?",
-				"cheating?",
-				"luck was on your side that day. (or skill...)",
-				"isn't this game so good when you win?",
-			];
-			const badBSMessages = [
-				"great score, but not good enough for 1st :(",
-				"guess someone else was having an even better mogi.",
-				"not first? shortrat must have been in your room.",
-				"someone had to steal your thunder i guess.",
-				"nice, but i know you have at least 10 more points in you. maybe 15.",
-				"solid showing.",
-			];
+			const { goodEvents, badEvents } = buildColumnEvents({ filteredTables, loungeId: normalizedLoungeId, metrics: { bestScore, worstScore, overperformance, underperformance, carry, anchor } });
+			const linkMessage = buildTableLinksMessage([...goodEvents, ...badEvents]);
 
-			const goodWSMessages = [
-				"if you think that mogi sucked, think about whoever you beat.",
-				"your worst ever and you still didn't get last? We take it.",
-				"ouch.",
-				"at least you beat somebody!",
-				"hey, losing makes winning feel even better!",
-				"sometimes when you gamble, you lose.",
-				"you suck. (jk.)",
-			];
-			const badWSMessages = [
-				"this is the type of mogi i have when i'm about to promote.",
-				"video games aren't for everyone. maybe try sports?",
-				"yowch.",
-				"at least you beat somebody! wait, no you didn't.",
-				"thanks for graciously donating your mmr to those other players.",
-				"can't blame any teammates for that one.",
-				"you suck.",
-			];
+			await interaction.editReply("rendering image...");
 
-			const oPMessages = [
-				"against all odds!",
-				"they never saw it coming.",
-				"they underestimated you, but i knew you were like that.",
-				"great job!",
-				"holy w.",
-				"how does he do it?",
-				"the up and coming goat.",
-			];
+			const trackColors = ColorPalettes.notablesTrackColors[trackName] || ColorPalettes.notablesTrackColors[ColorPalettes.currentTrackName] || {
+				baseColor: "#ffffffd9",
+				headerColor: "#111111",
+				statsTextColor: "#333333",
+			};
 
-			const uPMessages = [
-				"well, even lightning mcqueen has lost races before.",
-				"but you were just unlucky, right?",
-				"oof.",
-				"guess the room was punching above its weight.",
-				"washed?",
-				"yikes.",
-				"everyone was silently judging you.",
-				"not your mogi.",
-			];
+			const attachment = await renderNotablesImage({
+				trackName,
+				trackColors,
+				displayName,
+				playerDetails,
+				discordUser,
+				favorites,
+				favoriteCharacterImage,
+				favoriteVehicleImage,
+				goodEvents,
+				badEvents,
+				timeFilter,
+				queueFilter,
+				playerCountFilter,
+				totalEvents: filteredTableIds.length,
+			});
 
-			const bCMessages = [
-				"someone had to pick up the slack.",
-				"does your back hurt?",
-				"you did everything you could.",
-				"impressive!",
-				"did the rest of your team suck or are you just that good?",
-				"you're the type of mate we all need.",
-				"holy carry.",
-			];
+			const updatedSession = {
+				loungeId: normalizedLoungeId,
+				serverId,
+				displayName,
+				loungeName,
+				playerDetails,
+				allTables,
+				favorites,
+				favoriteCharacterImage,
+				favoriteVehicleImage,
+				trackName,
+				discordUser,
+				filters: { timeFilter, queueFilter, playerCountFilter },
+				pendingFilters: null,
+				activeRequestToken: null,
+				target: {
+					loungeId: normalizedLoungeId,
+					loungeName,
+					displayName,
+				},
+			};
 
-			const bAMessages = [
-				"smh.",
-				"your team needed you, but you vanished.",
-				"someone had to pick up the slack, and it wasn't you.",
-				"ow.",
-				"thank god for teammates.",
-				"bad day?",
-			];
-
-			const playerNameWithFlag = embedEnhancer.formatPlayerNameWithFlag(discordUser.displayName, loungeUser.countryCode);
-
-			// Create time-aware title
-			const timePrefix = timeFilter === "weekly" ? "weekly " : timeFilter === "season" ? "season " : "";
-
-			const notablesEmbed = new EmbedBuilder()
-				.setColor("Gold")
-				.setTitle(`${playerNameWithFlag}'s ${serverOnly ? "server " : ""}${
-					squads ? "squad " : squads === false ? "soloQ " : ""}${timePrefix}notables`)
-				.setTimestamp()
-				.addFields(
-					{ name: "best score:", value: `[in this ${userTables[bS.tableId].numPlayers}p ${
-						userTables[bS.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${bS.tableId})`
-                + ` you scored **${bS.score}** ${
-                	bS.placement === 1 ? "and" : "but"} were rank **${
-                	bS.placement}**. ${
-                	getRandomMessage(bS.placement === 1 ? goodBSMessages : badBSMessages)}`,
-					},
-					{ name: "worst score:", value: `[in this ${userTables[wS.tableId].numPlayers}p ${
-						userTables[wS.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${wS.tableId})`
-                + ` you scored **${wS.score}** and were rank **${
-                	wS.placement}**. ${
-                	getRandomMessage(wS.placement === userTables[wS.tableId].numPlayers ? badWSMessages : goodWSMessages)}`,
-					},
-					{ name: "biggest overperformance:", value: `[in this ${userTables[oP.tableId].numPlayers}p ${
-						userTables[oP.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${oP.tableId})`
-                + ` you were seed **${
-                	oP.placement + oP.overperformance}** but scored **${
-                	oP.score}** and managed to get rank **${
-                	oP.placement}**. ${getRandomMessage(oPMessages)}`,
-					},
-					{ name: "biggest underperformance:", value: `[in this ${userTables[uP.tableId].numPlayers}p ${
-						userTables[uP.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${uP.tableId})`
-                + ` you were seed **${
-                	uP.placement + uP.underperformance}** but scored **${
-                	uP.score}** and ended up rank **${
-                	uP.placement}**. ${getRandomMessage(uPMessages)}`,
-					},
-					{ name: "biggest carry:", value: `[in this ${userTables[bC.tableId].numPlayers}p ${
-						userTables[bC.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${bC.tableId})`
-                + ` you were rank **${
-                	bC.placement}** and scored **${
-                	bC.score}** while your ${
-                	userTables[bC.tableId].format === "2v2" ?
-                	"mate scored" : "teammates averaged"} **${
-                	bC.score - bC.carryAmount}**. `
-                + getRandomMessage(bCMessages),
-					},
-					{ name: "biggest anchor:", value: `[in this ${userTables[bA.tableId].numPlayers}p ${
-						userTables[bA.tableId].format}](https://lounge.mkcentral.com/mkworld/TableDetails/${bA.tableId})`
-                + ` you were rank **${
-                	bA.placement}** and scored **${
-                	bA.score}** while your ${
-                	userTables[bA.tableId].format === "2v2" ?
-                	"mate scored" : "teammates averaged"} **${
-                	bA.score - bA.anchorAmount}**. `
-                + getRandomMessage(bAMessages),
-					},
-				);
-
-			// Add player avatar as thumbnail
-			const avatarUrl = embedEnhancer.getPlayerAvatarUrl(discordUser);
-			if (avatarUrl) {
-				notablesEmbed.setThumbnail(avatarUrl);
-			}
-
-			// Add time-aware footer
-			const eventCount = Object.keys(userTables).length;
-			let footerText = `your most notable moments from ${eventCount} event${eventCount !== 1 ? "s" : ""}`;
-			if (timeFilter === "weekly") {
-				footerText += " (past 7 days)";
-			}
-			else if (timeFilter === "season") {
-				footerText += " (current season)";
-			}
-			notablesEmbed.setFooter({ text: footerText });
-
-			return { success: true, embed: notablesEmbed };
+			return {
+				success: true,
+				content: linkMessage || "",
+				files: [attachment],
+				session: updatedSession,
+			};
 		}
 		catch (error) {
 			console.error("error generating notables:", error);

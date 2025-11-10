@@ -1,69 +1,728 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const database = require("../../utils/database");
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require("discord.js");
+const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
+const { createCanvas, loadImage } = require("canvas");
+const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
 const DataManager = require("../../utils/dataManager");
-const embedEnhancer = require("../../utils/embedEnhancer");
+const EmbedEnhancer = require("../../utils/embedEnhancer");
+const { formatNumber, formatSignedNumber } = EmbedEnhancer;
 const AutoUserManager = require("../../utils/autoUserManager");
+const GameData = require("../../utils/gameData");
+const ColorPalettes = require("../../utils/colorPalettes");
+const resolveTargetPlayer = require("../../utils/playerResolver");
+
+const EDGE_RADIUS = 30;
+
+const LAYOUT = {
+	pagePadding: 100,
+	columnGap: 50,
+	headerHeight: 120,
+	statsHeight: 720,
+	sectionGap: 40,
+	headerPaddingLeft: 40,
+	headerPaddingRight: 25,
+	headerEmojiSize: 60,
+	headerEmojiGap: 24,
+	headerTitleFontSize: 52,
+	headerSubtitleFontSize: 26,
+	headerSubtitleGap: 10,
+	headerAvatarSize: 96,
+	headerAvatarRadius: 24,
+	headerAssetGap: 15,
+	headerFavoriteMaxSize: 100,
+	statsPadding: 45,
+	statsCellPadding: 42,
+	statsLabelFontSize: 32,
+	statsValueFontSize: 55,
+	statsSubLabelFontSize: 25,
+	statsCellAdditionalTopPadding: 10,
+	statsCellAdditionalBottomPadding: 17,
+};
+
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const DIVISION_CHART_CACHE_TTL_MS = ONE_WEEK_MS;
+const CHART_DIMENSIONS = { width: 835, height: 880 };
+const ICON_SIZE = 54;
+const ICON_GAP = 12;
+
+const divisionChartCache = new Map();
+let chartRenderer = null;
+const imageCache = new Map();
+const STATS_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
+const statsSessionCache = new Map();
+const statsRenderTokens = new Map();
+
+function beginStatsRender(messageId) {
+	if (!messageId) {
+		return null;
+	}
+	const token = Symbol("statsRender");
+	statsRenderTokens.set(messageId, token);
+	return token;
+}
+
+function isStatsRenderActive(messageId, token) {
+	if (!messageId || !token) {
+		return true;
+	}
+	return statsRenderTokens.get(messageId) === token;
+}
+
+function endStatsRender(messageId, token) {
+	if (!messageId || !token) {
+		return;
+	}
+	if (statsRenderTokens.get(messageId) === token) {
+		statsRenderTokens.delete(messageId);
+	}
+}
+
+function computeCanvasLayout({ chartWidth, chartHeight }) {
+	const headerFrame = {
+		left: LAYOUT.pagePadding,
+		top: LAYOUT.pagePadding,
+		width: chartWidth,
+		height: LAYOUT.headerHeight,
+	};
+
+	const statsFrame = {
+		left: LAYOUT.pagePadding,
+		top: headerFrame.top + headerFrame.height + LAYOUT.sectionGap,
+		width: chartWidth,
+		height: LAYOUT.statsHeight,
+	};
+
+	const chartFrame = {
+		left: headerFrame.left + headerFrame.width + LAYOUT.columnGap,
+		top: LAYOUT.pagePadding,
+		width: chartWidth,
+		height: chartHeight,
+	};
+
+	return { headerFrame, statsFrame, chartFrame };
+}
+
+function drawStatsGrid(ctx, frame, trackColors, gridConfig) {
+	if (!frame || !gridConfig?.length) return;
+
+	const columns = gridConfig[0]?.length || 0;
+	if (!columns) return;
+
+	ctx.save();
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+
+	const innerX = frame.left + LAYOUT.statsPadding;
+	const innerY = frame.top + LAYOUT.statsPadding;
+	const innerWidth = Math.max(frame.width - LAYOUT.statsPadding * 2, 1);
+	const innerHeight = Math.max(frame.height - LAYOUT.statsPadding * 2, 1);
+	const cellWidth = innerWidth / columns;
+	const cellHeight = innerHeight / gridConfig.length;
+
+	const labelFont = `${LAYOUT.statsLabelFontSize}px Lexend`;
+	const labelLineHeight = LAYOUT.statsLabelFontSize * 1.1;
+	const valueFont = `700 ${LAYOUT.statsValueFontSize}px Lexend`;
+	const subLabelFont = `${LAYOUT.statsSubLabelFontSize}px Lexend`;
+
+	const yOffset = (LAYOUT.statsCellPadding + LAYOUT.statsCellAdditionalTopPadding) / 2;
+
+	gridConfig.forEach((row, rowIndex) => {
+		row.forEach((cell, colIndex) => {
+			const cellTop = innerY + rowIndex * cellHeight;
+			const cellCenterX = innerX + colIndex * cellWidth + cellWidth / 2;
+			const cellBottom = cellTop + cellHeight - LAYOUT.statsCellPadding;
+			const cellTopInner = cellTop + LAYOUT.statsCellPadding;
+			const baseValueY = yOffset + cellTop + cellHeight / 2;
+			const defaultTextColor = trackColors?.statsTextColor || "#ffffff";
+			const defaultValueColor = trackColors?.statsValueColor || defaultTextColor;
+
+			const labelLines = String(cell.label ?? "").split("\n");
+			ctx.font = labelFont;
+			ctx.fillStyle = defaultTextColor;
+			let labelY = yOffset + cellTopInner - (labelLineHeight * (labelLines.length - 1)) + LAYOUT.statsCellAdditionalTopPadding;
+			labelLines.forEach(line => {
+				ctx.fillText(line, cellCenterX, labelY);
+				labelY += labelLineHeight;
+			});
+
+			ctx.font = valueFont;
+			const valueColor = cell.valueColor || defaultValueColor;
+			const valueOutlineColor = cell.valueOutlineColor || null;
+			ctx.fillStyle = valueColor;
+			let valueY = baseValueY;
+			if (typeof cell.valueYOffset === "number") {
+				valueY += cell.valueYOffset;
+			}
+			const minValueY = cellTopInner + LAYOUT.statsLabelFontSize + 10;
+			if (valueY < minValueY) {
+				valueY = minValueY;
+			}
+			if (valueOutlineColor) {
+				ctx.save();
+				ctx.lineWidth = 4;
+				ctx.strokeStyle = valueOutlineColor;
+				ctx.lineJoin = "round";
+				ctx.strokeText(cell.value ?? "-", cellCenterX, valueY);
+				ctx.restore();
+			}
+			ctx.fillText(cell.value ?? "-", cellCenterX, valueY);
+
+			if (cell.subLabel) {
+				ctx.font = subLabelFont;
+				ctx.fillStyle = defaultTextColor;
+				let subY = yOffset + cellBottom - LAYOUT.statsCellAdditionalBottomPadding;
+				if (typeof cell.subLabelYOffset === "number") {
+					subY += cell.subLabelYOffset;
+				}
+				const minSubY = cellTopInner + LAYOUT.statsLabelFontSize;
+				if (subY < minSubY) {
+					subY = minSubY;
+				}
+				ctx.fillText(cell.subLabel, cellCenterX, subY);
+			}
+		});
+	});
+
+	ctx.restore();
+}
+
+
+function getStatsSession(messageId) {
+	if (!messageId) {
+		return null;
+	}
+	const session = statsSessionCache.get(messageId);
+	if (!session) {
+		return null;
+	}
+	if (session.expiresAt && session.expiresAt <= Date.now()) {
+		statsSessionCache.delete(messageId);
+		return null;
+	}
+	refreshStatsSession(messageId);
+	return statsSessionCache.get(messageId);
+}
+
+function storeStatsSession(messageId, session) {
+	if (!messageId || !session) {
+		return;
+	}
+	const expiresAt = Date.now() + STATS_SESSION_CACHE_TTL_MS;
+	statsSessionCache.set(messageId, {
+		...session,
+		messageId,
+		expiresAt,
+	});
+}
+
+function refreshStatsSession(messageId) {
+	const session = statsSessionCache.get(messageId);
+	if (!session) {
+		return;
+	}
+	session.expiresAt = Date.now() + STATS_SESSION_CACHE_TTL_MS;
+}
+
+
+function getChartRenderer() {
+	if (chartRenderer) {
+		return chartRenderer;
+	}
+	chartRenderer = new ChartJSNodeCanvas({
+		width: CHART_DIMENSIONS.width,
+		height: CHART_DIMENSIONS.height,
+		backgroundColour: "rgba(0,0,0,0)",
+		chartCallback: ChartJS => {
+			ChartJS.defaults.font.family = "Lexend";
+		},
+	});
+	return chartRenderer;
+}
+
+async function loadCachedImage(resource) {
+	if (!resource) {
+		return null;
+	}
+	if (imageCache.has(resource)) {
+		return imageCache.get(resource);
+	}
+	try {
+		const image = await loadImage(resource);
+		imageCache.set(resource, image);
+		return image;
+	}
+	catch (error) {
+		console.warn(`failed to load image ${resource}:`, error);
+		imageCache.set(resource, null);
+		return null;
+	}
+}
+
+function computeDivisionSignature(divisionData) {
+	try {
+		return JSON.stringify(divisionData ?? []);
+	}
+	catch (error) {
+		console.warn("failed to hash division data for cache signature:", error);
+		return "";
+	}
+}
+
+async function getRankIcon(tier) {
+	if (!tier) {
+		return null;
+	}
+	const filename = PlayerStats.getRankIconFilename(tier);
+	if (!filename) {
+		console.warn(`no icon found for tier ${tier}, skipping`);
+		return null;
+	}
+	return loadCachedImage(`images/ranks/${filename}`);
+}
+
+async function getDivisionChart(trackName, trackColors, globals) {
+	const cacheKey = trackName || "__default";
+	const signature = computeDivisionSignature(globals?.divisionData);
+	const existing = divisionChartCache.get(cacheKey);
+	const now = Date.now();
+	if (existing && existing.signature === signature && existing.expiresAt > now) {
+		return existing;
+	}
+
+	const divisionEntries = Array.isArray(globals?.divisionData)
+		? [...globals.divisionData].reverse()
+		: [];
+	const chartLabels = divisionEntries.map(entry => entry.tier);
+	const chartData = divisionEntries.map(entry => entry.count);
+	const rankImages = await Promise.all(chartLabels.map(tier => getRankIcon(tier)));
+
+	const iconPlugin = {
+		id: "xAxisIcons",
+		afterDraw(chart, args, options) {
+			const pluginOptions = options || {};
+			const icons = pluginOptions.icons || [];
+			if (!icons.length) {
+				return;
+			}
+			const chartCtx = chart.ctx;
+			const { bottom } = chart.chartArea;
+			const xScale = chart.scales.x;
+			chartCtx.save();
+			icons.forEach((img, idx) => {
+				if (!img) return;
+				const x = xScale.getPixelForTick(idx);
+				chartCtx.drawImage(img, x - ICON_SIZE / 2, bottom + ICON_GAP, ICON_SIZE, ICON_SIZE);
+			});
+			chartCtx.restore();
+		},
+	};
+
+	let capturedMetrics = null;
+	const metricsCapturePlugin = {
+		id: "captureBarMetrics",
+		afterDatasetsDraw(chart) {
+			const meta = chart.getDatasetMeta(0);
+			if (!meta?.data?.length) {
+				return;
+			}
+			const centers = meta.data.map(element => element.x);
+			const widths = centers.map((center, index) => {
+				if (index < centers.length - 1) {
+					return centers[index + 1] - center;
+				}
+				if (centers.length > 1) {
+					return center - centers[index - 1];
+				}
+				return chart.chartArea.right - chart.chartArea.left;
+			});
+			capturedMetrics = {
+				bars: centers.map((center, index) => {
+					const barWidth = Math.abs(widths[index] || 0);
+					const barTop = meta.data[index]?.y;
+					return {
+						left: center - barWidth / 2,
+						width: barWidth,
+						top: barTop,
+					};
+				}),
+				chartArea: { ...chart.chartArea },
+			};
+		},
+	};
+
+	const barColors = [
+		"#575757ff",
+		"#a9600e",
+		"#8d8d8dff",
+		"#e9c235",
+		"#3fabb8",
+		"#426cd3",
+		"#c6215f",
+		"#c4f2ff",
+		"#9170db",
+		"#97082e",
+	];
+
+	const renderer = getChartRenderer();
+
+	const config = {
+		type: "bar",
+		data: {
+			labels: chartLabels,
+			datasets: [{
+				data: chartData,
+				backgroundColor: barColors.map(color =>
+					EmbedEnhancer.randomPattern(color, "#ffffff", 20, [], 0.3),
+				),
+				fill: true,
+				tension: 0.3,
+				categoryPercentage: 1,
+				barPercentage: 1,
+				borderRadius: { topLeft: EDGE_RADIUS / 2, topRight: EDGE_RADIUS / 2 },
+				borderSkipped: false,
+			}],
+		},
+		options: {
+			plugins: {
+				title: {
+					display: true,
+					text: "mmr distribution",
+					font: {
+						size: 40,
+					},
+					color: trackColors.chartTextColor,
+				},
+				xAxisIcons: {
+					icons: rankImages,
+				},
+				legend: { display: false },
+			},
+			scales: {
+				y: {
+					title: {
+						display: true,
+						text: "player count",
+						font: { size: 24 },
+						color: trackColors.chartTextColor,
+					},
+					beginAtZero: true,
+					grid: { color: trackColors.yGridColor },
+					ticks: {
+						stepSize: 1000,
+						font: { size: 20 },
+						color: trackColors.chartTextColor,
+					},
+				},
+				x: {
+					ticks: { display: false },
+					grid: { display: false },
+					categoryPercentage: 1,
+					barPercentage: 1,
+				},
+			},
+			layout: {
+				padding: {
+					top: 25,
+					right: 25,
+					bottom: ICON_SIZE + ICON_GAP * 2,
+					left: 25,
+				},
+			},
+		},
+		plugins: [iconPlugin, metricsCapturePlugin],
+	};
+
+	const chartBuffer = await renderer.renderToBuffer(config);
+	const chartImage = await loadImage(chartBuffer);
+
+	const entry = {
+		image: chartImage,
+		metrics: capturedMetrics,
+		labels: chartLabels,
+		signature,
+		expiresAt: now + DIVISION_CHART_CACHE_TTL_MS,
+	};
+	divisionChartCache.set(cacheKey, entry);
+	return entry;
+}
+
+function buildStatsCustomId(action, { timeFilter, queueFilter, playerCountFilter, loungeId }) {
+	const safeAction = action || "time";
+	const safeTime = timeFilter || "alltime";
+	const safeQueue = queueFilter || "both";
+	const safePlayers = playerCountFilter || "both";
+	const safeLounge = loungeId ?? "";
+	return ["stats", safeAction, safeTime, safeQueue, safePlayers, safeLounge].join("|");
+}
+
+function buildStatsComponentRows({ loungeId, timeFilter, queueFilter, playerCountFilter }) {
+	const safeTime = timeFilter || "alltime";
+	const safeQueue = queueFilter || "both";
+	const safePlayerCount = playerCountFilter || "both";
+	const rows = [];
+
+	const timeRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("time", { timeFilter: "alltime", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("all time")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeTime === "alltime"),
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("time", { timeFilter: "weekly", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("past week")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeTime === "weekly"),
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("time", { timeFilter: "season", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("this season")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeTime === "season"),
+		);
+	rows.push(timeRow);
+
+	const queueRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "soloq", playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("soloq")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeQueue === "soloq"),
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "squads", playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("squads")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeQueue === "squads"),
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "both", playerCountFilter: safePlayerCount, loungeId }))
+				.setLabel("both")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safeQueue === "both"),
+		);
+	rows.push(queueRow);
+
+	const playerRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "12p", loungeId }))
+				.setLabel("12p")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safePlayerCount === "12p"),
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "24p", loungeId }))
+				.setLabel("24p")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safePlayerCount === "24p"),
+			new ButtonBuilder()
+				.setCustomId(buildStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "both", loungeId }))
+				.setLabel("both")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(safePlayerCount === "both"),
+		);
+	rows.push(playerRow);
+
+	return rows;
+}
+
+function parseStatsInteraction(customId) {
+	if (!customId?.startsWith("stats|")) {
+		return null;
+	}
+	const parts = customId.split("|");
+	if (parts.length < 6) {
+		return null;
+	}
+	const [, actionRaw, timeRaw, queueRaw, playerRaw, loungeId] = parts;
+	const normalizedAction = (actionRaw || "").toLowerCase();
+	return {
+		action: normalizedAction,
+		timeFilter: (timeRaw || "alltime").toLowerCase(),
+		queueFilter: (queueRaw || "both").toLowerCase(),
+		playerCountFilter: (playerRaw || "both").toLowerCase(),
+		loungeId,
+	};
+}
+
+if (typeof document === "undefined") {
+	global.document = {
+		createElement(tag) {
+			if (tag !== "canvas") {
+				throw new Error(`Unsupported element requested: ${tag}`);
+			}
+			return createCanvas(64, 64); // size can be small; patternomaly resizes internally
+		},
+	};
+}
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("stats")
 		.setDescription("check your (or someone else's) stats.")
-		.addUserOption(option =>
-			option.setName("user")
-				.setDescription("yourself if left blank."))
-		.addBooleanOption(option =>
-			option.setName("server-only")
-				.setDescription("true = only mogis including other server members."))
-		.addBooleanOption(option =>
-			option.setName("squads")
-				.setDescription("true = squad only, false = solo only.")),
+		.addStringOption(option =>
+			option.setName("player")
+				.setDescription("lounge name or id. leave blank for yourself.")
+				.setAutocomplete(true)),
+
+	autocomplete: async interaction => {
+		const focused = interaction.options.getFocused(true);
+		if (focused.name !== "player") {
+			await interaction.respond([]);
+			return;
+		}
+
+		const guild = interaction.guild;
+		if (!guild) {
+			await interaction.respond([]);
+			return;
+		}
+
+		const rawQuery = (focused.value || "").trim();
+		const normalizedQuery = rawQuery.toLowerCase();
+		const serverLimit = 5;
+		const globalLimit = 5;
+		const maxSuggestions = serverLimit + globalLimit;
+		const suggestions = [];
+		const seenValues = new Set();
+
+		try {
+			const serverData = await Database.getServerData(guild.id);
+			const users = Object.values(serverData?.users || {});
+			const byName = users
+				.filter(entry => entry?.loungeName)
+				.sort((a, b) => a.loungeName.localeCompare(b.loungeName));
+
+			for (const entry of byName) {
+				const loungeName = entry.loungeName;
+				const normalizedName = loungeName.toLowerCase();
+				if (normalizedQuery && !normalizedName.includes(normalizedQuery)) {
+					continue;
+				}
+				const value = String(entry.loungeId ?? entry.id ?? loungeName);
+				if (seenValues.has(value)) continue;
+				suggestions.push({
+					name: loungeName,
+					value,
+				});
+				seenValues.add(value);
+				if (suggestions.length >= serverLimit) break;
+			}
+		}
+		catch (error) {
+			console.warn("stats autocomplete error:", error);
+		}
+
+		if (rawQuery && suggestions.length < maxSuggestions) {
+			try {
+				const globalResults = await LoungeApi.searchPlayers(rawQuery, { limit: globalLimit });
+				for (const player of globalResults) {
+					const loungeId = [player.id, player.playerId, player.loungeId]
+						.map(id => id === undefined || id === null ? null : String(id))
+						.find(Boolean);
+					if (!loungeId || seenValues.has(loungeId)) continue;
+
+					const displayName = player.name || player.loungeName || player.playerName || player.username;
+					if (!displayName) continue;
+
+					suggestions.push({
+						name: displayName.length > 100 ? displayName.slice(0, 97) + "..." : displayName,
+						value: loungeId,
+					});
+					seenValues.add(loungeId);
+					if (suggestions.length >= maxSuggestions) break;
+				}
+			}
+			catch (error) {
+				console.warn("stats global autocomplete error:", error);
+			}
+		}
+
+		if (!suggestions.length && normalizedQuery) {
+			// allow raw query fallback for direct name or id lookups
+			suggestions.push({
+				name: `search "${rawQuery}"`,
+				value: rawQuery,
+			});
+		}
+
+		await interaction.respond(suggestions.slice(0, maxSuggestions));
+	},
 
 	async execute(interaction) {
 		try {
 			await interaction.deferReply();
 
 			await interaction.editReply("validating user...");
-			const discordUser = interaction.options.getUser("user") || interaction.user;
-			const serverOnly = interaction.options.getBoolean("server-only") ?? false;
-			const squads = interaction.options.getBoolean("squads");
 			const serverId = interaction.guildId;
+			const rawPlayer = interaction.options.getString("player");
+			const timeFilter = "alltime";
+			const queueFilter = "both";
+			const playerCountFilter = "both";
+			const currentFilters = { timeFilter, queueFilter, playerCountFilter };
 
-			// Use generateStats for consistency with button interactions
-			const result = await this.generateStats(interaction, discordUser, serverId, serverOnly, squads, "alltime");
+			const validation = await AutoUserManager.validateUserForCommand(interaction.user.id, serverId, interaction.client);
+			if (!validation.success) {
+				await interaction.editReply({
+					content: validation.message || "unable to validate command user.",
+					files: [],
+					components: [],
+				});
+				return;
+			}
 
-			   if (!result.success) {
-				   const embed = new EmbedBuilder()
-					   .setColor("Red")
-					   .setDescription(result.message || "unable to load stats data.");
-				   return await interaction.editReply({ content: "", embeds: [embed] });
-			   }
-
-			// Create action row with three buttons (current one disabled)
-			const row = new ActionRowBuilder()
-				.addComponents(
-					// Current view is disabled
-					new ButtonBuilder()
-						.setCustomId(`stats_alltime_${discordUser.id}_${serverOnly}_${squads}`)
-						.setLabel("all time")
-						.setStyle(ButtonStyle.Secondary)
-						.setDisabled(true),
-					new ButtonBuilder()
-						.setCustomId(`stats_weekly_${discordUser.id}_${serverOnly}_${squads}`)
-						.setLabel("past week")
-						.setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder()
-						.setCustomId(`stats_season_${discordUser.id}_${serverOnly}_${squads}`)
-						.setLabel("this season")
-						.setStyle(ButtonStyle.Secondary),
-				);
-
-			await interaction.editReply({
-				content: "",
-				embeds: [result.embed],
-				components: [row],
+			const serverData = await Database.getServerData(serverId);
+			const target = await resolveTargetPlayer(interaction, {
+				rawInput: rawPlayer,
+				defaultToInvoker: !rawPlayer,
+				serverData,
 			});
+
+			if (target.error) {
+				await interaction.editReply({
+					content: target.error,
+					files: [],
+					components: [],
+				});
+				return;
+			}
+
+			const componentRows = buildStatsComponentRows({
+				loungeId: target.loungeId,
+				timeFilter,
+				queueFilter,
+				playerCountFilter,
+			});
+
+			const result = await this.generateStats(interaction, target, serverId, queueFilter, playerCountFilter, timeFilter, serverData);
+
+			if (!result.success) {
+				await interaction.editReply({
+					content: result.message || "unable to load stats data.",
+					files: [],
+					components: componentRows,
+					embeds: [],
+					allowedMentions: { parse: [] },
+				});
+				return;
+			}
+
+			const replyMessage = await interaction.editReply({
+				content: result.content,
+				files: result.files,
+				components: componentRows,
+				embeds: [],
+				allowedMentions: { parse: [] },
+			});
+
+			if (replyMessage && result.session) {
+				storeStatsSession(replyMessage.id, {
+					...result.session,
+					discordUser: target.discordUser || result.session.discordUser || null,
+					filters: currentFilters,
+					pendingFilters: null,
+					activeRequestToken: null,
+				});
+			}
 
 		}
 		catch (error) {
@@ -93,54 +752,122 @@ module.exports = {
 
 	// Handle button interactions
 	async handleButtonInteraction(interaction) {
-		if (!interaction.customId.startsWith("stats_")) return false;
+		const parsed = parseStatsInteraction(interaction.customId);
+		if (!parsed) return false;
 
 		try {
 			await interaction.deferUpdate();
 
-			const parts = interaction.customId.split("_");
-			// "weekly", "alltime", or "season"
-			const timeFilter = parts[1];
-			const userId = parts[2];
-			const serverOnly = parts[3] === "true";
-			const squads = parts[4] === "null" ? null : parts[4] === "true";
+			const { action, timeFilter: rawTime, queueFilter: rawQueue, playerCountFilter: rawPlayers, loungeId } = parsed;
+
+			const messageId = interaction.message?.id || null;
+			const cachedSession = messageId ? getStatsSession(messageId) : null;
+			const defaultFilters = {
+				timeFilter: "alltime",
+				queueFilter: "both",
+				playerCountFilter: "both",
+			};
+			const baseFilters = cachedSession?.pendingFilters || cachedSession?.filters || defaultFilters;
+
+			let timeFilter = baseFilters.timeFilter || defaultFilters.timeFilter;
+			let queueFilter = baseFilters.queueFilter || defaultFilters.queueFilter;
+			let playerCountFilter = baseFilters.playerCountFilter || defaultFilters.playerCountFilter;
+
+			if (action === "queue") {
+				queueFilter = rawQueue || "both";
+			}
+			else if (action === "players") {
+				playerCountFilter = rawPlayers || "both";
+			}
+			else if (action === "time") {
+				timeFilter = rawTime || "alltime";
+			}
+			else {
+				console.warn(`unknown stats action received: ${action}`);
+			}
+
+			const futureFilters = { timeFilter, queueFilter, playerCountFilter };
+			if (cachedSession) {
+				cachedSession.pendingFilters = futureFilters;
+			}
 
 			const serverId = interaction.guild.id;
-			const discordUser = await interaction.client.users.fetch(userId);
+			const serverData = await Database.getServerData(serverId);
+			const target = await resolveTargetPlayer(interaction, {
+				loungeId,
+				serverData,
+			});
 
-			// Generate stats based on time filter
-			const result = await this.generateStats(interaction, discordUser, serverId, serverOnly, squads, timeFilter);
-
-			if (result && result.success) {
-				// Create action row with three buttons (current one disabled)
-				const row = new ActionRowBuilder()
-					.addComponents(
-						new ButtonBuilder()
-							.setCustomId(`stats_alltime_${userId}_${serverOnly}_${squads}`)
-							.setLabel("all time")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "alltime"),
-						new ButtonBuilder()
-							.setCustomId(`stats_weekly_${userId}_${serverOnly}_${squads}`)
-							.setLabel("past week")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "weekly"),
-						new ButtonBuilder()
-							.setCustomId(`stats_season_${userId}_${serverOnly}_${squads}`)
-							.setLabel("this season")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(timeFilter === "season"),
-					);
-
-				await interaction.editReply({ content: "", embeds: [result.embed], components: [row] });
+			if (target.error) {
+				const components = buildStatsComponentRows({
+					loungeId,
+					timeFilter,
+					queueFilter,
+					playerCountFilter,
+				});
+				await interaction.editReply({
+					content: target.error,
+					components,
+					embeds: [],
+				});
+				return true;
 			}
-			   else {
-				   // Handle error case for button interactions
-				   const embed = new EmbedBuilder()
-					   .setColor("Red")
-					   .setDescription(result.message || "unable to load stats data.");
-				   await interaction.editReply({ content: "", embeds: [embed] });
-			   }
+
+			const components = buildStatsComponentRows({
+				loungeId: target.loungeId,
+				timeFilter,
+				queueFilter,
+				playerCountFilter,
+			});
+
+			const renderToken = beginStatsRender(messageId);
+			if (cachedSession) {
+				cachedSession.activeRequestToken = renderToken;
+			}
+
+			let result;
+			try {
+				result = await this.generateStats(
+					interaction,
+					target,
+					serverId,
+					queueFilter,
+					playerCountFilter,
+					timeFilter,
+					serverData,
+					{ session: cachedSession, filtersOverride: futureFilters },
+				);
+
+				if (isStatsRenderActive(messageId, renderToken)) {
+					if (result && result.success) {
+						await interaction.editReply({ content: result.content ?? "", files: result.files, components, embeds: [] });
+						if (messageId && result.session) {
+							storeStatsSession(messageId, {
+								...result.session,
+								discordUser: target.discordUser || result.session.discordUser || null,
+								filters: futureFilters,
+								pendingFilters: null,
+								activeRequestToken: null,
+							});
+						}
+					}
+					else {
+						await interaction.editReply({
+							content: result?.message || "unable to load stats data.",
+							components,
+							embeds: [],
+							files: [],
+						});
+					}
+				}
+			}
+			finally {
+				endStatsRender(messageId, renderToken);
+				if (cachedSession) {
+					cachedSession.pendingFilters = null;
+					cachedSession.activeRequestToken = null;
+				}
+			}
 
 			return true;
 		}
@@ -151,161 +878,557 @@ module.exports = {
 	},
 
 	// Generate stats data
-	async generateStats(interaction, discordUser, serverId, serverOnly, squads, timeFilter = "alltime") {
+	async generateStats(interaction, target, serverId, queueFilter, playerCountFilter, timeFilter = "alltime", serverDataOverride = null, cacheOptions = {}) {
 		try {
-			// Validate user exists and add them if they have a lounge account
-			const userValidation = await AutoUserManager.validateUserForCommand(discordUser.id, serverId, interaction.client);
+			const { loungeId } = target;
+			const normalizedLoungeId = String(loungeId);
+			const fallbackName = `player ${normalizedLoungeId}`;
+			const session = cacheOptions?.session || null;
+			const useSession = Boolean(session && session.playerDetails && session.allTables && session.trackName);
 
-			if (!userValidation.success) {
-				if (userValidation.needsSetup) {
-					return { success: false, message: "this server hasn't been set up yet. run `/setup` first." };
+			let serverData = serverDataOverride || null;
+			if (!serverData && !useSession) {
+				serverData = await Database.getServerData(serverId);
+			}
+
+			let displayName = target.displayName || target.loungeName || fallbackName;
+			let loungeName = target.loungeName || displayName || fallbackName;
+			let playerDetails = useSession ? session.playerDetails : null;
+			let allTables = useSession ? session.allTables : null;
+			let favorites = useSession ? session.favorites || {} : null;
+			let favoriteCharacterImage = useSession ? session.favoriteCharacterImage || null : null;
+			let favoriteVehicleImage = useSession ? session.favoriteVehicleImage || null : null;
+			let trackName = useSession ? session.trackName : null;
+			let globals = useSession ? session.globals || null : null;
+			let discordUser = target.discordUser || (useSession ? session.discordUser : null);
+			let storedRecord = (!useSession && serverData) ? serverData?.users?.[normalizedLoungeId] : null;
+
+			if (!playerDetails) {
+				playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
+				if (!playerDetails) {
+					return { success: false, message: "couldn't find that player in mkw lounge." };
 				}
-				return { success: false, message: userValidation.message };
 			}
 
-			// Get user data from Lounge API
-			const userId = discordUser.id;
-			const loungeUser = await LoungeApi.getPlayerByDiscordIdDetailed(userId);
+			if (!useSession) {
+				const ensureResult = await DataManager.ensureUserRecord({
+					loungeId: normalizedLoungeId,
+					loungeName,
+					serverId,
+					client: interaction.client,
+					guild: interaction.guild ?? null,
+				});
+				if (ensureResult?.userRecord) {
+					if (!storedRecord && ensureResult.userRecord.servers?.includes(serverId)) {
+						storedRecord = ensureResult.userRecord;
+						if (serverData) {
+							serverData.users = {
+								...serverData.users,
+								[normalizedLoungeId]: ensureResult.userRecord,
+							};
+						}
+					}
+					else if (storedRecord && ensureResult.userRecord.servers?.includes(serverId)) {
+						storedRecord = ensureResult.userRecord;
+						if (serverData) {
+							serverData.users[normalizedLoungeId] = ensureResult.userRecord;
+						}
+					}
+					if (!target.loungeName && ensureResult.userRecord.loungeName) {
+						target.loungeName = ensureResult.userRecord.loungeName;
+					}
+					if (!target.displayName && ensureResult.userRecord.username) {
+						target.displayName = ensureResult.userRecord.username;
+					}
+					if (!loungeName && ensureResult.userRecord.loungeName) {
+						loungeName = ensureResult.userRecord.loungeName;
+					}
+				}
 
-			if (!loungeUser) {
-				return null;
-			}
+				if (ensureResult?.discordUser && !discordUser) {
+					discordUser = ensureResult.discordUser;
+					if (!target.displayName) {
+						target.displayName = ensureResult.discordUser.displayName || ensureResult.discordUser.username;
+					}
+				}
+				if (ensureResult?.loungeProfile?.name && (!loungeName || loungeName === fallbackName)) {
+					loungeName = ensureResult.loungeProfile.name;
+				}
+				displayName = target.displayName || loungeName || fallbackName;
+				loungeName = loungeName || fallbackName;
 
-			await DataManager.updateServerUser(serverId, userId, interaction.client).catch(error => {
-				console.warn(`failed to update user ${userId}:`, error);
-			});
-			await interaction.editReply(`getting ${discordUser.displayName}'s mogis...`);
-			let userTables = await LoungeApi.getAllPlayerTables(discordUser.id, serverId);
+				const candidateDiscordIds = new Set([
+					discordUser?.id,
+					...(storedRecord?.discordIds || []),
+				]);
+				if (ensureResult?.guildMember && ensureResult.discordId) {
+					candidateDiscordIds.add(ensureResult.discordId);
+				}
 
-			if (!userTables || Object.keys(userTables).length === 0) {
-				return { success: false, message: "no events found for this player." };
-			}
-			await interaction.editReply("filtering...");
-			// Apply time filter using PlayerStats methods
-			if (timeFilter === "weekly") {
-				userTables = PlayerStats.filterTablesByWeek(userTables, true);
-			}
-			else if (timeFilter === "season") {
-				userTables = PlayerStats.filterTablesBySeason(userTables, true);
-			}
-
-			// Filter by server-only if requested
-			if (serverOnly) {
-				const filteredEntries = [];
-				for (const [tableId, table] of Object.entries(userTables)) {
+				const membershipCache = new Map();
+				const guild = interaction.guild ?? null;
+				const isKnownServerMember = (discordId, record) => {
+					if (!discordId) return false;
+					if (!record) return false;
+					if (!record.servers?.includes(serverId)) return false;
+					if (!record.discordIds?.includes(discordId)) return false;
+					return true;
+				};
+				const ensureGuildMembership = async discordId => {
+					if (!guild || !discordId) return false;
+					const key = String(discordId);
+					if (membershipCache.has(key)) {
+						return membershipCache.get(key);
+					}
+					if (guild.members.cache.has(key)) {
+						membershipCache.set(key, true);
+						return true;
+					}
 					try {
-						if (await PlayerStats.checkIfServerTable(userId, table, serverId)) {
-							filteredEntries.push([tableId, table]);
+						const member = await guild.members.fetch({ user: key, cache: true, force: false });
+						const result = Boolean(member);
+						membershipCache.set(key, result);
+						return result;
+					}
+					catch (error) {
+						if (error.code === 10007 || error.status === 404) {
+							membershipCache.set(key, false);
+							return false;
+						}
+						console.warn(`failed guild membership check for ${key}:`, error);
+						membershipCache.set(key, false);
+						return false;
+					}
+				};
+
+				for (const candidateId of candidateDiscordIds) {
+					const normalizedId = candidateId ? String(candidateId) : null;
+					if (!normalizedId) continue;
+
+					let isMember = isKnownServerMember(normalizedId, storedRecord);
+					if (!isMember) {
+						isMember = await ensureGuildMembership(normalizedId);
+					}
+					if (!isMember) continue;
+
+					try {
+						const updated = await DataManager.updateServerUser(serverId, normalizedId, interaction.client);
+						if (updated) {
+							break;
 						}
 					}
 					catch (error) {
-						console.warn(`error checking server table ${tableId}:`, error);
+						console.warn(`failed to update user ${normalizedId}:`, error);
 					}
 				}
-				userTables = Object.fromEntries(filteredEntries);
 			}
 
-			// Filter by squad/solo if requested
-			if (squads) {
-				userTables = Object.fromEntries(
-					Object.entries(userTables).filter(([tableId, table]) =>
-						table.tier === "SQ"),
-				);
-			}
-			if (squads === false) {
-				userTables = Object.fromEntries(
-					Object.entries(userTables).filter(([tableId, table]) =>
-						table.tier !== "SQ"),
-				);
+			displayName = target.displayName || loungeName || fallbackName;
+			loungeName = loungeName || fallbackName;
+			if (discordUser && !target.discordUser) {
+				target.discordUser = discordUser;
 			}
 
-			// Check if any tables remain after filtering
-			if (Object.keys(userTables).length === 0) {
+			await interaction.editReply(`getting ${displayName}'s mogis...`);
+
+			if (!allTables) {
+				allTables = await LoungeApi.getAllPlayerTables(normalizedLoungeId, serverId);
+			}
+			if (!allTables || Object.keys(allTables).length === 0) {
+				return { success: false, message: "no events found for this player." };
+			}
+
+
+			await interaction.editReply("filtering...");
+
+
+			const filteredTables = PlayerStats.filterTablesByControls(allTables, { timeFilter, queueFilter, playerCountFilter });
+			const filteredTableIds = Object.keys(filteredTables);
+			if (!filteredTableIds.length) {
 				return { success: false, message: "no events found matching the specified filters." };
 			}
+
+
 			await interaction.editReply("calculating...");
-			const playerStats = await PlayerStats.getPlayerStats(userId, serverId, userTables);
-			const mMR = playerStats.mMR;
-			let mMRText = mMR;
-			let emojiMessage = PlayerStats.mMRToRankEmojiAndText(mMR).emoji + " " + PlayerStats.mMRToRankEmojiAndText(mMR).text;
-			if (timeFilter !== "alltime") {
-				let change;
-				if (timeFilter === "weekly") {
-					change = await LoungeApi.getWeeklyMMRChange(userId);
-				}
-				if (timeFilter === "season") {
-					change = await LoungeApi.getSeasonMMRChange(userId);
-				}
-				mMRText = (change >= 0 ? "+" : "") + change;
-				emojiMessage = PlayerStats.mMRToRankEmojiAndText(mMR - change).emoji === PlayerStats.mMRToRankEmojiAndText(mMR).emoji ?
-					PlayerStats.mMRToRankEmojiAndText(mMR).emoji + " unchanged" : PlayerStats.mMRToRankEmojiAndText(mMR - change).emoji + " to " + PlayerStats.mMRToRankEmojiAndText(mMR).emoji;
+
+
+			if (!favorites) {
+				const userData = await Database.getUserData(normalizedLoungeId);
+				favorites = userData?.favorites || {};
 			}
-			const rank = playerStats.rank;
-			const percent = Math.ceil(100 * (rank / await LoungeApi.getTotalNumberOfRankedPlayers()));
-			const eP = String(playerStats.matchesPlayed);
-			const tWR = (playerStats.winRate * 100).toFixed(2);
-			const aSc = playerStats.avgScore.toFixed(2);
-			const bS = playerStats.bestScore;
-			const wS = playerStats.worstScore;
-			const aSe = playerStats.avgSeed.toFixed(2);
-			const aP = playerStats.avgPlacement.toFixed(2);
-			const tH2H = playerStats.tH2H;
+			if (!trackName) {
+				trackName = favorites.track || GameData.getRandomTrack();
+			}
+			if (!favoriteCharacterImage || !favoriteVehicleImage) {
+				const [characterImage, vehicleImage] = await Promise.all([
+					favoriteCharacterImage ? Promise.resolve(favoriteCharacterImage) : EmbedEnhancer.loadFavoriteCharacterImage(favorites),
+					favoriteVehicleImage ? Promise.resolve(favoriteVehicleImage) : EmbedEnhancer.loadFavoriteVehicleImage(favorites),
+				]);
+				favoriteCharacterImage = characterImage || favoriteCharacterImage;
+				favoriteVehicleImage = vehicleImage || favoriteVehicleImage;
+			}
 
-			const playerNameWithFlag = embedEnhancer.formatPlayerNameWithFlag(discordUser.displayName, loungeUser.countryCode);
+			if (!globals) {
+				globals = await LoungeApi.getGlobalStats();
+			}
 
-			// Create time-aware title
-			const timePrefix = timeFilter === "weekly" ? "weekly " : timeFilter === "season" ? "season " : "";
+			const playerStats = await getPlayerStats(normalizedLoungeId, serverId, filteredTables, playerDetails);
+			const mmrRaw = Number(playerStats?.mmr);
+			const mmr = Number.isFinite(mmrRaw) ? mmrRaw : 0;
+			const mmrDeltaFromTables = PlayerStats.getTotalMmrDeltaFromTables(filteredTables, normalizedLoungeId);
+			const mmrDeltaForFilter = timeFilter === "alltime"
+				? mmrDeltaFromTables
+				: PlayerStats.computeMmrDeltaForFilter({
+					playerDetails,
+					tableIds: filteredTableIds,
+					timeFilter,
+					queueFilter,
+					playerCountFilter,
+				});
+			const filtersAreBoth = queueFilter === "both" && playerCountFilter === "both";
+			const isAllTimeView = timeFilter === "alltime";
+			const isSeasonView = timeFilter === "season";
+			const showCurrentMmr = filtersAreBoth && (isAllTimeView || isSeasonView);
+			let peakMmr = null;
+			if (showCurrentMmr) {
+				if (isSeasonView) {
+					const seasonPeak = Number(playerDetails?.maxMmr);
+					if (Number.isFinite(seasonPeak)) {
+						peakMmr = seasonPeak;
+					}
+				}
+				else if (isAllTimeView) {
+					const peaks = [];
+					const currentSeasonPeak = Number(playerDetails?.maxMmr);
+					if (Number.isFinite(currentSeasonPeak)) {
+						peaks.push(currentSeasonPeak);
+					}
+					const maxSeason = Number(LoungeApi.DEFAULT_SEASON);
+					if (Number.isFinite(maxSeason) && maxSeason > 0) {
+						const seasonIndices = [];
+						for (let seasonIndex = 0; seasonIndex < maxSeason; seasonIndex++) {
+							seasonIndices.push(seasonIndex);
+						}
+						if (seasonIndices.length) {
+							const seasonResults = await Promise.all(seasonIndices.map(async seasonIndex => {
+								try {
+									return await LoungeApi.getPlayerByLoungeId(normalizedLoungeId, seasonIndex);
+								}
+								catch (seasonError) {
+									console.warn(`failed to fetch season ${seasonIndex} peak mmr for ${normalizedLoungeId}:`, seasonError);
+									return null;
+								}
+							}));
+							seasonResults.forEach(seasonData => {
+								const seasonalPeak = Number(seasonData?.maxMmr);
+								if (Number.isFinite(seasonalPeak)) {
+									peaks.push(seasonalPeak);
+								}
+							});
+						}
+					}
+					if (peaks.length) {
+						peakMmr = Math.max(...peaks);
+					}
+				}
+				if (!Number.isFinite(peakMmr) && Number.isFinite(mmr)) {
+					peakMmr = mmr;
+				}
+			}
+			const mmrDisplay = showCurrentMmr ? formatNumber(mmrRaw) : formatSignedNumber(mmrDeltaForFilter);
+			const mmrFormatted = formatNumber(mmrRaw);
+			let mmrSubLabel = null;
+			if (showCurrentMmr) {
+				if (Number.isFinite(peakMmr)) {
+					mmrSubLabel = `(peak: ${formatNumber(Math.round(peakMmr))})`;
+				}
+			}
+			else if (mmrFormatted !== "-") {
+				mmrSubLabel = `(current: ${mmrFormatted})`;
+			}
+			const averageRoomMmr = PlayerStats.computeAverageRoomMmr(filteredTables);
+			const averageRoomMmrDisplay = Number.isFinite(averageRoomMmr) ? formatNumber(Math.round(averageRoomMmr)) : "-";
 
-			const statsEmbed = new EmbedBuilder()
-				.setColor("Purple")
-				.setTitle(`${playerNameWithFlag}'s ${serverOnly ? "server " : ""}${
-					squads ? "squad " : squads === false ? "soloQ " : ""}${timePrefix}stats`)
-				.setTimestamp()
-				.addFields(
-					{ name: "mmr:", value: `[${mMRText}](https://lounge.mkcentral.com/mkworld/PlayerDetails/${loungeUser.playerId})\n(${emojiMessage})`, inline: true },
-					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "rank:", value: `${rank}\n(top ${percent}%)`, inline: true },
-					{ name: "team win rate:", value: tWR + "%", inline: true },
-					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "average score:", value: aSc, inline: true },
-					{ name: "best score:", value: `[${bS.score}](https://lounge.mkcentral.com/mkworld/TableDetails/${bS.tableId})`, inline: true },
-					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "worst score:", value: `[${wS.score}](https://lounge.mkcentral.com/mkworld/TableDetails/${wS.tableId})`, inline: true },
-					{ name: "average seed:", value: aSe, inline: true },
-					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "average placement:", value: aP, inline: true },
-					{ name: "events played:", value: eP, inline: true },
-					{ name: "\u200B", value: "\u200B", inline: true },
-					{ name: "head-to-head vs. server members:",
-						value: `${
-							tH2H.wins
-						}-${
-							tH2H.losses
-						}${
-							tH2H.ties ? "-" + tH2H.ties : ""
-						}`,
-						inline: true,
-					},
-				);
+			const rank = playerStats?.rank ?? "-";
+			const percent = globals?.totalPlayers ? Math.ceil(100 * (rank / globals.totalPlayers)) : null;
+			const tWR = playerStats?.winRate || null;
+			if (tWR && typeof tWR.winRate === "number") {
+				tWR.winRate = (tWR.winRate * 100).toFixed(1);
+			}
+			const aSc = Number.isFinite(playerStats?.avgScore) ? playerStats.avgScore.toFixed(2) : "-";
+			const bS = playerStats?.bestScore;
+			const aSe = Number.isFinite(playerStats?.avgSeed) ? playerStats.avgSeed.toFixed(2) : "-";
+			const aP = Number.isFinite(playerStats?.avgPlacement) ? playerStats.avgPlacement.toFixed(2) : "-";
+			const matchesPlayedCount = Number(playerStats?.matchesPlayed);
+			const hasMatches = Number.isFinite(matchesPlayedCount) && matchesPlayedCount > 0;
+			const eP = Number.isFinite(matchesPlayedCount) ? String(matchesPlayedCount) : "-";
+			let eventsSubLabel = null;
+			const breakdown = PlayerStats.getPlayerCountBreakdown(filteredTables, normalizedLoungeId) || {};
+			if (playerCountFilter === "both" && hasMatches) {
+				const twelveCount = breakdown["12p"] ?? 0;
+				const twentyFourCount = breakdown["24p"] ?? 0;
+				if (twelveCount || twentyFourCount) {
+					const preferTwelve = twelveCount > twentyFourCount;
+					const preferTwentyFour = twentyFourCount > twelveCount;
+					const modeLabel = preferTwentyFour ? "24p" : preferTwelve ? "12p" : "12p";
+					const modeCount = preferTwentyFour ? twentyFourCount : twelveCount;
+					if (modeCount > 0) {
+						eventsSubLabel = `(${modeLabel}: ${modeCount})`;
+					}
+				}
+			}
+			const pC = Number(playerStats?.playerCount);
+			const placementSubLabel = playerCountFilter === "both" && Number.isFinite(pC)
+				? (`(out of ${pC.toFixed(Number.isInteger(pC) ? 0 : 1)})`)
+				: null;
+			const avgAvg = hasMatches
+				? ((82 * (breakdown["12p"] ?? 0) + 72 * (breakdown["24p"] ?? 0)) / matchesPlayedCount)
+				: null;
+			const aScSubLabel = Number.isFinite(avgAvg)
+				? (`(room avg: ${avgAvg.toFixed(Number.isInteger(avgAvg) ? 0 : 2)})`)
+				: null;
 
-			// Add player avatar as thumbnail
-			const avatarUrl = embedEnhancer.getPlayerAvatarUrl(discordUser);
+
+			await interaction.editReply("rendering image...");
+
+
+			const trackColors = ColorPalettes.statsTrackColors[trackName];
+			const canvasWidth = 1920;
+			const canvasHeight = 1080;
+			const canvas = createCanvas(canvasWidth, canvasHeight);
+			const ctx = canvas.getContext("2d");
+
+			try {
+				const backgroundImage = await loadCachedImage(`images/tracks/${trackName}_stats.png`);
+				if (backgroundImage) {
+					EmbedEnhancer.drawBlurredImage(ctx, backgroundImage, 0, 0, canvasWidth, canvasHeight);
+				}
+				else {
+					throw new Error("background image not available");
+				}
+			}
+			catch (backgroundError) {
+				console.warn(`failed to load background image for ${trackName}:`, backgroundError);
+				ctx.fillStyle = trackColors?.baseColor || "#000";
+				ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+			}
+
+			const avatarSource = discordUser || target.discordUser || null;
+			const avatarUrl = EmbedEnhancer.getPlayerAvatarUrl(avatarSource);
+			let avatar = null;
 			if (avatarUrl) {
-				statsEmbed.setThumbnail(avatarUrl);
+				try {
+					avatar = await EmbedEnhancer.loadWebPAsPng(avatarUrl);
+				}
+				catch (avatarError) {
+					console.warn("failed to load avatar image:", avatarError);
+				}
 			}
 
-			// Add time-aware footer
-			const eventCount = Object.keys(userTables).length;
-			let footerText = `based on ${eventCount} event${eventCount !== 1 ? "s" : ""}`;
-			if (timeFilter === "weekly") {
-				footerText += " (past 7 days)";
+			const playerEmoji = EmbedEnhancer.getCountryFlag(playerDetails.countryCode);
+			let chartResult = null;
+			try {
+				chartResult = await getDivisionChart(trackName, trackColors, globals);
 			}
-			else if (timeFilter === "season") {
-				footerText += " (current season)";
+			catch (chartError) {
+				console.warn("failed to generate division chart:", chartError);
 			}
-			statsEmbed.setFooter({ text: footerText });
+			const chartImage = chartResult?.image || null;
+			const chartLabels = chartResult?.labels || [];
+			const chartMetrics = chartResult?.metrics || null;
 
-			return { success: true, embed: statsEmbed };
+			const { headerFrame, statsFrame, chartFrame } = computeCanvasLayout({ chartWidth: CHART_DIMENSIONS.width, chartHeight: CHART_DIMENSIONS.height });
+
+			EmbedEnhancer.drawRoundedPanel(ctx, headerFrame, trackColors.baseColor, EDGE_RADIUS);
+			EmbedEnhancer.drawRoundedPanel(ctx, statsFrame, trackColors.baseColor, EDGE_RADIUS);
+			EmbedEnhancer.drawRoundedPanel(ctx, chartFrame, trackColors.baseColor, EDGE_RADIUS);
+
+			const headerTextSize = LAYOUT.headerTitleFontSize;
+			const headerEmojiSize = LAYOUT.headerEmojiSize;
+			const avatarSize = LAYOUT.headerAvatarSize;
+			const headerTextX = headerFrame.left + LAYOUT.headerPaddingLeft + headerEmojiSize + LAYOUT.headerEmojiGap;
+			const headerEmojiX = headerFrame.left + LAYOUT.headerPaddingLeft;
+			const headerEmojiY = headerFrame.top + (headerFrame.height - headerEmojiSize) / 2;
+			const headerTitle = `${displayName}'s stats`;
+			const timeLabels = {
+				alltime: "all time",
+				weekly: "past week",
+				season: `season ${LoungeApi.DEFAULT_SEASON}`,
+			};
+			const queueLabels = {
+				soloq: "solo queue",
+				squads: "squads",
+			};
+			const subtitleParts = [];
+			const timeLabel = timeLabels[timeFilter] || timeFilter;
+			if (timeLabel) subtitleParts.push(timeLabel);
+			if (queueFilter !== "both" && queueLabels[queueFilter]) {
+				subtitleParts.push(queueLabels[queueFilter]);
+			}
+			if (playerCountFilter !== "both" && playerCountFilter) {
+				subtitleParts.push(playerCountFilter);
+			}
+			const subtitleText = subtitleParts.join(" · ");
+			const hasSubtitle = Boolean(subtitleText);
+			const subtitleFontSize = LAYOUT.headerSubtitleFontSize;
+			const subtitleGap = LAYOUT.headerSubtitleGap;
+			const textBlockHeight = headerTextSize + (hasSubtitle ? subtitleGap + subtitleFontSize : 0);
+			const textBlockTop = headerFrame.top + (headerFrame.height - textBlockHeight) / 2;
+			const titleBaseline = textBlockTop + headerTextSize;
+			const subtitleBaseline = hasSubtitle ? titleBaseline + subtitleGap + subtitleFontSize : null;
+
+			ctx.textAlign = "left";
+			ctx.textBaseline = "alphabetic";
+			ctx.font = `${headerTextSize}px Lexend`;
+			ctx.fillStyle = trackColors.headerColor;
+
+			if (playerEmoji) {
+				await EmbedEnhancer.drawEmoji(ctx, playerEmoji, headerEmojiX, headerEmojiY, headerEmojiSize);
+			}
+			ctx.fillText(headerTitle, headerTextX, titleBaseline);
+
+			if (hasSubtitle) {
+				const subtitleColor = trackColors.headerSubtitleColor || trackColors.statsTextColor || trackColors.headerColor;
+				ctx.font = `${subtitleFontSize}px Lexend`;
+				ctx.fillStyle = subtitleColor;
+				ctx.fillText(subtitleText, headerTextX, subtitleBaseline);
+			}
+
+			const scaleToFavoriteFrame = image => {
+				const maxSize = LAYOUT.headerFavoriteMaxSize;
+				const width = Math.max(image?.width || 1, 1);
+				const height = Math.max(image?.height || 1, 1);
+				const scale = maxSize / Math.max(width, height);
+				return {
+					width: width * scale,
+					height: height * scale,
+				};
+			};
+
+			const headerAssets = [];
+			if (favoriteCharacterImage) {
+				const dimensions = scaleToFavoriteFrame(favoriteCharacterImage);
+				headerAssets.push({
+					type: "character",
+					image: favoriteCharacterImage,
+					width: dimensions.width,
+					height: dimensions.height,
+				});
+			}
+			if (favoriteVehicleImage) {
+				const dimensions = scaleToFavoriteFrame(favoriteVehicleImage);
+				headerAssets.push({
+					type: "vehicle",
+					image: favoriteVehicleImage,
+					width: dimensions.width,
+					height: dimensions.height,
+				});
+			}
+			if (headerAssets.length < 2 && avatar) {
+				headerAssets.push({
+					type: "avatar",
+					image: avatar,
+					width: avatarSize,
+					height: avatarSize,
+				});
+			}
+
+			let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingRight;
+			for (let index = headerAssets.length - 1; index >= 0; index--) {
+				const asset = headerAssets[index];
+				assetCursor -= asset.width;
+				const drawX = assetCursor;
+				const drawY = headerFrame.top + (headerFrame.height - asset.height) / 2;
+				if (asset.type === "avatar") {
+					EmbedEnhancer.drawRoundedImage(ctx, asset.image, drawX, drawY, asset.width, asset.height, LAYOUT.headerAvatarRadius);
+				}
+				else {
+					ctx.drawImage(asset.image, drawX, drawY, asset.width, asset.height);
+				}
+				if (index > 0) {
+					assetCursor -= LAYOUT.headerAssetGap;
+				}
+			}
+
+			const bestScoreValue = bS?.score != null ? bS.score : "-";
+			const winRateText = tWR?.winRate != null ? `${tWR.winRate}%` : "-";
+			const winLossRecord = EmbedEnhancer.formatWinLoss(tWR);
+			const gridConfig = [
+				[
+					{
+						label: "mmr",
+						value: mmrDisplay,
+						subLabel: mmrSubLabel || undefined,
+					},
+					{ label: "rank", value: rank, subLabel: percent ? `(top ${percent}%)` : undefined },
+					{ label: "team\nwin rate", value: winRateText, subLabel: winLossRecord ? `(${winLossRecord})` : undefined },
+				],
+				[
+					{ label: "average\nroom mmr", value: averageRoomMmrDisplay },
+					{ label: "average\nscore", value: aSc, subLabel: aScSubLabel || undefined },
+					{ label: "best\nscore", value: bestScoreValue },
+				],
+				[
+					{ label: "average\nseed", value: aSe },
+					{ label: "average\nplacement", value: aP, subLabel: placementSubLabel || undefined },
+					{ label: "events\nplayed", value: eP, subLabel: eventsSubLabel || undefined },
+				],
+			];
+
+			drawStatsGrid(ctx, statsFrame, trackColors, gridConfig);
+
+			if (chartImage) {
+				EmbedEnhancer.drawRoundedImage(
+					ctx,
+					chartImage,
+					chartFrame.left,
+					chartFrame.top,
+					chartFrame.width,
+					chartFrame.height,
+					EDGE_RADIUS,
+				);
+			}
+
+			drawMMRMarker(ctx, mmr, trackName, {
+				chartX: chartFrame.left,
+				chartY: chartFrame.top,
+				chartWidth: chartFrame.width,
+				chartHeight: chartFrame.height,
+				labels: chartLabels,
+				metrics: chartMetrics,
+				iconSize: ICON_SIZE,
+				iconGap: ICON_GAP,
+			});
+
+			const pngBuffer = canvas.toBuffer("image/png");
+			const attachment = new AttachmentBuilder(pngBuffer, { name: "stats.png" });
+
+			const updatedSession = {
+				loungeId: normalizedLoungeId,
+				serverId,
+				displayName,
+				loungeName,
+				playerDetails,
+				allTables,
+				favorites,
+				favoriteCharacterImage,
+				favoriteVehicleImage,
+				trackName,
+				globals,
+				discordUser,
+				target: {
+					loungeId: normalizedLoungeId,
+					loungeName,
+					displayName,
+				},
+			};
+
+			return {
+				success: true,
+				content: "",
+				files: [attachment],
+				session: updatedSession,
+			};
 		}
 		catch (error) {
 			console.error("error generating stats:", error);
@@ -313,3 +1436,170 @@ module.exports = {
 		}
 	},
 };
+
+
+async function getPlayerStats(loungeId, serverId, tables) {
+	try {
+		const normalizedLoungeId = String(loungeId);
+		const player = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
+		const mmr = player.mmr;
+		const rank = player.overallRank;
+		const streakData = PlayerStats.calculateWinStreaks(tables, normalizedLoungeId);
+		const matchesPlayed = PlayerStats.getMatchesPlayed(tables, normalizedLoungeId);
+		const winRate = PlayerStats.getWinRate(tables, normalizedLoungeId);
+		const avgPlacement = PlayerStats.getAveragePlacement(tables, normalizedLoungeId);
+		const avgScore = PlayerStats.getAverageScore(tables, normalizedLoungeId);
+		const avgSeed = PlayerStats.getAverageSeed(tables, normalizedLoungeId);
+		const bestScore = PlayerStats.getBestScore(tables, normalizedLoungeId);
+		const worstScore = PlayerStats.getWorstScore(tables, normalizedLoungeId);
+		const playerCount = PlayerStats.getAveragePlayerCount(tables, normalizedLoungeId);
+		const tH2H = await PlayerStats.getTotalH2H(tables, normalizedLoungeId, serverId);
+
+		return {
+			mmr,
+			rank,
+			loungeId: normalizedLoungeId,
+			matchesPlayed,
+			winRate,
+			avgPlacement,
+			avgScore,
+			avgSeed,
+			...streakData,
+			bestScore,
+			worstScore,
+			playerCount,
+			tH2H,
+		};
+	}
+	catch (error) {
+		console.error(`Error getting player stats for lounge user ${loungeId}:`, error);
+		return null;
+	}
+}
+
+// Draws the "you are here" marker using captured bar geometry and user MMR.
+function drawMMRMarker(ctx, mmr, trackName, {
+	chartX,
+	chartY,
+	chartWidth,
+	chartHeight,
+	labels,
+	metrics,
+	iconSize,
+	iconGap,
+}) {
+	const mmrValue = Number(mmr);
+	if (!Number.isFinite(mmrValue)) {
+		return;
+	}
+
+	const tierInfos = Array.isArray(labels)
+		? labels.map(label => PlayerStats.getRankThresholdByName(label))
+		: [];
+	if (!tierInfos.length) {
+		return;
+	}
+
+	let tierIndex = -1;
+	let tierInfo = null;
+
+	for (let i = 0; i < tierInfos.length; i++) {
+		const info = tierInfos[i];
+		if (!info) continue;
+		const withinRange = mmrValue >= info.min && (mmrValue < info.max || !Number.isFinite(info.max));
+		if (withinRange) {
+			tierIndex = i;
+			tierInfo = info;
+			break;
+		}
+	}
+
+	if (tierIndex === -1) {
+		const fallbackTier = PlayerStats.getRankThresholdForMmr(mmrValue);
+		if (fallbackTier) {
+			const matchingIndex = tierInfos.findIndex(info => info?.key === fallbackTier.key);
+			if (matchingIndex !== -1) {
+				tierIndex = matchingIndex;
+				tierInfo = fallbackTier;
+			}
+			else {
+				tierIndex = tierInfos.findIndex(info => info);
+				tierInfo = fallbackTier;
+			}
+		}
+	}
+
+	if (tierIndex === -1) {
+		tierIndex = tierInfos.length - 1;
+		tierInfo = tierInfos[tierIndex] || PlayerStats.getRankThresholds()[0] || { min: 0, max: Infinity };
+	}
+
+	if (tierIndex < 0) {
+		tierIndex = 0;
+	}
+	if (tierIndex >= tierInfos.length) {
+		tierIndex = tierInfos.length - 1;
+	}
+	if (!tierInfo) {
+		tierInfo = PlayerStats.getRankThresholds()[tierIndex] || { min: 0, max: Infinity };
+	}
+
+	const lower = Number.isFinite(tierInfo.min) ? tierInfo.min : 0;
+	const upper = tierInfo.max;
+	let ratio = 0;
+	if (!Number.isFinite(upper)) {
+		ratio = Math.min((mmrValue - lower) / 1500, 1);
+	}
+	else {
+		ratio = (mmrValue - lower) / (upper - lower);
+	}
+	ratio = Math.min(Math.max(ratio, 0), 1);
+
+	let markerX;
+	let markerY;
+	let barBottomY;
+	const radius = 8;
+
+	if (metrics?.bars?.length) {
+		const barMetrics = metrics.bars[tierIndex];
+		if (!barMetrics) return;
+		const { left, width, top } = barMetrics;
+		markerX = chartX + left + ratio * width;
+		const barTop = Number.isFinite(top) ? chartY + top : chartY + chartHeight * 0.1;
+		markerY = barTop + 25 + radius / 2;
+		const bottom = metrics.chartArea?.bottom ?? chartHeight;
+		barBottomY = chartY + bottom;
+	}
+	else {
+		const tierCount = Math.max(tierInfos.length, 1);
+		const barWidth = chartWidth / tierCount;
+		const progress = 1 - ratio;
+		markerX = chartX + tierIndex * barWidth + progress * barWidth;
+		markerY = chartY + chartHeight * 0.15;
+		barBottomY = chartY + chartHeight;
+	}
+	markerY -= (iconSize ?? 0) / 2;
+
+	ctx.save();
+
+	const trackColors = ColorPalettes.statsTrackColors[trackName];
+	// ctx.setLineDash([20, 20]); // first number is dash length and second is gap
+	// ctx.strokeStyle = "#ffffff60";
+	// ctx.lineWidth = 7;
+	// ctx.beginPath();
+	// ctx.moveTo(markerX, markerY + radius); // start at bottom of dot
+	// ctx.lineTo(markerX, barBottomY); // stop above icon row
+	// ctx.stroke();
+	ctx.strokeStyle = "#ffffff";
+	ctx.fillStyle = "#ffffff";
+	ctx.beginPath();
+	ctx.arc(markerX, markerY, radius, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.stroke();
+	ctx.fillStyle = trackColors.youColor;
+	ctx.font = "24px";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "bottom";
+	ctx.fillText("you", markerX, markerY - radius - 10);
+	ctx.restore();
+}

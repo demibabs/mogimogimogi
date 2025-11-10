@@ -16,21 +16,143 @@ class DataManager {
 	 */
 	static async addServerUser(serverId, userId, client) {
 		try {
-			const serverData = await database.getServerData(serverId);
-			if (!serverData.users) serverData.users = {};
+			const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
+			if (!loungeUser) {
+				return false;
+			}
 
-			// Check if user already exists
-			if (serverData.users[userId]) {
+			const loungeId = loungeUser.id;
+			const userRecord = await database.getUserData(loungeId);
+			if (userRecord?.servers?.includes(serverId)) {
+				const discordIds = new Set([...(userRecord.discordIds || []), String(userId)]);
+				if (discordIds.size !== (userRecord.discordIds || []).length) {
+					await database.saveUserData(loungeId, {
+						...userRecord,
+						discordIds: Array.from(discordIds),
+					});
+				}
 				return true;
 			}
 
-			await DataManager.updateServerUser(serverId, userId, client);
+			await DataManager.updateServerUser(serverId, userId, client, loungeUser);
 			return true;
 		}
 		catch (error) {
 			console.error(`Error adding user ${userId} to server ${serverId}:`, error);
 			return false;
 		}
+	}
+
+	static async ensureUserRecord({ loungeId, loungeName = null, serverId = null, client = null, guild = null }) {
+		if (loungeId === undefined || loungeId === null) {
+			throw new Error("loungeId is required to ensure user record");
+		}
+
+		const normalizedId = String(loungeId);
+		let existingRecord = null;
+		try {
+			existingRecord = await database.getUserData(normalizedId);
+		}
+		catch (error) {
+			console.warn(`failed to read user record ${normalizedId}:`, error);
+		}
+
+		const record = existingRecord ? JSON.parse(JSON.stringify(existingRecord)) : {
+			loungeId: normalizedId,
+			servers: [],
+			discordIds: [],
+		};
+		record.servers = Array.isArray(record.servers) ? record.servers.map(String) : [];
+		record.discordIds = Array.isArray(record.discordIds) ? record.discordIds.map(String) : [];
+		let changed = !existingRecord;
+
+		if (!record.loungeName && loungeName) {
+			record.loungeName = loungeName;
+			changed = true;
+		}
+
+		let loungeProfile = null;
+		try {
+			loungeProfile = await LoungeApi.getPlayerByLoungeId(normalizedId);
+		}
+		catch (error) {
+			console.warn(`failed to load lounge profile for ${normalizedId}:`, error);
+		}
+
+		if (loungeProfile?.name && record.loungeName !== loungeProfile.name) {
+			record.loungeName = loungeProfile.name;
+			changed = true;
+		}
+
+		const discordId = loungeProfile?.discordId ? String(loungeProfile.discordId) : null;
+		let discordUser = null;
+		let guildMember = null;
+
+		if (discordId) {
+			const discordIdSet = new Set((record.discordIds || []).map(String));
+			if (!discordIdSet.has(discordId)) {
+				discordIdSet.add(discordId);
+				record.discordIds = Array.from(discordIdSet);
+				changed = true;
+			}
+
+			if (guild) {
+				try {
+					guildMember = await guild.members.fetch(discordId);
+				}
+				catch (error) {
+					if (error.code !== 10007 && error.status !== 404) {
+						console.warn(`failed to fetch guild member ${discordId}:`, error);
+					}
+				}
+			}
+
+			if (!discordUser && guildMember) {
+				discordUser = guildMember.user;
+			}
+
+			if (!discordUser && client) {
+				try {
+					discordUser = await client.users.fetch(discordId);
+				}
+				catch (error) {
+					if (error.code !== 10013 && error.status !== 404) {
+						console.warn(`failed to fetch discord user ${discordId}:`, error);
+					}
+				}
+			}
+
+			if (discordUser?.username && record.username !== discordUser.username) {
+				record.username = discordUser.username;
+				changed = true;
+			}
+
+			if (serverId && guildMember) {
+				const serverSet = new Set((record.servers || []).map(String));
+				if (!serverSet.has(serverId)) {
+					serverSet.add(serverId);
+					record.servers = Array.from(serverSet);
+					changed = true;
+				}
+			}
+		}
+
+		if (!record.createdAt) {
+			record.createdAt = new Date().toISOString();
+			changed = true;
+		}
+
+		if (changed) {
+			await database.saveUserData(normalizedId, record);
+		}
+
+		return {
+			userRecord: record,
+			loungeProfile,
+			discordId,
+			discordUser,
+			guildMember,
+		};
 	}
 
 	/**
@@ -40,67 +162,70 @@ class DataManager {
 	 * @param {Object} client - Discord client instance
 	 * @returns {Promise<boolean>} Success status
 	 */
-	static async updateServerUser(serverId, userId, client) {
+	static async updateServerUser(serverId, userId, client, loungeUserOverride = null) {
 		try {
-			const serverData = await database.getServerData(serverId);
-
-			// Check if server data exists
-			if (!serverData) {
-				console.warn(`Server data not found for ${serverId} when updating user ${userId}`);
-				return false;
-			}
-
+			const discordId = String(userId);
 			// Fetch user info from Discord
-			const user = await client.users.fetch(userId);
-			const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
+			const user = await client.users.fetch(discordId);
+			const loungeUser = loungeUserOverride || await LoungeApi.getPlayerByDiscordId(discordId);
 
 			if (!loungeUser) {
-				console.warn(`User ${userId} not found in Lounge API`);
+				console.warn(`User ${discordId} not found in Lounge API`);
 				return false;
 			}
+			const loungeId = loungeUser.id;
 
 			// Get tables using a safe method that handles both old and new formats
 			let userTables = {};
 			try {
-				userTables = await LoungeApi.getAllPlayerTables(userId, serverId);
+				userTables = await LoungeApi.getAllPlayerTables(loungeId, serverId);
 			}
 			catch (error) {
-				console.warn(`Failed to get player tables for ${userId}:`, error);
+				console.warn(`Failed to get player tables for lounge user ${loungeId}:`, error);
 				// Continue with empty tables rather than failing completely
 				userTables = {};
 			}
 
-			// Get current user's table count from user_tables relationship
-			const existingTables = await database.getUserTables(userId, serverId);
-			const currentTableCount = existingTables.length;
+			// Get current user's table metadata for deduping
+			const existingTables = await database.getUserTables(loungeId);
+			const existingTableIds = new Set(existingTables.map(entry => String(entry.id)));
+			const serverLinked = new Set(
+				existingTables
+					.filter(entry => Array.isArray(entry.servers) && entry.servers.includes(serverId))
+					.map(entry => String(entry.id)),
+			);
 
 			// Save new tables to normalized storage
-			if (Object.keys(userTables).length > currentTableCount) {
-				for (const [tableId, tableData] of Object.entries(userTables)) {
-					// Check if table is already saved
-					const existingTable = await database.getTable(tableId);
-					if (!existingTable) {
-						await database.saveTable(tableId, tableData);
-					}
+			for (const [tableId, tableData] of Object.entries(userTables)) {
+				const normalizedTableId = String(tableId);
+				if (!existingTableIds.has(normalizedTableId)) {
+					await database.saveTable(normalizedTableId, tableData);
+					existingTableIds.add(normalizedTableId);
+				}
 
-					// Link user to this table (if not already linked)
-					await database.linkUserToTable(userId, tableId, serverId);
+				if (!serverLinked.has(normalizedTableId)) {
+					await database.linkUserToTable(loungeId, normalizedTableId, serverId);
+					serverLinked.add(normalizedTableId);
 				}
 			}
 
-			// Update user data in server_data (without tables)
-			serverData.users[userId] = {
+			const existingUser = await database.getUserData(loungeId);
+			const servers = new Set([...(existingUser?.servers || []), serverId]);
+			const discordIds = new Set([...(existingUser?.discordIds || []), discordId]);
+			const userPayload = {
+				...existingUser,
+				loungeId,
 				username: user.username,
 				loungeName: loungeUser.name,
 				lastUpdated: new Date().toISOString(),
-		    };
+				servers: Array.from(servers),
+				discordIds: Array.from(discordIds),
+			};
 
-			// Save server data without embedded tables
-			const saveResult = await database.saveServerData(serverId, serverData);
-			return saveResult;
+			return await database.saveUserData(loungeId, userPayload);
 		}
 		catch (error) {
-			console.error(`Error updating user ${userId}:`, error);
+			console.error(`Error updating discord user ${userId}:`, error);
 			return false;
 		}
 	}
@@ -111,8 +236,12 @@ class DataManager {
 	 * @param {string} serverId - Server ID
 	 * @returns {Promise<Array>} Array of table objects
 	 */
-	static async getUserTables(userId, serverId) {
-		return await database.getUserTables(userId, serverId);
+	static async getUserTables(loungeId, serverId = null) {
+		const entries = await database.getUserTables(loungeId);
+		if (!serverId) {
+			return entries;
+		}
+		return entries.filter(entry => Array.isArray(entry.servers) && entry.servers.includes(serverId));
 	}
 
 	/**
@@ -121,14 +250,14 @@ class DataManager {
 	 * @param {Array<string>} userIds - Array of user IDs to get tables for
 	 * @returns {Promise<Object>} Object with tableId as key, table data as value
 	 */
-	static async getTablesForUsers(serverId, userIds) {
+	static async getTablesForUsers(serverId, loungeIds) {
 		const tables = {};
 		const tableIds = new Set();
 
 		// Get all table IDs for these users
-		for (const userId of userIds) {
-			const userTables = await this.getUserTables(userId, serverId);
-			userTables.forEach(table => tableIds.add(table.id));
+		for (const loungeId of loungeIds) {
+			const userTables = await this.getUserTables(loungeId, serverId);
+			userTables.forEach(table => tableIds.add(String(table.id)));
 		}
 
 		// Fetch all unique tables
@@ -154,9 +283,12 @@ class DataManager {
 			// Try to get from stored data first (if serverId provided)
 			if (serverId) {
 				const serverData = await database.getServerData(serverId);
-				const storedUser = serverData.users?.[userId];
-				if (storedUser && storedUser.username) {
-					return storedUser.username;
+				const loungeId = serverData?.discordIndex?.[String(userId)] || null;
+				if (loungeId) {
+					const storedUser = await database.getUserData(loungeId);
+					if (storedUser?.username) {
+						return storedUser.username;
+					}
 				}
 			}
 
