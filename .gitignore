@@ -35,3 +35,5 @@ config.json
 commands/testing/
 
 leaderboard-backup.js.bak
+
+data

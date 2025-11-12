@@ -7,7 +7,7 @@ const database = require("../../utils/database");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("setup")
-		.setDescription("adds every server user with a lounge account and builds leaderboard cache."),
+		.setDescription("adds every server user with a lounge account."),
 
 	async execute(interaction) {
 		try {

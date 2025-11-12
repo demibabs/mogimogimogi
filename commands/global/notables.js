@@ -63,27 +63,30 @@ const EVENT_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
 });
 
 const LAYOUT = {
-	pagePadding: 100,
-	columnGap: 60,
-	sectionGap: 60,
-	headerHeight: 160,
-	headerPaddingHorizontal: 80,
-	headerPaddingVertical: 36,
-	headerTitleFontSize: 64,
+	pagePadding: 75,
+	columnGap: 45,
+	sectionGap: 35,
+	headerHeight: 120,
+	headerPaddingHorizontal: 60,
+	headerPaddingVertical: 14,
+	headerTitleFontSize: 60,
 	headerSubtitleFontSize: 30,
-	headerSubtitleGap: 14,
+	headerSubtitleGap: 10,
+	headerTextVerticalAdjustment: -8,
 	headerEmojiSize: 54,
 	headerEmojiGap: 22,
-	headerFavoriteMaxSize: 140,
-	headerAvatarSize: 120,
+	headerFavoriteMaxSize: 100,
+	headerAvatarSize: 100,
 	headerAvatarRadius: 30,
 	headerAssetGap: 28,
 	columnPadding: 46,
-	eventTitleFontSize: 40,
+	eventTitleFontSize: 37,
+	eventTitleOpacity: 0.5,
 	eventTitleGap: 12,
-	eventBodyFontSize: 28,
+	eventBodyFontSize: 36,
 	eventGap: 44,
-	footnoteFontSize: 28,
+	footnoteFontSize: 30,
+	eventFootnoteOpacity: 0.4,
 };
 
 const goodBSMessages = [
@@ -96,25 +99,27 @@ const goodBSMessages = [
 	"cheating?",
 	"luck was on your side that day. (or skill...)",
 	"isn't this game so good when you win?",
+	"unstoppable",
 ];
 
 const badBSMessages = [
 	"great score, but not good enough for 1st :(",
-	"guess someone else was having an even better mogi.",
+	"guess someone else was cooking even harder.",
 	"not first? shortrat must have been in your room.",
 	"someone had to steal your thunder i guess.",
-	"nice, but i know you have at least 10 more points in you. maybe 15.",
-	"solid showing.",
+	"i know you have at least 10 more points in you!",
 ];
 
 const goodWSMessages = [
-	"if you think that mogi sucked, think about whoever you beat.",
-	"your worst ever and you still didn't get last? we take it.",
+	"if that sucked, think about whoever you beat.",
+	"your worst ever and you didn't get last? we take it.",
 	"ouch.",
 	"at least you beat somebody!",
 	"hey, losing makes winning feel even better!",
 	"sometimes when you gamble, you lose.",
 	"you suck. (jk.)",
+	"only uphill from here, at least?",
+	"a record you should hope NOT to beat.",
 ];
 
 const badWSMessages = [
@@ -125,6 +130,7 @@ const badWSMessages = [
 	"thanks for graciously donating your mmr to those other players.",
 	"can't blame any teammates for that one.",
 	"you suck.",
+	"i don't even have a joke. this is just sad.",
 ];
 
 const oPMessages = [
@@ -135,6 +141,9 @@ const oPMessages = [
 	"holy w.",
 	"how does he do it?",
 	"the up and coming goat.",
+	"you're overpowered.",
+	"i went to underrated town and they all knew you.",
+	"better than the movies!",
 ];
 
 const uPMessages = [
@@ -146,6 +155,9 @@ const uPMessages = [
 	"yikes.",
 	"everyone was silently judging you.",
 	"not your mogi.",
+	"what a sell.",
+	"ur gameplay was wurse than my speling.",
+	"you were the best in the room, but only in theory.",
 ];
 
 const bCMessages = [
@@ -156,6 +168,9 @@ const bCMessages = [
 	"did the rest of your team suck or are you just that good?",
 	"you're the type of mate we all need.",
 	"holy carry.",
+	"lebron type performance.",
+	"everyone else had a team but you had to fly solo.",
+	"we all know how that feels. not good.",
 ];
 
 const bAMessages = [
@@ -165,6 +180,10 @@ const bAMessages = [
 	"ow.",
 	"thank god for teammates.",
 	"bad day?",
+	"they call you the Partner Average Killer.",
+	"tip: having a team doesn't mean you take the day off.",
+	"hopefully your team doesn't hold grudges.",
+	"you had one job.",
 ];
 
 function getRandomMessage(pool) {
@@ -484,7 +503,7 @@ function buildTableLinksMessage(events) {
 		const label = event?.title ? `${event.title}` : "";
 		parts.push(`[${label}](${link})`.trim());
 	}
-	return parts.join(", ");
+	return "links: " + parts.join(", ");
 }
 
 function drawEventsColumn(ctx, frame, trackColors, events) {
@@ -493,12 +512,13 @@ function drawEventsColumn(ctx, frame, trackColors, events) {
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
 	const titleFont = `600 ${LAYOUT.eventTitleFontSize}px Lexend`;
-	const bodyFont = `${LAYOUT.eventBodyFontSize}px Lexend`;
+	const bodyFontRegular = `${LAYOUT.footnoteFontSize}px Lexend`;
+	const bodyFontBold = `500 ${LAYOUT.eventBodyFontSize}px Lexend`;
 	const bodyLineHeight = LAYOUT.eventBodyFontSize * 1.32;
 	const contentWidth = frame.width - LAYOUT.columnPadding * 2;
 	const processed = [];
 
-	ctx.font = bodyFont;
+	ctx.font = bodyFontBold;
 	for (const event of events) {
 		if (!event?.description) continue;
 		const bodyLines = wrapText(ctx, event.description, contentWidth);
@@ -532,17 +552,24 @@ function drawEventsColumn(ctx, frame, trackColors, events) {
 	for (let index = 0; index < processed.length; index++) {
 		const event = processed[index];
 		ctx.font = titleFont;
-		ctx.fillStyle = trackColors.statsTextColor || "#333333";
+		const textColor = trackColors.statsTextColor || "#333333";
+		ctx.fillStyle = textColor;
+		ctx.globalAlpha = LAYOUT.eventTitleOpacity;
 		ctx.fillText(event.title, frame.left + LAYOUT.columnPadding, cursorY);
+		ctx.globalAlpha = 1;
 		cursorY += LAYOUT.eventTitleFontSize;
 		cursorY += LAYOUT.eventTitleGap;
 
-		ctx.font = bodyFont;
-		ctx.fillStyle = trackColors.statsTextColor || "#333333";
-		for (const line of event.bodyLines) {
+		ctx.fillStyle = textColor;
+		for (let lineIndex = 0; lineIndex < event.bodyLines.length; lineIndex++) {
+			const line = event.bodyLines[lineIndex];
+			const isFootnote = lineIndex === 0;
+			ctx.font = isFootnote ? bodyFontRegular : bodyFontBold;
+			ctx.globalAlpha = isFootnote ? LAYOUT.eventFootnoteOpacity : 1;
 			ctx.fillText(line, frame.left + LAYOUT.columnPadding, cursorY);
 			cursorY += bodyLineHeight;
 		}
+		ctx.globalAlpha = 1;
 
 		if (index < processed.length - 1) {
 			cursorY += gapSize;
@@ -649,7 +676,7 @@ async function renderNotablesImage({
 	const subtitleFontSize = LAYOUT.headerSubtitleFontSize;
 	const hasSubtitle = Boolean(subtitleText);
 	const textBlockHeight = titleFontSize + (hasSubtitle ? LAYOUT.headerSubtitleGap + subtitleFontSize : 0);
-	const textBlockTop = headerFrame.top + (headerFrame.height - textBlockHeight) / 2;
+	const textBlockTop = headerFrame.top + (headerFrame.height - textBlockHeight) / 2 + LAYOUT.headerTextVerticalAdjustment;
 	const titleBaseline = textBlockTop + titleFontSize;
 	const subtitleBaseline = hasSubtitle ? titleBaseline + LAYOUT.headerSubtitleGap + subtitleFontSize : null;
 	let textX = headerFrame.left + LAYOUT.headerPaddingHorizontal;
@@ -671,7 +698,7 @@ async function renderNotablesImage({
 
 	if (hasSubtitle && subtitleBaseline !== null) {
 		ctx.font = `${subtitleFontSize}px Lexend`;
-		ctx.fillStyle = trackColors.headerSubtitleColor || trackColors.statsTextColor || "#333333";
+		ctx.fillStyle = trackColors.statsTextColor || "#333333";
 		ctx.fillText(subtitleText, textX, subtitleBaseline);
 	}
 	ctx.restore();

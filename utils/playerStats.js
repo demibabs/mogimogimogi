@@ -696,9 +696,27 @@ class PlayerStats {
 		return false;
 	}
 
-	static async getH2HTables(userIdentifier1, userIdentifier2, serverId) {
-		const normalizedUser1 = PlayerStats.normalizeIdentifier(userIdentifier1);
-		const normalizedUser2 = PlayerStats.normalizeIdentifier(userIdentifier2);
+	static async getH2HTables(source, otherIdentifier, serverId = null) {
+		if (source && typeof source === "object" && !Array.isArray(source)) {
+			const normalizedOpponent = PlayerStats.normalizeIdentifier(otherIdentifier);
+			if (!normalizedOpponent) {
+				return {};
+			}
+			const entries = source instanceof Map ? Array.from(source.entries()) : Object.entries(source);
+			const sharedTables = {};
+			for (const [tableId, table] of entries) {
+				if (!table) continue;
+				const players = PlayerStats.getPlayersFromTable(table);
+				const hasOpponent = players.some((player) => PlayerStats.playerMatchesIdentifier(player, normalizedOpponent));
+				if (hasOpponent) {
+					sharedTables[tableId] = table;
+				}
+			}
+			return sharedTables;
+		}
+
+		const normalizedUser1 = PlayerStats.normalizeIdentifier(source);
+		const normalizedUser2 = PlayerStats.normalizeIdentifier(otherIdentifier);
 		if (!normalizedUser1 || !normalizedUser2) {
 			return {};
 		}

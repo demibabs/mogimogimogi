@@ -86,7 +86,7 @@ function buildAutocompleteSuggestions(options, query) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("customize")
-		.setDescription("set your favorite track, character, and vehicle.")
+		.setDescription("set the track and combo that appear when you use /stats and /notables.")
 		.addStringOption(option =>
 			option
 				.setName("track")
@@ -96,13 +96,13 @@ module.exports = {
 		.addStringOption(option =>
 			option
 				.setName("character")
-				.setDescription("select your favorite racer")
+				.setDescription("select your main char")
 				.setAutocomplete(true),
 		)
 		.addStringOption(option =>
 			option
 				.setName("vehicle")
-				.setDescription("choose your favorite ride")
+				.setDescription("choose your main vehicle")
 				.setAutocomplete(true),
 		),
 
