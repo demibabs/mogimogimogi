@@ -14,6 +14,8 @@ const {
 	drawBlurredImage,
 	drawEmoji,
 	getCountryFlag,
+	drawTextWithEmojis,
+	truncateTextWithEmojis,
 } = EmbedEnhancer;
 
 const EDGE_RADIUS = 30;
@@ -63,6 +65,7 @@ const LAYOUT = {
 	headerTitleFontSize: 64,
 	headerSubtitleFontSize: 30,
 	headerSubtitleGap: 14,
+	titleOffset: 5,
 	columnGap: null,
 	headerIconGap: 28,
 	headerIconSizeExtra: 20,
@@ -379,7 +382,7 @@ async function renderLeaderboardImage({
 	ctx.textAlign = "left";
 	ctx.textBaseline = "alphabetic";
 
-	const titleBaseline = headerFrame.top + (headerFrame.height / 2);
+	const titleBaseline = headerFrame.top + (headerFrame.height / 2) + LAYOUT.titleOffset;
 
 	let textStartX = headerFrame.left + LAYOUT.headerPaddingHorizontal;
 	if (guildIcon) {
@@ -414,7 +417,13 @@ async function renderLeaderboardImage({
 	}
 	ctx.font = `700 ${LAYOUT.headerTitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.fillStyle = palette.headerColor || "#000000";
-	ctx.fillText(serverName, textStartX, titleBaseline);
+	await drawTextWithEmojis(ctx, serverName, textStartX, titleBaseline, {
+		font: ctx.font,
+		fillStyle: ctx.fillStyle,
+		emojiSize: LAYOUT.headerTitleFontSize * 0.92,
+		lineHeight: LAYOUT.headerTitleFontSize * 1.2,
+		maxWidth: headerFrame.left + headerFrame.width - textStartX - 20,
+	});
 
 	ctx.font = `${LAYOUT.headerSubtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.fillStyle = palette.headerColor || "#000000";
@@ -523,8 +532,17 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 		const nameMaxWidth = Math.max(maxNameRight - currentX, 0);
 		const nameValue = entry.displayName || entry.playerDetails?.name || `player ${entry.loungeId}`;
 		ctx.font = `600 ${LAYOUT.nameFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
-		const fittedName = truncateText(ctx, nameValue, nameMaxWidth);
-		ctx.fillText(fittedName, currentX, centerY);
+		const fittedName = truncateTextWithEmojis(ctx, nameValue, nameMaxWidth, {
+			font: ctx.font,
+			emojiSize: LAYOUT.nameFontSize * 0.92,
+		});
+		await drawTextWithEmojis(ctx, fittedName, currentX, centerY, {
+			font: ctx.font,
+			fillStyle: ctx.fillStyle,
+			emojiSize: LAYOUT.nameFontSize * 0.92,
+			baseline: "middle",
+			textAlign: "left",
+		});
 		ctx.restore();
 
 		ctx.save();

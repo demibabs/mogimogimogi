@@ -417,7 +417,14 @@ async function renderHeadToHeadImage({
 		const nameX = alignment === "left"
 			? textBoundary + flagOffset
 			: textBoundary - flagOffset;
-		ctx.fillText(displayName, nameX, centerY);
+		await EmbedEnhancer.drawTextWithEmojis(ctx, displayName, nameX, centerY, {
+			font: ctx.font,
+			fillStyle: ctx.fillStyle,
+			emojiSize: 60 * 0.85,
+			lineHeight: 60 * 1.15,
+			textAlign: alignment,
+			baseline: "middle",
+		});
 		if (flagEmoji) {
 			try {
 				const emojiX = alignment === "left" ? textBoundary : textBoundary - flagSize;
@@ -541,7 +548,14 @@ async function renderHeadToHeadImage({
 				if (titleLines.length) {
 					ctx.font = HIGHLIGHT_TITLE_FONT;
 					for (const line of titleLines) {
-						ctx.fillText(line, contentX, cursorY);
+						await EmbedEnhancer.drawTextWithEmojis(ctx, line, contentX, cursorY, {
+							font: HIGHLIGHT_TITLE_FONT,
+							fillStyle: ctx.fillStyle,
+							emojiSize: 36 * 0.95,
+							lineHeight: highlightTitleLineHeight,
+							textAlign: alignment,
+							baseline: "top",
+						});
 						cursorY += highlightTitleLineHeight;
 					}
 					previousRendered = true;
@@ -551,7 +565,14 @@ async function renderHeadToHeadImage({
 					ctx.font = HIGHLIGHT_DESCRIPTOR_FONT;
 					ctx.globalAlpha = 0.75;
 					for (const line of descriptorLines) {
-						ctx.fillText(line, contentX, cursorY);
+						await EmbedEnhancer.drawTextWithEmojis(ctx, line, contentX, cursorY, {
+							font: HIGHLIGHT_DESCRIPTOR_FONT,
+							fillStyle: ctx.fillStyle,
+							emojiSize: 26 * 0.95,
+							lineHeight: highlightDescriptorLineHeight,
+							textAlign: alignment,
+							baseline: "top",
+						});
 						cursorY += highlightDescriptorLineHeight;
 					}
 					ctx.globalAlpha = 1;
@@ -561,7 +582,14 @@ async function renderHeadToHeadImage({
 					if (previousRendered) cursorY += summaryGap;
 					ctx.font = HIGHLIGHT_SUMMARY_FONT;
 					for (const line of summaryLines) {
-						ctx.fillText(line, contentX, cursorY);
+						await EmbedEnhancer.drawTextWithEmojis(ctx, line, contentX, cursorY, {
+							font: HIGHLIGHT_SUMMARY_FONT,
+							fillStyle: ctx.fillStyle,
+							emojiSize: 35 * 0.95,
+							lineHeight: highlightSummaryLineHeight,
+							textAlign: alignment,
+							baseline: "top",
+						});
 						cursorY += highlightSummaryLineHeight;
 					}
 				}

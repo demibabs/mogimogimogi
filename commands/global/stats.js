@@ -1286,7 +1286,13 @@ module.exports = {
 			if (playerEmoji) {
 				await EmbedEnhancer.drawEmoji(ctx, playerEmoji, headerEmojiX, headerEmojiY, headerEmojiSize);
 			}
-			ctx.fillText(headerTitle, headerTextX, titleBaseline);
+			await EmbedEnhancer.drawTextWithEmojis(ctx, headerTitle, headerTextX, titleBaseline, {
+				font: ctx.font,
+				fillStyle: ctx.fillStyle,
+				emojiSize: headerTextSize * 0.92,
+				lineHeight: headerTextSize * 1.2,
+				maxWidth: headerFrame.left + headerFrame.width - headerTextX - LAYOUT.headerPaddingRight,
+			});
 
 			if (hasSubtitle) {
 				const subtitleColor = trackColors.headerSubtitleColor || trackColors.statsTextColor || trackColors.headerColor;

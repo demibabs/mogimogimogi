@@ -21,6 +21,7 @@ const {
 	loadWebPAsPng,
 	getCountryFlag,
 	drawEmoji,
+	drawTextWithEmojis,
 } = EmbedEnhancer;
 
 const EDGE_RADIUS = 30;
@@ -696,7 +697,13 @@ async function renderNotablesImage({
 
 	ctx.font = `700 ${titleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
-	ctx.fillText(headerTitle, textX, titleBaseline);
+	await drawTextWithEmojis(ctx, headerTitle, textX, titleBaseline, {
+		font: ctx.font,
+		fillStyle: ctx.fillStyle,
+		emojiSize: titleFontSize * 0.9,
+		lineHeight: titleFontSize * 1.15,
+		maxWidth: headerFrame.width - (textX - headerFrame.left) - LAYOUT.headerPaddingRight,
+	});
 
 	if (hasSubtitle && subtitleBaseline !== null) {
 		ctx.font = `${subtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;

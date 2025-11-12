@@ -320,6 +320,225 @@ function formatSignedNumber(value) {
 	return `${sign}${magnitude}`;
 }
 
+// ---------------- Inline Emoji Text Rendering -----------------
+// Renders a string containing arbitrary emoji + normal text by splitting into runs and drawing
+// twemoji images for emoji code points while preserving a single baseline. Supports simple wrapping.
+// We use a conservative emoji regex (covers standard pictographs, flags, keycaps, modifiers) and fall back
+// to regular text for anything not matched.
+
+// Simplified broad emoji regex: matches surrogate pairs & some symbols. Not exhaustive but avoids eslint char class issues.
+const EMOJI_REGEX = /(?:[\u231A-\u231B]|[\u23E9-\u23F3]|[\u23F8-\u23FA]|[\u2600-\u27BF]|[\u2B05-\u2B55]|[\u2934-\u2935]|[\u3297\u3299]|[\u3030\u303D]|[\u24C2]|[\u00A9\u00AE\u2122\u2139]|[\uD83C][\uDF00-\uDFFF]|[\uD83D][\uDC00-\uDE4F]|[\uD83D][\uDE80-\uDEFF]|[\uD83E][\uDD00-\uDDFF])/g;
+
+function splitRuns(text) {
+	if (!text) return [];
+	const runs = [];
+	let lastIndex = 0;
+	text.replace(EMOJI_REGEX, (match, offset) => {
+		if (offset > lastIndex) {
+			runs.push({ type: "text", value: text.slice(lastIndex, offset) });
+		}
+		runs.push({ type: "emoji", value: match });
+		lastIndex = offset + match.length;
+		return match;
+	});
+	if (lastIndex < text.length) {
+		runs.push({ type: "text", value: text.slice(lastIndex) });
+	}
+	return runs.filter(r => r.value);
+}
+
+function tokenizeForEmojiTruncation(text) {
+	const runs = splitRuns(text);
+	const tokens = [];
+	for (const run of runs) {
+		if (run.type === "emoji") {
+			tokens.push({ type: "emoji", value: run.value });
+			continue;
+		}
+		if (run.type === "text") {
+			for (const ch of [...run.value]) {
+				tokens.push({ type: "char", value: ch });
+			}
+		}
+	}
+	return tokens;
+}
+
+function measureEmojiAwareWidth(ctx, tokens, emojiSize) {
+	let w = 0;
+	for (const t of tokens) {
+		if (t.type === "emoji") w += emojiSize;
+		else w += ctx.measureText(t.value).width;
+	}
+	return w;
+}
+
+function joinTokens(tokens) {
+	return tokens.map(t => t.value).join("");
+}
+
+function parseFontPx(font) {
+	const m = /([0-9]+)px/.exec(font || "");
+	return m ? parseInt(m[1], 10) : 32;
+}
+
+// Truncate a single-line string with emoji-awareness so its width <= maxWidth. Returns fitted string.
+function truncateTextWithEmojis(ctx, text, maxWidth, options = {}) {
+	if (!text) return "";
+	const { font = ctx.font, emojiSize = null, ellipsis = "\u2026" } = options;
+	const prevFont = ctx.font;
+	ctx.font = font;
+	const size = emojiSize || parseFontPx(font) * 0.95;
+	const tokens = tokenizeForEmojiTruncation(text);
+	const ellipsisWidth = ctx.measureText(ellipsis).width;
+	let width = measureEmojiAwareWidth(ctx, tokens, size);
+	if (width <= maxWidth) {
+		ctx.font = prevFont;
+		return text;
+	}
+	const fitted = tokens.slice();
+	while (fitted.length && width + ellipsisWidth > maxWidth) {
+		const popped = fitted.pop();
+		if (!popped) break;
+		width -= popped.type === "emoji" ? size : ctx.measureText(popped.value).width;
+	}
+	const result = joinTokens(fitted) + (fitted.length < tokens.length ? ellipsis : "");
+	ctx.font = prevFont;
+	return result;
+}
+
+const emojiImageCache = new Map(); // codePoint -> Image
+async function ensureEmojiImage(emoji) {
+	const code = twemoji.convert.toCodePoint(emoji);
+	if (emojiImageCache.has(code)) {
+		return emojiImageCache.get(code);
+	}
+	const url = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`;
+	const res = await fetch(url);
+	if (!res.ok) throw new Error(`emoji fetch failed: ${res.status}`);
+	const buf = Buffer.from(await res.arrayBuffer());
+	const img = await loadImage(buf);
+	emojiImageCache.set(code, img);
+	return img;
+}
+
+// Draws text with emoji images. Returns total rendered width.
+// Supports basic wrapping across lines when maxWidth provided.
+async function drawTextWithEmojis(ctx, text, x, y, options = {}) {
+	const {
+		font = ctx.font,
+		fillStyle = ctx.fillStyle,
+		maxWidth = Infinity,
+		lineHeight = null,
+		emojiSize = null,
+		baseline = "alphabetic",
+		textAlign = "left",
+		verticalCenter = false, // if true, treat y as vertical center for single-line render
+		onMeasureLine = null, // callback(lineWidth, isEmojiRun)
+	} = options;
+
+	ctx.save();
+	ctx.font = font;
+	const userAlign = textAlign;
+	ctx.textAlign = "left"; // draw left-to-right consistently; we manually adjust startX for alignment
+	ctx.textBaseline = baseline;
+	ctx.fillStyle = fillStyle;
+	const runs = splitRuns(text);
+	const fontPxMatch = /([0-9]+)px/.exec(font);
+	const numericPx = fontPxMatch ? parseInt(fontPxMatch[1], 10) : 32;
+	const measuredLineHeight = lineHeight || numericPx * 1.2;
+	const size = emojiSize || numericPx;
+
+	let cursorX = x;
+	let cursorY = y;
+	if (verticalCenter) {
+		// Align baseline such that text block centers on provided y
+		cursorY = y + numericPx * 0.35; // heuristic baseline shift
+	}
+
+	// If single-line rendering and non-left alignment, precompute total width and adjust start
+	if (!Number.isFinite(maxWidth) || maxWidth === Infinity) {
+		let totalWidth = 0;
+		for (const run of runs) {
+			if (run.type === "emoji") totalWidth += size;
+			else totalWidth += ctx.measureText(run.value).width;
+		}
+		if (userAlign === "right") {
+			cursorX = x - totalWidth;
+		}
+		else if (userAlign === "center") {
+			cursorX = x - totalWidth / 2;
+		}
+	}
+
+	const commitWrap = () => {
+		cursorX = x;
+		cursorY += measuredLineHeight;
+	};
+
+
+	const getDrawY = () => {
+		// Calculate top-left y for emoji image based on baseline selection
+		switch (baseline) {
+		case "top":
+			return cursorY;
+		case "middle":
+			return cursorY - size / 2;
+		case "bottom":
+			return cursorY - size;
+		case "hanging":
+			return cursorY - size * 0.2;
+		case "ideographic":
+			return cursorY - size * 0.9;
+		case "alphabetic":
+		default:
+			return cursorY - size * 0.9;
+		}
+	};
+
+	for (const run of runs) {
+		if (run.type === "text") {
+			const segments = run.value.split(/(\s+)/);
+			for (const seg of segments) {
+				if (!seg) continue;
+				const segWidth = ctx.measureText(seg).width;
+				if (cursorX + segWidth > x + maxWidth && seg.trim()) {
+					commitWrap();
+				}
+				if (onMeasureLine) onMeasureLine(segWidth, false);
+				ctx.fillText(seg, cursorX, cursorY);
+				cursorX += segWidth;
+			}
+		}
+		else if (run.type === "emoji") {
+			if (cursorX + size > x + maxWidth) {
+				commitWrap();
+			}
+			try {
+				const img = await ensureEmojiImage(run.value);
+				const drawY = getDrawY();
+				ctx.drawImage(img, cursorX, drawY, size, size);
+				if (onMeasureLine) onMeasureLine(size, true);
+				cursorX += size;
+			}
+			catch (e) {
+				// Fallback: draw as text if image fails
+				const fallback = run.value;
+				const w = ctx.measureText(fallback).width;
+				if (cursorX + w > x + maxWidth) {
+					commitWrap();
+				}
+				if (onMeasureLine) onMeasureLine(w, false);
+				ctx.fillText(fallback, cursorX, cursorY);
+				cursorX += w;
+			}
+		}
+	}
+
+	ctx.restore();
+	return { width: cursorX - x, height: cursorY - y + measuredLineHeight };
+}
+
 // async function loadImageFromUrl(url) {
 // 	const res = await fetch(url);
 // 	if (!res.ok) {
@@ -372,6 +591,8 @@ module.exports = {
 	drawRoundedImage,
 	drawBlurredImage,
 	drawEmoji,
+	drawTextWithEmojis,
+	truncateTextWithEmojis,
 	randomPattern,
 	// loadImageFromUrl,
 	loadWebPAsPng,
