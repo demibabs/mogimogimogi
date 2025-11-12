@@ -5,7 +5,14 @@ const twemoji = require("twemoji");
 const { loadImage } = require("canvas");
 const StackBlur = require("stackblur-canvas");
 const { draw } = require("patternomaly");
-const sharp = require("sharp");
+let sharp = null;
+try {
+	sharp = require("sharp");
+}
+catch (sharpError) {
+	// Optional dependency not installed in this environment; WebP conversion will fallback.
+	// console.warn("embedEnhancer: sharp not available, falling back to direct image load for avatars.");
+}
 
 function roundedRectPath(ctx, x, y, width, height, radius = 20) {
 	const clampedRadius = Math.max(0, Math.min(radius, Math.min(width, height) / 2));
@@ -325,10 +332,23 @@ function formatSignedNumber(value) {
 async function loadWebPAsPng(url) {
 	const res = await fetch(url);
 	if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
-
 	const webpBuffer = Buffer.from(await res.arrayBuffer());
-	const pngBuffer = await sharp(webpBuffer).png().toBuffer(); // WebP → PNG
-	return loadImage(pngBuffer);
+	if (sharp) {
+		try {
+			const pngBuffer = await sharp(webpBuffer).png().toBuffer(); // WebP → PNG
+			return loadImage(pngBuffer);
+		}
+		catch (conversionError) {
+			// fall through to raw
+		}
+	}
+	// Fallback: attempt direct load (may work if Canvas supports it or image isn't actually WebP)
+	try {
+		return loadImage(webpBuffer);
+	}
+	catch (rawError) {
+		throw new Error("avatar image conversion failed and sharp unavailable");
+	}
 }
 
 
