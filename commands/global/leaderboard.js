@@ -6,6 +6,7 @@ const PlayerStats = require("../../utils/playerStats");
 const EmbedEnhancer = require("../../utils/embedEnhancer");
 const AutoUserManager = require("../../utils/autoUserManager");
 const ColorPalettes = require("../../utils/colorPalettes");
+const Fonts = require("../../utils/fonts");
 const resolveTargetPlayer = require("../../utils/playerResolver");
 
 const {
@@ -411,11 +412,11 @@ async function renderLeaderboardImage({
 			console.warn("leaderboard: failed to draw guild icon:", iconError);
 		}
 	}
-	ctx.font = `700 ${LAYOUT.headerTitleFontSize}px Lexend`;
+	ctx.font = `700 ${LAYOUT.headerTitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.fillStyle = palette.headerColor || "#000000";
 	ctx.fillText(serverName, textStartX, titleBaseline);
 
-	ctx.font = `${LAYOUT.headerSubtitleFontSize}px Lexend`;
+	ctx.font = `${LAYOUT.headerSubtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.fillStyle = palette.headerColor || "#000000";
 	ctx.fillText(subtitleText, textStartX, titleBaseline + LAYOUT.headerSubtitleGap + LAYOUT.headerSubtitleFontSize);
 	ctx.restore();
@@ -486,7 +487,7 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 		});
 
 		ctx.save();
-		ctx.font = `700 ${LAYOUT.mmrFontSize}px Lexend`;
+		ctx.font = `700 ${LAYOUT.mmrFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 		const valueWidth = ctx.measureText(valueText).width;
 		ctx.restore();
 
@@ -502,7 +503,7 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 		ctx.save();
 		ctx.textAlign = "left";
 		ctx.textBaseline = "middle";
-		ctx.font = `700 ${LAYOUT.rankFontSize}px Lexend`;
+		ctx.font = `700 ${LAYOUT.rankFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 		ctx.fillStyle = palette.leaderboardTextColor || "#000000";
 		ctx.fillText(rankText, currentX, centerY);
 		const rankWidth = ctx.measureText(rankText).width;
@@ -521,7 +522,7 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 
 		const nameMaxWidth = Math.max(maxNameRight - currentX, 0);
 		const nameValue = entry.displayName || entry.playerDetails?.name || `player ${entry.loungeId}`;
-		ctx.font = `600 ${LAYOUT.nameFontSize}px Lexend`;
+		ctx.font = `600 ${LAYOUT.nameFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 		const fittedName = truncateText(ctx, nameValue, nameMaxWidth);
 		ctx.fillText(fittedName, currentX, centerY);
 		ctx.restore();
@@ -529,7 +530,7 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 		ctx.save();
 		ctx.textAlign = "right";
 		ctx.textBaseline = "middle";
-		ctx.font = `700 ${LAYOUT.mmrFontSize}px Lexend`;
+		ctx.font = `700 ${LAYOUT.mmrFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 		let valueColor = palette.leaderboardTextColor || "#000000";
 		if (timeFilter !== "alltime") {
 			if (metricValue === null) {

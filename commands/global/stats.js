@@ -121,10 +121,10 @@ function drawStatsGrid(ctx, frame, trackColors, gridConfig) {
 	const cellWidth = innerWidth / columns;
 	const cellHeight = innerHeight / gridConfig.length;
 
-	const labelFont = `${LAYOUT.statsLabelFontSize}px Lexend`;
+	const labelFont = `${LAYOUT.statsLabelFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	const labelLineHeight = LAYOUT.statsLabelFontSize * 1.1;
-	const valueFont = `700 ${LAYOUT.statsValueFontSize}px Lexend`;
-	const subLabelFont = `${LAYOUT.statsSubLabelFontSize}px Lexend`;
+	const valueFont = `700 ${LAYOUT.statsValueFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
+	const subLabelFont = `${LAYOUT.statsSubLabelFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 
 	const yOffset = (LAYOUT.statsCellPadding + LAYOUT.statsCellAdditionalTopPadding) / 2;
 
@@ -1250,7 +1250,7 @@ module.exports = {
 			const headerTextX = headerFrame.left + LAYOUT.headerPaddingLeft + headerEmojiSize + LAYOUT.headerEmojiGap;
 			const headerEmojiX = headerFrame.left + LAYOUT.headerPaddingLeft;
 			const headerEmojiY = headerFrame.top + (headerFrame.height - headerEmojiSize) / 2;
-			const headerTitle = `${displayName}'s stats`;
+			const headerTitle = displayName + (displayName.length < 10 ? "'s stats" : "");
 			const timeLabels = {
 				alltime: "all time",
 				weekly: "past week",
@@ -1280,7 +1280,7 @@ module.exports = {
 
 			ctx.textAlign = "left";
 			ctx.textBaseline = "alphabetic";
-			ctx.font = `${headerTextSize}px Lexend`;
+			ctx.font = `${headerTextSize}px ${Fonts.FONT_FAMILY_STACK}`;
 			ctx.fillStyle = trackColors.headerColor;
 
 			if (playerEmoji) {
@@ -1290,7 +1290,7 @@ module.exports = {
 
 			if (hasSubtitle) {
 				const subtitleColor = trackColors.headerSubtitleColor || trackColors.statsTextColor || trackColors.headerColor;
-				ctx.font = `${subtitleFontSize}px Lexend`;
+				ctx.font = `${subtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 				ctx.fillStyle = subtitleColor;
 				ctx.fillText(subtitleText, headerTextX, subtitleBaseline);
 			}
@@ -1598,7 +1598,7 @@ function drawMMRMarker(ctx, mmr, trackName, {
 	ctx.fill();
 	ctx.stroke();
 	ctx.fillStyle = trackColors.youColor;
-	ctx.font = "24px";
+	ctx.font = `24px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.textAlign = "center";
 	ctx.textBaseline = "bottom";
 	ctx.fillText("you", markerX, markerY - radius - 10);

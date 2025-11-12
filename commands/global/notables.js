@@ -8,6 +8,7 @@ const EmbedEnhancer = require("../../utils/embedEnhancer");
 const AutoUserManager = require("../../utils/autoUserManager");
 const GameData = require("../../utils/gameData");
 const ColorPalettes = require("../../utils/colorPalettes");
+const Fonts = require("../../utils/fonts");
 const resolveTargetPlayer = require("../../utils/playerResolver");
 
 const {
@@ -512,9 +513,9 @@ function drawEventsColumn(ctx, frame, trackColors, events) {
 	ctx.save();
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	const titleFont = `600 ${LAYOUT.eventTitleFontSize}px Lexend`;
-	const bodyFontRegular = `${LAYOUT.footnoteFontSize}px Lexend`;
-	const bodyFontBold = `500 ${LAYOUT.eventBodyFontSize}px Lexend`;
+	const titleFont = `600 ${LAYOUT.eventTitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
+	const bodyFontRegular = `${LAYOUT.footnoteFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
+	const bodyFontBold = `500 ${LAYOUT.eventBodyFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	const bodyLineHeight = LAYOUT.eventBodyFontSize * 1.32;
 	const contentWidth = frame.width - LAYOUT.columnPadding * 2;
 	const processed = [];
@@ -693,12 +694,12 @@ async function renderNotablesImage({
 		textX += emojiSize + emojiGap;
 	}
 
-	ctx.font = `700 ${titleFontSize}px Lexend`;
+	ctx.font = `700 ${titleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
 	ctx.fillText(headerTitle, textX, titleBaseline);
 
 	if (hasSubtitle && subtitleBaseline !== null) {
-		ctx.font = `${subtitleFontSize}px Lexend`;
+		ctx.font = `${subtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 		ctx.fillStyle = trackColors.statsTextColor || "#333333";
 		ctx.fillText(subtitleText, textX, subtitleBaseline);
 	}
