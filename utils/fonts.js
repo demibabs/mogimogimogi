@@ -10,9 +10,12 @@ const FONT_FAMILY_PRIMARY = "Lexend";
 // Fallbacks: broaden coverage across common OSes without registering extra fonts.
 // Order favors widely available system fonts; if a font isn't present, the system skips it harmlessly.
 const FONT_FAMILY_FALLBACKS = [
-	"Noto Sans",
+	"Noto Sans", // Often present on cloud images
+	"Noto Sans Symbols 2", // Extended symbols (registered below if present)
+	"Noto Sans Symbols", // Misc symbols (registered below if present)
 	"Noto Sans JP", // Japanese coverage (registered below if present)
-	"DejaVu Sans", // Most Linux images (good Unicode coverage)
+	"Noto Sans Math", // Math symbols (registered below if present)
+	"Noto Music", // Musical symbols (registered below if present)
 	"sans-serif",
 ];
 const FONT_FAMILY_STACK = `${FONT_FAMILY_PRIMARY}, ${FONT_FAMILY_FALLBACKS.join(", ")}`;
@@ -126,6 +129,61 @@ function init() {
 				}
 			}
 		}
+		// Register Noto Sans Symbols if present
+		(() => {
+			const dir = path.join(__dirname, "..", "fonts", "Noto_Sans_Symbols");
+			const regular = path.join(dir, "static", "NotoSansSymbols-Regular.ttf");
+			if (fs.existsSync(regular)) {
+				try {
+					registerFont(regular, { family: "Noto Sans Symbols", weight: "400" });
+				}
+				catch (e) {
+					console.warn("Failed to register NotoSansSymbols-Regular:", e?.message || e);
+				}
+			}
+		})();
+
+		// Register Noto Sans Symbols 2 if present
+		(() => {
+			const dir = path.join(__dirname, "..", "fonts", "Noto_Sans_Symbols_2");
+			const regular = path.join(dir, "NotoSansSymbols2-Regular.ttf");
+			if (fs.existsSync(regular)) {
+				try {
+					registerFont(regular, { family: "Noto Sans Symbols 2", weight: "400" });
+				}
+				catch (e) {
+					console.warn("Failed to register NotoSansSymbols2-Regular:", e?.message || e);
+				}
+			}
+		})();
+
+		// Register Noto Sans Math if present
+		(() => {
+			const dir = path.join(__dirname, "..", "fonts", "Noto_Sans_Math");
+			const regular = path.join(dir, "NotoSansMath-Regular.ttf");
+			if (fs.existsSync(regular)) {
+				try {
+					registerFont(regular, { family: "Noto Sans Math", weight: "400" });
+				}
+				catch (e) {
+					console.warn("Failed to register NotoSansMath-Regular:", e?.message || e);
+				}
+			}
+		})();
+
+		// Register Noto Music if present
+		(() => {
+			const dir = path.join(__dirname, "..", "fonts", "Noto_Music");
+			const regular = path.join(dir, "NotoMusic-Regular.ttf");
+			if (fs.existsSync(regular)) {
+				try {
+					registerFont(regular, { family: "Noto Music", weight: "400" });
+				}
+				catch (e) {
+					console.warn("Failed to register NotoMusic-Regular:", e?.message || e);
+				}
+			}
+		})();
 	}
 	catch (e) {
 		// ignore
