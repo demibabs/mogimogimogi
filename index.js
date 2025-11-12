@@ -5,6 +5,17 @@ const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST, Activ
 // Load environment variables
 require("dotenv").config();
 
+// Register custom fonts (Lexend) for canvas rendering before any drawing occurs
+try {
+	const Fonts = require("./utils/fonts");
+	if (typeof Fonts?.init === "function") {
+		Fonts.init();
+	}
+}
+catch (e) {
+	console.warn("Font registration skipped:", e?.message || e);
+}
+
 // Parse command line arguments
 const args = process.argv.slice(2);
 

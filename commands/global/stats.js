@@ -2,6 +2,7 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Attac
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const { createCanvas, loadImage } = require("canvas");
 const Database = require("../../utils/database");
+const Fonts = require("../../utils/fonts");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
 const DataManager = require("../../utils/dataManager");
@@ -234,7 +235,7 @@ function getChartRenderer() {
 		height: CHART_DIMENSIONS.height,
 		backgroundColour: "rgba(0,0,0,0)",
 		chartCallback: ChartJS => {
-			ChartJS.defaults.font.family = "Lexend";
+			ChartJS.defaults.font.family = Fonts?.FONT_FAMILY_STACK || "Lexend, Arial, sans-serif";
 		},
 	});
 	return chartRenderer;

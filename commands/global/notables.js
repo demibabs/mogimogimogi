@@ -68,6 +68,7 @@ const LAYOUT = {
 	sectionGap: 35,
 	headerHeight: 120,
 	headerPaddingHorizontal: 60,
+	headerPaddingRight: 15,
 	headerPaddingVertical: 14,
 	headerTitleFontSize: 60,
 	headerSubtitleFontSize: 30,
@@ -744,7 +745,7 @@ async function renderNotablesImage({
 			console.warn("failed to load avatar image:", error);
 		}
 	}
-	if (headerAssets.length < 2 && avatarImage) {
+	if (avatarImage) {
 		headerAssets.push({
 			type: "avatar",
 			image: avatarImage,
@@ -753,7 +754,7 @@ async function renderNotablesImage({
 		});
 	}
 
-	let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingHorizontal;
+	let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingRight;
 	for (let index = headerAssets.length - 1; index >= 0; index--) {
 		const asset = headerAssets[index];
 		assetCursor -= asset.width;
