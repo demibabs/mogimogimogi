@@ -9,6 +9,8 @@ const FONT_FAMILY_PRIMARY = "Lexend";
 // Fallbacks: keep it simple and portable as requested.
 const FONT_FAMILY_FALLBACKS = [
 	"Arial",
+	"DejaVu Sans", // common on Linux, broad Unicode coverage
+	"Segoe UI Symbol", // Windows symbol coverage
 	"sans-serif",
 ];
 const FONT_FAMILY_STACK = `${FONT_FAMILY_PRIMARY}, ${FONT_FAMILY_FALLBACKS.join(", ")}`;
