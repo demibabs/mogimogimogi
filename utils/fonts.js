@@ -10,6 +10,7 @@ const FONT_FAMILY_PRIMARY = "Lexend";
 // Fallbacks: broaden coverage across common OSes without registering extra fonts.
 // Order favors widely available system fonts; if a font isn't present, the system skips it harmlessly.
 const FONT_FAMILY_FALLBACKS = [
+	"Noto Sans",
 	"Noto Sans JP", // Japanese coverage (registered below if present)
 	"DejaVu Sans", // Most Linux images (good Unicode coverage)
 	"sans-serif",
@@ -82,6 +83,43 @@ function init() {
 			if (fs.existsSync(p)) {
 				try {
 					registerFont(p, { family: "Noto Sans JP", weight: w.weight });
+				}
+				catch (e) {
+					console.warn(`Failed to register font ${w.file}:`, e?.message || e);
+				}
+			}
+		}
+
+		// Register Noto Sans (broad Latin/Unicode) if present
+		const notoSansStatic = path.join(__dirname, "..", "fonts", "Noto_Sans", "static");
+		const notoSansWeights = [
+			{ file: "NotoSans-Regular.ttf", weight: "400" },
+			{ file: "NotoSans-Medium.ttf", weight: "500" },
+			{ file: "NotoSans-SemiBold.ttf", weight: "600" },
+			{ file: "NotoSans-Bold.ttf", weight: "700" },
+		];
+		const notoSansItalics = [
+			{ file: "NotoSans-Italic.ttf", weight: "400" },
+			{ file: "NotoSans-MediumItalic.ttf", weight: "500" },
+			{ file: "NotoSans-SemiBoldItalic.ttf", weight: "600" },
+			{ file: "NotoSans-BoldItalic.ttf", weight: "700" },
+		];
+		for (const w of notoSansWeights) {
+			const p = path.join(notoSansStatic, w.file);
+			if (fs.existsSync(p)) {
+				try {
+					registerFont(p, { family: "Noto Sans", weight: w.weight });
+				}
+				catch (e) {
+					console.warn(`Failed to register font ${w.file}:`, e?.message || e);
+				}
+			}
+		}
+		for (const w of notoSansItalics) {
+			const p = path.join(notoSansStatic, w.file);
+			if (fs.existsSync(p)) {
+				try {
+					registerFont(p, { family: "Noto Sans", weight: w.weight, style: "italic" });
 				}
 				catch (e) {
 					console.warn(`Failed to register font ${w.file}:`, e?.message || e);
