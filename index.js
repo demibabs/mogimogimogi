@@ -108,7 +108,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	// Handle button interactions
 	else if (interaction.isButton()) {
 		console.log(`Button interaction: ${interaction.customId}`);
-		
+
 		// Check if any command can handle this button interaction
 		let handled = false;
 		for (const command of interaction.client.commands.values()) {
@@ -133,7 +133,7 @@ client.on(Events.InteractionCreate, async interaction => {
 				}
 			}
 		}
-		
+
 		if (!handled) {
 			console.warn(`No handler found for button interaction: ${interaction.customId}`);
 			if (!interaction.replied && !interaction.deferred) {

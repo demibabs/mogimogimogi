@@ -101,7 +101,7 @@ const goodBSMessages = [
 	"cheating?",
 	"luck was on your side that day. (or skill...)",
 	"isn't this game so good when you win?",
-	"unstoppable",
+	"unstoppable.",
 ];
 
 const badBSMessages = [

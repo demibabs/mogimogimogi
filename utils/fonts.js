@@ -6,9 +6,16 @@ const path = require("path");
 let registered = false;
 
 const FONT_FAMILY_PRIMARY = "Lexend";
-// Include Noto Color Emoji to improve emoji glyph coverage (if available on host).
-// Order matters: we want Lexend first for regular text, then system-style fallbacks, then emoji.
-const FONT_FAMILY_FALLBACKS = ["Arial", "sans-serif", "Noto Color Emoji"]; // Arial & Noto may need to exist on host
+// Include emoji-capable families to improve glyph coverage.
+// Order matters and is per-glyph: keep Lexend first (primary), then emoji families so emoji are found early,
+// then general-purpose fallbacks. Families that aren't present on the host are harmless.
+const FONT_FAMILY_FALLBACKS = [
+	"Noto Color Emoji", // vendored/registered if available
+	"Segoe UI Emoji", // Windows
+	"Apple Color Emoji", // macOS
+	"Arial",
+	"sans-serif",
+];
 const FONT_FAMILY_STACK = `${FONT_FAMILY_PRIMARY}, ${FONT_FAMILY_FALLBACKS.join(", ")}`;
 
 function init() {
@@ -23,6 +30,7 @@ function init() {
 	}
 	const staticDir = path.join(__dirname, "..", "fonts", "Lexend", "static");
 	const emojiDir = path.join(__dirname, "..", "fonts", "Noto_Color_Emoji");
+	const notoEmojiDir = path.join(__dirname, "..", "fonts", "Noto_Emoji");
 	const weights = [
 		{ file: "Lexend-Regular.ttf", weight: "400" },
 		{ file: "Lexend-Medium.ttf", weight: "500" },
@@ -44,6 +52,14 @@ function init() {
 	}
 	catch (e) {
 		console.warn("Noto Color Emoji not registered (optional):", e?.message || e);
+	}
+
+	// Optional: register non-color Noto Emoji as a fallback for hosts without color emoji rendering.
+	try {
+		registerFont(path.join(notoEmojiDir, "NotoEmoji-Regular.ttf"), { family: "Noto Emoji" });
+	}
+	catch (e) {
+		// safe to ignore
 	}
 	registered = true;
 }
