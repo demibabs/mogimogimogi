@@ -6,11 +6,14 @@ const path = require("path");
 let registered = false;
 
 const FONT_FAMILY_PRIMARY = "Lexend";
-// Fallbacks: keep it simple and portable as requested.
+// Fallbacks: broaden coverage across common OSes without registering extra fonts.
+// Order favors widely available system fonts; if a font isn't present, the system skips it harmlessly.
 const FONT_FAMILY_FALLBACKS = [
-	"Arial",
-	"DejaVu Sans", // common on Linux, broad Unicode coverage
+	"Arial", // Windows/macOS common
 	"Segoe UI Symbol", // Windows symbol coverage
+	"DejaVu Sans", // Most Linux images (good Unicode coverage)
+	"Liberation Sans", // Many Linux distros
+	"Noto Sans", // Often present on cloud images
 	"sans-serif",
 ];
 const FONT_FAMILY_STACK = `${FONT_FAMILY_PRIMARY}, ${FONT_FAMILY_FALLBACKS.join(", ")}`;
