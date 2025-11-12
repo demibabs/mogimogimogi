@@ -169,6 +169,33 @@ class Database {
 		}
 	}
 
+	/**
+	 * Purge all persisted data (destructive!). Requires useDatabase=true.
+	 * Drops and recreates tables to ensure a clean slate.
+	 */
+	async purgeAll() {
+		if (!this.useDatabase) {
+			console.warn("purgeAll called but DATABASE_URL not set; skipping.");
+			return false;
+		}
+		try {
+			// Drop in reverse dependency order
+			await this.pool.query("DROP TABLE IF EXISTS user_tables");
+			await this.pool.query("DROP TABLE IF EXISTS tables");
+			await this.pool.query("DROP TABLE IF EXISTS user_data");
+			await this.pool.query("DROP TABLE IF EXISTS leaderboard_cache");
+			await this.pool.query("DROP TABLE IF EXISTS streak_cache");
+			// Recreate schema
+			await this.initializeDatabase();
+			console.log("database purged and reinitialized");
+			return true;
+		}
+		catch (error) {
+			console.error("purgeAll error:", error);
+			return false;
+		}
+	}
+
 	// --- User-centric data access -------------------------------------------------
 
 	async getUserData(loungeId) {
