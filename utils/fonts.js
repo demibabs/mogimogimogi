@@ -18,7 +18,11 @@ const FONT_FAMILY_FALLBACKS = [
 	"Noto Music", // Musical symbols (registered below if present)
 	"sans-serif",
 ];
-const FONT_FAMILY_STACK = `${FONT_FAMILY_PRIMARY}, ${FONT_FAMILY_FALLBACKS.join(", ")}`;
+// Quote family names that contain spaces so the CSS font shorthand stays valid in canvas
+function quoteFamily(name) {
+	return /\s/.test(name) ? `"${name}"` : name;
+}
+const FONT_FAMILY_STACK = `${quoteFamily(FONT_FAMILY_PRIMARY)}, ${FONT_FAMILY_FALLBACKS.map(quoteFamily).join(", ")}`;
 
 function init() {
 	if (registered) return;
