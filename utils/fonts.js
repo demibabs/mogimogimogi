@@ -10,7 +10,7 @@ const FONT_FAMILY_PRIMARY = "Lexend";
 // Order matters and is per-glyph: keep Lexend first (primary), then emoji families so emoji are found early,
 // then general-purpose fallbacks. Families that aren't present on the host are harmless.
 const FONT_FAMILY_FALLBACKS = [
-	"Noto Color Emoji", // vendored/registered if available
+	"Noto Emoji", // vendored/registered if available (monochrome)
 	"Segoe UI Emoji", // Windows
 	"Apple Color Emoji", // macOS
 	"Arial",
@@ -29,8 +29,7 @@ function init() {
 		return;
 	}
 	const staticDir = path.join(__dirname, "..", "fonts", "Lexend", "static");
-	const emojiDir = path.join(__dirname, "..", "fonts", "Noto_Color_Emoji");
-	const notoEmojiDir = path.join(__dirname, "..", "fonts", "Noto_Emoji");
+	const notoEmojiDir = path.join(__dirname, "..", "fonts", "Noto_Emoji", "static");
 	const weights = [
 		{ file: "Lexend-Regular.ttf", weight: "400" },
 		{ file: "Lexend-Medium.ttf", weight: "500" },
@@ -46,20 +45,21 @@ function init() {
 		}
 	}
 
-	// Attempt to register Noto Color Emoji for emoji glyph fallback (color rendering depends on host support).
-	try {
-		registerFont(path.join(emojiDir, "NotoColorEmoji-Regular.ttf"), { family: "Noto Color Emoji" });
-	}
-	catch (e) {
-		console.warn("Noto Color Emoji not registered (optional):", e?.message || e);
-	}
-
-	// Optional: register non-color Noto Emoji as a fallback for hosts without color emoji rendering.
-	try {
-		registerFont(path.join(notoEmojiDir, "NotoEmoji-Regular.ttf"), { family: "Noto Emoji" });
-	}
-	catch (e) {
-		// safe to ignore
+	// Register Noto Emoji (monochrome) as an emoji-capable fallback.
+	// Attempt multiple weights if present; silently continue if a file is missing.
+	const emojiWeights = [
+		{ file: "NotoEmoji-Regular.ttf", weight: "400" },
+		{ file: "NotoEmoji-Medium.ttf", weight: "500" },
+		{ file: "NotoEmoji-SemiBold.ttf", weight: "600" },
+		{ file: "NotoEmoji-Bold.ttf", weight: "700" },
+	];
+	for (const w of emojiWeights) {
+		try {
+			registerFont(path.join(notoEmojiDir, w.file), { family: "Noto Emoji", weight: w.weight });
+		}
+		catch (e) {
+			// fine if this weight isn't present
+		}
 	}
 	registered = true;
 }
