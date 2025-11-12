@@ -3,17 +3,15 @@
 // Usage: require('./utils/fonts').init(); then use getFont(weight, size) or FONT_FAMILY constant.
 
 const path = require("path");
+const fs = require("fs");
 let registered = false;
 
 const FONT_FAMILY_PRIMARY = "Lexend";
 // Fallbacks: broaden coverage across common OSes without registering extra fonts.
 // Order favors widely available system fonts; if a font isn't present, the system skips it harmlessly.
 const FONT_FAMILY_FALLBACKS = [
-	"Arial", // Windows/macOS common
-	"Segoe UI Symbol", // Windows symbol coverage
+	"Noto Sans JP", // Japanese coverage (registered below if present)
 	"DejaVu Sans", // Most Linux images (good Unicode coverage)
-	"Liberation Sans", // Many Linux distros
-	"Noto Sans", // Often present on cloud images
 	"sans-serif",
 ];
 const FONT_FAMILY_STACK = `${FONT_FAMILY_PRIMARY}, ${FONT_FAMILY_FALLBACKS.join(", ")}`;
@@ -44,8 +42,59 @@ function init() {
 		}
 	}
 
+	// Optionally register a coverage font if present (e.g., IPA, symbols, misc. Unicode).
+	// This is optional: if the files are missing, we silently skip.
+	try {
+		const dejavuDir = path.join(__dirname, "..", "fonts", "dejavu-sans");
+		const dejavuCandidates = [
+			{ file: "DejaVuSans.ttf", family: "DejaVu Sans", weight: "400" },
+			{ file: "DejaVuSans-Bold.ttf", family: "DejaVu Sans", weight: "700" },
+			{ file: "DejaVuSans-Oblique.ttf", family: "DejaVu Sans", weight: "400", style: "italic" },
+			{ file: "DejaVuSans-BoldOblique.ttf", family: "DejaVu Sans", weight: "700", style: "italic" },
+		];
+		for (const cand of dejavuCandidates) {
+			const p = path.join(dejavuDir, cand.file);
+			if (fs.existsSync(p)) {
+				try {
+					registerFont(p, { family: cand.family, weight: cand.weight, style: cand.style || "normal" });
+				}
+				catch (e) {
+					console.warn(`Failed to register font ${cand.file}:`, e?.message || e);
+				}
+			}
+		}
+
+		// Register Noto Sans JP (CJK) if present for Japanese glyph coverage
+		const notoJpStatic = path.join(__dirname, "..", "fonts", "Noto_Sans_JP", "static");
+		const notoJpWeights = [
+			{ file: "NotoSansJP-Thin.ttf", weight: "100" },
+			{ file: "NotoSansJP-ExtraLight.ttf", weight: "200" },
+			{ file: "NotoSansJP-Light.ttf", weight: "300" },
+			{ file: "NotoSansJP-Regular.ttf", weight: "400" },
+			{ file: "NotoSansJP-Medium.ttf", weight: "500" },
+			{ file: "NotoSansJP-SemiBold.ttf", weight: "600" },
+			{ file: "NotoSansJP-Bold.ttf", weight: "700" },
+			{ file: "NotoSansJP-ExtraBold.ttf", weight: "800" },
+			{ file: "NotoSansJP-Black.ttf", weight: "900" },
+		];
+		for (const w of notoJpWeights) {
+			const p = path.join(notoJpStatic, w.file);
+			if (fs.existsSync(p)) {
+				try {
+					registerFont(p, { family: "Noto Sans JP", weight: w.weight });
+				}
+				catch (e) {
+					console.warn(`Failed to register font ${w.file}:`, e?.message || e);
+				}
+			}
+		}
+	}
+	catch (e) {
+		// ignore
+	}
+
 	// No emoji font registration. We rely on Twemoji images for emoji rendering and
-	// allow system fallbacks (Arial, sans-serif) for non-emoji glyphs.
+	// allow system fallbacks (Arial, DejaVu Sans, etc.) for non-emoji glyphs.
 	registered = true;
 }
 
