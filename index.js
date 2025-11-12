@@ -83,7 +83,9 @@ client.on(Events.InteractionCreate, async interaction => {
 
 	// Handle slash commands
 	if (interaction.isChatInputCommand()) {
-		console.log(`Chat input command: ${interaction.commandName}`);
+		const guildName = interaction.guild?.name || "DM";
+		const displayName = interaction.member?.displayName || interaction.user?.globalName || interaction.user?.username || "unknown";
+		console.log(`Chat input command: ${interaction.commandName} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
 
 		const command = interaction.client.commands.get(interaction.commandName);
 
@@ -107,7 +109,9 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 	// Handle button interactions
 	else if (interaction.isButton()) {
-		console.log(`Button interaction: ${interaction.customId}`);
+		const guildName = interaction.guild?.name || "DM";
+		const displayName = interaction.member?.displayName || interaction.user?.globalName || interaction.user?.username || "unknown";
+		console.log(`Button interaction: ${interaction.customId} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
 
 		// Check if any command can handle this button interaction
 		let handled = false;

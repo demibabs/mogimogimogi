@@ -6,13 +6,8 @@ const path = require("path");
 let registered = false;
 
 const FONT_FAMILY_PRIMARY = "Lexend";
-// Include emoji-capable families to improve glyph coverage.
-// Order matters and is per-glyph: keep Lexend first (primary), then emoji families so emoji are found early,
-// then general-purpose fallbacks. Families that aren't present on the host are harmless.
+// Fallbacks: keep it simple and portable as requested.
 const FONT_FAMILY_FALLBACKS = [
-	"Noto Emoji", // vendored/registered if available (monochrome)
-	"Segoe UI Emoji", // Windows
-	"Apple Color Emoji", // macOS
 	"Arial",
 	"sans-serif",
 ];
@@ -29,7 +24,6 @@ function init() {
 		return;
 	}
 	const staticDir = path.join(__dirname, "..", "fonts", "Lexend", "static");
-	const notoEmojiDir = path.join(__dirname, "..", "fonts", "Noto_Emoji", "static");
 	const weights = [
 		{ file: "Lexend-Regular.ttf", weight: "400" },
 		{ file: "Lexend-Medium.ttf", weight: "500" },
@@ -45,22 +39,8 @@ function init() {
 		}
 	}
 
-	// Register Noto Emoji (monochrome) as an emoji-capable fallback.
-	// Attempt multiple weights if present; silently continue if a file is missing.
-	const emojiWeights = [
-		{ file: "NotoEmoji-Regular.ttf", weight: "400" },
-		{ file: "NotoEmoji-Medium.ttf", weight: "500" },
-		{ file: "NotoEmoji-SemiBold.ttf", weight: "600" },
-		{ file: "NotoEmoji-Bold.ttf", weight: "700" },
-	];
-	for (const w of emojiWeights) {
-		try {
-			registerFont(path.join(notoEmojiDir, w.file), { family: "Noto Emoji", weight: w.weight });
-		}
-		catch (e) {
-			// fine if this weight isn't present
-		}
-	}
+	// No emoji font registration. We rely on Twemoji images for emoji rendering and
+	// allow system fallbacks (Arial, sans-serif) for non-emoji glyphs.
 	registered = true;
 }
 

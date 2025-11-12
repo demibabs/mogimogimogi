@@ -474,7 +474,7 @@ const headToHeadPalette = {
 	highlightPanelColor: "#fbecffd9",
 	textColor: "#111111",
 	headerColor: "#000000",
-	baseColor: "#feedffbf",
+	baseColor: "#feedffa2",
 	valuePositiveColor: "#1f7a3f",
 	valueNegativeColor: "#b6403b",
 };
