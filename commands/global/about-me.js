@@ -16,25 +16,20 @@ module.exports = {
 		   try {
 			   // Tables
 			   await interaction.editReply("tabulating tables...");
-			   const tableRes = await database.pool.query("SELECT COUNT(*) FROM tables");
-			   tableCount = parseInt(tableRes.rows[0].count);
-
-			   // Get all server IDs
-			   await interaction.editReply("counting users...");
-			   const serverIds = await database.getAllServerIds();
-			   const uniqueUserIds = new Set();
-			   for (const serverId of serverIds) {
-				   try {
-					   const serverData = await database.getServerData(serverId);
-					   if (serverData && serverData.users) {
-						   for (const userId of Object.keys(serverData.users)) {
-							   uniqueUserIds.add(userId);
-						   }
-					   }
-				   }
-				catch (e) {}
+			   if (database.useDatabase && database.pool) {
+				   const tableRes = await database.pool.query("SELECT COUNT(*) FROM tables");
+				   tableCount = parseInt(tableRes.rows[0].count, 10);
 			   }
-			   userCount = uniqueUserIds.size;
+
+			   await interaction.editReply("counting users...");
+			   if (database.useDatabase && database.pool) {
+				   const userRes = await database.pool.query("SELECT COUNT(*) FROM user_data");
+				   userCount = parseInt(userRes.rows[0].count, 10);
+			   }
+			   else {
+				   const userIds = await database.getAllUserIds();
+				   userCount = userIds.length;
+			   }
 		   }
 		catch (e) {
 			   // fallback to 0s
