@@ -1278,29 +1278,6 @@ module.exports = {
 			const titleBaseline = textBlockTop + headerTextSize;
 			const subtitleBaseline = hasSubtitle ? titleBaseline + subtitleGap + subtitleFontSize : null;
 
-			ctx.textAlign = "left";
-			ctx.textBaseline = "alphabetic";
-			ctx.font = `${headerTextSize}px ${Fonts.FONT_FAMILY_STACK}`;
-			ctx.fillStyle = trackColors.headerColor;
-
-			if (playerEmoji) {
-				await EmbedEnhancer.drawEmoji(ctx, playerEmoji, headerEmojiX, headerEmojiY, headerEmojiSize);
-			}
-			await EmbedEnhancer.drawTextWithEmojis(ctx, headerTitle, headerTextX, titleBaseline, {
-				font: ctx.font,
-				fillStyle: ctx.fillStyle,
-				emojiSize: headerTextSize * 0.92,
-				lineHeight: headerTextSize * 1.2,
-				maxWidth: headerFrame.left + headerFrame.width - headerTextX - LAYOUT.headerPaddingRight,
-			});
-
-			if (hasSubtitle) {
-				const subtitleColor = trackColors.headerSubtitleColor || trackColors.statsTextColor || trackColors.headerColor;
-				ctx.font = `${subtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
-				ctx.fillStyle = subtitleColor;
-				ctx.fillText(subtitleText, headerTextX, subtitleBaseline);
-			}
-
 			const scaleToFavoriteFrame = image => {
 				const maxSize = LAYOUT.headerFavoriteMaxSize;
 				const width = Math.max(image?.width || 1, 1);
@@ -1311,7 +1288,6 @@ module.exports = {
 					height: height * scale,
 				};
 			};
-
 			const headerAssets = [];
 			if (favoriteCharacterImage) {
 				const dimensions = scaleToFavoriteFrame(favoriteCharacterImage);
@@ -1338,6 +1314,36 @@ module.exports = {
 					width: avatarSize,
 					height: avatarSize,
 				});
+			}
+			const assetsWidth = headerAssets.reduce((sum, asset) => sum + asset.width, 0);
+			const assetsGaps = Math.max(headerAssets.length - 1, 0) * LAYOUT.headerAssetGap;
+			const rightReserved = assetsWidth + assetsGaps + LAYOUT.headerPaddingRight;
+
+			ctx.textAlign = "left";
+			ctx.textBaseline = "alphabetic";
+			ctx.font = `${headerTextSize}px ${Fonts.FONT_FAMILY_STACK}`;
+			ctx.fillStyle = trackColors.headerColor;
+
+			if (playerEmoji) {
+				await EmbedEnhancer.drawEmoji(ctx, playerEmoji, headerEmojiX, headerEmojiY, headerEmojiSize);
+			}
+			const maxTitleWidth = headerFrame.left + headerFrame.width - rightReserved - headerTextX;
+			const fittedTitle = EmbedEnhancer.truncateTextWithEmojis(ctx, headerTitle, Math.max(0, maxTitleWidth), {
+				font: ctx.font,
+				emojiSize: headerTextSize * 0.92,
+			});
+			await EmbedEnhancer.drawTextWithEmojis(ctx, fittedTitle, headerTextX, titleBaseline, {
+				font: ctx.font,
+				fillStyle: ctx.fillStyle,
+				emojiSize: headerTextSize * 0.92,
+				lineHeight: headerTextSize * 1.2,
+			});
+
+			if (hasSubtitle) {
+				const subtitleColor = trackColors.headerSubtitleColor || trackColors.statsTextColor || trackColors.headerColor;
+				ctx.font = `${subtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
+				ctx.fillStyle = subtitleColor;
+				ctx.fillText(subtitleText, headerTextX, subtitleBaseline);
 			}
 
 			let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingRight;

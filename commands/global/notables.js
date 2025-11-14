@@ -22,6 +22,7 @@ const {
 	getCountryFlag,
 	drawEmoji,
 	drawTextWithEmojis,
+	truncateTextWithEmojis,
 } = EmbedEnhancer;
 
 const EDGE_RADIUS = 30;
@@ -126,11 +127,10 @@ const goodWSMessages = [
 ];
 
 const badWSMessages = [
-	"this is the type of mogi i have when i'm about to promote.",
 	"video games aren't for everyone. maybe try sports?",
 	"yowch.",
 	"at least you beat somebody! wait, no you didn't.",
-	"thanks for graciously donating your mmr to those other players.",
+	"thx for donating mmr to those other players.",
 	"can't blame any teammates for that one.",
 	"you suck.",
 	"i don't even have a joke. this is just sad.",
@@ -695,23 +695,6 @@ async function renderNotablesImage({
 		textX += emojiSize + emojiGap;
 	}
 
-	ctx.font = `700 ${titleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
-	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
-	await drawTextWithEmojis(ctx, headerTitle, textX, titleBaseline, {
-		font: ctx.font,
-		fillStyle: ctx.fillStyle,
-		emojiSize: titleFontSize * 0.9,
-		lineHeight: titleFontSize * 1.15,
-		maxWidth: headerFrame.width - (textX - headerFrame.left) - LAYOUT.headerPaddingRight,
-	});
-
-	if (hasSubtitle && subtitleBaseline !== null) {
-		ctx.font = `${subtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
-		ctx.fillStyle = trackColors.statsTextColor || "#333333";
-		ctx.fillText(subtitleText, textX, subtitleBaseline);
-	}
-	ctx.restore();
-
 	const scaleToFavoriteFrame = image => {
 		const maxSize = LAYOUT.headerFavoriteMaxSize;
 		const width = Math.max(image?.width || 1, 1);
@@ -722,7 +705,6 @@ async function renderNotablesImage({
 			height: height * scale,
 		};
 	};
-
 	const headerAssets = [];
 	if (favoriteCharacterImage) {
 		const dimensions = scaleToFavoriteFrame(favoriteCharacterImage);
@@ -742,7 +724,6 @@ async function renderNotablesImage({
 			height: dimensions.height,
 		});
 	}
-
 	let avatarImage = null;
 	const avatarUrl = getPlayerAvatarUrl(discordUser);
 	if (avatarUrl) {
@@ -761,6 +742,31 @@ async function renderNotablesImage({
 			height: LAYOUT.headerAvatarSize,
 		});
 	}
+	const assetsWidth = headerAssets.reduce((sum, asset) => sum + asset.width, 0);
+	const assetsGaps = Math.max(headerAssets.length - 1, 0) * LAYOUT.headerAssetGap;
+	const rightReserved = assetsWidth + assetsGaps + LAYOUT.headerPaddingRight;
+	const truncationBuffer = 11;
+
+	ctx.font = `700 ${titleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
+	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
+	const maxTitleWidth = Math.max(0, headerFrame.left + headerFrame.width - rightReserved - textX - truncationBuffer);
+	const fittedTitle = truncateTextWithEmojis(ctx, headerTitle, Math.max(0, maxTitleWidth), {
+		font: ctx.font,
+		emojiSize: titleFontSize * 0.9,
+	});
+	await drawTextWithEmojis(ctx, fittedTitle, textX, titleBaseline, {
+		font: ctx.font,
+		fillStyle: ctx.fillStyle,
+		emojiSize: titleFontSize * 0.9,
+		lineHeight: titleFontSize * 1.15,
+	});
+
+	if (hasSubtitle && subtitleBaseline !== null) {
+		ctx.font = `${subtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
+		ctx.fillStyle = trackColors.statsTextColor || "#333333";
+		ctx.fillText(subtitleText, textX, subtitleBaseline);
+	}
+	ctx.restore();
 
 	let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingRight;
 	for (let index = headerAssets.length - 1; index >= 0; index--) {

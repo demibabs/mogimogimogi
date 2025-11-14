@@ -417,7 +417,17 @@ async function renderHeadToHeadImage({
 		const nameX = alignment === "left"
 			? textBoundary + flagOffset
 			: textBoundary - flagOffset;
-		await EmbedEnhancer.drawTextWithEmojis(ctx, displayName, nameX, centerY, {
+		// Constrain name within column bounds to avoid crossing the center gap
+		const columnLeft = frame.left + COLUMN_PADDING;
+		const columnRight = frame.left + frame.width - COLUMN_PADDING;
+		const maxNameWidth = alignment === "left"
+			? Math.max(0, columnRight - nameX)
+			: Math.max(0, nameX - columnLeft);
+		const fittedName = EmbedEnhancer.truncateTextWithEmojis(ctx, displayName, maxNameWidth, {
+			font: ctx.font,
+			emojiSize: 60 * 0.85,
+		});
+		await EmbedEnhancer.drawTextWithEmojis(ctx, fittedName, nameX, centerY, {
 			font: ctx.font,
 			fillStyle: ctx.fillStyle,
 			emojiSize: 60 * 0.85,

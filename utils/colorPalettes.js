@@ -234,7 +234,7 @@ const trackColors = {
 			youColor: "#30223aff",
 		},
 		notables: {
-			baseColor: "#ebddf899",
+			baseColor: "#ebddf8d9",
 			headerColor: "#16161a",
 			statsTextColor: "#2b2236ff",
 		},
@@ -474,7 +474,7 @@ const headToHeadPalette = {
 	highlightPanelColor: "#fbecffd9",
 	textColor: "#111111",
 	headerColor: "#000000",
-	baseColor: "#feedffa2",
+	baseColor: "#feedff7e",
 	valuePositiveColor: "#1f7a3f",
 	valueNegativeColor: "#b6403b",
 };
