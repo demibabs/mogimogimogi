@@ -16,7 +16,7 @@ const trackColors = {
 	},
 	CC: {
 		stats: {
-			baseColor: "#d9f0fd99",
+			baseColor: "#d9f0fdba",
 			headerColor: "#16161a",
 			statsTextColor: "#424242",
 			chartTextColor: "#666666",

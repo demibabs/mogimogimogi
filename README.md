@@ -1,155 +1,81 @@
 # mogimogimogi
 
-> Discord slash-command bot for Mario Kart World Lounge stats, player insights, and automation.
+> Discord slash-command bot for Mario Kart World Lounge stats and server insights. This repository documents the single production instance that powers the public bot.
 
 ## Table of Contents
 - [Overview](#overview)
-- [Highlights](#highlights)
-- [Slash Commands](#slash-commands)
+- [Core Capabilities](#core-capabilities)
+- [Command Catalog](#command-catalog)
+- [Architecture](#architecture)
+  - [Runtime Flow](#runtime-flow)
+  - [Rendering Pipeline](#rendering-pipeline)
+  - [Storage & Caching](#storage--caching)
 - [Tech Stack](#tech-stack)
-- [Project Layout](#project-layout)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Configuration](#configuration)
-- [Running the Bot](#running-the-bot)
-- [Deployment](#deployment)
-- [Data & Assets](#data--assets)
-- [Linting & Tooling](#linting--tooling)
-- [Troubleshooting](#troubleshooting)
+- [Directory Map](#directory-map)
+- [Operational Notes](#operational-notes)
+- [Future Work](#future-work)
 - [License](#license)
 
 ## Overview
-mogimogimogi keeps Discord servers in sync with Mario Kart World Lounge (MKW Lounge) by rendering high-signal stat cards, surfacing standout performances, and tracking player activity. The bot runs entirely on slash commands and can be deployed with either a managed PostgreSQL database or local JSON storage for quick prototypes.
+mogimogimogi is a Discord bot designed to provide competitive Mario Kart World players with detailed stats, synthesized into customizable player cards. All functionality is exposed through Discord slash commands and backed by a custom data pipeline that blends live Lounge API data with cached Discord server context.
 
-## Highlights
-- Rich `/stats` cards rendered with Canvas + Chart.js (MMR chart, avatars, favorite assets, win/loss breakdowns)
-- `/notables` highlight reels for top scores, carries, anchors, and streaks
-- `/head-to-head` breakdowns and lounge-aware auto-complete
-- Automatic user syncing, lounge profile lookups, and emoji-safe text rendering
-- Dual storage model: PostgreSQL in production, JSON files in development
-- Asset pipeline for track backgrounds, Twemoji glyphs, custom fonts, and rank icons
+## Core Capabilities
+- **Stats Cards**: `/stats` renders 1920×1080 canvases combining player MMR, streaks, track-specific palettes, avatars, and queue filters.
+- **Highlights & Storytelling**: `/notables` shows best/worst events along with biggest carries and anchors.
+- **Comparative Insights**: `/head-to-head` calculates win/loss records against specific opponents, including biggest victories and losses.
+- **Usage Metrics**: `/about-me` exposes live deployment stats plus a rundown of the available commands.
+- **Customization**: `/customize` lets users save favorite characters, vehicles and tracks to personalize their stats cards.
+- **Autonomous User Syncing**: AutoUserManager keeps the cached lounge records, Discord IDs, and avatars aligned without manual intervention.
 
-## Slash Commands
-| Command | Description |
-|---------|-------------|
-| `/setup` | Walk through initial server setup and link the bot to your guild |
-| `/stats [player]` | Render the interactive stats card for yourself or any lounge player |
-| `/notables` | Generate highlight columns showing best/worst performances |
-| `/head-to-head <player1> <player2>` | Compare two players with records, deltas, and key events |
-| `/leaderboard` | Display per-server or global standings (filters available) |
-| `/about-me` | Show deployment health (servers, tracked users, tables) |
-| `/customize` | Store favorite characters, vehicles, and other cosmetic choices |
+## Command Catalog
+| Command | Focus |
+|---------|-------|
+| `/stats [player]` | Full stat card with filters for time range, queue, and player count. |
+| `/notables` | Highlight + lowlight reel of a player's best and worst events. |
+| `/head-to-head <player1> <player2>` | Shows players' win/loss records across shared events. |
+| `/leaderboard` | Displays a server-wide MMR leaderboard. |
+| `/about-me` | Deployment info and command help. |
+| `/customize` | Capture favorite characters, vehicles, flags, and other preferences. |
+| `/setup` | Internal onboarding helper for wiring the bot to a new guild. |
+
+## Architecture
+### Runtime Flow
+1. **Slash command entry** (`commands/global/*`): validates the requester, resolves lounge IDs, and builds filter state.
+2. **Data hydration** (`utils/loungeApi`, `utils/dataManager`): merges Lounge API responses with cached Discord metadata.
+3. **Computation** (`utils/playerStats`): derives averages, partner scores, per-queue filters, etc.
+4. **Rendering** (`utils/embedEnhancer`, `utils/colorPalettes`, `images/`): composes canvases, fonts, gradients, emoji glyphs, and charts.
+5. **Response lifecycle**: edits the original interaction reply with the generated attachment plus interactive components.
+
+### Rendering Pipeline
+- **Canvas** (`canvas` package) draws the background, rounded panels, avatars, partner assets, and grid typography.
+- **Chart Layer** (`chartjs-node-canvas`) renders the division histogram and exposes bar metrics for the "you are here" marker.
+- **Emoji Glyphs**: Emojis are embedded as Twemoji PNGs to show up in labels and names.
+- **Asset Packs**: Track backgrounds and rank icons live under `images/`; color palettes come from `utils/colorPalettes.js` with per-track gradients, accent values, and text colors.
+
+### Storage & Caching
+- **Primary Store**: PostgreSQL (`tables`, `user_data`, `user_tables`, plus cache tables for leaderboards/streaks).
+- **File Fallback**: When `DATABASE_URL` is absent (local dev), the same schema is mirrored in `data/` JSON files.
+- **In-Memory Caches**: Division chart renderings, image assets, and stats sessions stay hot for faster rerenders and button interactions.
+- **Auto Migration Tools**: `scripts/migrateLocalData.js` handles legacy server JSON to the new user-centric format.
 
 ## Tech Stack
-- Node.js 18+ with Discord.js v14 slash-command router
-- Canvas, Chart.js, and Twemoji for server-side image rendering
-- PostgreSQL via `pg`, with automatic JSON fallbacks under `data/`
-- Lightweight utilities for Lounge API access, auto user management, and color palettes
+- **Runtime**: Node.js 18+, Discord.js v14 REST/WebSocket adapters.
+- **Rendering**: `canvas`, `chart.js`, `chartjs-node-canvas`, `stackblur-canvas`, custom font registration.
+- **Data**: PostgreSQL via `pg`, optional JSON persistence, bespoke Lounge API client with rate limiting and caching.
+- **Utilities**: `twemoji`, `patternomaly` for randomized chart fills, `sharp` for image conversions.
+- **Tooling**: ESLint (flat config) + npm scripts for linting, deploy, and start commands.
 
-## Project Layout
+## Directory Map
 ```
-mogibot/
-├─ commands/           # Slash command implementations
-│  ├─ global/          # User-facing commands (stats, notables, etc.)
-│  └─ utility/         # Maintenance and helper commands
-├─ data/               # JSON fallback storage (users, tables, user_tables)
-├─ images/             # Track backgrounds, rank icons, misc art
-├─ fonts/              # Lexend + emoji fonts registered at runtime
-├─ scripts/            # One-off maintenance scripts (e.g., migrateLocalData)
-├─ utils/              # Core helpers (database, lounge API, player stats, rendering)
-├─ deploy.js           # Slash-command registration
-├─ index.js            # Bot entry point (REST adapter + Discord client)
-└─ package.json        # Dependencies and npm scripts
+commands/          Slash-command handlers (global + utility scopes)
+data/              JSON persistence layer when running without PostgreSQL
+fonts/             Bundled Lexend + emoji fonts registered at startup
+images/            Track backgrounds, rank icons, avatars, miscellaneous art
+scripts/           Maintenance helpers (migrations, data sync)
+utils/             Shared helpers (database, lounge API, player stats, renderers)
+deploy.js          Command registration entry point
+index.js           Bot bootstrap (Discord client + health endpoint)
 ```
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18.x (or newer) and npm
-- Discord application with a bot user and the `applications.commands` + `bot` scopes
-- Access to MK World Lounge API (public endpoints are sufficient)
-- Optional: PostgreSQL database (Railway, Supabase, RDS, etc.) if you want persistent storage
-
-### Installation
-```bash
-git clone https://github.com/demibabs/mogimogimogi.git
-cd mogimogimogi
-npm install
-```
-
-### Configuration
-Create a `.env` file at the repo root and provide the tokens/IDs you need:
-
-```
-DISCORD_TOKEN=prod-bot-token
-DEV_DISCORD_TOKEN=dev-bot-token
-APP_ID=prod-application-id
-DEV_APP_ID=dev-application-id
-GUILD_ID=dev-guild-id-for-command-registration
-DATABASE_URL=postgres://user:pass@host:5432/dbname
-PORT=3000
-NODE_ENV=development
-```
-
-Environment variable reference:
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DISCORD_TOKEN` | yes | Production bot token used by `node index` |
-| `DEV_DISCORD_TOKEN` | no | Dev/testing token consumed by `node index --dev` |
-| `APP_ID` | yes | Application ID for slash-command deploys |
-| `DEV_APP_ID` | no | Dev application ID for `node deploy --dev` |
-| `GUILD_ID` | yes for dev | Guild to register commands during development (global deploy ignores this) |
-| `DATABASE_URL` | no | PostgreSQL connection string; when unset the bot stores data under `data/` |
-| `PORT` | no | Port for the tiny health server (defaults to 3000) |
-| `NODE_ENV` | no | Controls SSL requirements when connecting to PostgreSQL |
-
-> The repository falls back to JSON on disk (`data/users`, `data/tables`, `data/user_tables`) whenever `DATABASE_URL` is not provided. This is perfect for local testing and unit experiments.
-
-## Running the Bot
-Deploy commands first, then launch the bot:
-
-```bash
-# Register commands globally (may take up to an hour to propagate)
-node deploy --global
-
-# Register commands to a single dev guild
-node deploy --dev
-
-# Start production bot
-node index
-
-# Start development bot with dev tokens/IDs
-node index --dev
-```
-
-## Deployment
-mogimogimogi runs anywhere Node 18+ is available:
-
-1. Provision hosting (Railway, Fly.io, Render, Docker, etc.).
-2. Provide the environment variables above (Railway will auto-populate `DATABASE_URL`).
-3. Make sure the process runs `node index` (or `npm start`).
-4. Keep the accompanying PostgreSQL instance (or local JSON volume) persistent across restarts.
-
-The included `deploy.js` script can be run from CI to re-register commands during release pipelines.
-
-## Data & Assets
-- Local JSON storage lives under `data/` and mirrors the PostgreSQL schema (`user_data`, `tables`, `user_tables`).
-- Track backgrounds, rank icons, and badges reside in `images/`. When you add new tracks, drop the assets there.
-- Fonts (Lexend, emoji fallbacks) are loaded from `fonts/`. Add new variants here and register them in `utils/fonts.js`.
-- `scripts/migrateLocalData.js` can import/export JSON files or seed a database as needed.
-
-## Linting & Tooling
-- Run `npx eslint .` (or the scoped command) before opening a PR.
-- `node deploy` and `node index` double as smoke tests because they exercise command registration and login.
-- Use `npm start` as a shorthand for `node index.js` in production environments.
-
-## Troubleshooting
-- **Commands missing**: ensure you ran `node deploy --global` or `node deploy --dev` with the correct tokens/IDs.
-- **Database errors**: verify `DATABASE_URL` and, in production, set `NODE_ENV=production` so SSL is required only when needed.
-- **Blank stat images**: missing assets in `images/tracks` or fonts in `fonts/` will be logged. Re-run the bot after syncing assets.
-- **Rate limits**: Lounge API requests are cached aggressively; still, avoid spamming `/stats` by batching requests via the built-in UI buttons.
 
 ## License
 Distributed under the ISC license. See `LICENSE` for the full text.

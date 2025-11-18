@@ -32,7 +32,7 @@ const LAYOUT = {
 	headerAvatarRadius: 24,
 	headerAssetGap: 15,
 	headerAvatarOffset: 12,
-	headerTextYOffset: -7,
+	headerTextYOffset: -6,
 	headerFavoriteMaxSize: 100,
 	statsPadding: 45,
 	statsCellPadding: 42,
@@ -48,6 +48,7 @@ const DIVISION_CHART_CACHE_TTL_MS = ONE_WEEK_MS;
 const CHART_DIMENSIONS = { width: 835, height: 880 };
 const ICON_SIZE = 54;
 const ICON_GAP = 12;
+const MAX_BAR_HEIGHT_RATIO = 0.90;
 
 const divisionChartCache = new Map();
 let chartRenderer = null;
@@ -298,6 +299,10 @@ async function getDivisionChart(trackName, trackColors, globals) {
 		: [];
 	const chartLabels = divisionEntries.map(entry => entry.tier);
 	const chartData = divisionEntries.map(entry => entry.count);
+	const peakBarValue = chartData.length ? Math.max(...chartData) : 0;
+	const yAxisMax = peakBarValue > 0
+		? Math.ceil(peakBarValue / MAX_BAR_HEIGHT_RATIO)
+		: undefined;
 	const rankImages = await Promise.all(chartLabels.map(tier => getRankIcon(tier)));
 
 	const iconPlugin = {
@@ -410,11 +415,18 @@ async function getDivisionChart(trackName, trackColors, globals) {
 						color: trackColors.chartTextColor,
 					},
 					beginAtZero: true,
+					max: yAxisMax,
 					grid: { color: trackColors.yGridColor },
 					ticks: {
 						stepSize: 1000,
 						font: { size: 20 },
 						color: trackColors.chartTextColor,
+						callback(value) {
+							if (typeof yAxisMax === "number" && value >= yAxisMax) {
+								return "";
+							}
+							return value;
+						},
 					},
 				},
 				x: {
@@ -1584,7 +1596,7 @@ function drawMMRMarker(ctx, mmr, trackName, {
 	let markerX;
 	let markerY;
 	let barBottomY;
-	const radius = 8;
+	const radius = 10;
 
 	if (metrics?.bars?.length) {
 		const barMetrics = metrics.bars[tierIndex];
@@ -1609,23 +1621,34 @@ function drawMMRMarker(ctx, mmr, trackName, {
 	ctx.save();
 
 	const trackColors = ColorPalettes.statsTrackColors[trackName];
-	// ctx.setLineDash([20, 20]); // first number is dash length and second is gap
-	// ctx.strokeStyle = "#ffffff60";
-	// ctx.lineWidth = 7;
-	// ctx.beginPath();
-	// ctx.moveTo(markerX, markerY + radius); // start at bottom of dot
-	// ctx.lineTo(markerX, barBottomY); // stop above icon row
-	// ctx.stroke();
 	ctx.strokeStyle = "#ffffff";
 	ctx.fillStyle = "#ffffff";
 	ctx.beginPath();
 	ctx.arc(markerX, markerY, radius, 0, Math.PI * 2);
 	ctx.fill();
 	ctx.stroke();
-	ctx.fillStyle = trackColors.youColor;
-	ctx.font = `24px ${Fonts.FONT_FAMILY_STACK}`;
+
+	const labelText = "you";
+	const labelFontSize = 24;
+	const labelPaddingX = 12;
+	const labelPaddingY = 6;
+	const labelGap = 10;
+	ctx.font = `${labelFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.textAlign = "center";
 	ctx.textBaseline = "bottom";
-	ctx.fillText("you", markerX, markerY - radius - 10);
+	const textMetrics = ctx.measureText(labelText);
+	const labelWidth = Math.ceil(textMetrics.width + labelPaddingX * 2);
+	const labelHeight = Math.ceil(labelFontSize + labelPaddingY * 2);
+	const labelBottom = markerY - radius - labelGap;
+	const labelLeft = markerX - labelWidth / 2;
+	const labelTop = labelBottom - labelHeight;
+	EmbedEnhancer.drawRoundedPanel(
+		ctx,
+		{ left: labelLeft, top: labelTop, width: labelWidth, height: labelHeight },
+		trackColors.baseColor,
+		12,
+	);
+	ctx.fillStyle = trackColors.youColor;
+	ctx.fillText(labelText, markerX, labelBottom - labelPaddingY);
 	ctx.restore();
 }

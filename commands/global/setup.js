@@ -64,7 +64,7 @@ module.exports = {
 			}
 
 			await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
-				loungers.length === 1 ? "" : "s"}.`);
+				loungers.length === 1 ? "" : "s"}. use /about-me to see all commands`);
 		}
 		catch (error) {
 			console.error("setup error:", error);

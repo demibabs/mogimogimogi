@@ -1,10 +1,20 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const database = require("../../utils/database");
 
+const GLOBAL_COMMANDS = [
+	{ name: "/stats", description: "render a detailed lounge stats card" },
+	{ name: "/notables", description: "highlight your best and worst performances" },
+	{ name: "/customize", description: "edit the appearance of /stats and /notables" },
+	{ name: "/head-to-head", description: "compare two players across shared mogis" },
+	{ name: "/leaderboard", description: "view a server MMR leaderboard" },
+	{ name: "/setup", description: "fetches + saves server members' lounge data so that the other commands work" },
+	{ name: "/about-me", description: "this lol" },
+];
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("about-me")
-		.setDescription("show bot deployment stats: servers, users, tables."),
+		.setDescription("see all commands + bot deployment data."),
 
 	async execute(interaction) {
 		await interaction.deferReply();
@@ -38,11 +48,16 @@ module.exports = {
 		   // Get server count directly from Discord client
 		   const serverCount = interaction.client.guilds.cache.size;
 
+		   const commandSummary = GLOBAL_COMMANDS
+			   .map(entry => `• ${entry.name} – ${entry.description}`)
+			   .join("\n");
+
 		   const embed = new EmbedBuilder()
 			   .setTitle("about me")
 			   .setColor("Aqua")
-			   .setDescription("bot for tracking server-wide lounge stats.")
+			   .setDescription("the most detailed mario kart world lounge stats bot.")
 			  .addFields(
+				{ name: "commands", value: commandSummary, inline: false },
 				  { name: "servers:", value: String(serverCount), inline: true },
 				  { name: "users tracked:", value: String(userCount), inline: true },
 				  { name: "tables tracked:", value: String(tableCount), inline: true },
