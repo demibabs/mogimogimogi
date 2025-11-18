@@ -31,6 +31,8 @@ const LAYOUT = {
 	headerAvatarSize: 96,
 	headerAvatarRadius: 24,
 	headerAssetGap: 15,
+	headerAvatarOffset: 12,
+	headerTextYOffset: -7,
 	headerFavoriteMaxSize: 100,
 	statsPadding: 45,
 	statsCellPadding: 42,
@@ -622,7 +624,7 @@ module.exports = {
 						.find(Boolean);
 					if (!loungeId || seenValues.has(loungeId)) continue;
 
-					const displayName = player.name || player.loungeName || player.playerName || player.username;
+					const displayName = player.name;
 					if (!displayName) continue;
 
 					suggestions.push({
@@ -1156,8 +1158,8 @@ module.exports = {
 			if (tWR && typeof tWR.winRate === "number") {
 				tWR.winRate = (tWR.winRate * 100).toFixed(1);
 			}
-			const aSc = Number.isFinite(playerStats?.avgScore) ? playerStats.avgScore.toFixed(2) : "-";
-			const bS = playerStats?.bestScore;
+			const aSc = Number.isFinite(playerStats?.avgScore) ? playerStats.avgScore.toFixed(1) : "-";
+			const partnerAverage = playerStats?.partnerAverage || null;
 			const aSe = Number.isFinite(playerStats?.avgSeed) ? playerStats.avgSeed.toFixed(2) : "-";
 			const aP = Number.isFinite(playerStats?.avgPlacement) ? playerStats.avgPlacement.toFixed(2) : "-";
 			const matchesPlayedCount = Number(playerStats?.matchesPlayed);
@@ -1174,19 +1176,30 @@ module.exports = {
 					const modeLabel = preferTwentyFour ? "24p" : preferTwelve ? "12p" : "12p";
 					const modeCount = preferTwentyFour ? twentyFourCount : twelveCount;
 					if (modeCount > 0) {
-						eventsSubLabel = `(${modeLabel}: ${modeCount})`;
+						eventsSubLabel = `(${modeLabel}: ${modeCount === matchesPlayedCount ? "all" : modeCount})`;
 					}
 				}
 			}
-			const pC = Number(playerStats?.playerCount);
-			const placementSubLabel = playerCountFilter === "both" && Number.isFinite(pC)
-				? (`(out of ${pC.toFixed(Number.isInteger(pC) ? 0 : 1)})`)
-				: null;
 			const avgAvg = hasMatches
 				? ((82 * (breakdown["12p"] ?? 0) + 72 * (breakdown["24p"] ?? 0)) / matchesPlayedCount)
 				: null;
+			let avgAvgFixed;
+			if (avgAvg) {
+				avgAvgFixed = parseFloat(avgAvg.toFixed(Number.isInteger(avgAvg) ? 0 : 1));
+				avgAvgFixed = avgAvgFixed.toFixed(Number.isInteger(avgAvgFixed) ? 0 : 1);
+			}
 			const aScSubLabel = Number.isFinite(avgAvg)
-				? (`(room avg: ${avgAvg.toFixed(Number.isInteger(avgAvg) ? 0 : 2)})`)
+				? (`(room avg: ${avgAvgFixed})`)
+				: null;
+			const partnerAverageValue = Number.isFinite(partnerAverage?.average)
+				? partnerAverage.average.toFixed(1)
+				: "-";
+			const partnerAverageSubLabel = partnerAverage && parseFloat(partnerAverage.roomAverageFixed) != avgAvg
+				? (`(room avg: ${partnerAverage?.roomAverageFixed})`)
+				: undefined;
+			const pC = Number(playerStats?.playerCount);
+			const placementSubLabel = playerCountFilter === "both" && Number.isFinite(pC)
+				? (`(out of ${pC.toFixed(Number.isInteger(pC) ? 0 : 1)})`)
 				: null;
 
 
@@ -1274,7 +1287,7 @@ module.exports = {
 			const subtitleFontSize = LAYOUT.headerSubtitleFontSize;
 			const subtitleGap = LAYOUT.headerSubtitleGap;
 			const textBlockHeight = headerTextSize + (hasSubtitle ? subtitleGap + subtitleFontSize : 0);
-			const textBlockTop = headerFrame.top + (headerFrame.height - textBlockHeight) / 2;
+			const textBlockTop = headerFrame.top + (headerFrame.height - textBlockHeight) / 2 + (LAYOUT.headerTextYOffset || 0);
 			const titleBaseline = textBlockTop + headerTextSize;
 			const subtitleBaseline = hasSubtitle ? titleBaseline + subtitleGap + subtitleFontSize : null;
 
@@ -1307,6 +1320,7 @@ module.exports = {
 					height: dimensions.height,
 				});
 			}
+			let headerAvatarOffsetNeeded = false;
 			if (headerAssets.length < 2 && avatar) {
 				headerAssets.push({
 					type: "avatar",
@@ -1314,6 +1328,7 @@ module.exports = {
 					width: avatarSize,
 					height: avatarSize,
 				});
+				headerAvatarOffsetNeeded = true;
 			}
 			const assetsWidth = headerAssets.reduce((sum, asset) => sum + asset.width, 0);
 			const assetsGaps = Math.max(headerAssets.length - 1, 0) * LAYOUT.headerAssetGap;
@@ -1346,7 +1361,7 @@ module.exports = {
 				ctx.fillText(subtitleText, headerTextX, subtitleBaseline);
 			}
 
-			let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingRight;
+			let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingRight + (headerAvatarOffsetNeeded ? LAYOUT.headerAvatarOffset : 0);
 			for (let index = headerAssets.length - 1; index >= 0; index--) {
 				const asset = headerAssets[index];
 				assetCursor -= asset.width;
@@ -1363,7 +1378,6 @@ module.exports = {
 				}
 			}
 
-			const bestScoreValue = bS?.score != null ? bS.score : "-";
 			const winRateText = tWR?.winRate != null ? `${tWR.winRate}%` : "-";
 			const winLossRecord = EmbedEnhancer.formatWinLoss(tWR);
 			const gridConfig = [
@@ -1379,7 +1393,7 @@ module.exports = {
 				[
 					{ label: "average\nroom mmr", value: averageRoomMmrDisplay },
 					{ label: "average\nscore", value: aSc, subLabel: aScSubLabel || undefined },
-					{ label: "best\nscore", value: bestScoreValue },
+					{ label: "partner\naverage", value: partnerAverageValue, subLabel: partnerAverageSubLabel },
 				],
 				[
 					{ label: "average\nseed", value: aSe },
@@ -1438,7 +1452,7 @@ module.exports = {
 
 			return {
 				success: true,
-				content: "",
+				content: `[link to ${displayName}'s lounge profile](https://lounge.mkcentral.com/mkworld/PlayerDetails/${normalizedLoungeId})`,
 				files: [attachment],
 				session: updatedSession,
 			};
@@ -1457,7 +1471,6 @@ async function getPlayerStats(loungeId, serverId, tables) {
 		const player = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
 		const mmr = player.mmr;
 		const rank = player.overallRank;
-		const streakData = PlayerStats.calculateWinStreaks(tables, normalizedLoungeId);
 		const matchesPlayed = PlayerStats.getMatchesPlayed(tables, normalizedLoungeId);
 		const winRate = PlayerStats.getWinRate(tables, normalizedLoungeId);
 		const avgPlacement = PlayerStats.getAveragePlacement(tables, normalizedLoungeId);
@@ -1465,6 +1478,7 @@ async function getPlayerStats(loungeId, serverId, tables) {
 		const avgSeed = PlayerStats.getAverageSeed(tables, normalizedLoungeId);
 		const bestScore = PlayerStats.getBestScore(tables, normalizedLoungeId);
 		const worstScore = PlayerStats.getWorstScore(tables, normalizedLoungeId);
+		const partnerAverage = PlayerStats.getPartnerAverage(tables, normalizedLoungeId);
 		const playerCount = PlayerStats.getAveragePlayerCount(tables, normalizedLoungeId);
 		const tH2H = await PlayerStats.getTotalH2H(tables, normalizedLoungeId, serverId);
 
@@ -1477,11 +1491,10 @@ async function getPlayerStats(loungeId, serverId, tables) {
 			avgPlacement,
 			avgScore,
 			avgSeed,
-			...streakData,
 			bestScore,
 			worstScore,
+			partnerAverage,
 			playerCount,
-			tH2H,
 		};
 	}
 	catch (error) {

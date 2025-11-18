@@ -914,6 +914,88 @@ class PlayerStats {
 	}
 
 	/**
+	 * Compute the average teammate score for non-FFA tables the player participated in
+	 * @param {Object} tables - Object containing table data
+	 * @param {string|number} playerIdentifier - Player identifier to match against
+	 * @returns {Object|null} Object with { average, teammateSamples, tableCount } or null if insufficient data
+	 */
+	static getPartnerAverage(tables, playerIdentifier) {
+		const normalizedId = PlayerStats.normalizeIdentifier(playerIdentifier);
+		if (!normalizedId || !tables || typeof tables !== "object") {
+			return null;
+		}
+
+		let totalScore = 0;
+		let teammateSamples = 0;
+		let tableCount = 0;
+		let twelve = 0;
+		let twentyFour = 0;
+
+		for (const tableId of Object.keys(tables)) {
+			const table = tables[tableId];
+			if (!table || !Array.isArray(table.teams) || !table.teams.length) {
+				continue;
+			}
+			const format = typeof table.format === "string" ? table.format.trim().toLowerCase() : "";
+			if (format === "ffa") {
+				continue; // skip free-for-all events
+			}
+
+			let matchingTeam = null;
+			for (const team of table.teams) {
+				if (!team || !Array.isArray(team.scores)) {
+					continue;
+				}
+				if (team.scores.some(player => PlayerStats.playerMatchesIdentifier(player, normalizedId))) {
+					matchingTeam = team;
+					break;
+				}
+			}
+			if (!matchingTeam) {
+				continue;
+			}
+
+			let tableContributed = false;
+			for (const teammate of matchingTeam.scores || []) {
+				if (PlayerStats.playerMatchesIdentifier(teammate, normalizedId)) {
+					continue;
+				}
+				const rawScore = teammate?.score ?? teammate?.points ?? teammate?.total;
+				const score = Number(rawScore);
+				if (!Number.isFinite(score)) {
+					continue;
+				}
+				totalScore += score;
+				teammateSamples++;
+				tableContributed = true;
+			}
+
+			if (tableContributed) {
+				tableCount++;
+				if (table.numPlayers == 12) {
+					twelve++;
+				}
+				if (table.numPlayers == 24) {
+					twentyFour++;
+				}
+			}
+		}
+
+		if (!teammateSamples) {
+			return null;
+		}
+
+		const roomAverage = (82 * twelve + 72 * twentyFour) / tableCount;
+		let roomAverageFixed = parseFloat(roomAverage.toFixed(Number.isInteger(roomAverage) ? 0 : 1));
+		roomAverageFixed = roomAverageFixed.toFixed(Number.isInteger(roomAverageFixed) ? 0 : 1);
+
+		return {
+			average: totalScore / teammateSamples,
+			roomAverageFixed,
+		};
+	}
+
+	/**
 	 * Get a player's best (highest) score across all tables
 	 * @param {Object} tables - Object containing table data
 	 * @param {string|number} playerIdentifier - Discord or lounge ID of the player to find
