@@ -6,6 +6,7 @@
 - [Overview](#overview)
 - [Core Capabilities](#core-capabilities)
 - [Command Catalog](#command-catalog)
+- [Example Cards](#example-cards)
 - [Architecture](#architecture)
   - [Runtime Flow](#runtime-flow)
   - [Rendering Pipeline](#rendering-pipeline)
@@ -17,7 +18,9 @@
 - [License](#license)
 
 ## Overview
-mogimogimogi is a Discord bot designed to provide competitive Mario Kart World players with detailed stats, synthesized into customizable player cards. All functionality is exposed through Discord slash commands and backed by a custom data pipeline that blends live Lounge API data with cached Discord server context.
+mogimogimogi is a Discord bot designed to provide competitive Mario Kart World players with detailed stats, synthesized into customizable player cards. The bot works entirely through Discord slash commands and is backed by a custom data pipeline that automatically combines new data into an existing database.
+
+![stats example](images/examples/stats%20example%20two.png)
 
 ## Core Capabilities
 - **Stats Cards**: `/stats` renders 1920×1080 canvases combining player MMR, streaks, track-specific palettes, avatars, and queue filters.
@@ -37,6 +40,13 @@ mogimogimogi is a Discord bot designed to provide competitive Mario Kart World p
 | `/about-me` | Deployment info and command help. |
 | `/customize` | Capture favorite characters, vehicles, flags, and other preferences. |
 | `/setup` | Internal onboarding helper for wiring the bot to a new guild. |
+
+## Example Cards
+
+![stats example](images/examples/stats%20example.png)
+![head-to-head example](images/examples/head-to-head%20example.png)
+![leaderboard example](images/examples/leaderboard%20example.png)
+![notables example](images/examples/notables%20example.png)
 
 ## Architecture
 ### Runtime Flow
