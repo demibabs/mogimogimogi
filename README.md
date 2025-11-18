@@ -20,7 +20,7 @@
 ## Overview
 mogimogimogi is a Discord bot designed to provide competitive Mario Kart World players with detailed stats, synthesized into customizable player cards. The bot works entirely through Discord slash commands and is backed by a custom data pipeline that automatically combines new data into an existing database.
 
-![stats example](images/examples/stats%20example%20.png)
+![stats example](images/examples/stats%20example.png)
 
 ## Core Capabilities
 - **Stats Cards**: `/stats` renders 1920×1080 canvases combining player MMR, streaks, track-specific palettes, avatars, and queue filters.
