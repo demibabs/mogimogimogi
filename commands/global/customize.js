@@ -86,7 +86,7 @@ function buildAutocompleteSuggestions(options, query) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("customize")
-		.setDescription("set the track and combo that appear when you use /stats and /notables.")
+		.setDescription("set the track and combo that appear when you use /stats, /rank-stats and /notables.")
 		.addStringOption(option =>
 			option
 				.setName("track")

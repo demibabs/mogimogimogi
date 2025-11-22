@@ -33,12 +33,13 @@ mogimogimogi is a Discord bot designed to provide competitive Mario Kart World p
 ## Command Catalog
 | Command | Focus |
 |---------|-------|
-| `/stats [player]` | Full stat card with filters for time range, queue, and player count. |
+| `/stats` | Full stat card with filters for time range, queue, and player count. |
 | `/notables` | Highlight + lowlight reel of a player's best and worst events. |
+| `/rank-stats` | Breakdown of player stats by the ranks of their opponents. |
 | `/head-to-head <player1> <player2>` | Shows players' win/loss records across shared events. |
 | `/leaderboard` | Displays a server-wide MMR leaderboard. |
 | `/about-me` | Deployment info and command help. |
-| `/customize` | Capture favorite characters, vehicles, flags, and other preferences. |
+| `/customize` | Capture player preferences to customize player stat cards. |
 | `/setup` | Internal onboarding helper for wiring the bot to a new guild. |
 
 ## Example Cards
@@ -78,7 +79,7 @@ mogimogimogi is a Discord bot designed to provide competitive Mario Kart World p
 ```
 commands/          Slash-command handlers (global + utility scopes)
 data/              JSON persistence layer when running without PostgreSQL
-fonts/             Bundled Lexend + emoji fonts registered at startup
+fonts/             Fonts registered at startup
 images/            Track backgrounds, rank icons, avatars, miscellaneous art
 scripts/           Maintenance helpers (migrations, data sync)
 utils/             Shared helpers (database, lounge API, player stats, renderers)
