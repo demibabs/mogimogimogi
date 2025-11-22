@@ -21,16 +21,16 @@ function normalizeRankName(name) {
 }
 
 const RANK_THRESHOLDS = [
-	{ key: "iron", label: "Iron", text: "iron", min: 0, max: 2000, emoji: "⛏️" },
-	{ key: "bronze", label: "Bronze", text: "bronze", min: 2000, max: 3500, emoji: "🧸" },
-	{ key: "silver", label: "Silver", text: "silver", min: 3500, max: 5000, emoji: "💿" },
-	{ key: "gold", label: "Gold", text: "gold", min: 5000, max: 6500, emoji: "⭐" },
-	{ key: "platinum", label: "Platinum", text: "platinum", min: 6500, max: 8000, emoji: "🦚" },
-	{ key: "sapphire", label: "Sapphire", text: "sapphire", min: 8000, max: 9500, emoji: "🌊" },
-	{ key: "ruby", label: "Ruby", text: "ruby", min: 9500, max: 11000, emoji: "🍓" },
-	{ key: "diamond", label: "Diamond", text: "diamond", min: 11000, max: 12500, emoji: "💎" },
-	{ key: "master", label: "Master", text: "master", min: 12500, max: 13500, emoji: "🪻" },
-	{ key: "grandmaster", label: "Grandmaster", text: "grandmaster", min: 13500, max: Infinity, emoji: "🎸" },
+	{ key: "iron", label: "iron", text: "iron", min: 0, max: 2000, emoji: "⛏️" },
+	{ key: "bronze", label: "bronze", text: "bronze", min: 2000, max: 3500, emoji: "🧸" },
+	{ key: "silver", label: "silver", text: "silver", min: 3500, max: 5000, emoji: "💿" },
+	{ key: "gold", label: "gold", text: "gold", min: 5000, max: 6500, emoji: "⭐" },
+	{ key: "platinum", label: "platinum", text: "platinum", min: 6500, max: 8000, emoji: "🦚" },
+	{ key: "sapphire", label: "sapphire", text: "sapphire", min: 8000, max: 9500, emoji: "🌊" },
+	{ key: "ruby", label: "ruby", text: "ruby", min: 9500, max: 11000, emoji: "🍓" },
+	{ key: "diamond", label: "diamond", text: "diamond", min: 11000, max: 12500, emoji: "💎" },
+	{ key: "master", label: "master", text: "master", min: 12500, max: 13500, emoji: "🪻" },
+	{ key: "grandmaster", label: "grandmaster", text: "grandmaster", min: 13500, max: Infinity, emoji: "🎸" },
 ];
 
 const RANK_THRESHOLD_MAP = RANK_THRESHOLDS.reduce((map, tier) => {

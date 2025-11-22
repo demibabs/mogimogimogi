@@ -1,3 +1,81 @@
+const HEX_COLOR_PATTERN = /^#([0-9a-f]{6})([0-9a-f]{2})?$/i;
+const RANK_STATS_CHART_VARIATION = 0.07;
+
+function clampChannel(value) {
+	if (!Number.isFinite(value)) {
+		return 0;
+	}
+	return Math.min(255, Math.max(0, Math.round(value)));
+}
+
+function parseHexColor(hexColor) {
+	if (typeof hexColor !== "string") {
+		return null;
+	}
+	const match = HEX_COLOR_PATTERN.exec(hexColor.trim());
+	if (!match) {
+		return null;
+	}
+	const [, rgb, alpha] = match;
+	const r = parseInt(rgb.slice(0, 2), 16);
+	const g = parseInt(rgb.slice(2, 4), 16);
+	const b = parseInt(rgb.slice(4, 6), 16);
+	return {
+		r,
+		g,
+		b,
+		alphaHex: (alpha || "").toLowerCase(),
+	};
+}
+
+function formatHexColor({ r, g, b, alphaHex }) {
+	const components = [r, g, b]
+		.map(value => clampChannel(value).toString(16).padStart(2, "0"))
+		.join("");
+	return `#${components}${alphaHex ?? ""}`;
+}
+
+function adjustColor(hexColor, factor, mode) {
+	const parsed = parseHexColor(hexColor);
+	if (!parsed) {
+		return null;
+	}
+	const { r, g, b, alphaHex } = parsed;
+	const ratio = Number.isFinite(factor) ? Math.min(Math.max(factor, 0), 1) : 0;
+	const transform = value => {
+		if (mode === "lighten") {
+			return value + (255 - value) * ratio;
+		}
+		return value * (1 - ratio);
+	};
+	return formatHexColor({
+		r: transform(r),
+		g: transform(g),
+		b: transform(b),
+		alphaHex,
+	});
+}
+
+function applyRankStatsChartColors(trackMap) {
+	if (!trackMap) {
+		return;
+	}
+	for (const palette of Object.values(trackMap)) {
+		const rankStats = palette?.rankStats;
+		if (!rankStats?.baseColor) {
+			continue;
+		}
+		const lighter = adjustColor(rankStats.baseColor, RANK_STATS_CHART_VARIATION, "lighten");
+		const darker = adjustColor(rankStats.baseColor, RANK_STATS_CHART_VARIATION, "darken");
+		if (lighter) {
+			rankStats.chartColor1 = lighter;
+		}
+		if (darker) {
+			rankStats.chartColor2 = darker;
+		}
+	}
+}
+
 const trackColors = {
 	MBC: {
 		stats: {
@@ -13,6 +91,11 @@ const trackColors = {
 			headerColor: "#16161a",
 			statsTextColor: "#1e1e1eff",
 		},
+		rankStats: {
+			baseColor: "#382222ee",
+			headerColor: "#ffe8e8ff",
+			statsTextColor: "#f3f3f3ff",
+		},
 	},
 	CC: {
 		stats: {
@@ -26,6 +109,11 @@ const trackColors = {
 		notables: {
 			baseColor: "#e3f5ffdc",
 			headerColor: "#16161a",
+			statsTextColor: "#181818ff",
+		},
+		rankStats: {
+			baseColor: "#ffffe3dc",
+			headerColor: "#211410ff",
 			statsTextColor: "#181818ff",
 		},
 	},
@@ -43,10 +131,15 @@ const trackColors = {
 			headerColor: "#16161a",
 			statsTextColor: "#131313ff",
 		},
+		rankStats: {
+			baseColor: "#43251aee",
+			headerColor: "#ffe8d9ff",
+			statsTextColor: "#f3f3f3ff",
+		},
 	},
 	DKS: {
 		stats: {
-			baseColor: "#38455f99",
+			baseColor: "#2c3b5ad3",
 			headerColor: "#d6d6e8ff",
 			statsTextColor: "#dde4f4ff",
 			chartTextColor: "#c0c7d4ff",
@@ -57,6 +150,11 @@ const trackColors = {
 			baseColor: "#e3f5ffdc",
 			headerColor: "#16161a",
 			statsTextColor: "#181818ff",
+		},
+		rankStats: {
+			baseColor: "#1a2b43ee",
+			headerColor: "#d9e8ffff",
+			statsTextColor: "#f3f3f3ff",
 		},
 	},
 	rDH: {
@@ -70,6 +168,11 @@ const trackColors = {
 		},
 		notables: {
 			baseColor: "#f6f8ddd9",
+			headerColor: "#16161a",
+			statsTextColor: "#202020ff",
+		},
+		rankStats: {
+			baseColor: "#f9ebd7d9",
 			headerColor: "#16161a",
 			statsTextColor: "#202020ff",
 		},
@@ -88,6 +191,11 @@ const trackColors = {
 			headerColor: "#16161a",
 			statsTextColor: "#242424ff",
 		},
+		rankStats: {
+			baseColor: "#ffe9cdd9",
+			headerColor: "#16161a",
+			statsTextColor: "#242424ff",
+		},
 	},
 	rWS: {
 		stats: {
@@ -102,6 +210,11 @@ const trackColors = {
 			baseColor: "#f8ddddda",
 			headerColor: "#16161a",
 			statsTextColor: "#313131ff",
+		},
+		rankStats: {
+			baseColor: "#462c24ee",
+			headerColor: "#ffe3d9ff",
+			statsTextColor: "#ffffffff",
 		},
 	},
 	rAF: {
@@ -118,6 +231,11 @@ const trackColors = {
 			headerColor: "#f1dce8ff",
 			statsTextColor: "#fff0feff",
 		},
+		rankStats: {
+			baseColor: "#462c24ee",
+			headerColor: "#ffe3d9ff",
+			statsTextColor: "#ffffffff",
+		},
 	},
 	rDKP: {
 		stats: {
@@ -132,6 +250,11 @@ const trackColors = {
 			baseColor: "#d9dafdf8",
 			headerColor: "#16161a",
 			statsTextColor: "#1b1b1bff",
+		},
+		rankStats: {
+			baseColor: "#333946ee",
+			headerColor: "#d9e8ffff",
+			statsTextColor: "#f3f3f3ff",
 		},
 	},
 	SP: {
@@ -148,6 +271,11 @@ const trackColors = {
 			headerColor: "#d6d6e8ff",
 			statsTextColor: "#e8eefcff",
 		},
+		rankStats: {
+			baseColor: "#1a2b43ee",
+			headerColor: "#d9e8ffff",
+			statsTextColor: "#f3f3f3ff",
+		},
 	},
 	rSHS: {
 		stats: {
@@ -162,6 +290,11 @@ const trackColors = {
 			baseColor: "#fccdffee",
 			headerColor: "#200620ff",
 			statsTextColor: "#23071fff",
+		},
+		rankStats: {
+			baseColor: "#1a3143ee",
+			headerColor: "#d9eeffff",
+			statsTextColor: "#f3f3f3ff",
 		},
 	},
 	rWSh: {
@@ -178,6 +311,11 @@ const trackColors = {
 			headerColor: "#d6e5e8ff",
 			statsTextColor: "#ddf4f4ff",
 		},
+		rankStats: {
+			baseColor: "#1a3443ee",
+			headerColor: "#d9f5ffff",
+			statsTextColor: "#f3f3f3ff",
+		},
 	},
 	rKTB: {
 		stats: {
@@ -192,6 +330,11 @@ const trackColors = {
 			baseColor: "#d9f0fde3",
 			headerColor: "#16161a",
 			statsTextColor: "#1a1d2fff",
+		},
+		rankStats: {
+			baseColor: "#18383cee",
+			headerColor: "#d9fffcff",
+			statsTextColor: "#ffffffff",
 		},
 	},
 	FO: {
@@ -208,6 +351,11 @@ const trackColors = {
 			headerColor: "#ffe5d9ff",
 			statsTextColor: "#fff7f1ff",
 		},
+		rankStats: {
+			baseColor: "#333946ee",
+			headerColor: "#e8eaffff",
+			statsTextColor: "#f3f3f3ff",
+		},
 	},
 	PS: {
 		stats: {
@@ -220,6 +368,11 @@ const trackColors = {
 		},
 		notables: {
 			baseColor: "#ffe7e4e7",
+			headerColor: "#1a1716ff",
+			statsTextColor: "#231b1bff",
+		},
+		rankStats: {
+			baseColor: "#fff7f5e7",
 			headerColor: "#1a1716ff",
 			statsTextColor: "#231b1bff",
 		},
@@ -238,6 +391,11 @@ const trackColors = {
 			headerColor: "#16161a",
 			statsTextColor: "#2b2236ff",
 		},
+		rankStats: {
+			baseColor: "#633421ee",
+			headerColor: "#ffe3d9ff",
+			statsTextColor: "#ffffffff",
+		},
 	},
 	SSS: {
 		stats: {
@@ -252,6 +410,11 @@ const trackColors = {
 			baseColor: "#424b69e1",
 			headerColor: "#d9e9ffff",
 			statsTextColor: "#f1fbffff",
+		},
+		rankStats: {
+			baseColor: "#e2f4ffe7",
+			headerColor: "#1a1716ff",
+			statsTextColor: "#231b1bff",
 		},
 	},
 	rDDJ: {
@@ -268,6 +431,11 @@ const trackColors = {
 			headerColor: "#1f241eff",
 			statsTextColor: "#2b342bff",
 		},
+		rankStats: {
+			baseColor: "#633421ee",
+			headerColor: "#ffe3d9ff",
+			statsTextColor: "#ffffffff",
+		},
 	},
 	GBR: {
 		stats: {
@@ -283,6 +451,11 @@ const trackColors = {
 			headerColor: "#16161a",
 			statsTextColor: "#242424ff",
 		},
+		rankStats: {
+			baseColor: "#333946ee",
+			headerColor: "#e8eaffff",
+			statsTextColor: "#f3f3f3ff",
+		},
 	},
 	CCF: {
 		stats: {
@@ -295,6 +468,11 @@ const trackColors = {
 		},
 		notables: {
 			baseColor: "#f7ece1e6",
+			headerColor: "#16161a",
+			statsTextColor: "#212121ff",
+		},
+		rankStats: {
+			baseColor: "#fff3ebe6",
 			headerColor: "#16161a",
 			statsTextColor: "#212121ff",
 		},
@@ -313,6 +491,11 @@ const trackColors = {
 			headerColor: "#16161a",
 			statsTextColor: "#252525ff",
 		},
+		rankStats: {
+			baseColor: "#fdf0d9e8",
+			headerColor: "#16161a",
+			statsTextColor: "#161616ff",
+		},
 	},
 	BCi: {
 		stats: {
@@ -328,6 +511,11 @@ const trackColors = {
 			headerColor: "#cce0d4ff",
 			statsTextColor: "#e8ffecff",
 		},
+		rankStats: {
+			baseColor: "#462518ee",
+			headerColor: "#ffe3d9ff",
+			statsTextColor: "#ffffffff",
+		},
 	},
 	DBB: {
 		stats: {
@@ -339,6 +527,11 @@ const trackColors = {
 			youColor: "#602525ff",
 		},
 		notables: {
+			baseColor: "#512929ea",
+			headerColor: "#ffe1e1ff",
+			statsTextColor: "#fff3f3ff",
+		},
+		rankStats: {
 			baseColor: "#512929ea",
 			headerColor: "#ffe1e1ff",
 			statsTextColor: "#fff3f3ff",
@@ -358,6 +551,11 @@ const trackColors = {
 			headerColor: "#d2e0ccff",
 			statsTextColor: "#f2ffe8ff",
 		},
+		rankStats: {
+			baseColor: "#d9f7fde8",
+			headerColor: "#16161a",
+			statsTextColor: "#161616ff",
+		},
 	},
 	rCM: {
 		stats: {
@@ -373,6 +571,11 @@ const trackColors = {
 			headerColor: "#171717ff",
 			statsTextColor: "#171717ff",
 		},
+		rankStats: {
+			baseColor: "#fff4dce2",
+			headerColor: "#171717ff",
+			statsTextColor: "#171717ff",
+		},
 	},
 	rTF: {
 		stats: {
@@ -384,9 +587,14 @@ const trackColors = {
 			youColor: "#2d2d2dff",
 		},
 		notables: {
-			baseColor: "#d3ffcee2",
-			headerColor: "#171717ff",
-			statsTextColor: "#171717ff",
+			baseColor: "#2d3b2bee",
+			headerColor: "#ffffffff",
+			statsTextColor: "#f2fff0ff",
+		},
+		rankStats: {
+			baseColor: "#2e4051ee",
+			headerColor: "#e8eaffff",
+			statsTextColor: "#f3f3f3ff",
 		},
 	},
 	BC: {
@@ -403,6 +611,11 @@ const trackColors = {
 			headerColor: "#fff1f0ff",
 			statsTextColor: "#ffeaeaff",
 		},
+		rankStats: {
+			baseColor: "#333e46ee",
+			headerColor: "#d9f0ffff",
+			statsTextColor: "#f3f3f3ff",
+		},
 	},
 	AH: {
 		stats: {
@@ -417,6 +630,11 @@ const trackColors = {
 			baseColor: "#c3f5dae1",
 			headerColor: "#1f241eff",
 			statsTextColor: "#191b19ff",
+		},
+		rankStats: {
+			baseColor: "#2b392fee",
+			headerColor: "#efffe7ff",
+			statsTextColor: "#ffffffff",
 		},
 	},
 	rMC: {
@@ -433,6 +651,11 @@ const trackColors = {
 			headerColor: "#d9e9ffff",
 			statsTextColor: "#f1fbffff",
 		},
+		rankStats: {
+			baseColor: "#e2f4ffe7",
+			headerColor: "#1a1716ff",
+			statsTextColor: "#231b1bff",
+		},
 	},
 	RR: {
 		stats: {
@@ -448,8 +671,15 @@ const trackColors = {
 			headerColor: "#d6d6e8ff",
 			statsTextColor: "#e9f0ffff",
 		},
+		rankStats: {
+			baseColor: "#462218ee",
+			headerColor: "#ffddd9ff",
+			statsTextColor: "#ffffffff",
+		},
 	},
 };
+
+applyRankStatsChartColors(trackColors);
 
 const statsTrackColors = Object.fromEntries(
 	Object.entries(trackColors).map(([track, palette]) => [track, palette.stats]),
@@ -457,6 +687,10 @@ const statsTrackColors = Object.fromEntries(
 
 const notablesTrackColors = Object.fromEntries(
 	Object.entries(trackColors).map(([track, palette]) => [track, palette.notables]),
+);
+
+const rankStatsTrackColors = Object.fromEntries(
+	Object.entries(trackColors).map(([track, palette]) => [track, palette.rankStats]),
 );
 
 const currentTrackName = "RR";
@@ -472,9 +706,9 @@ const leaderboardPalette = {
 const headToHeadPalette = {
 	backgroundColor: "#0b0b0b",
 	highlightPanelColor: "#fbecffd9",
-	textColor: "#111111",
-	headerColor: "#000000",
-	baseColor: "#feedff7e",
+	textColor: "#050505ff",
+	headerColor: "#000000ff",
+	baseColor: "#feedff9d",
 	valuePositiveColor: "#1f7a3f",
 	valueNegativeColor: "#b6403b",
 };
@@ -496,6 +730,7 @@ module.exports = {
 	trackColors,
 	statsTrackColors,
 	notablesTrackColors,
+	rankStatsTrackColors,
 	currentTrackName,
 	leaderboardPalette,
 	headToHeadPalette,

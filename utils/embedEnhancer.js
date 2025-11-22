@@ -174,6 +174,18 @@ async function drawEmoji(ctx, emoji, x, y, size) {
 	ctx.drawImage(img, x, y, size, size);
 }
 
+function drawInlineImage(ctx, image, x, baselineY, size, options = {}) {
+	if (!ctx || !image || !Number.isFinite(x) || !Number.isFinite(baselineY) || !Number.isFinite(size) || size <= 0) {
+		return 0;
+	}
+	const { descentRatio = 0.18 } = options;
+	const clampedRatio = Math.min(Math.max(descentRatio, 0), 1);
+	const descent = size * clampedRatio;
+	const y = baselineY - size + descent;
+	ctx.drawImage(image, x, y, size, size);
+	return size;
+}
+
 const shapeNames = [
 	"plus", "cross", "dash", "cross-dash", "dot", "dot-dash",
 	"disc", "ring", "line", "line-vertical", "weave", "zigzag",
@@ -591,6 +603,7 @@ module.exports = {
 	drawRoundedImage,
 	drawBlurredImage,
 	drawEmoji,
+	drawInlineImage,
 	drawTextWithEmojis,
 	truncateTextWithEmojis,
 	randomPattern,

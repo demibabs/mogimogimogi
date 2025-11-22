@@ -8,7 +8,6 @@ const EmbedEnhancer = require("../../utils/embedEnhancer");
 const AutoUserManager = require("../../utils/autoUserManager");
 const GameData = require("../../utils/gameData");
 const ColorPalettes = require("../../utils/colorPalettes");
-const Fonts = require("../../utils/fonts");
 const resolveTargetPlayer = require("../../utils/playerResolver");
 
 const {
@@ -21,8 +20,6 @@ const {
 	loadWebPAsPng,
 	getCountryFlag,
 	drawEmoji,
-	drawTextWithEmojis,
-	truncateTextWithEmojis,
 } = EmbedEnhancer;
 
 const EDGE_RADIUS = 30;
@@ -71,7 +68,6 @@ const LAYOUT = {
 	sectionGap: 35,
 	headerHeight: 120,
 	headerPaddingHorizontal: 60,
-	headerPaddingRight: 15,
 	headerPaddingVertical: 14,
 	headerTitleFontSize: 60,
 	headerSubtitleFontSize: 30,
@@ -83,6 +79,7 @@ const LAYOUT = {
 	headerAvatarSize: 100,
 	headerAvatarRadius: 30,
 	headerAssetGap: 28,
+	headerAssetOffsetX: 48,
 	columnPadding: 46,
 	eventTitleFontSize: 37,
 	eventTitleOpacity: 0.5,
@@ -103,7 +100,7 @@ const goodBSMessages = [
 	"cheating?",
 	"luck was on your side that day. (or skill...)",
 	"isn't this game so good when you win?",
-	"unstoppable.",
+	"unstoppable",
 ];
 
 const badBSMessages = [
@@ -127,10 +124,10 @@ const goodWSMessages = [
 ];
 
 const badWSMessages = [
-	"video games aren't for everyone. maybe try sports?",
+	"gaming isn't for everyone. maybe try sports?",
 	"yowch.",
 	"at least you beat somebody! wait, no you didn't.",
-	"thx for donating mmr to those other players.",
+	"thanks for donating your mmr to those other players.",
 	"can't blame any teammates for that one.",
 	"you suck.",
 	"i don't even have a joke. this is just sad.",
@@ -142,7 +139,7 @@ const oPMessages = [
 	"they underestimated you, but i knew you were like that.",
 	"great job!",
 	"holy w.",
-	"how does he do it?",
+	"how do you do it?",
 	"the up and coming goat.",
 	"you're overpowered.",
 	"i went to underrated town and they all knew you.",
@@ -514,9 +511,9 @@ function drawEventsColumn(ctx, frame, trackColors, events) {
 	ctx.save();
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	const titleFont = `600 ${LAYOUT.eventTitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
-	const bodyFontRegular = `${LAYOUT.footnoteFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
-	const bodyFontBold = `500 ${LAYOUT.eventBodyFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
+	const titleFont = `600 ${LAYOUT.eventTitleFontSize}px Lexend`;
+	const bodyFontRegular = `${LAYOUT.footnoteFontSize}px Lexend`;
+	const bodyFontBold = `500 ${LAYOUT.eventBodyFontSize}px Lexend`;
 	const bodyLineHeight = LAYOUT.eventBodyFontSize * 1.32;
 	const contentWidth = frame.width - LAYOUT.columnPadding * 2;
 	const processed = [];
@@ -695,6 +692,17 @@ async function renderNotablesImage({
 		textX += emojiSize + emojiGap;
 	}
 
+	ctx.font = `700 ${titleFontSize}px Lexend`;
+	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
+	ctx.fillText(headerTitle, textX, titleBaseline);
+
+	if (hasSubtitle && subtitleBaseline !== null) {
+		ctx.font = `${subtitleFontSize}px Lexend`;
+		ctx.fillStyle = trackColors.statsTextColor || "#333333";
+		ctx.fillText(subtitleText, textX, subtitleBaseline);
+	}
+	ctx.restore();
+
 	const scaleToFavoriteFrame = image => {
 		const maxSize = LAYOUT.headerFavoriteMaxSize;
 		const width = Math.max(image?.width || 1, 1);
@@ -705,6 +713,7 @@ async function renderNotablesImage({
 			height: height * scale,
 		};
 	};
+
 	const headerAssets = [];
 	if (favoriteCharacterImage) {
 		const dimensions = scaleToFavoriteFrame(favoriteCharacterImage);
@@ -724,6 +733,7 @@ async function renderNotablesImage({
 			height: dimensions.height,
 		});
 	}
+
 	let avatarImage = null;
 	const avatarUrl = getPlayerAvatarUrl(discordUser);
 	if (avatarUrl) {
@@ -742,33 +752,8 @@ async function renderNotablesImage({
 			height: LAYOUT.headerAvatarSize,
 		});
 	}
-	const assetsWidth = headerAssets.reduce((sum, asset) => sum + asset.width, 0);
-	const assetsGaps = Math.max(headerAssets.length - 1, 0) * LAYOUT.headerAssetGap;
-	const rightReserved = assetsWidth + assetsGaps + LAYOUT.headerPaddingRight;
-	const truncationBuffer = 11;
 
-	ctx.font = `700 ${titleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
-	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
-	const maxTitleWidth = Math.max(0, headerFrame.left + headerFrame.width - rightReserved - textX - truncationBuffer);
-	const fittedTitle = truncateTextWithEmojis(ctx, headerTitle, Math.max(0, maxTitleWidth), {
-		font: ctx.font,
-		emojiSize: titleFontSize * 0.9,
-	});
-	await drawTextWithEmojis(ctx, fittedTitle, textX, titleBaseline, {
-		font: ctx.font,
-		fillStyle: ctx.fillStyle,
-		emojiSize: titleFontSize * 0.9,
-		lineHeight: titleFontSize * 1.15,
-	});
-
-	if (hasSubtitle && subtitleBaseline !== null) {
-		ctx.font = `${subtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
-		ctx.fillStyle = trackColors.statsTextColor || "#333333";
-		ctx.fillText(subtitleText, textX, subtitleBaseline);
-	}
-	ctx.restore();
-
-	let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingRight;
+	let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingHorizontal + LAYOUT.headerAssetOffsetX;
 	for (let index = headerAssets.length - 1; index >= 0; index--) {
 		const asset = headerAssets[index];
 		assetCursor -= asset.width;
