@@ -672,15 +672,15 @@ module.exports = {
 		.setDescription("compare head-to-head stats of two players.")
 		.addStringOption((option) =>
 			option
-				.setName("player1")
-				.setDescription("lounge name or id for the first player")
+				.setName("player")
+				.setDescription("lounge name or id for a player")
 				.setAutocomplete(true)
 				.setRequired(true),
 		)
 		.addStringOption((option) =>
 			option
 				.setName("player2")
-				.setDescription("lounge name or id for the second player")
+				.setDescription("lounge name or id for another player")
 				.setAutocomplete(true)
 				.setRequired(false),
 		),
@@ -747,7 +747,7 @@ module.exports = {
 			await interaction.editReply("validating players...");
 
 			const serverId = interaction.guildId;
-			const rawPlayer1 = interaction.options.getString("player1");
+			const rawPlayer1 = interaction.options.getString("player");
 			const rawPlayer2 = interaction.options.getString("player2");
 			const validation = await AutoUserManager.validateUserForCommand(
 				interaction.user.id,

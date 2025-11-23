@@ -4,7 +4,7 @@ const database = require("../../utils/database");
 const GLOBAL_COMMANDS = [
 	{ name: "/stats", description: "render a detailed lounge stats card" },
 	{ name: "/notables", description: "highlight your best and worst performances" },
-	{ name: "/rank-stats", description: "stats broken down by the ranks of your opponents" },
+	{ name: "/rank-stats", description: "break down your stats by the ranks of your opponents" },
 	{ name: "/customize", description: "edit the appearance of /stats, /rank-stats and /notables" },
 	{ name: "/head-to-head", description: "compare two players across shared mogis" },
 	{ name: "/leaderboard", description: "view a server MMR leaderboard" },
