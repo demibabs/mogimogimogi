@@ -412,7 +412,7 @@ const trackColors = {
 			statsTextColor: "#f1fbffff",
 		},
 		rankStats: {
-			baseColor: "#e2f4ffe7",
+			baseColor: "#fff9e2e7",
 			headerColor: "#1a1716ff",
 			statsTextColor: "#231b1bff",
 		},

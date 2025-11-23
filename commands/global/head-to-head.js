@@ -1033,7 +1033,39 @@ module.exports = {
 			};
 			const leftEventsPlayed = parseEventsPlayed(leftPlayerDetails);
 			const rightEventsPlayed = parseEventsPlayed(rightPlayerDetails);
-			const preferredBaseId = leftEventsPlayed <= rightEventsPlayed ? normalizedLeftId : normalizedRightId;
+
+			const fetchCachedTableCount = async (loungeId) => {
+				try {
+					const entries = await Database.getUserTables(loungeId);
+					return Array.isArray(entries) ? entries.length : 0;
+				}
+				catch (error) {
+					console.warn(`head-to-head: failed to read cached tables for ${loungeId}:`, error);
+					return 0;
+				}
+			};
+
+			const [leftCachedTableCount, rightCachedTableCount] = await Promise.all([
+				fetchCachedTableCount(normalizedLeftId),
+				fetchCachedTableCount(normalizedRightId),
+			]);
+
+			const selectPreferredBaseId = () => {
+				const leftHasCache = leftCachedTableCount > 0;
+				const rightHasCache = rightCachedTableCount > 0;
+				if (leftHasCache && !rightHasCache) {
+					return normalizedLeftId;
+				}
+				if (rightHasCache && !leftHasCache) {
+					return normalizedRightId;
+				}
+				if (leftHasCache && rightHasCache && leftCachedTableCount !== rightCachedTableCount) {
+					return leftCachedTableCount > rightCachedTableCount ? normalizedLeftId : normalizedRightId;
+				}
+				return leftEventsPlayed <= rightEventsPlayed ? normalizedLeftId : normalizedRightId;
+			};
+
+			const preferredBaseId = selectPreferredBaseId();
 
 			let basePlayerId = targetSession.primaryPlayerId || null;
 			let basePlayerTables = targetSession.primaryPlayerTables || null;
