@@ -158,6 +158,7 @@ const uPMessages = [
 	"what a sell.",
 	"ur gameplay was wurse than my speling.",
 	"you were the best in the room, but only in theory.",
+	"bro is throwing.",
 ];
 
 const bCMessages = [

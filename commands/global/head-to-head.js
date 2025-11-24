@@ -673,14 +673,14 @@ module.exports = {
 		.addStringOption((option) =>
 			option
 				.setName("player")
-				.setDescription("lounge name or id for a player")
+				.setDescription("lounge name or id for a player.")
 				.setAutocomplete(true)
 				.setRequired(true),
 		)
 		.addStringOption((option) =>
 			option
 				.setName("player2")
-				.setDescription("lounge name or id for another player")
+				.setDescription("defaults to you if left blank.")
 				.setAutocomplete(true)
 				.setRequired(false),
 		),

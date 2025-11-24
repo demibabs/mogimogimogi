@@ -14,12 +14,25 @@ module.exports = {
 			await interaction.deferReply();
 			await interaction.editReply("starting setup process...");
 
+			const serverId = interaction.guild.id;
 			const members = await interaction.guild.members.fetch();
-			const serverData = await database.getServerData(interaction.guild.id);
+			const serverData = await database.getServerData(serverId);
 
 			const loungers = [];
 			const totalMembers = members.size;
 			let processedCount = 0;
+			const recordSetupCompletion = async (stats = {}) => {
+				try {
+					await database.markServerSetupComplete(serverId, {
+						initiatedBy: interaction.user?.id || null,
+						totalMembers,
+						...stats,
+					});
+				}
+				catch (stateError) {
+					console.warn("setup: failed to store setup metadata:", stateError);
+				}
+			};
 
 			await interaction.editReply(`processing ${totalMembers} server members...`);
 
@@ -44,7 +57,8 @@ module.exports = {
 			}
 
 			if (loungers.length === 0) {
-				return await interaction.editReply("setup complete! no new users to add. :)");
+				await recordSetupCompletion({ detectedLoungers: 0, addedUsers: 0 });
+				return await interaction.editReply("setup complete! no users to add. :)");
 			}
 
 			await interaction.editReply(`adding ${loungers.length} new users to server data...`);
@@ -62,6 +76,8 @@ module.exports = {
 					console.error(`failed to add user ${lounger}:`, error);
 				}
 			}
+
+			await recordSetupCompletion({ detectedLoungers: loungers.length, addedUsers: addedCount });
 
 			await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
 				loungers.length === 1 ? "" : "s"}. use /about-me to see all commands`);

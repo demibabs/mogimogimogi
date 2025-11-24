@@ -7,7 +7,7 @@ module.exports = {
 		.setDescription("List all deployed servers with member counts (testing only)."),
 
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply();
 
 		// Fetch all guilds the bot is in
 		const guilds = interaction.client.guilds.cache;

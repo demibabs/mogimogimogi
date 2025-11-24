@@ -90,19 +90,19 @@ module.exports = {
 		.addStringOption(option =>
 			option
 				.setName("track")
-				.setDescription("choose your favorite track")
+				.setDescription("choose your favorite track.")
 				.setAutocomplete(true),
 		)
 		.addStringOption(option =>
 			option
 				.setName("character")
-				.setDescription("select your main char")
+				.setDescription("select your main char.")
 				.setAutocomplete(true),
 		)
 		.addStringOption(option =>
 			option
 				.setName("vehicle")
-				.setDescription("choose your main vehicle")
+				.setDescription("choose your main vehicle.")
 				.setAutocomplete(true),
 		),
 

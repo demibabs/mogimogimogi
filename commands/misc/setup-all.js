@@ -14,6 +14,7 @@ module.exports = {
 		await interaction.editReply("Starting multi-server setup...");
 
 		const client = interaction.client;
+		const initiatorId = interaction.user?.id || null;
 		const guilds = client.guilds.cache;
 		if (!guilds.size) {
 			return interaction.editReply("No guilds found.");
@@ -51,6 +52,18 @@ module.exports = {
 					}
 				}
 				perGuildSummary.push(`• ${guild.name}: added ${added} user(s) out of ${considered} member(s)`);
+				try {
+					await database.markServerSetupComplete(guildId, {
+						initiatedBy: initiatorId,
+						totalMembers: members.size,
+						detectedLoungers: added,
+						addedUsers: added,
+						source: "setup-all",
+					});
+				}
+				catch (stateError) {
+					console.warn(`setup-all: failed to store setup metadata for ${guildId}:`, stateError);
+				}
 			}
 			catch (error) {
 				console.error(`Setup-all error for guild ${guildId}:`, error);

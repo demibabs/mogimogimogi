@@ -17,13 +17,19 @@ class AutoUserManager {
 	 */
 	static async ensureUserExists(userId, serverId, client) {
 		try {
-	       // First check if server has any data at all
-	       const serverData = await database.getServerData(serverId);
-	       if (!serverData || !serverData.users || Object.keys(serverData.users).length === 0) {
+	       // First check if server has any data or completed setup metadata
+	       const [serverDataRaw, setupState] = await Promise.all([
+		       database.getServerData(serverId),
+		       database.getServerSetupState(serverId),
+	       ]);
+	       const serverData = serverDataRaw || { users: {}, discordIndex: {} };
+	       const hasStoredUsers = Object.keys(serverData.users || {}).length > 0;
+	       const setupCompleted = Boolean(setupState?.completed);
+	       if (!hasStoredUsers && !setupCompleted) {
 		       return {
-			       success: false,
-			       needsSetup: true,
-			       message: "this server hasn't been set up yet. please run `/setup` first.",
+		       	success: false,
+		       	needsSetup: true,
+		       	message: "this server hasn't been set up yet. please run `/setup` first.",
 		       };
 	       }
 
