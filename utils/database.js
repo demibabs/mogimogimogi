@@ -127,50 +127,6 @@ class Database {
 				)
 			`);
 
-			await this.pool.query(`
-				CREATE TABLE IF NOT EXISTS leaderboard_cache (
-					id SERIAL PRIMARY KEY,
-					server_id VARCHAR(20) NOT NULL,
-					user_id VARCHAR(20) NOT NULL,
-					cache_data JSONB NOT NULL,
-					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-					UNIQUE(server_id, user_id)
-				)
-			`);
-
-			await this.pool.query(`
-				CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_server
-				ON leaderboard_cache(server_id)
-			`);
-
-			await this.pool.query(`
-				CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_updated
-				ON leaderboard_cache(updated_at)
-			`);
-
-			await this.pool.query(`
-				CREATE TABLE IF NOT EXISTS streak_cache (
-					id SERIAL PRIMARY KEY,
-					server_id VARCHAR(20) NOT NULL,
-					user_id VARCHAR(20) NOT NULL,
-					cache_data JSONB NOT NULL,
-					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-					UNIQUE(server_id, user_id)
-				)
-			`);
-
-			await this.pool.query(`
-				CREATE INDEX IF NOT EXISTS idx_streak_cache_server
-				ON streak_cache(server_id)
-			`);
-
-			await this.pool.query(`
-				CREATE INDEX IF NOT EXISTS idx_streak_cache_updated
-				ON streak_cache(updated_at)
-			`);
-
 			console.log("database initialized successfully");
 		}
 		catch (error) {
@@ -192,8 +148,6 @@ class Database {
 			await this.pool.query("DROP TABLE IF EXISTS user_tables");
 			await this.pool.query("DROP TABLE IF EXISTS tables");
 			await this.pool.query("DROP TABLE IF EXISTS user_data");
-			await this.pool.query("DROP TABLE IF EXISTS leaderboard_cache");
-			await this.pool.query("DROP TABLE IF EXISTS streak_cache");
 			// Recreate schema
 			await this.initializeDatabase();
 			console.log("database purged and reinitialized");
