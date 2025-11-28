@@ -1,5 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const database = require("./utils/database");
+const { resolveCommandFromButtonId, isGlobalCommand, normalizeCommandName } = require("./utils/globalCommands");
 const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST, ActivityType } = require("discord.js");
 
 // Load environment variables
@@ -24,6 +26,34 @@ const useDev = args.includes("--dev");
 const token = useDev ? process.env.DEV_DISCORD_TOKEN : process.env.DISCORD_TOKEN;
 
 console.log(`Starting ${useDev ? "DEVELOPMENT" : "PRODUCTION"} bot...`);
+
+const OWNER_USER_ID = "437813284981309441";
+
+function shouldTrackUsage(userId) {
+	return typeof userId === "string" && userId.length > 0 && userId !== OWNER_USER_ID;
+}
+
+async function trackSlashCommandUsage(interaction, commandName) {
+	if (!shouldTrackUsage(interaction.user?.id)) {
+		return;
+	}
+	const normalizedName = normalizeCommandName(commandName);
+	if (!normalizedName || !isGlobalCommand(normalizedName)) {
+		return;
+	}
+	await database.recordCommandUsage(normalizedName, "slash");
+}
+
+async function trackButtonInteractionUsage(interaction) {
+	if (!shouldTrackUsage(interaction.user?.id)) {
+		return;
+	}
+	const resolvedCommandName = resolveCommandFromButtonId(interaction.customId);
+	if (!resolvedCommandName) {
+		return;
+	}
+	await database.recordCommandUsage(resolvedCommandName, "button");
+}
 
 const client = new Client({
 	intents: [
@@ -94,6 +124,8 @@ client.on(Events.InteractionCreate, async interaction => {
 			return;
 		}
 
+		await trackSlashCommandUsage(interaction, command.data?.name);
+
 		try {
 			await command.execute(interaction);
 		}
@@ -112,6 +144,8 @@ client.on(Events.InteractionCreate, async interaction => {
 		const guildName = interaction.guild?.name || "DM";
 		const displayName = interaction.member?.displayName || interaction.user?.globalName || interaction.user?.username || "unknown";
 		console.log(`Button interaction: ${interaction.customId} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
+
+		await trackButtonInteractionUsage(interaction);
 
 		// Check if any command can handle this button interaction
 		let handled = false;

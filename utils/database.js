@@ -1,6 +1,7 @@
 const { Pool } = require("pg");
 const fs = require("fs").promises;
 const path = require("path");
+const { normalizeCommandName } = require("./globalCommands");
 
 const numericIdPattern = /^\d+$/;
 
@@ -123,6 +124,16 @@ class Database {
 				CREATE TABLE IF NOT EXISTS server_state (
 					server_id VARCHAR(20) PRIMARY KEY,
 					state JSONB NOT NULL,
+					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+				)
+			`);
+
+			await this.pool.query(`
+				CREATE TABLE IF NOT EXISTS command_usage (
+					command_name VARCHAR(50) PRIMARY KEY,
+					slash_count INTEGER NOT NULL DEFAULT 0,
+					button_count INTEGER NOT NULL DEFAULT 0,
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 				)
 			`);
@@ -540,6 +551,85 @@ class Database {
 		catch (error) {
 			console.error("database user tables query error:", error);
 			return [];
+		}
+	}
+
+	// --- Command usage analytics -------------------------------------------------
+
+	async recordCommandUsage(commandName, interactionType = "slash") {
+		if (!this.useDatabase) {
+			return false;
+		}
+		const normalizedName = normalizeCommandName(commandName);
+		if (!normalizedName) {
+			return false;
+		}
+		const isButton = interactionType === "button";
+		const slashIncrement = isButton ? 0 : 1;
+		const buttonIncrement = isButton ? 1 : 0;
+		const targetColumn = isButton ? "button_count" : "slash_count";
+		try {
+			await this.pool.query(
+				`INSERT INTO command_usage (command_name, slash_count, button_count)
+				 VALUES ($1, $2, $3)
+				 ON CONFLICT (command_name)
+				 DO UPDATE SET ${targetColumn} = command_usage.${targetColumn} + 1, updated_at = CURRENT_TIMESTAMP`,
+				[normalizedName, slashIncrement, buttonIncrement],
+			);
+			return true;
+		}
+		catch (error) {
+			console.error("command usage update error:", error);
+			return false;
+		}
+	}
+
+	async getCommandUsageStats(limit = 25) {
+		if (!this.useDatabase) {
+			return [];
+		}
+		const safeLimit = Number.isFinite(limit)
+			? Math.min(Math.max(Math.floor(limit), 1), 100)
+			: 25;
+		try {
+			const result = await this.pool.query(
+				`SELECT command_name, slash_count, button_count, updated_at
+				 FROM command_usage
+				 ORDER BY slash_count DESC, button_count DESC, command_name ASC
+				 LIMIT $1`,
+				[safeLimit],
+			);
+			return result.rows;
+		}
+		catch (error) {
+			console.error("command usage stats query error:", error);
+			return [];
+		}
+	}
+
+	async upsertCommandUsageTotals(commandName, slashCount = 0, buttonCount = 0) {
+		if (!this.useDatabase) {
+			return false;
+		}
+		const normalizedName = normalizeCommandName(commandName);
+		if (!normalizedName) {
+			return false;
+		}
+		const safeSlash = Math.max(0, Number.isFinite(slashCount) ? Math.floor(slashCount) : 0);
+		const safeButton = Math.max(0, Number.isFinite(buttonCount) ? Math.floor(buttonCount) : 0);
+		try {
+			await this.pool.query(
+				`INSERT INTO command_usage (command_name, slash_count, button_count)
+				 VALUES ($1, $2, $3)
+				 ON CONFLICT (command_name)
+				 DO UPDATE SET slash_count = $2, button_count = $3, updated_at = CURRENT_TIMESTAMP`,
+				[normalizedName, safeSlash, safeButton],
+			);
+			return true;
+		}
+		catch (error) {
+			console.error("command usage totals upsert failed:", error);
+			return false;
 		}
 	}
 
