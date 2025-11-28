@@ -16,7 +16,8 @@ function buildUsageLines(usageEntries) {
 
 	return usageEntries.map(([commandName, counts], index) => {
 		const label = commandName.replace(/-/g, " ");
-		return `**${index + 1}. ${label}**\n・slash: ${formatCount(counts.slash)} | buttons: ${formatCount(counts.button)}`;
+		const rank = index + 1;
+		return `**${rank}. ${label}**\nslash: ${formatCount(counts.slash)} | buttons: ${formatCount(counts.button)}`;
 	}).join("\n\n");
 }
 
