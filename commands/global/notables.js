@@ -100,7 +100,8 @@ const goodBSMessages = [
 	"cheating?",
 	"luck was on your side that day. (or skill...)",
 	"isn't this game so good when you win?",
-	"unstoppable",
+	"unstoppable.",
+	"#gonein1.",
 ];
 
 const badBSMessages = [
@@ -130,7 +131,7 @@ const badWSMessages = [
 	"thanks for donating your mmr to those other players.",
 	"can't blame any teammates for that one.",
 	"you suck.",
-	"i don't even have a joke. this is just sad.",
+	"i don't even have a joke. that was just sad.",
 ];
 
 const oPMessages = [
@@ -157,7 +158,7 @@ const uPMessages = [
 	"not your mogi.",
 	"what a sell.",
 	"ur gameplay was wurse than my speling.",
-	"you were the best in the room, but only in theory.",
+	"you were among the best in the room, but only in theory.",
 	"bro is throwing.",
 ];
 
