@@ -17,7 +17,7 @@ function buildUsageLines(usageEntries) {
 	return usageEntries.map(([commandName, counts], index) => {
 		const label = commandName.replace(/-/g, " ");
 		const rank = index + 1;
-		return `**${rank}. ${label}**\nslash: ${formatCount(counts.slash)} | buttons: ${formatCount(counts.button)}`;
+		return `**${rank}. ${label}**\nslash:${formatCount(counts.slash)} | buttons:${formatCount(counts.button)}`;
 	}).join("\n\n");
 }
 
@@ -78,7 +78,7 @@ module.exports = {
 			.setTitle("Global Command Usage")
 			.setColor(0x5865f2)
 			.setDescription(buildUsageLines(orderedEntries))
-			.addFields({ name: "Totals", value: `slash: ${formatCount(totals.slash)} | buttons: ${formatCount(totals.button)}` })
+			.addFields({ name: "Totals", value: `slash:${formatCount(totals.slash)} | buttons:${formatCount(totals.button)}` })
 			.setFooter({ text: "Ranked by slash command usage" })
 			.setTimestamp();
 
