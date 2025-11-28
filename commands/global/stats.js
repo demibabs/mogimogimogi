@@ -12,6 +12,11 @@ const AutoUserManager = require("../../utils/autoUserManager");
 const GameData = require("../../utils/gameData");
 const ColorPalettes = require("../../utils/colorPalettes");
 const resolveTargetPlayer = require("../../utils/playerResolver");
+const {
+	setCacheEntry,
+	refreshCacheEntry,
+	deleteCacheEntry,
+} = require("../../utils/cacheManager");
 
 const EDGE_RADIUS = 30;
 
@@ -45,16 +50,20 @@ const LAYOUT = {
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const DIVISION_CHART_CACHE_TTL_MS = ONE_WEEK_MS;
+const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
 const CHART_DIMENSIONS = { width: 835, height: 880 };
 const ICON_SIZE = 54;
 const ICON_GAP = 12;
 const MAX_BAR_HEIGHT_RATIO = 0.90;
 
 const divisionChartCache = new Map();
+const divisionChartExpiryTimers = new Map();
 let chartRenderer = null;
 const imageCache = new Map();
+const imageCacheExpiryTimers = new Map();
 const STATS_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
 const statsSessionCache = new Map();
+const statsSessionExpiryTimers = new Map();
 const statsRenderTokens = new Map();
 
 function beginStatsRender(messageId) {
@@ -201,11 +210,12 @@ function getStatsSession(messageId) {
 		return null;
 	}
 	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		statsSessionCache.delete(messageId);
+		deleteCacheEntry(statsSessionCache, statsSessionExpiryTimers, messageId);
 		return null;
 	}
-	refreshStatsSession(messageId);
-	return statsSessionCache.get(messageId);
+	refreshCacheEntry(statsSessionCache, statsSessionExpiryTimers, messageId, STATS_SESSION_CACHE_TTL_MS);
+	session.expiresAt = Date.now() + STATS_SESSION_CACHE_TTL_MS;
+	return session;
 }
 
 function storeStatsSession(messageId, session) {
@@ -213,18 +223,23 @@ function storeStatsSession(messageId, session) {
 		return;
 	}
 	const expiresAt = Date.now() + STATS_SESSION_CACHE_TTL_MS;
-	statsSessionCache.set(messageId, {
+	const payload = {
 		...session,
 		messageId,
 		expiresAt,
-	});
+	};
+	setCacheEntry(statsSessionCache, statsSessionExpiryTimers, messageId, payload, STATS_SESSION_CACHE_TTL_MS);
 }
 
 function refreshStatsSession(messageId) {
+	if (!messageId) {
+		return;
+	}
 	const session = statsSessionCache.get(messageId);
 	if (!session) {
 		return;
 	}
+	refreshCacheEntry(statsSessionCache, statsSessionExpiryTimers, messageId, STATS_SESSION_CACHE_TTL_MS);
 	session.expiresAt = Date.now() + STATS_SESSION_CACHE_TTL_MS;
 }
 
@@ -253,12 +268,11 @@ async function loadCachedImage(resource) {
 	}
 	try {
 		const image = await loadImage(resource);
-		imageCache.set(resource, image);
-		return image;
+		return setCacheEntry(imageCache, imageCacheExpiryTimers, resource, image, IMAGE_CACHE_TTL_MS);
 	}
 	catch (error) {
 		console.warn(`failed to load image ${resource}:`, error);
-		imageCache.set(resource, null);
+		setCacheEntry(imageCache, imageCacheExpiryTimers, resource, null, IMAGE_CACHE_TTL_MS);
 		return null;
 	}
 }
@@ -458,7 +472,7 @@ async function getDivisionChart(trackName, trackColors, globals) {
 		signature,
 		expiresAt: now + DIVISION_CHART_CACHE_TTL_MS,
 	};
-	divisionChartCache.set(cacheKey, entry);
+	setCacheEntry(divisionChartCache, divisionChartExpiryTimers, cacheKey, entry, DIVISION_CHART_CACHE_TTL_MS);
 	return entry;
 }
 

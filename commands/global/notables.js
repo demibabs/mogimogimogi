@@ -9,6 +9,11 @@ const AutoUserManager = require("../../utils/autoUserManager");
 const GameData = require("../../utils/gameData");
 const ColorPalettes = require("../../utils/colorPalettes");
 const resolveTargetPlayer = require("../../utils/playerResolver");
+const {
+	setCacheEntry,
+	refreshCacheEntry,
+	deleteCacheEntry,
+} = require("../../utils/cacheManager");
 
 const {
 	getPlayerAvatarUrl,
@@ -26,9 +31,12 @@ const EDGE_RADIUS = 30;
 const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 const NOTABLES_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
+const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
 
 const notablesSessionCache = new Map();
+const notablesSessionExpiryTimers = new Map();
 const imageCache = new Map();
+const imageCacheExpiryTimers = new Map();
 const notablesRenderTokens = new Map();
 
 function beginNotablesRender(messageId) {
@@ -209,12 +217,11 @@ async function loadCachedImage(resource) {
 	}
 	try {
 		const image = await loadImage(resource);
-		imageCache.set(resource, image);
-		return image;
+		return setCacheEntry(imageCache, imageCacheExpiryTimers, resource, image, IMAGE_CACHE_TTL_MS);
 	}
 	catch (error) {
 		console.warn(`failed to load image ${resource}:`, error);
-		imageCache.set(resource, null);
+		setCacheEntry(imageCache, imageCacheExpiryTimers, resource, null, IMAGE_CACHE_TTL_MS);
 		return null;
 	}
 }
@@ -354,11 +361,12 @@ function getNotablesSession(messageId) {
 		return null;
 	}
 	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		notablesSessionCache.delete(messageId);
+		deleteCacheEntry(notablesSessionCache, notablesSessionExpiryTimers, messageId);
 		return null;
 	}
-	refreshNotablesSession(messageId);
-	return notablesSessionCache.get(messageId);
+	refreshCacheEntry(notablesSessionCache, notablesSessionExpiryTimers, messageId, NOTABLES_SESSION_CACHE_TTL_MS);
+	session.expiresAt = Date.now() + NOTABLES_SESSION_CACHE_TTL_MS;
+	return session;
 }
 
 function storeNotablesSession(messageId, session) {
@@ -366,18 +374,23 @@ function storeNotablesSession(messageId, session) {
 		return;
 	}
 	const expiresAt = Date.now() + NOTABLES_SESSION_CACHE_TTL_MS;
-	notablesSessionCache.set(messageId, {
+	const payload = {
 		...session,
 		messageId,
 		expiresAt,
-	});
+	};
+	setCacheEntry(notablesSessionCache, notablesSessionExpiryTimers, messageId, payload, NOTABLES_SESSION_CACHE_TTL_MS);
 }
 
 function refreshNotablesSession(messageId) {
+	if (!messageId) {
+		return;
+	}
 	const session = notablesSessionCache.get(messageId);
 	if (!session) {
 		return;
 	}
+	refreshCacheEntry(notablesSessionCache, notablesSessionExpiryTimers, messageId, NOTABLES_SESSION_CACHE_TTL_MS);
 	session.expiresAt = Date.now() + NOTABLES_SESSION_CACHE_TTL_MS;
 }
 

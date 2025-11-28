@@ -17,6 +17,11 @@ const Fonts = require("../../utils/fonts");
 const EmbedEnhancer = require("../../utils/embedEnhancer");
 const resolveTargetPlayer = require("../../utils/playerResolver");
 const AutoUserManager = require("../../utils/autoUserManager");
+const {
+	setCacheEntry,
+	refreshCacheEntry,
+	deleteCacheEntry,
+} = require("../../utils/cacheManager");
 
 // -------------------- constants --------------------
 const EDGE_RADIUS = 30;
@@ -56,6 +61,7 @@ const MMR_OFFSET_Y = 70;
 const STATS_LABEL_OFFSET = 80;
 
 const SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
+const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
 const BACKGROUND_RESOURCE = "images/other backgrounds/headtoheadbg.png";
 
 const DEFAULT_FILTERS = {
@@ -73,8 +79,10 @@ const EVENT_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
 
 // -------------------- caches / state --------------------
 const headToHeadSessionCache = new Map(); // messageId -> { ...session, expiresAt }
+const headToHeadSessionExpiryTimers = new Map();
 const headToHeadRenderTokens = new Map(); // messageId -> Symbol
 const imageCache = new Map(); // path/url -> Image|null
+const imageCacheExpiryTimers = new Map();
 
 // -------------------- session helpers --------------------
 function getHeadToHeadSession(messageId) {
@@ -82,19 +90,21 @@ function getHeadToHeadSession(messageId) {
 	const session = headToHeadSessionCache.get(messageId);
 	if (!session) return null;
 	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		headToHeadSessionCache.delete(messageId);
+		deleteCacheEntry(headToHeadSessionCache, headToHeadSessionExpiryTimers, messageId);
 		return null;
 	}
+	refreshCacheEntry(headToHeadSessionCache, headToHeadSessionExpiryTimers, messageId, SESSION_CACHE_TTL_MS);
 	session.expiresAt = Date.now() + SESSION_CACHE_TTL_MS;
 	return session;
 }
 function storeHeadToHeadSession(messageId, session) {
 	if (!messageId || !session) return;
-	headToHeadSessionCache.set(messageId, {
+	const payload = {
 		...session,
 		messageId,
 		expiresAt: Date.now() + SESSION_CACHE_TTL_MS,
-	});
+	};
+	setCacheEntry(headToHeadSessionCache, headToHeadSessionExpiryTimers, messageId, payload, SESSION_CACHE_TTL_MS);
 }
 function beginHeadToHeadRender(messageId) {
 	if (!messageId) return null;
@@ -119,12 +129,11 @@ async function loadCachedImage(resource) {
 	if (imageCache.has(resource)) return imageCache.get(resource);
 	try {
 		const img = await loadImage(resource);
-		imageCache.set(resource, img);
-		return img;
+		return setCacheEntry(imageCache, imageCacheExpiryTimers, resource, img, IMAGE_CACHE_TTL_MS);
 	}
 	catch (err) {
 		console.warn(`head-to-head: failed to load image ${resource}:`, err);
-		imageCache.set(resource, null);
+		setCacheEntry(imageCache, imageCacheExpiryTimers, resource, null, IMAGE_CACHE_TTL_MS);
 		return null;
 	}
 }

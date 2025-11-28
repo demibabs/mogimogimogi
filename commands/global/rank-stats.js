@@ -15,6 +15,11 @@ const AutoUserManager = require("../../utils/autoUserManager");
 const ColorPalettes = require("../../utils/colorPalettes");
 const GameData = require("../../utils/gameData");
 const resolveTargetPlayer = require("../../utils/playerResolver");
+const {
+	setCacheEntry,
+	refreshCacheEntry,
+	deleteCacheEntry,
+} = require("../../utils/cacheManager");
 
 const {
 	getPlayerAvatarUrl,
@@ -57,11 +62,15 @@ const LAYOUT = {
 };
 
 const DEFAULT_TRACK_NAME = ColorPalettes.currentTrackName || "RR";
+const BACKGROUND_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const BACKGROUND_CACHE = new Map();
+const backgroundCacheExpiryTimers = new Map();
 const RANK_THRESHOLDS = PlayerStats.getRankThresholds();
 const RANK_ORDER_INDEX = new Map(RANK_THRESHOLDS.map((tier, index) => [tier.key, index]));
 const UNKNOWN_RANK_KEY = "unknown";
+const ICON_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const ICON_CACHE = new Map();
+const iconCacheExpiryTimers = new Map();
 const DEFAULT_RANK_STATS_COLORS = {
 	baseColor: "#2f3f5eea",
 	chartColor1: "#3d5179ea",
@@ -155,12 +164,11 @@ async function loadCachedImage(resource) {
 	}
 	try {
 		const image = await loadImage(resource);
-		BACKGROUND_CACHE.set(resource, image);
-		return image;
+		return setCacheEntry(BACKGROUND_CACHE, backgroundCacheExpiryTimers, resource, image, BACKGROUND_CACHE_TTL_MS);
 	}
 	catch (error) {
 		console.warn(`rank-stats: failed to load image ${resource}:`, error);
-		BACKGROUND_CACHE.set(resource, null);
+		setCacheEntry(BACKGROUND_CACHE, backgroundCacheExpiryTimers, resource, null, BACKGROUND_CACHE_TTL_MS);
 		return null;
 	}
 }
@@ -196,6 +204,7 @@ function normalizeRankStatsFilters(filters = {}) {
 }
 
 const rankStatsSessionCache = new Map();
+const rankStatsSessionExpiryTimers = new Map();
 const rankStatsRenderTokens = new Map();
 
 function getRankStatsSession(messageId) {
@@ -207,9 +216,10 @@ function getRankStatsSession(messageId) {
 		return null;
 	}
 	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		rankStatsSessionCache.delete(messageId);
+		deleteCacheEntry(rankStatsSessionCache, rankStatsSessionExpiryTimers, messageId);
 		return null;
 	}
+	refreshCacheEntry(rankStatsSessionCache, rankStatsSessionExpiryTimers, messageId, SESSION_CACHE_TTL_MS);
 	session.expiresAt = Date.now() + SESSION_CACHE_TTL_MS;
 	return session;
 }
@@ -218,11 +228,12 @@ function storeRankStatsSession(messageId, session) {
 	if (!messageId || !session) {
 		return;
 	}
-	rankStatsSessionCache.set(messageId, {
+	const payload = {
 		...session,
 		messageId,
 		expiresAt: Date.now() + SESSION_CACHE_TTL_MS,
-	});
+	};
+	setCacheEntry(rankStatsSessionCache, rankStatsSessionExpiryTimers, messageId, payload, SESSION_CACHE_TTL_MS);
 }
 
 function beginRankStatsRender(messageId) {
@@ -590,12 +601,11 @@ async function loadRankIcon(filename) {
 	}
 	try {
 		const image = await loadImage(resource);
-		ICON_CACHE.set(resource, image);
-		return image;
+		return setCacheEntry(ICON_CACHE, iconCacheExpiryTimers, resource, image, ICON_CACHE_TTL_MS);
 	}
 	catch (error) {
 		console.warn(`failed to load rank icon ${resource}:`, error);
-		ICON_CACHE.set(resource, null);
+		setCacheEntry(ICON_CACHE, iconCacheExpiryTimers, resource, null, ICON_CACHE_TTL_MS);
 		return null;
 	}
 }

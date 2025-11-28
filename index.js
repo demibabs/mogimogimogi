@@ -1,7 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST, ActivityType } = require("discord.js");
-const { startMemoryMonitor } = require("./utils/memoryMonitor");
 
 // Load environment variables
 require("dotenv").config();
@@ -23,15 +22,6 @@ const args = process.argv.slice(2);
 // Check if using development bot
 const useDev = args.includes("--dev");
 const token = useDev ? process.env.DEV_DISCORD_TOKEN : process.env.DISCORD_TOKEN;
-const memoryMonitorEnabled = process.env.MEMORY_MONITOR_ENABLED !== "false";
-if (memoryMonitorEnabled) {
-	const monitor = startMemoryMonitor();
-	if (monitor) {
-		process.on("SIGINT", () => monitor.stop());
-		process.on("SIGTERM", () => monitor.stop());
-		console.log("Memory monitor started (set MEMORY_MONITOR_ENABLED=false to disable).");
-	}
-}
 
 console.log(`Starting ${useDev ? "DEVELOPMENT" : "PRODUCTION"} bot...`);
 

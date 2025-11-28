@@ -8,6 +8,11 @@ const AutoUserManager = require("../../utils/autoUserManager");
 const ColorPalettes = require("../../utils/colorPalettes");
 const Fonts = require("../../utils/fonts");
 const resolveTargetPlayer = require("../../utils/playerResolver");
+const {
+	setCacheEntry,
+	refreshCacheEntry,
+	deleteCacheEntry,
+} = require("../../utils/cacheManager");
 
 const {
 	drawRoundedPanel,
@@ -26,9 +31,12 @@ const LEADERBOARD_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
 const MAX_ENTRIES = 10;
 const ENTRIES_PER_COLUMN = 5;
 const BACKGROUND_RESOURCE = "images/other backgrounds/leaderboardbg.png";
+const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
 
 const leaderboardSessionCache = new Map();
+const leaderboardSessionExpiryTimers = new Map();
 const imageCache = new Map();
+const imageCacheExpiryTimers = new Map();
 const leaderboardRenderTokens = new Map();
 
 function beginLeaderboardRender(messageId) {
@@ -215,12 +223,11 @@ async function loadCachedImage(resource) {
 	}
 	try {
 		const image = await loadImage(resource);
-		imageCache.set(resource, image);
-		return image;
+		return setCacheEntry(imageCache, imageCacheExpiryTimers, resource, image, IMAGE_CACHE_TTL_MS);
 	}
 	catch (error) {
 		console.warn(`leaderboard: failed to load image ${resource}:`, error);
-		imageCache.set(resource, null);
+		setCacheEntry(imageCache, imageCacheExpiryTimers, resource, null, IMAGE_CACHE_TTL_MS);
 		return null;
 	}
 }
@@ -313,11 +320,12 @@ function storeLeaderboardSession(messageId, session) {
 	if (!messageId || !session) {
 		return;
 	}
-	leaderboardSessionCache.set(messageId, {
+	const payload = {
 		...session,
 		messageId,
 		expiresAt: Date.now() + LEADERBOARD_SESSION_CACHE_TTL_MS,
-	});
+	};
+	setCacheEntry(leaderboardSessionCache, leaderboardSessionExpiryTimers, messageId, payload, LEADERBOARD_SESSION_CACHE_TTL_MS);
 }
 
 function getLeaderboardSession(messageId) {
@@ -329,9 +337,10 @@ function getLeaderboardSession(messageId) {
 		return null;
 	}
 	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		leaderboardSessionCache.delete(messageId);
+		deleteCacheEntry(leaderboardSessionCache, leaderboardSessionExpiryTimers, messageId);
 		return null;
 	}
+	refreshCacheEntry(leaderboardSessionCache, leaderboardSessionExpiryTimers, messageId, LEADERBOARD_SESSION_CACHE_TTL_MS);
 	session.expiresAt = Date.now() + LEADERBOARD_SESSION_CACHE_TTL_MS;
 	return session;
 }
