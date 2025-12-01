@@ -16,7 +16,9 @@ module.exports = {
 
 			const serverId = interaction.guild.id;
 			const members = await interaction.guild.members.fetch();
-			const serverData = await database.getServerData(serverId);
+			let serverData = await database.getServerData(serverId);
+			const setupState = await database.getServerSetupState(serverId);
+			const needsCleanup = Boolean(setupState?.completed);
 
 			const loungers = [];
 			const totalMembers = members.size;
@@ -34,6 +36,32 @@ module.exports = {
 				}
 			};
 
+			let removedCount = 0;
+			if (needsCleanup) {
+				const storedUsers = Object.entries(serverData?.users || {});
+				if (storedUsers.length) {
+					await interaction.editReply(`verifying ${storedUsers.length} stored members before setup...`);
+					let inspected = 0;
+					for (const [loungeId, record] of storedUsers) {
+						inspected++;
+						const discordIds = Array.isArray(record?.discordIds)
+							? record.discordIds.map(String)
+							: [];
+						const stillMember = discordIds.some(discordId => members.has(discordId));
+						if (!stillMember) {
+							const removed = await DataManager.removeServerUser(serverId, { loungeId });
+							if (removed) {
+								removedCount++;
+							}
+						}
+						if (inspected % 25 === 0 || inspected === storedUsers.length) {
+							await interaction.editReply(`verifying stored members... (${inspected}/${storedUsers.length}) | removed ${removedCount}`);
+						}
+					}
+				}
+				serverData = await database.getServerData(serverId);
+			}
+
 			await interaction.editReply(`processing ${totalMembers} server members...`);
 
 			// Find users with Lounge accounts who aren't already in server data
@@ -43,7 +71,7 @@ module.exports = {
 				try {
 					const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
 					if (!loungeUser) continue;
-					if (serverData?.users?.[userId]) continue;
+					if (serverData?.discordIndex?.[userId]) continue;
 					loungers.push(userId);
 				}
 				catch (error) {
@@ -57,7 +85,7 @@ module.exports = {
 			}
 
 			if (loungers.length === 0) {
-				await recordSetupCompletion({ detectedLoungers: 0, addedUsers: 0 });
+				await recordSetupCompletion({ detectedLoungers: 0, addedUsers: 0, removedUsers: removedCount });
 				return await interaction.editReply("setup complete! no users to add. :)");
 			}
 
@@ -77,10 +105,15 @@ module.exports = {
 				}
 			}
 
-			await recordSetupCompletion({ detectedLoungers: loungers.length, addedUsers: addedCount });
+			await recordSetupCompletion({
+				detectedLoungers: loungers.length,
+				addedUsers: addedCount,
+				removedUsers: removedCount,
+			});
 
+			const removedSuffix = removedCount ? ` removed ${removedCount} stale entr${removedCount === 1 ? "y" : "ies"}.` : "";
 			await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
-				loungers.length === 1 ? "" : "s"}. use /about-me to see all commands`);
+				loungers.length === 1 ? "" : "s"}.${removedSuffix} use /about-me to see all commands`);
 		}
 		catch (error) {
 			console.error("setup error:", error);
