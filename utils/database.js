@@ -5,6 +5,25 @@ const { normalizeCommandName } = require("./globalCommands");
 
 const numericIdPattern = /^\d+$/;
 
+const USER_TABLES_TABLE_DEFINITION = `
+	id SERIAL PRIMARY KEY,
+	user_id VARCHAR(20) NOT NULL,
+	table_id VARCHAR(20) NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE(user_id, table_id),
+	FOREIGN KEY (table_id) REFERENCES tables(table_id) ON DELETE CASCADE
+`;
+
+function buildUserTablesCreateStatement(includeIfNotExists = true) {
+	const clause = includeIfNotExists ? "IF NOT EXISTS " : "";
+	return `
+		CREATE TABLE ${clause}user_tables (
+			${USER_TABLES_TABLE_DEFINITION}
+		)
+	`;
+}
+
 function normalizeLoungeId(loungeId) {
 	if (loungeId === null || loungeId === undefined) {
 		throw new Error("loungeId is required");
@@ -35,6 +54,7 @@ function toTableIdString(tableId) {
 	const value = String(tableId).trim();
 	return value.length ? value : null;
 }
+
 function mergeTableIds(existingEntries, incomingIds) {
 	const currentList = Array.isArray(existingEntries) ? existingEntries.slice() : [];
 	const seen = new Set(currentList.map(value => toTableIdString(value)));
@@ -77,6 +97,7 @@ class Database {
 		this.legacyServersDir = path.join(__dirname, "..", "data", "servers");
 		this.serverStatePath = path.join(__dirname, "..", "data", "server_state.json");
 		this._legacyMigrationPromise = null;
+		this._userTablesFileMigrationPromise = null;
 
 		if (this.useDatabase) {
 			this.pool = new Pool({
@@ -108,17 +129,8 @@ class Database {
 				)
 			`);
 
-			await this.pool.query(`
-				CREATE TABLE IF NOT EXISTS user_tables (
-					id SERIAL PRIMARY KEY,
-					user_id VARCHAR(20) NOT NULL,
-					table_id VARCHAR(20) NOT NULL,
-					server_id VARCHAR(20) NOT NULL,
-					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-					UNIQUE(user_id, table_id, server_id),
-					FOREIGN KEY (table_id) REFERENCES tables(table_id) ON DELETE CASCADE
-				)
-			`);
+			await this.pool.query(buildUserTablesCreateStatement(true));
+			await this._ensureUserTablesSchema();
 
 			await this.pool.query(`
 				CREATE TABLE IF NOT EXISTS server_state (
@@ -419,13 +431,9 @@ class Database {
 			const existing = await this.getUserData(orphanId);
 			if (!existing) continue;
 			const remainingServers = (existing.servers || []).filter(id => id !== serverId);
-			if (remainingServers.length === 0) {
-				await this.deleteUserData(orphanId);
-			}
-			else {
-				existing.servers = remainingServers;
-				await this.saveUserData(orphanId, existing);
-			}
+			existing.servers = remainingServers;
+			existing.updatedAt = new Date().toISOString();
+			await this.saveUserData(orphanId, existing);
 		}
 
 		return true;
@@ -435,12 +443,7 @@ class Database {
 		const users = await this.getUsersByServer(serverId);
 		for (const user of users) {
 			const remainingServers = (user.servers || []).filter(id => id !== serverId);
-			if (remainingServers.length === 0) {
-				await this.deleteUserData(user.loungeId);
-			}
-			else {
-				await this.saveUserData(user.loungeId, { ...user, servers: remainingServers });
-			}
+			await this.saveUserData(user.loungeId, { ...user, servers: remainingServers });
 		}
 		return true;
 	}
@@ -468,8 +471,13 @@ class Database {
 	// --- Table management ---------------------------------------------------------
 
 	async saveTable(tableId, tableData) {
+		const normalizedTableId = toTableIdString(tableId);
+		if (!normalizedTableId) {
+			return false;
+		}
+
 		if (!this.useDatabase) {
-			return await this._saveTableToFile(tableId, tableData);
+			return await this._saveTableToFile(normalizedTableId, tableData);
 		}
 
 		try {
@@ -478,7 +486,7 @@ class Database {
 				 VALUES ($1, $2, CURRENT_TIMESTAMP)
 				 ON CONFLICT (table_id)
 				 DO UPDATE SET table_data = $2, updated_at = CURRENT_TIMESTAMP`,
-				[tableId, JSON.stringify(tableData)],
+				[normalizedTableId, JSON.stringify(tableData)],
 			);
 			return true;
 		}
@@ -507,18 +515,22 @@ class Database {
 		}
 	}
 
-	async linkUserToTable(loungeId, tableId, serverId) {
+	async linkUserToTable(loungeId, tableId, serverId = null) {
 		const normalizedId = normalizeLoungeId(loungeId);
+		const normalizedTableId = toTableIdString(tableId);
+		if (!normalizedTableId) {
+			return false;
+		}
 		if (!this.useDatabase) {
-			return await this._linkUserToTableInFile(normalizedId, tableId, serverId);
+			return await this._linkUserToTableInFile(normalizedId, normalizedTableId, serverId || "global");
 		}
 
 		try {
 			await this.pool.query(
-				`INSERT INTO user_tables (user_id, table_id, server_id)
-				 VALUES ($1, $2, $3)
-				 ON CONFLICT (user_id, table_id, server_id) DO NOTHING`,
-				[normalizedId, tableId, serverId],
+				`INSERT INTO user_tables (user_id, table_id)
+				 VALUES ($1, $2)
+				 ON CONFLICT (user_id, table_id) DO NOTHING`,
+				[normalizedId, normalizedTableId],
 			);
 			return true;
 		}
@@ -536,17 +548,13 @@ class Database {
 
 		try {
 			const result = await this.pool.query(
-				`SELECT t.table_id, ARRAY_AGG(DISTINCT ut.server_id) AS servers
+				`SELECT ut.table_id
 				 FROM user_tables ut
-				 JOIN tables t ON t.table_id = ut.table_id
 				 WHERE ut.user_id = $1
-				 GROUP BY t.table_id`,
+				 ORDER BY ut.created_at DESC`,
 				[normalizedId],
 			);
-			return result.rows.map(row => ({
-				id: row.table_id,
-				servers: Array.isArray(row.servers) ? row.servers.filter(Boolean).map(String) : [],
-			}));
+			return result.rows.map(row => ({ id: row.table_id }));
 		}
 		catch (error) {
 			console.error("database user tables query error:", error);
@@ -643,6 +651,120 @@ class Database {
 			console.error("error creating users directory:", error);
 		}
 	}
+
+	async _ensureUserTablesSchema() {
+		if (!this.useDatabase) {
+			return;
+		}
+		try {
+			const legacyColumnResult = await this.pool.query(`
+				SELECT 1
+				FROM information_schema.columns
+				WHERE table_name = 'user_tables'
+					AND column_name = 'server_id'
+				LIMIT 1
+			`);
+			if (!legacyColumnResult.rowCount) {
+				return;
+			}
+
+			console.log("migrating user_tables to global schema...");
+			await this.pool.query("ALTER TABLE user_tables RENAME TO user_tables_legacy");
+			await this.pool.query(buildUserTablesCreateStatement(false));
+			await this.pool.query(`
+				INSERT INTO user_tables (user_id, table_id, created_at)
+				SELECT user_id, table_id, MIN(created_at)
+				FROM user_tables_legacy
+				GROUP BY user_id, table_id
+				ON CONFLICT (user_id, table_id) DO NOTHING
+			`);
+			await this.pool.query("DROP TABLE user_tables_legacy");
+		}
+		catch (error) {
+			console.error("failed to migrate user_tables schema:", error);
+		}
+	}
+
+	async _ensureUserTablesFileMigration() {
+		if (this.useDatabase) {
+			return;
+		}
+		if (!this._userTablesFileMigrationPromise) {
+			this._userTablesFileMigrationPromise = this._migrateUserTableFiles().catch(error => {
+				console.error("user_tables file migration failed:", error);
+			});
+		}
+		await this._userTablesFileMigrationPromise;
+	}
+
+	async _migrateUserTableFiles() {
+		const relationshipsDir = path.join(__dirname, "..", "data", "user_tables");
+		let files;
+		try {
+			files = await fs.readdir(relationshipsDir);
+		}
+		catch (error) {
+			if (error.code === "ENOENT") {
+				return;
+			}
+			throw error;
+		}
+
+		const globalPath = path.join(relationshipsDir, "global.json");
+		let globalData = {};
+		try {
+			const raw = await fs.readFile(globalPath, "utf8");
+			globalData = JSON.parse(raw) || {};
+		}
+		catch (error) {
+			if (error.code !== "ENOENT") {
+				console.error("error reading global user_tables file:", error);
+			}
+		}
+
+		let changed = false;
+		for (const file of files) {
+			if (!file.endsWith(".json") || file === "global.json") {
+				continue;
+			}
+			const filePath = path.join(relationshipsDir, file);
+			try {
+				const raw = await fs.readFile(filePath, "utf8");
+				const legacyData = JSON.parse(raw) || {};
+				for (const [userId, tableIds] of Object.entries(legacyData)) {
+					let normalizedId;
+					try {
+						normalizedId = normalizeLoungeId(userId);
+					}
+					catch (error) {
+						continue;
+					}
+					const { list, changed: updated } = mergeTableIds(globalData[normalizedId], tableIds);
+					if (updated) {
+						globalData[normalizedId] = list;
+						changed = true;
+					}
+				}
+			}
+			catch (error) {
+				console.error(`error migrating user_tables file ${file}:`, error);
+			}
+			try {
+				await fs.unlink(filePath);
+			}
+			catch (error) {
+				if (error.code !== "ENOENT") {
+					console.error(`error deleting legacy user_tables file ${file}:`, error);
+				}
+			}
+		}
+
+		if (changed) {
+			await fs.mkdir(relationshipsDir, { recursive: true });
+			await fs.writeFile(globalPath, JSON.stringify(globalData, null, 2));
+		}
+	}
+
 
 	async _ensureLegacyMigration() {
 		if (this.useDatabase) return;
@@ -917,6 +1039,7 @@ class Database {
 		}
 
 		try {
+			await this._ensureUserTablesFileMigration();
 			const relationshipsDir = path.join(__dirname, "..", "data", "user_tables");
 			await fs.mkdir(relationshipsDir, { recursive: true });
 			const globalPath = path.join(relationshipsDir, "global.json");
@@ -949,17 +1072,18 @@ class Database {
 
 	async _linkUserToTableInFile(loungeId, tableId, serverId) {
 		try {
+			await this._ensureUserTablesFileMigration();
 			const relationshipsDir = path.join(__dirname, "..", "data", "user_tables");
 			await fs.mkdir(relationshipsDir, { recursive: true });
-			const relationshipPath = path.join(relationshipsDir, `${serverId}.json`);
+			const globalPath = path.join(relationshipsDir, "global.json");
 			let relationships = {};
 			try {
-				const data = await fs.readFile(relationshipPath, "utf8");
+				const data = await fs.readFile(globalPath, "utf8");
 				relationships = JSON.parse(data) || {};
 			}
 			catch (readError) {
 				if (readError.code !== "ENOENT") {
-					console.error("error reading relationships file:", readError);
+					console.error("error reading global user_tables file:", readError);
 				}
 			}
 
@@ -973,11 +1097,7 @@ class Database {
 			relationships[normalizedId] = list;
 
 			if (changed) {
-				await fs.writeFile(relationshipPath, JSON.stringify(relationships, null, 2));
-			}
-
-			if (serverId !== "global") {
-				await this._ensureGlobalTableLink(relationshipsDir, normalizedId, normalizedTableId);
+				await fs.writeFile(globalPath, JSON.stringify(relationships, null, 2));
 			}
 			return true;
 		}
@@ -987,44 +1107,11 @@ class Database {
 		}
 	}
 
-	async _ensureGlobalTableLink(relationshipsDir, loungeId, tableId) {
-		try {
-			const normalizedTableId = toTableIdString(tableId);
-			if (!normalizedTableId) {
-				return false;
-			}
-			const globalPath = path.join(relationshipsDir, "global.json");
-			let globalData = {};
-			try {
-				const raw = await fs.readFile(globalPath, "utf8");
-				globalData = JSON.parse(raw) || {};
-			}
-			catch (readError) {
-				if (readError.code !== "ENOENT") {
-					console.error("error reading global user_tables file:", readError);
-				}
-			}
-
-			const existing = Array.isArray(globalData[loungeId]) ? globalData[loungeId] : [];
-			const { list, changed } = mergeTableIds(existing, [normalizedTableId]);
-			if (!changed) {
-				return false;
-			}
-
-			globalData[loungeId] = list;
-			await fs.writeFile(globalPath, JSON.stringify(globalData, null, 2));
-			return true;
-		}
-		catch (error) {
-			console.error(`error updating global cache for lounge user ${loungeId}:`, error);
-			return false;
-		}
-	}
-
 	async _getUserTablesFromFile(loungeId) {
 		const normalizedId = normalizeLoungeId(loungeId);
 		const relationshipsDir = path.join(__dirname, "..", "data", "user_tables");
 		const tableMap = new Map();
+		await this._ensureUserTablesFileMigration();
 
 		let files = [];
 		try {
@@ -1040,7 +1127,6 @@ class Database {
 
 		for (const file of files) {
 			if (!file.endsWith(".json")) continue;
-			const serverId = file.replace(/\.json$/, "");
 			try {
 				const raw = await fs.readFile(path.join(relationshipsDir, file), "utf8");
 				const relationships = JSON.parse(raw);
@@ -1048,10 +1134,7 @@ class Database {
 				if (!Array.isArray(entries) || !entries.length) continue;
 				for (const tableId of entries) {
 					const key = String(tableId);
-					if (!tableMap.has(key)) {
-						tableMap.set(key, { id: key, servers: new Set() });
-					}
-					tableMap.get(key).servers.add(serverId);
+					tableMap.set(key, true);
 				}
 			}
 			catch (error) {
@@ -1059,10 +1142,7 @@ class Database {
 			}
 		}
 
-		return Array.from(tableMap.values()).map(entry => ({
-			id: entry.id,
-			servers: Array.from(entry.servers).map(String),
-		}));
+		return Array.from(tableMap.keys()).map(id => ({ id }));
 	}
 }
 

@@ -43,6 +43,44 @@ class DataManager {
 		}
 	}
 
+	static async removeServerUser(serverId, identifiers = {}) {
+		if (!serverId) {
+			return false;
+		}
+		const normalizedServerId = String(serverId);
+		let resolvedLoungeId = identifiers?.loungeId ? String(identifiers.loungeId) : null;
+		try {
+			if (!resolvedLoungeId && identifiers?.discordId) {
+				const serverData = await database.getServerData(normalizedServerId);
+				resolvedLoungeId = serverData?.discordIndex?.[String(identifiers.discordId)] || null;
+			}
+
+			if (!resolvedLoungeId) {
+				return false;
+			}
+
+			const userRecord = await database.getUserData(resolvedLoungeId);
+			if (!userRecord) {
+				return false;
+			}
+
+			const remainingServers = Array.from(new Set((userRecord.servers || [])
+				.map(String)
+				.filter(id => id !== normalizedServerId)));
+			await database.saveUserData(resolvedLoungeId, {
+				...userRecord,
+				servers: remainingServers,
+				updatedAt: new Date().toISOString(),
+			});
+
+			return true;
+		}
+		catch (error) {
+			console.error(`Error removing user ${identifiers?.discordId || identifiers?.loungeId || "unknown"} from server ${normalizedServerId}:`, error);
+			return false;
+		}
+	}
+
 	static async ensureUserRecord({ loungeId, loungeName = null, serverId = null, client = null, guild = null }) {
 		if (loungeId === undefined || loungeId === null) {
 			throw new Error("loungeId is required to ensure user record");
@@ -175,25 +213,32 @@ class DataManager {
 			}
 			const loungeId = loungeUser.id;
 
-			// Get tables using a safe method that handles both old and new formats
-			let userTables = {};
-			try {
-				userTables = await LoungeApi.getAllPlayerTables(loungeId, serverId);
-			}
-			catch (error) {
-				console.warn(`Failed to get player tables for lounge user ${loungeId}:`, error);
-				// Continue with empty tables rather than failing completely
-				userTables = {};
+			// Load existing cached tables first so we can avoid unnecessary API calls.
+			const cachedEntries = await database.getUserTables(loungeId);
+			const existingTableIds = new Set(cachedEntries.map(entry => String(entry.id)));
+			const cachedTables = {};
+			for (const entry of cachedEntries) {
+				try {
+					const tableData = await database.getTable(entry.id);
+					if (tableData) {
+						cachedTables[String(entry.id)] = tableData;
+					}
+				}
+				catch (error) {
+					console.warn(`failed to load cached table ${entry.id} for ${loungeId}:`, error);
+				}
 			}
 
-			// Get current user's table metadata for deduping
-			const existingTables = await database.getUserTables(loungeId);
-			const existingTableIds = new Set(existingTables.map(entry => String(entry.id)));
-			const serverLinked = new Set(
-				existingTables
-					.filter(entry => Array.isArray(entry.servers) && entry.servers.includes(serverId))
-					.map(entry => String(entry.id)),
-			);
+			let userTables = cachedTables;
+			if (!Object.keys(userTables).length) {
+				try {
+					userTables = await LoungeApi.getAllPlayerTables(loungeId, serverId);
+				}
+				catch (error) {
+					console.warn(`Failed to get player tables for lounge user ${loungeId}:`, error);
+					userTables = {};
+				}
+			}
 
 			// Save new tables to normalized storage
 			for (const [tableId, tableData] of Object.entries(userTables)) {
@@ -203,10 +248,7 @@ class DataManager {
 					existingTableIds.add(normalizedTableId);
 				}
 
-				if (!serverLinked.has(normalizedTableId)) {
-					await database.linkUserToTable(loungeId, normalizedTableId, serverId);
-					serverLinked.add(normalizedTableId);
-				}
+				await database.linkUserToTable(loungeId, normalizedTableId, serverId);
 			}
 
 			const existingUser = await database.getUserData(loungeId);
@@ -241,7 +283,15 @@ class DataManager {
 		if (!serverId) {
 			return entries;
 		}
-		return entries.filter(entry => Array.isArray(entry.servers) && entry.servers.includes(serverId));
+		try {
+			const userRecord = await database.getUserData(loungeId);
+			const servers = Array.isArray(userRecord?.servers) ? userRecord.servers.map(String) : [];
+			return servers.includes(serverId) ? entries : [];
+		}
+		catch (error) {
+			console.warn(`failed to load user record ${loungeId} while filtering tables:`, error);
+			return [];
+		}
 	}
 
 	/**

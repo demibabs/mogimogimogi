@@ -724,9 +724,6 @@ class PlayerStats {
 		const userTables = await database.getUserTables(normalizedUser1);
 
 		for (const userTable of userTables) {
-			if (serverId && !(Array.isArray(userTable.servers) && userTable.servers.includes(serverId))) {
-				continue;
-			}
 			const table = await database.getTable(userTable.id);
 			if (!table) continue;
 

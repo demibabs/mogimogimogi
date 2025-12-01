@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const database = require("./utils/database");
+const AutoUserManager = require("./utils/autoUserManager");
 const { resolveCommandFromButtonId, isGlobalCommand, normalizeCommandName } = require("./utils/globalCommands");
 const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST, ActivityType } = require("discord.js");
 
@@ -90,6 +91,24 @@ client.once(Events.ClientReady, readyClient => {
 		type: ActivityType.Watching,
 	});
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+});
+
+client.on(Events.GuildMemberAdd, async member => {
+	try {
+		await AutoUserManager.handleGuildMemberAdd(member);
+	}
+	catch (error) {
+		console.error("guildMemberAdd handler failed:", error);
+	}
+});
+
+client.on(Events.GuildMemberRemove, async member => {
+	try {
+		await AutoUserManager.handleGuildMemberRemove(member);
+	}
+	catch (error) {
+		console.error("guildMemberRemove handler failed:", error);
+	}
 });
 
 client.on(Events.InteractionCreate, async interaction => {

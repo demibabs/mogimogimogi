@@ -8,6 +8,38 @@ const LoungeApi = require("./loungeApi");
 const database = require("./database");
 
 class AutoUserManager {
+	static async ensureServerReady(serverId) {
+		try {
+			const [serverDataRaw, setupState] = await Promise.all([
+				database.getServerData(serverId),
+				database.getServerSetupState(serverId),
+			]);
+			const serverData = serverDataRaw || { users: {}, discordIndex: {} };
+			const hasStoredUsers = Object.keys(serverData.users || {}).length > 0;
+			const setupCompleted = Boolean(setupState?.completed);
+			if (!hasStoredUsers && !setupCompleted) {
+				return {
+					success: false,
+					needsSetup: true,
+					message: "this server hasn't been set up yet. please run `/setup` first.",
+				};
+			}
+			return {
+				success: true,
+				serverData,
+				setupState,
+			};
+		}
+		catch (error) {
+			console.error(`Error validating server readiness for ${serverId}:`, error);
+			return {
+				success: false,
+				message: "unable to check this server's setup status right now.",
+				needsSetup: false,
+			};
+		}
+	}
+
 	/**
 	 * Check if user exists in server data, and auto-add them if they have a lounge account
 	 * @param {string} userId - Discord user ID
@@ -17,21 +49,11 @@ class AutoUserManager {
 	 */
 	static async ensureUserExists(userId, serverId, client) {
 		try {
-	       // First check if server has any data or completed setup metadata
-	       const [serverDataRaw, setupState] = await Promise.all([
-		       database.getServerData(serverId),
-		       database.getServerSetupState(serverId),
-	       ]);
-	       const serverData = serverDataRaw || { users: {}, discordIndex: {} };
-	       const hasStoredUsers = Object.keys(serverData.users || {}).length > 0;
-	       const setupCompleted = Boolean(setupState?.completed);
-	       if (!hasStoredUsers && !setupCompleted) {
-		       return {
-		       	success: false,
-		       	needsSetup: true,
-		       	message: "this server hasn't been set up yet. please run `/setup` first.",
-		       };
+	       const readiness = await this.ensureServerReady(serverId);
+	       if (!readiness.success) {
+	       	return readiness;
 	       }
+	       const serverData = readiness.serverData || { users: {}, discordIndex: {} };
 
 	       // Check if user already exists in server data
 	       if (serverData.discordIndex && serverData.discordIndex[userId]) {
@@ -104,17 +126,49 @@ class AutoUserManager {
 	 * @returns {Promise<Object>} Object with success boolean and message if error
 	 */
 	static async validateUserForCommand(userId, serverId, client) {
-		const result = await this.ensureUserExists(userId, serverId, client);
-
-		if (result.success) {
+		const readiness = await this.ensureServerReady(serverId);
+		if (readiness.success) {
 			return { success: true };
 		}
-
 		return {
 			success: false,
-			message: result.message,
-			needsSetup: result.needsSetup || false,
+			message: readiness.message,
+			needsSetup: readiness.needsSetup || false,
 		};
+	}
+
+	static async handleGuildMemberAdd(member) {
+		const serverId = member?.guild?.id;
+		const userId = member?.user?.id || member?.id;
+		if (!serverId || !userId) {
+			return;
+		}
+		try {
+			const result = await this.ensureUserExists(userId, serverId, member.client);
+			if (!result.success && !result.needsSetup) {
+				console.log(`member ${userId} joined ${serverId} but was not added: ${result.message}`);
+			}
+		}
+		catch (error) {
+			console.error(`failed to auto-add member ${userId} in server ${serverId}:`, error);
+		}
+	}
+
+	static async handleGuildMemberRemove(member) {
+		const serverId = member?.guild?.id;
+		const userId = member?.user?.id || member?.id;
+		if (!serverId || !userId) {
+			return;
+		}
+		try {
+			const removed = await DataManager.removeServerUser(serverId, { discordId: userId });
+			if (!removed) {
+				console.log(`member ${userId} left ${serverId}, no stored server data to update`);
+			}
+		}
+		catch (error) {
+			console.error(`failed to remove member ${userId} from server ${serverId}:`, error);
+		}
 	}
 }
 
