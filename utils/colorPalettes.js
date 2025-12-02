@@ -119,7 +119,7 @@ const trackColors = {
 	},
 	WS: {
 		stats: {
-			baseColor: "#ded9fdaf",
+			baseColor: "#ded9fdce",
 			headerColor: "#16161a",
 			statsTextColor: "#373737ff",
 			chartTextColor: "#666666",
@@ -159,7 +159,7 @@ const trackColors = {
 	},
 	rDH: {
 		stats: {
-			baseColor: "#f6f8ddc4",
+			baseColor: "#f6f8ddd3",
 			headerColor: "#16161a",
 			statsTextColor: "#3a3a3aff",
 			chartTextColor: "#666666",

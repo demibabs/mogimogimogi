@@ -707,10 +707,7 @@ async function generateLeaderboard(interaction, {
 
 	const guildIconUrl = interaction.guild?.iconURL({ extension: "png", size: 256 }) || null;
 	const guildIconImage = guildIconUrl ? await loadImageResource(guildIconUrl, "guild icon") : null;
-	if (guildIconImage && !session.guildIcon) {
-		session.guildIcon = guildIconImage;
-	}
-	const iconForRender = session.guildIcon || guildIconImage;
+	const iconForRender = guildIconImage;
 
 	const attachment = await renderLeaderboardImage({
 		serverName: session.serverName || guildName,

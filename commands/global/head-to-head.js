@@ -1189,7 +1189,7 @@ module.exports = {
 				leftAverageScore,
 				leftAveragePlacement,
 				leftMmrDelta,
-				session?.playerLeftAvatar || null,
+				null,
 			);
 			const playerRightRender = await formatPlayerSide(
 				playerRight,
@@ -1197,7 +1197,7 @@ module.exports = {
 				rightAverageScore,
 				rightAveragePlacement,
 				rightMmrDelta,
-				session?.playerRightAvatar || null,
+				null,
 			);
 
 			const highlights = { left: null, right: null };
@@ -1220,12 +1220,8 @@ module.exports = {
 			highlights.left = buildHighlight(playerLeft, playerRight, leftBestWin);
 			highlights.right = buildHighlight(playerRight, playerLeft, rightBestWin);
 
-			const nextLeftAvatar = playerLeftRender.avatarImage
-				? { image: playerLeftRender.avatarImage, source: playerLeftRender.avatarSource }
-				: session?.playerLeftAvatar || null;
-			const nextRightAvatar = playerRightRender.avatarImage
-				? { image: playerRightRender.avatarImage, source: playerRightRender.avatarSource }
-				: session?.playerRightAvatar || null;
+			const nextLeftAvatar = null;
+			const nextRightAvatar = null;
 
 			await interaction.editReply("rendering image...");
 
@@ -1245,8 +1241,6 @@ module.exports = {
 				primaryPlayerId: basePlayerId,
 				sharedTables,
 				filters,
-				playerLeftAvatar: nextLeftAvatar,
-				playerRightAvatar: nextRightAvatar,
 				target: {
 					left: playerLeft,
 					right: playerRight,

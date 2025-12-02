@@ -893,8 +893,8 @@ module.exports = {
 			let playerDetails = useSession ? session.playerDetails : null;
 			let allTables = useSession ? session.allTables : null;
 			let favorites = useSession ? session.favorites || {} : null;
-			let favoriteCharacterImage = useSession ? session.favoriteCharacterImage || null : null;
-			let favoriteVehicleImage = useSession ? session.favoriteVehicleImage || null : null;
+			let favoriteCharacterImage = null;
+			let favoriteVehicleImage = null;
 			let trackName = useSession ? session.trackName : null;
 			let globals = useSession ? session.globals || null : null;
 			let discordUser = target.discordUser || (useSession ? session.discordUser : null);
@@ -1432,8 +1432,6 @@ module.exports = {
 				playerDetails,
 				allTables,
 				favorites,
-				favoriteCharacterImage,
-				favoriteVehicleImage,
 				trackName,
 				globals,
 				discordUser,
