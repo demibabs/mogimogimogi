@@ -46,9 +46,16 @@ module.exports = {
 			components: totalPages > 1 ? [buildNavRow(pageIndex, totalPages)] : [],
 		});
 
-		const replyMessage = await interaction.editReply(buildPayload());
+		await interaction.editReply(buildPayload());
+		let replyMessage = null;
+		try {
+			replyMessage = await interaction.fetchReply();
+		}
+		catch (error) {
+			console.warn("failed to fetch reply message for pagination:", error);
+		}
 
-		if (totalPages > 1) {
+		if (totalPages > 1 && replyMessage) {
 			const collector = replyMessage.createMessageComponentCollector({
 				componentType: ComponentType.Button,
 				time: COLLECTOR_IDLE_MS,
