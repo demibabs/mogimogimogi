@@ -4,18 +4,14 @@ const {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	ComponentType,
 } = require("discord.js");
 const DataManager = require("../../utils/dataManager");
 const LoungeApi = require("../../utils/loungeApi");
 const database = require("../../utils/database");
 
 const MAX_DESCRIPTION_LENGTH = 4096;
-const NAV_IDS = {
-	prev: "setupall_prev",
-	next: "setupall_next",
-};
-const COLLECTOR_IDLE_MS = 120_000;
+const SESSION_IDLE_MS = 120_000;
+const paginationSessions = new Map();
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -110,51 +106,69 @@ module.exports = {
 
 		const header = `Setup-all complete. Added ${totalAdded} users and removed ${totalRemoved} stale entr${totalRemoved === 1 ? "y" : "ies"} across ${guilds.size} guild(s).`;
 		const pages = buildSummaryPages(header, perGuildSummary);
-		let pageIndex = 0;
-		const totalPages = pages.length;
-		const buildPayload = () => ({
-			embeds: [buildSummaryEmbed(pages[pageIndex], pageIndex, totalPages)],
-			components: totalPages > 1 ? [buildNavRow(pageIndex, totalPages)] : [],
-		});
+		const sessionKey = interaction.id;
+		const initialPayload = buildSummaryPayload(pages, 0, sessionKey);
+		const replyMessage = await interaction.editReply(initialPayload);
 
-		await interaction.editReply(buildPayload());
-		let replyMessage = null;
-		try {
-			replyMessage = await interaction.fetchReply();
-		}
-		catch (error) {
-			console.warn("setup-all: failed to fetch reply message:", error);
-		}
-
-		if (totalPages > 1 && replyMessage && replyMessage.channel) {
-			const collector = replyMessage.channel.createMessageComponentCollector({
-				componentType: ComponentType.Button,
-				time: COLLECTOR_IDLE_MS,
-				filter: buttonInteraction =>
-					buttonInteraction.message.id === replyMessage.id &&
-					buttonInteraction.user.id === interaction.user.id &&
-					Object.values(NAV_IDS).includes(buttonInteraction.customId),
-			});
-
-			collector.on("collect", async buttonInteraction => {
-				if (buttonInteraction.customId === NAV_IDS.prev && pageIndex > 0) {
-					pageIndex -= 1;
-				}
-				else if (buttonInteraction.customId === NAV_IDS.next && pageIndex < totalPages - 1) {
-					pageIndex += 1;
-				}
-				await buttonInteraction.update(buildPayload());
-			});
-
-			collector.on("end", async () => {
-				try {
-					await replyMessage.edit({ components: [] });
-				}
-				catch (error) {
-					console.warn("setup-all: failed to clear buttons:", error);
-				}
+		if (pages.length > 1 && replyMessage) {
+			registerPaginationSession(sessionKey, {
+				command: "setup-all",
+				ownerId: interaction.user.id,
+				pages,
+				pageIndex: 0,
+				message: replyMessage,
 			});
 		}
+	},
+
+	async handleButtonInteraction(interaction) {
+		if (!interaction.customId.startsWith("setupall_")) {
+			return false;
+		}
+
+		const parts = interaction.customId.split(":");
+		if (parts.length !== 3) {
+			return false;
+		}
+
+		const direction = parts[1];
+		const sessionKey = parts[2];
+		const session = paginationSessions.get(sessionKey);
+		if (!session) {
+			await interaction.reply({
+				content: "This pagination session has expired.",
+				ephemeral: true,
+			});
+			return true;
+		}
+
+		if (interaction.user.id !== session.ownerId) {
+			await interaction.reply({
+				content: "Only the command invoker can use these buttons.",
+				ephemeral: true,
+			});
+			return true;
+		}
+
+		const totalPages = session.pages.length;
+		let updated = false;
+		if (direction === "prev" && session.pageIndex > 0) {
+			session.pageIndex -= 1;
+			updated = true;
+		}
+		else if (direction === "next" && session.pageIndex < totalPages - 1) {
+			session.pageIndex += 1;
+			updated = true;
+		}
+
+		if (!updated) {
+			await interaction.deferUpdate();
+			return true;
+		}
+
+		resetSessionTimer(sessionKey);
+		await interaction.update(buildSummaryPayload(session.pages, session.pageIndex, sessionKey));
+		return true;
 	},
 };
 
@@ -205,6 +219,14 @@ function chunkString(text, size) {
 	return chunks;
 }
 
+function buildSummaryPayload(pages, pageIndex, sessionKey) {
+	const totalPages = pages.length;
+	return {
+		embeds: [buildSummaryEmbed(pages[pageIndex], pageIndex, totalPages)],
+		components: totalPages > 1 ? [buildNavRow(pageIndex, totalPages, sessionKey)] : [],
+	};
+}
+
 function buildSummaryEmbed(description, pageIndex, totalPages) {
 	const embed = new EmbedBuilder()
 		.setTitle("Setup-all Summary")
@@ -217,17 +239,56 @@ function buildSummaryEmbed(description, pageIndex, totalPages) {
 	return embed.setFooter({ text: footerText });
 }
 
-function buildNavRow(pageIndex, totalPages) {
+function buildNavRow(pageIndex, totalPages, sessionKey) {
 	return new ActionRowBuilder().addComponents(
 		new ButtonBuilder()
-			.setCustomId(NAV_IDS.prev)
+			.setCustomId(`setupall_prev:${sessionKey}`)
 			.setStyle(ButtonStyle.Secondary)
 			.setLabel("< Prev")
 			.setDisabled(pageIndex === 0),
 		new ButtonBuilder()
-			.setCustomId(NAV_IDS.next)
+			.setCustomId(`setupall_next:${sessionKey}`)
 			.setStyle(ButtonStyle.Secondary)
 			.setLabel("Next >")
 			.setDisabled(pageIndex >= totalPages - 1),
 	);
+}
+
+function registerPaginationSession(sessionKey, sessionData) {
+	if (!sessionKey || !sessionData) return;
+	const existing = paginationSessions.get(sessionKey);
+	if (existing?.timeout) {
+		clearTimeout(existing.timeout);
+	}
+	sessionData.timeout = null;
+	paginationSessions.set(sessionKey, sessionData);
+	resetSessionTimer(sessionKey);
+}
+
+function resetSessionTimer(sessionKey) {
+	const session = paginationSessions.get(sessionKey);
+	if (!session) return;
+	if (session.timeout) {
+		clearTimeout(session.timeout);
+	}
+	session.timeout = setTimeout(() => {
+		cleanupPaginationSession(sessionKey).catch(error => {
+			console.warn("setup-all: failed to cleanup pagination session:", error);
+		});
+	}, SESSION_IDLE_MS);
+}
+
+async function cleanupPaginationSession(sessionKey) {
+	const session = paginationSessions.get(sessionKey);
+	if (!session) return;
+	if (session.timeout) {
+		clearTimeout(session.timeout);
+	}
+	paginationSessions.delete(sessionKey);
+	try {
+		await session.message.edit({ components: [] });
+	}
+	catch (error) {
+		console.warn("setup-all: failed to remove pagination components:", error);
+	}
 }

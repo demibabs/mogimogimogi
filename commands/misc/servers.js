@@ -4,16 +4,12 @@ const {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	ComponentType,
 } = require("discord.js");
 const database = require("../../utils/database");
 
 const MAX_DESCRIPTION_LENGTH = 4096;
-const NAV_IDS = {
-	prev: "servers_prev",
-	next: "servers_next",
-};
-const COLLECTOR_IDLE_MS = 120_000;
+const SESSION_IDLE_MS = 120_000;
+const paginationSessions = new Map();
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -39,63 +35,70 @@ module.exports = {
 		}));
 
 		const pages = paginateServerInfos(serverInfos);
-		let pageIndex = 0;
+		const sessionKey = interaction.id;
 		const totalPages = pages.length;
-		const buildPayload = () => ({
-			embeds: [buildServersEmbed(pages[pageIndex], pageIndex, totalPages)],
-			components: totalPages > 1 ? [buildNavRow(pageIndex, totalPages)] : [],
-		});
+		const initialPayload = buildServersPayload(pages, 0, sessionKey);
+		const replyMessage = await interaction.editReply(initialPayload);
 
-		await interaction.editReply(buildPayload());
-		let replyMessage = null;
-		try {
-			replyMessage = await interaction.fetchReply();
-		}
-		catch (error) {
-			console.warn("failed to fetch reply message for pagination:", error);
-		}
-
-		if (totalPages > 1 && replyMessage && replyMessage.channel) {
-			const collector = replyMessage.channel.createMessageComponentCollector({
-				componentType: ComponentType.Button,
-				time: COLLECTOR_IDLE_MS,
-				filter: buttonInteraction =>
-					buttonInteraction.message.id === replyMessage.id &&
-					Object.values(NAV_IDS).includes(buttonInteraction.customId),
-			});
-
-			collector.on("collect", async buttonInteraction => {
-				if (buttonInteraction.user.id !== interaction.user.id) {
-					await buttonInteraction.reply({
-						content: "Only the command invoker can use these buttons.",
-						ephemeral: true,
-					});
-					return;
-				}
-
-				if (buttonInteraction.customId === NAV_IDS.prev && pageIndex > 0) {
-					pageIndex -= 1;
-				}
-				else if (buttonInteraction.customId === NAV_IDS.next && pageIndex < totalPages - 1) {
-					pageIndex += 1;
-				}
-				else {
-					await buttonInteraction.deferUpdate();
-					return;
-				}
-
-				await buttonInteraction.update(buildPayload());
-			});
-
-			collector.on("end", async () => {
-				try {
-					await replyMessage.edit({ components: [] });
-				}
-				catch (err) {
-					console.warn("failed to clear pagination buttons:", err);
-				}
+		if (totalPages > 1 && replyMessage) {
+			registerPaginationSession(sessionKey, {
+				command: "servers",
+				ownerId: interaction.user.id,
+				pages,
+				pageIndex: 0,
+				message: replyMessage,
 			});
 		}
+	},
+
+	async handleButtonInteraction(interaction) {
+		if (!interaction.customId.startsWith("servers_")) {
+			return false;
+		}
+
+		const parts = interaction.customId.split(":");
+		if (parts.length !== 3) {
+			return false;
+		}
+
+		const direction = parts[1];
+		const sessionKey = parts[2];
+		const session = paginationSessions.get(sessionKey);
+		if (!session) {
+			await interaction.reply({
+				content: "This pagination session has expired.",
+				ephemeral: true,
+			});
+			return true;
+		}
+
+		if (interaction.user.id !== session.ownerId) {
+			await interaction.reply({
+				content: "Only the command invoker can use these buttons.",
+				ephemeral: true,
+			});
+			return true;
+		}
+
+		const totalPages = session.pages.length;
+		let updated = false;
+		if (direction === "prev" && session.pageIndex > 0) {
+			session.pageIndex -= 1;
+			updated = true;
+		}
+		else if (direction === "next" && session.pageIndex < totalPages - 1) {
+			session.pageIndex += 1;
+			updated = true;
+		}
+
+		if (!updated) {
+			await interaction.deferUpdate();
+			return true;
+		}
+
+		resetSessionTimer(sessionKey);
+		await interaction.update(buildServersPayload(session.pages, session.pageIndex, sessionKey));
+		return true;
 	},
 };
 
@@ -161,17 +164,64 @@ function buildServersEmbed(description, pageIndex, totalPages) {
 	return embed.setFooter({ text: footerText });
 }
 
-function buildNavRow(pageIndex, totalPages) {
+function buildServersPayload(pages, pageIndex, sessionKey) {
+	const totalPages = pages.length;
+	return {
+		embeds: [buildServersEmbed(pages[pageIndex], pageIndex, totalPages)],
+		components: totalPages > 1 ? [buildNavRow(pageIndex, totalPages, sessionKey)] : [],
+	};
+}
+
+function buildNavRow(pageIndex, totalPages, sessionKey) {
 	return new ActionRowBuilder().addComponents(
 		new ButtonBuilder()
-			.setCustomId(NAV_IDS.prev)
+			.setCustomId(`servers_prev:${sessionKey}`)
 			.setLabel("< Prev")
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(pageIndex === 0),
 		new ButtonBuilder()
-			.setCustomId(NAV_IDS.next)
+			.setCustomId(`servers_next:${sessionKey}`)
 			.setLabel("Next >")
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(pageIndex >= totalPages - 1),
 	);
+}
+
+function registerPaginationSession(sessionKey, sessionData) {
+	if (!sessionKey || !sessionData) return;
+	const existing = paginationSessions.get(sessionKey);
+	if (existing?.timeout) {
+		clearTimeout(existing.timeout);
+	}
+	sessionData.timeout = null;
+	paginationSessions.set(sessionKey, sessionData);
+	resetSessionTimer(sessionKey);
+}
+
+function resetSessionTimer(sessionKey) {
+	const session = paginationSessions.get(sessionKey);
+	if (!session) return;
+	if (session.timeout) {
+		clearTimeout(session.timeout);
+	}
+	session.timeout = setTimeout(() => {
+		cleanupPaginationSession(sessionKey).catch(error => {
+			console.warn("failed to cleanup pagination session:", error);
+		});
+	}, SESSION_IDLE_MS);
+}
+
+async function cleanupPaginationSession(sessionKey) {
+	const session = paginationSessions.get(sessionKey);
+	if (!session) return;
+	if (session.timeout) {
+		clearTimeout(session.timeout);
+	}
+	paginationSessions.delete(sessionKey);
+	try {
+		await session.message.edit({ components: [] });
+	}
+	catch (error) {
+		console.warn("failed to remove pagination components:", error);
+	}
 }
