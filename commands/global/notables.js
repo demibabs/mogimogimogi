@@ -111,7 +111,6 @@ const goodBSMessages = [
 const badBSMessages = [
 	"great score, but not good enough for 1st :(",
 	"guess someone else was cooking even harder.",
-	"not first? shortrat must have been in your room.",
 	"someone had to steal your thunder i guess.",
 	"i know you have at least 10 more points in you!",
 ];

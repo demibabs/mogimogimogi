@@ -228,4 +228,27 @@ app.listen(PORT, () => {
 	console.log(`Health check server running on port ${PORT}`);
 });
 
+// Manual Garbage Collection to reduce resting memory usage
+// This requires the --expose-gc flag in the start script
+if (global.gc) {
+	console.log("Manual garbage collection enabled. Running every 60 seconds.");
+	setInterval(() => {
+		try {
+			const memoryBefore = process.memoryUsage().rss / 1024 / 1024;
+			global.gc();
+			const memoryAfter = process.memoryUsage().rss / 1024 / 1024;
+			// Only log if significant memory was freed (e.g. > 10MB) to avoid log spam
+			if (memoryBefore - memoryAfter > 10) {
+				console.log(`[GC] Freed ${(memoryBefore - memoryAfter).toFixed(2)} MB. RSS: ${memoryAfter.toFixed(2)} MB`);
+			}
+		}
+		catch (e) {
+			console.error("Manual GC failed:", e);
+		}
+	}, 60000);
+}
+else {
+	console.log("Manual garbage collection not available. Run with --expose-gc to enable.");
+}
+
 client.login(token);
