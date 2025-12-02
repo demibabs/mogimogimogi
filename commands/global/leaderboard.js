@@ -16,7 +16,6 @@ const {
 
 const {
 	drawRoundedPanel,
-	drawBlurredImage,
 	drawEmoji,
 	getCountryFlag,
 	drawTextWithEmojis,
@@ -30,13 +29,10 @@ const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const LEADERBOARD_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
 const MAX_ENTRIES = 10;
 const ENTRIES_PER_COLUMN = 5;
-const BACKGROUND_RESOURCE = "images/other backgrounds/leaderboardbg.png";
-const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
+const BACKGROUND_RESOURCE = "images/other backgrounds blurred/leaderboardbg.png";
 
 const leaderboardSessionCache = new Map();
 const leaderboardSessionExpiryTimers = new Map();
-const imageCache = new Map();
-const imageCacheExpiryTimers = new Map();
 const leaderboardRenderTokens = new Map();
 
 function beginLeaderboardRender(messageId) {
@@ -111,7 +107,7 @@ async function getRankIconImage(rankName) {
 	if (!filename) {
 		return null;
 	}
-	return loadCachedImage(`images/ranks/${filename}`);
+	return loadImageResource(`images/ranks/${filename}`, `rank icon ${rankName}`);
 }
 
 function getMetricValue(entry, timeFilter) {
@@ -214,20 +210,16 @@ function truncateText(ctx, text, maxWidth) {
 	return ellipsis;
 }
 
-async function loadCachedImage(resource) {
+async function loadImageResource(resource, label = null) {
 	if (!resource) {
 		return null;
 	}
-	if (imageCache.has(resource)) {
-		return imageCache.get(resource);
-	}
 	try {
-		const image = await loadImage(resource);
-		return setCacheEntry(imageCache, imageCacheExpiryTimers, resource, image, IMAGE_CACHE_TTL_MS);
+		return await loadImage(resource);
 	}
 	catch (error) {
-		console.warn(`leaderboard: failed to load image ${resource}:`, error);
-		setCacheEntry(imageCache, imageCacheExpiryTimers, resource, null, IMAGE_CACHE_TTL_MS);
+		const descriptor = label || resource;
+		console.warn(`leaderboard: failed to load image ${descriptor}:`, error);
 		return null;
 	}
 }
@@ -359,9 +351,9 @@ async function renderLeaderboardImage({
 	ctx.quality = "best";
 
 	try {
-		const background = await loadCachedImage(BACKGROUND_RESOURCE);
+		const background = await loadImageResource(BACKGROUND_RESOURCE, "background");
 		if (background) {
-			drawBlurredImage(ctx, background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+			ctx.drawImage(background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 		}
 		else {
 			throw new Error("background not available");
@@ -714,7 +706,7 @@ async function generateLeaderboard(interaction, {
 	await interaction.editReply("rendering image...");
 
 	const guildIconUrl = interaction.guild?.iconURL({ extension: "png", size: 256 }) || null;
-	const guildIconImage = guildIconUrl ? await loadCachedImage(guildIconUrl) : null;
+	const guildIconImage = guildIconUrl ? await loadImageResource(guildIconUrl, "guild icon") : null;
 	if (guildIconImage && !session.guildIcon) {
 		session.guildIcon = guildIconImage;
 	}

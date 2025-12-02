@@ -25,7 +25,6 @@ const {
 	getPlayerAvatarUrl,
 	drawRoundedPanel,
 	drawRoundedImage,
-	drawBlurredImage,
 	drawEmoji,
 	loadWebPAsPng,
 	getCountryFlag,
@@ -62,15 +61,9 @@ const LAYOUT = {
 };
 
 const DEFAULT_TRACK_NAME = ColorPalettes.currentTrackName || "RR";
-const BACKGROUND_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
-const BACKGROUND_CACHE = new Map();
-const backgroundCacheExpiryTimers = new Map();
 const RANK_THRESHOLDS = PlayerStats.getRankThresholds();
 const RANK_ORDER_INDEX = new Map(RANK_THRESHOLDS.map((tier, index) => [tier.key, index]));
 const UNKNOWN_RANK_KEY = "unknown";
-const ICON_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
-const ICON_CACHE = new Map();
-const iconCacheExpiryTimers = new Map();
 const DEFAULT_RANK_STATS_COLORS = {
 	baseColor: "#2f3f5eea",
 	chartColor1: "#3d5179ea",
@@ -155,20 +148,16 @@ async function resolveRankStatsTrackName(loungeId, sessionTrackName) {
 	return getRandomRankStatsTrack();
 }
 
-async function loadCachedImage(resource) {
+async function loadImageResource(resource, label = null) {
 	if (!resource) {
 		return null;
 	}
-	if (BACKGROUND_CACHE.has(resource)) {
-		return BACKGROUND_CACHE.get(resource);
-	}
 	try {
-		const image = await loadImage(resource);
-		return setCacheEntry(BACKGROUND_CACHE, backgroundCacheExpiryTimers, resource, image, BACKGROUND_CACHE_TTL_MS);
+		return await loadImage(resource);
 	}
 	catch (error) {
-		console.warn(`rank-stats: failed to load image ${resource}:`, error);
-		setCacheEntry(BACKGROUND_CACHE, backgroundCacheExpiryTimers, resource, null, BACKGROUND_CACHE_TTL_MS);
+		const descriptor = label || resource;
+		console.warn(`rank-stats: failed to load image ${descriptor}:`, error);
 		return null;
 	}
 }
@@ -596,16 +585,11 @@ async function loadRankIcon(filename) {
 		return null;
 	}
 	const resource = `images/ranks/${filename}`;
-	if (ICON_CACHE.has(resource)) {
-		return ICON_CACHE.get(resource);
-	}
 	try {
-		const image = await loadImage(resource);
-		return setCacheEntry(ICON_CACHE, iconCacheExpiryTimers, resource, image, ICON_CACHE_TTL_MS);
+		return await loadImage(resource);
 	}
 	catch (error) {
 		console.warn(`failed to load rank icon ${resource}:`, error);
-		setCacheEntry(ICON_CACHE, iconCacheExpiryTimers, resource, null, ICON_CACHE_TTL_MS);
 		return null;
 	}
 }
@@ -788,10 +772,10 @@ async function renderRankStatsImage({
 	const ctx = canvas.getContext("2d");
 
 	try {
-		const backgroundResource = trackName ? `images/tracks/${trackName}_ranks.png` : null;
-		const backgroundImage = backgroundResource ? await loadCachedImage(backgroundResource) : null;
+		const backgroundResource = trackName ? `images/tracks blurred/${trackName}_ranks.png` : null;
+		const backgroundImage = backgroundResource ? await loadImageResource(backgroundResource, `${trackName} background`) : null;
 		if (backgroundImage) {
-			drawBlurredImage(ctx, backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+			ctx.drawImage(backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 		}
 		else {
 			throw new Error("background image not available");

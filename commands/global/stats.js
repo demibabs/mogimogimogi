@@ -49,18 +49,12 @@ const LAYOUT = {
 };
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const DIVISION_CHART_CACHE_TTL_MS = ONE_WEEK_MS;
-const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
 const CHART_DIMENSIONS = { width: 835, height: 880 };
 const ICON_SIZE = 54;
 const ICON_GAP = 12;
 const MAX_BAR_HEIGHT_RATIO = 0.90;
 
-const divisionChartCache = new Map();
-const divisionChartExpiryTimers = new Map();
 let chartRenderer = null;
-const imageCache = new Map();
-const imageCacheExpiryTimers = new Map();
 const STATS_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
 const statsSessionCache = new Map();
 const statsSessionExpiryTimers = new Map();
@@ -259,31 +253,17 @@ function getChartRenderer() {
 	return chartRenderer;
 }
 
-async function loadCachedImage(resource) {
+async function loadImageResource(resource, label = null) {
 	if (!resource) {
 		return null;
 	}
-	if (imageCache.has(resource)) {
-		return imageCache.get(resource);
-	}
 	try {
-		const image = await loadImage(resource);
-		return setCacheEntry(imageCache, imageCacheExpiryTimers, resource, image, IMAGE_CACHE_TTL_MS);
+		return await loadImage(resource);
 	}
 	catch (error) {
-		console.warn(`failed to load image ${resource}:`, error);
-		setCacheEntry(imageCache, imageCacheExpiryTimers, resource, null, IMAGE_CACHE_TTL_MS);
+		const descriptor = label || resource;
+		console.warn(`stats: failed to load image ${descriptor}:`, error);
 		return null;
-	}
-}
-
-function computeDivisionSignature(divisionData) {
-	try {
-		return JSON.stringify(divisionData ?? []);
-	}
-	catch (error) {
-		console.warn("failed to hash division data for cache signature:", error);
-		return "";
 	}
 }
 
@@ -296,18 +276,10 @@ async function getRankIcon(tier) {
 		console.warn(`no icon found for tier ${tier}, skipping`);
 		return null;
 	}
-	return loadCachedImage(`images/ranks/${filename}`);
+	return loadImageResource(`images/ranks/${filename}`, `rank icon ${tier}`);
 }
 
 async function getDivisionChart(trackName, trackColors, globals) {
-	const cacheKey = trackName || "__default";
-	const signature = computeDivisionSignature(globals?.divisionData);
-	const existing = divisionChartCache.get(cacheKey);
-	const now = Date.now();
-	if (existing && existing.signature === signature && existing.expiresAt > now) {
-		return existing;
-	}
-
 	const divisionEntries = Array.isArray(globals?.divisionData)
 		? [...globals.divisionData].reverse()
 		: [];
@@ -465,15 +437,11 @@ async function getDivisionChart(trackName, trackColors, globals) {
 	const chartBuffer = await renderer.renderToBuffer(config);
 	const chartImage = await loadImage(chartBuffer);
 
-	const entry = {
+	return {
 		image: chartImage,
 		metrics: capturedMetrics,
 		labels: chartLabels,
-		signature,
-		expiresAt: now + DIVISION_CHART_CACHE_TTL_MS,
 	};
-	setCacheEntry(divisionChartCache, divisionChartExpiryTimers, cacheKey, entry, DIVISION_CHART_CACHE_TTL_MS);
-	return entry;
 }
 
 function buildStatsCustomId(action, { timeFilter, queueFilter, playerCountFilter, loungeId }) {
@@ -1239,9 +1207,9 @@ module.exports = {
 			const ctx = canvas.getContext("2d");
 
 			try {
-				const backgroundImage = await loadCachedImage(`images/tracks/${trackName}_stats.png`);
+				const backgroundImage = await loadImageResource(`images/tracks blurred/${trackName}_stats.png`, `${trackName} stats background`);
 				if (backgroundImage) {
-					EmbedEnhancer.drawBlurredImage(ctx, backgroundImage, 0, 0, canvasWidth, canvasHeight);
+					ctx.drawImage(backgroundImage, 0, 0, canvasWidth, canvasHeight);
 				}
 				else {
 					throw new Error("background image not available");

@@ -8,7 +8,7 @@ const LoungeApi = require("../../utils/loungeApi");
 const { trackAbbreviationsToNames } = require("../../utils/gameData");
 
 const assetsRoot = path.join(__dirname, "..", "..", "images");
-const tracksDir = path.join(assetsRoot, "tracks");
+const tracksDir = resolveAssetDirectory(["tracks blurred", "tracks"]);
 const vehiclesDir = path.join(assetsRoot, "vehicles");
 const mainsDir = path.join(assetsRoot, "characters", "mains");
 const npcsDir = path.join(assetsRoot, "characters", "npcs");
@@ -51,6 +51,25 @@ const characterMap = new Map(characterOptions.map(option => [option.value, optio
 
 const CLEAR_VALUE = "none";
 const CLEAR_SUGGESTION = { name: CLEAR_VALUE, value: CLEAR_VALUE };
+
+function resolveAssetDirectory(names) {
+	if (!Array.isArray(names) || !names.length) {
+		return assetsRoot;
+	}
+	for (const relative of names) {
+		const candidate = path.join(assetsRoot, relative);
+		try {
+			const stats = fs.statSync(candidate);
+			if (stats.isDirectory()) {
+				return candidate;
+			}
+		}
+		catch (error) {
+			// ignore missing candidates
+		}
+	}
+	return path.join(assetsRoot, names[names.length - 1]);
+}
 
 function buildAutocompleteSuggestions(options, query) {
 	const normalizedQuery = (query || "").toLowerCase();

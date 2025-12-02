@@ -18,7 +18,6 @@ const {
 const {
 	getPlayerAvatarUrl,
 	drawRoundedPanel,
-	drawBlurredImage,
 	drawRoundedImage,
 	loadFavoriteCharacterImage,
 	loadFavoriteVehicleImage,
@@ -31,12 +30,9 @@ const EDGE_RADIUS = 30;
 const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 const NOTABLES_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
-const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
 
 const notablesSessionCache = new Map();
 const notablesSessionExpiryTimers = new Map();
-const imageCache = new Map();
-const imageCacheExpiryTimers = new Map();
 const notablesRenderTokens = new Map();
 
 function beginNotablesRender(messageId) {
@@ -208,20 +204,15 @@ function getRandomMessage(pool) {
 	return "";
 }
 
-async function loadCachedImage(resource) {
+async function loadImageResource(resource) {
 	if (!resource) {
 		return null;
 	}
-	if (imageCache.has(resource)) {
-		return imageCache.get(resource);
-	}
 	try {
-		const image = await loadImage(resource);
-		return setCacheEntry(imageCache, imageCacheExpiryTimers, resource, image, IMAGE_CACHE_TTL_MS);
+		return await loadImage(resource);
 	}
 	catch (error) {
 		console.warn(`failed to load image ${resource}:`, error);
-		setCacheEntry(imageCache, imageCacheExpiryTimers, resource, null, IMAGE_CACHE_TTL_MS);
 		return null;
 	}
 }
@@ -616,9 +607,9 @@ async function renderNotablesImage({
 	ctx.quality = "best";
 
 	try {
-		const backgroundImage = await loadCachedImage(`images/tracks/${trackName}_notables.png`);
+		const backgroundImage = await loadImageResource(`images/tracks blurred/${trackName}_notables.png`);
 		if (backgroundImage) {
-			drawBlurredImage(ctx, backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+			ctx.drawImage(backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 		}
 		else {
 			throw new Error("background image not available");

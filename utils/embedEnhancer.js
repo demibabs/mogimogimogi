@@ -3,11 +3,6 @@
  */
 const twemoji = require("twemoji");
 const { loadImage } = require("canvas");
-const {
-	setCacheEntry,
-	refreshCacheEntry,
-} = require("./cacheManager");
-const StackBlur = require("stackblur-canvas");
 const { draw } = require("patternomaly");
 let sharp = null;
 try {
@@ -153,15 +148,6 @@ function drawRoundedPanel(ctx, frame, fillColor, radius = 20, options = {}) {
 	}
 
 	ctx.restore();
-}
-
-function drawBlurredImage(ctx, image, x, y, width, height, blur = 12) {
-
-	ctx.drawImage(image, x, y, width, height);
-
-	const imageData = ctx.getImageData(0, 0, width, height);
-	StackBlur.imageDataRGBA(imageData, 0, 0, width, height, blur);
-	ctx.putImageData(imageData, 0, 0);
 }
 
 function emojiToUrl(emoji) {
@@ -423,21 +409,13 @@ function truncateTextWithEmojis(ctx, text, maxWidth, options = {}) {
 	return result;
 }
 
-const EMOJI_IMAGE_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
-const emojiImageCache = new Map(); // codePoint -> Image
-const emojiImageCacheTimers = new Map();
 async function ensureEmojiImage(emoji) {
 	const code = twemoji.convert.toCodePoint(emoji);
-	if (emojiImageCache.has(code)) {
-		refreshCacheEntry(emojiImageCache, emojiImageCacheTimers, code, EMOJI_IMAGE_CACHE_TTL_MS);
-		return emojiImageCache.get(code);
-	}
 	const url = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`;
 	const res = await fetch(url);
 	if (!res.ok) throw new Error(`emoji fetch failed: ${res.status}`);
 	const buf = Buffer.from(await res.arrayBuffer());
-	const img = await loadImage(buf);
-	return setCacheEntry(emojiImageCache, emojiImageCacheTimers, code, img, EMOJI_IMAGE_CACHE_TTL_MS);
+	return loadImage(buf);
 }
 
 // Draws text with emoji images. Returns total rendered width.
@@ -607,7 +585,6 @@ module.exports = {
 	getPlayerAvatarUrl,
 	enhanceEmbedWithPlayerInfo,
 	drawRoundedImage,
-	drawBlurredImage,
 	drawEmoji,
 	drawInlineImage,
 	drawTextWithEmojis,

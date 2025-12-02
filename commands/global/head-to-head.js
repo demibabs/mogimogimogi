@@ -61,8 +61,7 @@ const MMR_OFFSET_Y = 70;
 const STATS_LABEL_OFFSET = 80;
 
 const SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
-const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
-const BACKGROUND_RESOURCE = "images/other backgrounds/headtoheadbg.png";
+const BACKGROUND_RESOURCE = "images/other backgrounds blurred/headtoheadbg.png";
 
 const DEFAULT_FILTERS = {
 	timeFilter: "alltime", // alltime | weekly | season
@@ -81,8 +80,6 @@ const EVENT_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
 const headToHeadSessionCache = new Map(); // messageId -> { ...session, expiresAt }
 const headToHeadSessionExpiryTimers = new Map();
 const headToHeadRenderTokens = new Map(); // messageId -> Symbol
-const imageCache = new Map(); // path/url -> Image|null
-const imageCacheExpiryTimers = new Map();
 
 // -------------------- session helpers --------------------
 function getHeadToHeadSession(messageId) {
@@ -124,16 +121,14 @@ function endHeadToHeadRender(messageId, token) {
 }
 
 // -------------------- image helpers --------------------
-async function loadCachedImage(resource) {
+async function loadImageResource(resource, label = null) {
 	if (!resource) return null;
-	if (imageCache.has(resource)) return imageCache.get(resource);
 	try {
-		const img = await loadImage(resource);
-		return setCacheEntry(imageCache, imageCacheExpiryTimers, resource, img, IMAGE_CACHE_TTL_MS);
+		return await loadImage(resource);
 	}
 	catch (err) {
-		console.warn(`head-to-head: failed to load image ${resource}:`, err);
-		setCacheEntry(imageCache, imageCacheExpiryTimers, resource, null, IMAGE_CACHE_TTL_MS);
+		const descriptor = label || resource;
+		console.warn(`head-to-head: failed to load image ${descriptor}:`, err);
 		return null;
 	}
 }
@@ -142,7 +137,7 @@ async function getRankIcon(rankName, mmr) {
 	PlayerStats.getRankIconFilename(rankName) ||
 	PlayerStats.getRankIconFilenameForMmr(mmr);
 	if (!filename) return null;
-	return loadCachedImage(`images/ranks/${filename}`);
+	return loadImageResource(`images/ranks/${filename}`, `rank icon ${rankName || mmr}`);
 }
 function formatRecordText(record) {
 	if (!record) return "-";
@@ -333,7 +328,7 @@ async function renderHeadToHeadImage({
 	};
 
 	if (backgroundImage) {
-		EmbedEnhancer.drawBlurredImage(ctx, backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		ctx.drawImage(backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 	}
 	else {
 		ctx.fillStyle = palette?.backgroundColor || ColorPalettes.headToHeadPalette.backgroundColor;
@@ -1140,7 +1135,7 @@ module.exports = {
 				normalizedLeftId,
 			);
 
-			const backgroundImage = await loadCachedImage(BACKGROUND_RESOURCE);
+			const backgroundImage = await loadImageResource(BACKGROUND_RESOURCE, "background");
 			const palette = ColorPalettes.headToHeadPalette;
 
 			const formatPlayerSide = async (

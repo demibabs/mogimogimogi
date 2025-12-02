@@ -2,7 +2,7 @@ const fs = require("fs/promises");
 const path = require("path");
 const sharp = require("sharp");
 
-const TRACK_IMAGES_DIR = path.resolve(__dirname, "../images/tracks");
+const TRACK_IMAGES_DIR = path.resolve(__dirname, "../images/tracks unblurred");
 
 function isJpegFile(filename) {
 	return /\.jpe?g$/i.test(filename);
