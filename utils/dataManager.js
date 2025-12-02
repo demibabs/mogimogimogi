@@ -119,6 +119,18 @@ class DataManager {
 			}
 		}
 
+		if (loungeProfile && !loungeProfile.discordId) {
+			try {
+				const basicProfile = await LoungeApi.getPlayerByLoungeId(normalizedId);
+				if (basicProfile?.discordId) {
+					loungeProfile.discordId = basicProfile.discordId;
+				}
+			}
+			catch (error) {
+				// ignore
+			}
+		}
+
 		if (loungeProfile?.name && record.loungeName !== loungeProfile.name) {
 			record.loungeName = loungeProfile.name;
 			changed = true;
