@@ -1057,18 +1057,20 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 
 	let serverData = serverDataOverride || await Database.getServerData(serverId);
 
-	const ensureResult = await DataManager.ensureUserRecord({
-		loungeId,
+	const result = await AutoUserManager.ensureUserAndMembership({
+		interaction,
+		target,
 		serverId,
-		client: interaction.client,
-		guild: interaction.guild ?? null,
+		serverData,
+		loungeId,
+		loungeName: target.loungeName,
+		displayName: target.displayName,
+		discordUser: target.discordUser,
+		storedRecord: serverData?.users?.[loungeId],
+		fallbackName: `player ${loungeId}`,
 	});
-
-	if (ensureResult?.userRecord && ensureResult.userRecord.servers?.includes(serverId)) {
-		serverData = serverData || {};
-		serverData.users = serverData.users || {};
-		serverData.users[loungeId] = ensureResult.userRecord;
-	}
+	serverData = result.serverData;
+	const discordUser = result.discordUser;
 
 	let playerDetails = hasSessionDetails ? session.playerDetails : null;
 	if (!playerDetails) {
@@ -1122,7 +1124,7 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		favoriteVehicleImage = vehicleImage || favoriteVehicleImage;
 	}
 	const palette = buildRankStatsPalette(trackName);
-	const avatarUrl = getPlayerAvatarUrl(target.discordUser || ensureResult?.discordUser);
+	const avatarUrl = getPlayerAvatarUrl(target.discordUser || discordUser);
 	let avatarImage = null;
 	if (avatarUrl) {
 		try {
@@ -1178,7 +1180,7 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		filters,
 		trackName,
 		favorites,
-		discordUser: target.discordUser || ensureResult?.discordUser || null,
+		discordUser: target.discordUser || discordUser || null,
 		target: {
 			loungeId,
 			displayName,
@@ -1291,7 +1293,7 @@ module.exports = {
 			const initialFilters = normalizeRankStatsFilters(DEFAULT_FILTERS);
 			let components = [];
 
-			const validation = await AutoUserManager.validateUserForCommand(interaction.user.id, serverId, interaction.client);
+			const validation = await AutoUserManager.ensureServerReady(serverId);
 			if (!validation.success) {
 				await interaction.editReply({ content: validation.message || "unable to validate command user.", components, files: [] });
 				return;

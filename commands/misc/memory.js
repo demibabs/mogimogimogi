@@ -15,26 +15,26 @@ module.exports = {
 			.setTitle("Memory Usage")
 			.setColor("DarkBlue")
 			.addFields(
-				{ 
-					name: "RSS (Total)", 
-					value: `${toMB(usage.rss)} MB`, 
-					inline: true 
+				{
+					name: "RSS (Total)",
+					value: `${toMB(usage.rss)} MB`,
+					inline: true,
 				},
-				{ 
-					name: "Heap Used (JS)", 
-					value: `${toMB(usage.heapUsed)} MB`, 
-					inline: true 
+				{
+					name: "Heap Used (JS)",
+					value: `${toMB(usage.heapUsed)} MB`,
+					inline: true,
 				},
-				{ 
-					name: "External (Native/Canvas)", 
-					value: `${toMB(usage.external)} MB`, 
-					inline: true 
+				{
+					name: "External (Native/Canvas)",
+					value: `${toMB(usage.external)} MB`,
+					inline: true,
 				},
 				{
 					name: "Array Buffers",
 					value: `${toMB(usage.arrayBuffers)} MB`,
-					inline: true
-				}
+					inline: true,
+				},
 			)
 			.setFooter({ text: "External memory usually contains Canvas images." })
 			.setTimestamp();

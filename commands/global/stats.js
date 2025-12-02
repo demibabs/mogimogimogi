@@ -657,7 +657,7 @@ module.exports = {
 			const playerCountFilter = "both";
 			const currentFilters = { timeFilter, queueFilter, playerCountFilter };
 
-			const validation = await AutoUserManager.validateUserForCommand(interaction.user.id, serverId, interaction.client);
+			const validation = await AutoUserManager.ensureServerReady(serverId);
 			if (!validation.success) {
 				await interaction.editReply({
 					content: validation.message || "unable to validate command user.",
@@ -908,116 +908,25 @@ module.exports = {
 			}
 
 			if (!useSession) {
-				const ensureResult = await DataManager.ensureUserRecord({
+				const result = await AutoUserManager.ensureUserAndMembership({
+					interaction,
+					target,
+					serverId,
+					serverData,
 					loungeId: normalizedLoungeId,
 					loungeName,
-					serverId,
-					client: interaction.client,
-					guild: interaction.guild ?? null,
+					displayName,
+					discordUser,
+					storedRecord,
+					fallbackName,
 				});
-				if (ensureResult?.userRecord) {
-					if (!storedRecord && ensureResult.userRecord.servers?.includes(serverId)) {
-						storedRecord = ensureResult.userRecord;
-						if (serverData) {
-							serverData.users = {
-								...serverData.users,
-								[normalizedLoungeId]: ensureResult.userRecord,
-							};
-						}
-					}
-					else if (storedRecord && ensureResult.userRecord.servers?.includes(serverId)) {
-						storedRecord = ensureResult.userRecord;
-						if (serverData) {
-							serverData.users[normalizedLoungeId] = ensureResult.userRecord;
-						}
-					}
-					if (!target.loungeName && ensureResult.userRecord.loungeName) {
-						target.loungeName = ensureResult.userRecord.loungeName;
-					}
-					if (!target.displayName && ensureResult.userRecord.username) {
-						target.displayName = ensureResult.userRecord.username;
-					}
-					if (!loungeName && ensureResult.userRecord.loungeName) {
-						loungeName = ensureResult.userRecord.loungeName;
-					}
-				}
 
-				if (ensureResult?.discordUser && !discordUser) {
-					discordUser = ensureResult.discordUser;
-					if (!target.displayName) {
-						target.displayName = ensureResult.discordUser.displayName || ensureResult.discordUser.username;
-					}
-				}
-				if (ensureResult?.loungeProfile?.name && (!loungeName || loungeName === fallbackName)) {
-					loungeName = ensureResult.loungeProfile.name;
-				}
-				displayName = target.displayName || loungeName || fallbackName;
-				loungeName = loungeName || fallbackName;
-
-				const candidateDiscordIds = new Set([
-					discordUser?.id,
-					...(storedRecord?.discordIds || []),
-				]);
-				if (ensureResult?.guildMember && ensureResult.discordId) {
-					candidateDiscordIds.add(ensureResult.discordId);
-				}
-
-				const membershipCache = new Map();
-				const guild = interaction.guild ?? null;
-				const isKnownServerMember = (discordId, record) => {
-					if (!discordId) return false;
-					if (!record) return false;
-					if (!record.servers?.includes(serverId)) return false;
-					if (!record.discordIds?.includes(discordId)) return false;
-					return true;
-				};
-				const ensureGuildMembership = async discordId => {
-					if (!guild || !discordId) return false;
-					const key = String(discordId);
-					if (membershipCache.has(key)) {
-						return membershipCache.get(key);
-					}
-					if (guild.members.cache.has(key)) {
-						membershipCache.set(key, true);
-						return true;
-					}
-					try {
-						const member = await guild.members.fetch({ user: key, cache: true, force: false });
-						const result = Boolean(member);
-						membershipCache.set(key, result);
-						return result;
-					}
-					catch (error) {
-						if (error.code === 10007 || error.status === 404) {
-							membershipCache.set(key, false);
-							return false;
-						}
-						console.warn(`failed guild membership check for ${key}:`, error);
-						membershipCache.set(key, false);
-						return false;
-					}
-				};
-
-				for (const candidateId of candidateDiscordIds) {
-					const normalizedId = candidateId ? String(candidateId) : null;
-					if (!normalizedId) continue;
-
-					let isMember = isKnownServerMember(normalizedId, storedRecord);
-					if (!isMember) {
-						isMember = await ensureGuildMembership(normalizedId);
-					}
-					if (!isMember) continue;
-
-					try {
-						const updated = await DataManager.updateServerUser(serverId, normalizedId, interaction.client);
-						if (updated) {
-							break;
-						}
-					}
-					catch (error) {
-						console.warn(`failed to update user ${normalizedId}:`, error);
-					}
-				}
+				serverData = result.serverData;
+				target = result.target;
+				loungeName = result.loungeName;
+				displayName = result.displayName;
+				discordUser = result.discordUser;
+				storedRecord = result.storedRecord;
 			}
 
 			displayName = target.displayName || loungeName || fallbackName;

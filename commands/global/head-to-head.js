@@ -753,11 +753,7 @@ module.exports = {
 			const serverId = interaction.guildId;
 			const rawPlayer1 = interaction.options.getString("player");
 			const rawPlayer2 = interaction.options.getString("player2");
-			const validation = await AutoUserManager.validateUserForCommand(
-				interaction.user.id,
-				serverId,
-				interaction.client,
-			);
+			const validation = await AutoUserManager.ensureServerReady(serverId);
 			if (!validation.success) {
 				await interaction.editReply({
 					content: validation.message || "unable to validate command user.",
@@ -982,33 +978,21 @@ module.exports = {
 
 			const ensureAndMergeUser = async (target, normalizedId, playerDetails) => {
 				try {
-					const ensureResult = await DataManager.ensureUserRecord({
+					const result = await AutoUserManager.ensureUserAndMembership({
+						interaction,
+						target,
+						serverId,
+						serverData,
 						loungeId: normalizedId,
 						loungeName: playerDetails?.name || target.loungeName || target.displayName || null,
-						serverId,
-						client: interaction.client,
-						guild: interaction.guild ?? null,
+						displayName: target.displayName,
+						discordUser: target.discordUser,
+						storedRecord: serverData?.users?.[normalizedId],
+						fallbackName: `player ${normalizedId}`,
 					});
-					if (ensureResult?.userRecord?.servers?.includes(serverId) && serverData) {
-						serverData.users = {
-							...(serverData.users || {}),
-							[normalizedId]: ensureResult.userRecord,
-						};
-					}
-					if (!target.loungeName && ensureResult?.userRecord?.loungeName) {
-						target.loungeName = ensureResult.userRecord.loungeName;
-					}
-					if (ensureResult?.discordUser && !target.discordUser) {
-						target.discordUser = ensureResult.discordUser;
-					}
-					if (!target.displayName) {
-						target.displayName =
-							ensureResult?.userRecord?.loungeName ||
-							ensureResult?.discordUser?.displayName ||
-							ensureResult?.discordUser?.username ||
-							playerDetails?.name ||
-							target.loungeName ||
-							`player ${normalizedId}`;
+
+					if (result.serverData) {
+						serverData = result.serverData;
 					}
 				}
 				catch (ensureError) {

@@ -744,7 +744,7 @@ module.exports = {
 		try {
 			await interaction.deferReply();
 
-			const validation = await AutoUserManager.validateUserForCommand(interaction.user.id, interaction.guildId, interaction.client);
+			const validation = await AutoUserManager.ensureServerReady(interaction.guildId);
 			if (!validation.success) {
 				await interaction.editReply({
 					content: validation.message || "unable to validate command user.",

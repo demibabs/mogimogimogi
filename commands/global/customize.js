@@ -188,7 +188,7 @@ module.exports = {
 		const userId = interaction.user.id;
 		const serverId = interaction.guild.id;
 
-		const validation = await AutoUserManager.validateUserForCommand(userId, serverId, interaction.client);
+		const validation = await AutoUserManager.ensureServerReady(serverId);
 		if (!validation.success) {
 			await interaction.editReply(validation.message || "you need to finish setup before using this command.");
 			return;
@@ -242,7 +242,7 @@ module.exports = {
 			loungeId = String(loungeId);
 		}
 
-		let ensureResult = null;
+		let loungeName = null;
 
 		if (!loungeId) {
 			try {
@@ -252,13 +252,7 @@ module.exports = {
 					return;
 				}
 				loungeId = String(loungeProfile.id);
-				ensureResult = await DataManager.ensureUserRecord({
-					loungeId,
-					loungeName: loungeProfile.name ?? null,
-					serverId,
-					client: interaction.client,
-					guild: interaction.guild ?? null,
-				});
+				loungeName = loungeProfile.name ?? null;
 			}
 			catch (error) {
 				console.error("customize failed to load lounge profile:", error);
@@ -266,22 +260,23 @@ module.exports = {
 				return;
 			}
 		}
-		else {
-			try {
-				ensureResult = await DataManager.ensureUserRecord({
-					loungeId,
-					serverId,
-					client: interaction.client,
-					guild: interaction.guild ?? null,
-				});
-			}
-			catch (error) {
-				console.error("customize ensureUserRecord error:", error);
-			}
+
+		let ensureResult = null;
+		try {
+			ensureResult = await AutoUserManager.ensureUserAndMembership({
+				interaction,
+				serverId,
+				serverData,
+				loungeId,
+				loungeName,
+			});
+		}
+		catch (error) {
+			console.error("customize ensureUserRecord error:", error);
 		}
 
 		let storedUser = null;
-		if (loungeId) {
+		if (!ensureResult?.userRecord && loungeId) {
 			try {
 				storedUser = await database.getUserData(loungeId);
 			}
