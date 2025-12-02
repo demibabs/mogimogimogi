@@ -126,11 +126,12 @@ module.exports = {
 			console.warn("setup-all: failed to fetch reply message:", error);
 		}
 
-		if (totalPages > 1 && replyMessage) {
-			const collector = replyMessage.createMessageComponentCollector({
+		if (totalPages > 1 && replyMessage && replyMessage.channel) {
+			const collector = replyMessage.channel.createMessageComponentCollector({
 				componentType: ComponentType.Button,
 				time: COLLECTOR_IDLE_MS,
 				filter: buttonInteraction =>
+					buttonInteraction.message.id === replyMessage.id &&
 					buttonInteraction.user.id === interaction.user.id &&
 					Object.values(NAV_IDS).includes(buttonInteraction.customId),
 			});

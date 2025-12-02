@@ -55,10 +55,13 @@ module.exports = {
 			console.warn("failed to fetch reply message for pagination:", error);
 		}
 
-		if (totalPages > 1 && replyMessage) {
-			const collector = replyMessage.createMessageComponentCollector({
+		if (totalPages > 1 && replyMessage && replyMessage.channel) {
+			const collector = replyMessage.channel.createMessageComponentCollector({
 				componentType: ComponentType.Button,
 				time: COLLECTOR_IDLE_MS,
+				filter: buttonInteraction =>
+					buttonInteraction.message.id === replyMessage.id &&
+					Object.values(NAV_IDS).includes(buttonInteraction.customId),
 			});
 
 			collector.on("collect", async buttonInteraction => {
