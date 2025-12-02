@@ -1178,8 +1178,6 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		filters,
 		trackName,
 		favorites,
-		favoriteCharacterImage,
-		favoriteVehicleImage,
 		discordUser: target.discordUser || ensureResult?.discordUser || null,
 		target: {
 			loungeId,
