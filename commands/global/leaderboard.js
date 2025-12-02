@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require("discord.js");
-const { createCanvas } = require("canvas");
+const { createCanvas, loadImage } = require("canvas");
 const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
@@ -211,12 +211,17 @@ function truncateText(ctx, text, maxWidth) {
 }
 
 async function loadImageResource(resource, label = null) {
-	if (!resource) return null;
-	const img = await EmbedEnhancer.tryLoadImageResource(resource);
-	if (!img && label) {
-		console.warn(`leaderboard: failed to load image ${label}`);
+	if (!resource) {
+		return null;
 	}
-	return img;
+	try {
+		return await loadImage(resource);
+	}
+	catch (error) {
+		const descriptor = label || resource;
+		console.warn(`leaderboard: failed to load image ${descriptor}:`, error);
+		return null;
+	}
 }
 
 function safeParseDate(value) {

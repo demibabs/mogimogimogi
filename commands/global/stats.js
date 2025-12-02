@@ -257,7 +257,14 @@ async function loadImageResource(resource, label = null) {
 	if (!resource) {
 		return null;
 	}
-	return EmbedEnhancer.tryLoadImageResource(resource);
+	try {
+		return await loadImage(resource);
+	}
+	catch (error) {
+		const descriptor = label || resource;
+		console.warn(`stats: failed to load image ${descriptor}:`, error);
+		return null;
+	}
 }
 
 async function getRankIcon(tier) {
