@@ -13,6 +13,47 @@ catch (sharpError) {
 	// console.warn("embedEnhancer: sharp not available, falling back to direct image load for avatars.");
 }
 
+const assetCache = new Map();
+const MAX_ASSET_CACHE_SIZE = 100;
+const ASSET_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+// Periodic cleanup of expired assets
+setInterval(() => {
+	const now = Date.now();
+	for (const [key, entry] of assetCache.entries()) {
+		if (now - entry.lastAccess > ASSET_CACHE_TTL_MS) {
+			assetCache.delete(key);
+		}
+	}
+}, 5 * 60 * 1000).unref(); // Check every 5 minutes
+
+async function loadAndCacheImage(key, loadFn) {
+	if (assetCache.has(key)) {
+		const entry = assetCache.get(key);
+		entry.lastAccess = Date.now();
+		return entry.image;
+	}
+	try {
+		const img = await loadFn();
+		if (img) {
+			if (assetCache.size >= MAX_ASSET_CACHE_SIZE) {
+				// Simple LRU eviction: Map iterates in insertion order, so the first key is the oldest inserted.
+				// Note: This is "oldest inserted", not strictly "least recently used" unless we re-insert on access.
+				// For simplicity and performance, we'll stick to insertion order eviction for the size limit,
+				// but the TTL cleanup handles the "time" aspect.
+				const first = assetCache.keys().next().value;
+				assetCache.delete(first);
+			}
+			assetCache.set(key, { image: img, lastAccess: Date.now() });
+		}
+		return img;
+	}
+	catch (error) {
+		// console.warn(`Failed to load image for ${key}:`, error);
+		return null;
+	}
+}
+
 function roundedRectPath(ctx, x, y, width, height, radius = 20) {
 	const clampedRadius = Math.max(0, Math.min(radius, Math.min(width, height) / 2));
 	ctx.beginPath();
@@ -186,12 +227,14 @@ const shapeNames = [
 
 async function tryLoadImageResource(resourcePath) {
 	if (!resourcePath) return null;
-	try {
-		return await loadImage(resourcePath);
-	}
-	catch (error) {
-		return null;
-	}
+	return loadAndCacheImage(resourcePath, async () => {
+		try {
+			return await loadImage(resourcePath);
+		}
+		catch (error) {
+			return null;
+		}
+	});
 }
 
 function normalizeWhitespace(value) {
@@ -410,12 +453,14 @@ function truncateTextWithEmojis(ctx, text, maxWidth, options = {}) {
 }
 
 async function ensureEmojiImage(emoji) {
-	const code = twemoji.convert.toCodePoint(emoji);
-	const url = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`;
-	const res = await fetch(url);
-	if (!res.ok) throw new Error(`emoji fetch failed: ${res.status}`);
-	const buf = Buffer.from(await res.arrayBuffer());
-	return loadImage(buf);
+	return loadAndCacheImage(`emoji:${emoji}`, async () => {
+		const code = twemoji.convert.toCodePoint(emoji);
+		const url = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`;
+		const res = await fetch(url);
+		if (!res.ok) throw new Error(`emoji fetch failed: ${res.status}`);
+		const buf = Buffer.from(await res.arrayBuffer());
+		return loadImage(buf);
+	});
 }
 
 // Draws text with emoji images. Returns total rendered width.

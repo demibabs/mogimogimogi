@@ -208,13 +208,7 @@ async function loadImageResource(resource) {
 	if (!resource) {
 		return null;
 	}
-	try {
-		return await loadImage(resource);
-	}
-	catch (error) {
-		console.warn(`failed to load image ${resource}:`, error);
-		return null;
-	}
+	return EmbedEnhancer.tryLoadImageResource(resource);
 }
 
 function wrapText(ctx, text, maxWidth) {

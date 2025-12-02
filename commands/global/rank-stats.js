@@ -152,14 +152,7 @@ async function loadImageResource(resource, label = null) {
 	if (!resource) {
 		return null;
 	}
-	try {
-		return await loadImage(resource);
-	}
-	catch (error) {
-		const descriptor = label || resource;
-		console.warn(`rank-stats: failed to load image ${descriptor}:`, error);
-		return null;
-	}
+	return EmbedEnhancer.tryLoadImageResource(resource);
 }
 
 const SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
@@ -585,13 +578,7 @@ async function loadRankIcon(filename) {
 		return null;
 	}
 	const resource = `images/ranks/${filename}`;
-	try {
-		return await loadImage(resource);
-	}
-	catch (error) {
-		console.warn(`failed to load rank icon ${resource}:`, error);
-		return null;
-	}
+	return EmbedEnhancer.tryLoadImageResource(resource);
 }
 
 function formatWinRate(winRate) {

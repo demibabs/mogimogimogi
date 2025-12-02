@@ -6,7 +6,7 @@ const {
 	ButtonStyle,
 	AttachmentBuilder,
 } = require("discord.js");
-const { createCanvas, loadImage } = require("canvas");
+const { createCanvas } = require("canvas");
 
 const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
@@ -123,14 +123,11 @@ function endHeadToHeadRender(messageId, token) {
 // -------------------- image helpers --------------------
 async function loadImageResource(resource, label = null) {
 	if (!resource) return null;
-	try {
-		return await loadImage(resource);
+	const img = await EmbedEnhancer.tryLoadImageResource(resource);
+	if (!img && label) {
+		console.warn(`head-to-head: failed to load image ${label}`);
 	}
-	catch (err) {
-		const descriptor = label || resource;
-		console.warn(`head-to-head: failed to load image ${descriptor}:`, err);
-		return null;
-	}
+	return img;
 }
 async function getRankIcon(rankName, mmr) {
 	const filename =
