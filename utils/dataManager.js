@@ -203,15 +203,42 @@ class DataManager {
 	static async updateServerUser(serverId, userId, client, loungeUserOverride = null) {
 		try {
 			const discordId = String(userId);
+			const normalizedServerId = serverId ? String(serverId) : null;
 			// Fetch user info from Discord
 			const user = await client.users.fetch(discordId);
-			const loungeUser = loungeUserOverride || await LoungeApi.getPlayerByDiscordId(discordId);
+
+			let loungeUser = loungeUserOverride || null;
+			let resolvedLoungeId = loungeUser?.id ? String(loungeUser.id) : null;
+
+			if (!loungeUser && normalizedServerId) {
+				// Prefer cached lounge mappings before hitting the Lounge API
+				try {
+					const serverData = await database.getServerData(normalizedServerId);
+					const mappedId = serverData?.discordIndex?.[discordId] || null;
+					if (mappedId) {
+						resolvedLoungeId = String(mappedId);
+						const cachedUser = await database.getUserData(resolvedLoungeId);
+						loungeUser = {
+							id: resolvedLoungeId,
+							name: cachedUser?.loungeName || cachedUser?.username || null,
+						};
+					}
+				}
+				catch (error) {
+					console.warn(`failed to resolve cached lounge mapping for ${discordId}:`, error);
+				}
+			}
 
 			if (!loungeUser) {
+				loungeUser = await LoungeApi.getPlayerByDiscordId(discordId);
+				resolvedLoungeId = loungeUser?.id ? String(loungeUser.id) : resolvedLoungeId;
+			}
+
+			if (!loungeUser || !resolvedLoungeId) {
 				console.warn(`User ${discordId} not found in Lounge API`);
 				return false;
 			}
-			const loungeId = loungeUser.id;
+			const loungeId = resolvedLoungeId;
 
 			// Load existing cached tables first so we can avoid unnecessary API calls.
 			const cachedEntries = await database.getUserTables(loungeId);
@@ -258,7 +285,7 @@ class DataManager {
 				...existingUser,
 				loungeId,
 				username: user.username,
-				loungeName: loungeUser.name,
+				loungeName: loungeUser.name || existingUser?.loungeName || existingUser?.username || null,
 				lastUpdated: new Date().toISOString(),
 				servers: Array.from(servers),
 				discordIds: Array.from(discordIds),
