@@ -52,7 +52,7 @@ module.exports = {
 	},
 
 	async handleButtonInteraction(interaction) {
-		if (!interaction.customId.startsWith("servers_")) {
+		if (!interaction.customId.startsWith("servers:")) {
 			return false;
 		}
 
@@ -61,8 +61,7 @@ module.exports = {
 			return false;
 		}
 
-		const direction = parts[1];
-		const sessionKey = parts[2];
+		const [, sessionKey, direction] = parts;
 		const session = paginationSessions.get(sessionKey);
 		if (!session) {
 			await interaction.reply({
@@ -175,12 +174,12 @@ function buildServersPayload(pages, pageIndex, sessionKey) {
 function buildNavRow(pageIndex, totalPages, sessionKey) {
 	return new ActionRowBuilder().addComponents(
 		new ButtonBuilder()
-			.setCustomId(`servers_prev:${sessionKey}`)
+			.setCustomId(`servers:${sessionKey}:prev`)
 			.setLabel("< Prev")
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(pageIndex === 0),
 		new ButtonBuilder()
-			.setCustomId(`servers_next:${sessionKey}`)
+			.setCustomId(`servers:${sessionKey}:next`)
 			.setLabel("Next >")
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(pageIndex >= totalPages - 1),

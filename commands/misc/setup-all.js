@@ -122,7 +122,7 @@ module.exports = {
 	},
 
 	async handleButtonInteraction(interaction) {
-		if (!interaction.customId.startsWith("setupall_")) {
+		if (!interaction.customId.startsWith("setupall:")) {
 			return false;
 		}
 
@@ -131,8 +131,7 @@ module.exports = {
 			return false;
 		}
 
-		const direction = parts[1];
-		const sessionKey = parts[2];
+		const [, sessionKey, direction] = parts;
 		const session = paginationSessions.get(sessionKey);
 		if (!session) {
 			await interaction.reply({
@@ -242,12 +241,12 @@ function buildSummaryEmbed(description, pageIndex, totalPages) {
 function buildNavRow(pageIndex, totalPages, sessionKey) {
 	return new ActionRowBuilder().addComponents(
 		new ButtonBuilder()
-			.setCustomId(`setupall_prev:${sessionKey}`)
+			.setCustomId(`setupall:${sessionKey}:prev`)
 			.setStyle(ButtonStyle.Secondary)
 			.setLabel("< Prev")
 			.setDisabled(pageIndex === 0),
 		new ButtonBuilder()
-			.setCustomId(`setupall_next:${sessionKey}`)
+			.setCustomId(`setupall:${sessionKey}:next`)
 			.setStyle(ButtonStyle.Secondary)
 			.setLabel("Next >")
 			.setDisabled(pageIndex >= totalPages - 1),
