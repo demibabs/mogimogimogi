@@ -238,9 +238,9 @@ if (global.gc) {
 			global.gc();
 			const memoryAfter = process.memoryUsage().rss / 1024 / 1024;
 			// Only log if significant memory was freed (e.g. > 10MB) to avoid log spam
-			if (memoryBefore - memoryAfter > 10) {
-				console.log(`[GC] Freed ${(memoryBefore - memoryAfter).toFixed(2)} MB. RSS: ${memoryAfter.toFixed(2)} MB`);
-			}
+			// if (memoryBefore - memoryAfter > 10) {
+			console.log(`[GC] Freed ${(memoryBefore - memoryAfter).toFixed(2)} MB. RSS: ${memoryAfter.toFixed(2)} MB`);
+			// }
 		}
 		catch (e) {
 			console.error("Manual GC failed:", e);
