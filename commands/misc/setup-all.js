@@ -35,6 +35,7 @@ module.exports = {
 		}
 
 		let totalAdded = 0;
+		let totalRemoved = 0;
 		let processedGuilds = 0;
 		const perGuildSummary = [];
 
@@ -42,9 +43,30 @@ module.exports = {
 			processedGuilds++;
 			let added = 0;
 			let considered = 0;
+			let removed = 0;
 			try {
 				await interaction.editReply(`Processing guild ${processedGuilds}/${guilds.size}: ${guild.name}`);
 				const members = await guild.members.fetch();
+				let serverData = await database.getServerData(guildId);
+				const storedUsers = Object.entries(serverData?.users || {});
+				if (storedUsers.length) {
+					for (const [loungeId, record] of storedUsers) {
+						const discordIds = Array.isArray(record?.discordIds)
+							? record.discordIds.map(String)
+							: [];
+						const stillMember = discordIds.some(id => members.has(id));
+						if (!stillMember) {
+							const removedOk = await DataManager.removeServerUser(guildId, { loungeId });
+							if (removedOk) {
+								removed++;
+								totalRemoved++;
+							}
+						}
+					}
+					if (removed) {
+						serverData = await database.getServerData(guildId);
+					}
+				}
 				for (const [userId, member] of members) {
 					if (member.user.bot) continue;
 					considered++;
@@ -52,26 +74,27 @@ module.exports = {
 						const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
 						if (!loungeUser) continue;
 						// Add server user if not already associated
-						const serverData = await database.getServerData(guildId);
-						const already = Object.values(serverData.users || {}).some(u => (u.discordIds || []).includes(String(userId)));
+						const already = Boolean(serverData?.discordIndex?.[String(userId)]);
 						if (already) continue;
 						const ok = await DataManager.addServerUser(guildId, userId, client);
 						if (ok) {
 							added++;
 							totalAdded++;
+							serverData = await database.getServerData(guildId);
 						}
 					}
 					catch (err) {
 						console.warn(`Failed add attempt for ${userId} in guild ${guildId}:`, err.message);
 					}
 				}
-				perGuildSummary.push(`• ${guild.name}: added ${added} user(s) out of ${considered} member(s)`);
+				perGuildSummary.push(`• ${guild.name}: added ${added} user(s), removed ${removed} stale entr${removed === 1 ? "y" : "ies"} out of ${considered} member(s)`);
 				try {
 					await database.markServerSetupComplete(guildId, {
 						initiatedBy: initiatorId,
 						totalMembers: members.size,
 						detectedLoungers: added,
 						addedUsers: added,
+						removedUsers: removed,
 						source: "setup-all",
 					});
 				}
@@ -85,7 +108,7 @@ module.exports = {
 			}
 		}
 
-		const header = `Setup-all complete. Added ${totalAdded} users across ${guilds.size} guild(s).`;
+		const header = `Setup-all complete. Added ${totalAdded} users and removed ${totalRemoved} stale entr${totalRemoved === 1 ? "y" : "ies"} across ${guilds.size} guild(s).`;
 		const pages = buildSummaryPages(header, perGuildSummary);
 		let pageIndex = 0;
 		const totalPages = pages.length;
