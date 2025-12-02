@@ -1057,6 +1057,14 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 
 	let serverData = serverDataOverride || await Database.getServerData(serverId);
 
+	let playerDetails = hasSessionDetails ? session.playerDetails : null;
+	if (!playerDetails) {
+		playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(loungeId);
+		if (!playerDetails) {
+			return { success: false, message: "couldn't find that player in lounge." };
+		}
+	}
+
 	const result = await AutoUserManager.ensureUserAndMembership({
 		interaction,
 		target,
@@ -1068,22 +1076,15 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		discordUser: target.discordUser,
 		storedRecord: serverData?.users?.[loungeId],
 		fallbackName: `player ${loungeId}`,
+		playerDetails,
 	});
 	serverData = result.serverData;
 	const discordUser = result.discordUser;
 
-	let playerDetails = hasSessionDetails ? session.playerDetails : null;
-	if (!playerDetails) {
-		playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(loungeId);
-		if (!playerDetails) {
-			return { success: false, message: "couldn't find that player in lounge." };
-		}
-	}
-
 	await interaction.editReply("loading tables...");
 	let allTables = hasSessionTables ? session.allTables : null;
 	if (!allTables) {
-		allTables = await LoungeApi.getAllPlayerTables(loungeId, serverId);
+		allTables = await LoungeApi.getAllPlayerTables(loungeId, serverId, playerDetails);
 		if (!allTables || !Object.keys(allTables).length) {
 			return { success: false, message: "no tables found for that player." };
 		}

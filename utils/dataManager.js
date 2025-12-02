@@ -81,7 +81,7 @@ class DataManager {
 		}
 	}
 
-	static async ensureUserRecord({ loungeId, loungeName = null, serverId = null, client = null, guild = null }) {
+	static async ensureUserRecord({ loungeId, loungeName = null, serverId = null, client = null, guild = null, loungeProfileOverride = null }) {
 		if (loungeId === undefined || loungeId === null) {
 			throw new Error("loungeId is required to ensure user record");
 		}
@@ -109,12 +109,14 @@ class DataManager {
 			changed = true;
 		}
 
-		let loungeProfile = null;
-		try {
-			loungeProfile = await LoungeApi.getPlayerByLoungeId(normalizedId);
-		}
-		catch (error) {
-			console.warn(`failed to load lounge profile for ${normalizedId}:`, error);
+		let loungeProfile = loungeProfileOverride;
+		if (!loungeProfile) {
+			try {
+				loungeProfile = await LoungeApi.getPlayerByLoungeId(normalizedId);
+			}
+			catch (error) {
+				console.warn(`failed to load lounge profile for ${normalizedId}:`, error);
+			}
 		}
 
 		if (loungeProfile?.name && record.loungeName !== loungeProfile.name) {
@@ -208,7 +210,7 @@ class DataManager {
 			const user = await client.users.fetch(discordId);
 
 			let loungeUser = loungeUserOverride || null;
-			let resolvedLoungeId = loungeUser?.id ? String(loungeUser.id) : null;
+			let resolvedLoungeId = loungeUser?.id ? String(loungeUser.id) : (loungeUser?.playerId ? String(loungeUser.playerId) : null);
 
 			if (!loungeUser && normalizedServerId) {
 				// Prefer cached lounge mappings before hitting the Lounge API
@@ -231,7 +233,7 @@ class DataManager {
 
 			if (!loungeUser) {
 				loungeUser = await LoungeApi.getPlayerByDiscordId(discordId);
-				resolvedLoungeId = loungeUser?.id ? String(loungeUser.id) : resolvedLoungeId;
+				resolvedLoungeId = loungeUser?.id ? String(loungeUser.id) : (loungeUser?.playerId ? String(loungeUser.playerId) : resolvedLoungeId);
 			}
 
 			if (!loungeUser || !resolvedLoungeId) {

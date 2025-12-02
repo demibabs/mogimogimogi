@@ -1125,6 +1125,7 @@ module.exports = {
 					discordUser,
 					storedRecord,
 					fallbackName,
+					playerDetails,
 				});
 
 				serverData = result.serverData;
@@ -1144,7 +1145,7 @@ module.exports = {
 			await interaction.editReply(`getting ${displayName}'s mogis...`);
 
 			if (!allTables) {
-				allTables = await LoungeApi.getAllPlayerTables(normalizedLoungeId, serverId);
+				allTables = await LoungeApi.getAllPlayerTables(normalizedLoungeId, serverId, playerDetails);
 			}
 			if (!allTables || Object.keys(allTables).length === 0) {
 				return { success: false, message: "no events found for this player." };

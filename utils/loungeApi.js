@@ -247,7 +247,7 @@ async function getTable(tableId) {
  * @param {string} serverId - Discord server ID
  * @returns {Promise<Object>} Object containing all player tables
  */
-async function getAllPlayerTables(loungeId, serverId) {
+async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails = null) {
 	try {
 		const normalizedId = String(loungeId ?? "").trim();
 		if (!normalizedId) {
@@ -284,17 +284,30 @@ async function getAllPlayerTables(loungeId, serverId) {
 			return tables;
 		}
 
-		// Find the maximum table ID we already have
-		const maxTableId = existingTables.length > 0 ?
-			Math.max(...existingTables.map(t => {
-				const value = Number.parseInt(String(t.id), 10);
-				return Number.isNaN(value) ? 0 : value;
-			})) : 0;
+		// Find the maximum table ID we already have and its season
+		let maxTableId = 0;
+		let startSeason = 0;
+
+		for (const table of Object.values(tables)) {
+			const tId = Number(table.id);
+			if (!Number.isNaN(tId) && tId > maxTableId) {
+				maxTableId = tId;
+				const tSeason = Number(table.season);
+				startSeason = !Number.isNaN(tSeason) ? tSeason : 0;
+			}
+		}
 
 		// Get new tables from API
-		for (let season = 0; season <= DEFAULT_SEASON; season++) {
+		for (let season = startSeason; season <= DEFAULT_SEASON; season++) {
 			try {
-				const details = await getPlayerDetailsByLoungeId(numericId, season);
+				let details = null;
+				if (currentSeasonPlayerDetails && Number(currentSeasonPlayerDetails.season) === season) {
+					details = currentSeasonPlayerDetails;
+				}
+				else {
+					details = await getPlayerDetailsByLoungeId(numericId, season);
+				}
+
 				if (!details?.mmrChanges) {
 					continue;
 				}

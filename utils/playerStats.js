@@ -737,7 +737,7 @@ class PlayerStats {
 		return tables;
 	}
 
-	static async getTotalH2H(tables, playerIdentifier, serverId) {
+	static async getTotalH2H(tables, playerIdentifier, serverId, serverDataOverride = null) {
 		const normalizedTargetId = PlayerStats.normalizeIdentifier(playerIdentifier);
 		const record = {
 			wins: 0,
@@ -747,7 +747,7 @@ class PlayerStats {
 		if (!normalizedTargetId) {
 			return record;
 		}
-		const serverData = await database.getServerData(serverId);
+		const serverData = serverDataOverride || await database.getServerData(serverId);
 		if (!serverData?.users) {
 			return record;
 		}

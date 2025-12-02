@@ -1062,9 +1062,10 @@ module.exports = {
 			}
 			const computedBaseId = preferredBaseId;
 			const secondaryPlayerId = computedBaseId === normalizedLeftId ? normalizedRightId : normalizedLeftId;
+			const basePlayerDetails = computedBaseId === normalizedLeftId ? leftPlayerDetails : rightPlayerDetails;
 
 			if (!basePlayerTables) {
-				basePlayerTables = await LoungeApi.getAllPlayerTables(computedBaseId, serverId);
+				basePlayerTables = await LoungeApi.getAllPlayerTables(computedBaseId, serverId, basePlayerDetails);
 			}
 			basePlayerId = computedBaseId;
 			if (!basePlayerTables || Object.keys(basePlayerTables).length === 0) {

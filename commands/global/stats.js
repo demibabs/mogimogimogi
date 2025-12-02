@@ -667,7 +667,7 @@ module.exports = {
 				return;
 			}
 
-			const serverData = await Database.getServerData(serverId);
+			const serverData = validation.serverData;
 			const target = await resolveTargetPlayer(interaction, {
 				rawInput: rawPlayer,
 				defaultToInvoker: !rawPlayer,
@@ -919,6 +919,7 @@ module.exports = {
 					discordUser,
 					storedRecord,
 					fallbackName,
+					playerDetails,
 				});
 
 				serverData = result.serverData;
@@ -938,7 +939,7 @@ module.exports = {
 			await interaction.editReply(`getting ${displayName}'s mogis...`);
 
 			if (!allTables) {
-				allTables = await LoungeApi.getAllPlayerTables(normalizedLoungeId, serverId);
+				allTables = await LoungeApi.getAllPlayerTables(normalizedLoungeId, serverId, playerDetails);
 			}
 			if (!allTables || Object.keys(allTables).length === 0) {
 				return { success: false, message: "no events found for this player." };
@@ -959,8 +960,13 @@ module.exports = {
 
 
 			if (!favorites) {
-				const userData = await Database.getUserData(normalizedLoungeId);
-				favorites = userData?.favorites || {};
+				if (storedRecord && storedRecord.favorites) {
+					favorites = storedRecord.favorites;
+				}
+				else {
+					const userData = await Database.getUserData(normalizedLoungeId);
+					favorites = userData?.favorites || {};
+				}
 			}
 			if (!trackName) {
 				trackName = favorites.track || GameData.getRandomTrack();
@@ -978,7 +984,7 @@ module.exports = {
 				globals = await LoungeApi.getGlobalStats();
 			}
 
-			const playerStats = await getPlayerStats(normalizedLoungeId, serverId, filteredTables, playerDetails);
+			const playerStats = await getPlayerStats(normalizedLoungeId, serverId, filteredTables, playerDetails, serverData);
 			const mmrRaw = Number(playerStats?.mmr);
 			const mmr = Number.isFinite(mmrRaw) ? mmrRaw : 0;
 			const mmrDeltaFromTables = PlayerStats.getTotalMmrDeltaFromTables(filteredTables, normalizedLoungeId);
@@ -1366,10 +1372,10 @@ module.exports = {
 };
 
 
-async function getPlayerStats(loungeId, serverId, tables) {
+async function getPlayerStats(loungeId, serverId, tables, playerDetails = null, serverData = null) {
 	try {
 		const normalizedLoungeId = String(loungeId);
-		const player = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
+		const player = playerDetails || await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
 		const mmr = player.mmr;
 		const rank = player.overallRank;
 		const matchesPlayed = PlayerStats.getMatchesPlayed(tables, normalizedLoungeId);
@@ -1381,7 +1387,7 @@ async function getPlayerStats(loungeId, serverId, tables) {
 		const worstScore = PlayerStats.getWorstScore(tables, normalizedLoungeId);
 		const partnerAverage = PlayerStats.getPartnerAverage(tables, normalizedLoungeId);
 		const playerCount = PlayerStats.getAveragePlayerCount(tables, normalizedLoungeId);
-		const tH2H = await PlayerStats.getTotalH2H(tables, normalizedLoungeId, serverId);
+		const tH2H = await PlayerStats.getTotalH2H(tables, normalizedLoungeId, serverId, serverData);
 
 		return {
 			mmr,

@@ -162,6 +162,7 @@ class AutoUserManager {
 		discordUser,
 		storedRecord,
 		fallbackName,
+		playerDetails = null,
 	}) {
 		const normalizedLoungeId = String(loungeId);
 		const ensureResult = await DataManager.ensureUserRecord({
@@ -170,6 +171,7 @@ class AutoUserManager {
 			serverId,
 			client: interaction.client,
 			guild: interaction.guild ?? null,
+			loungeProfileOverride: playerDetails,
 		});
 
 		if (ensureResult?.userRecord) {
@@ -266,7 +268,7 @@ class AutoUserManager {
 			if (!isMember) continue;
 
 			try {
-				const updated = await DataManager.updateServerUser(serverId, normalizedId, interaction.client);
+				const updated = await DataManager.updateServerUser(serverId, normalizedId, interaction.client, playerDetails);
 				if (updated) {
 					break;
 				}
