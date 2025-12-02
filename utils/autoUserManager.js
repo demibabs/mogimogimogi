@@ -286,3 +286,5 @@ class AutoUserManager {
 		};
 	}
 }
+
+module.exports = AutoUserManager;
