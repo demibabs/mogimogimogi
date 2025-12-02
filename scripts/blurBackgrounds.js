@@ -4,7 +4,7 @@ const path = require("path");
 const { createCanvas, loadImage } = require("canvas");
 const StackBlur = require("stackblur-canvas");
 
-const BLUR_RADIUS = 12;
+const BLUR_RADIUS = 8;
 const VALID_EXTENSIONS = new Set([".png", ".jpg", ".jpeg"]);
 const ROOT_DIR = path.resolve(__dirname, "..", "images");
 const DIRECTORY_PAIRS = [
