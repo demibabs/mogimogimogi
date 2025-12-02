@@ -20,7 +20,7 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "start": "node --optimize_for_size --max-old-space-size=2048 --gc-interval=100 index.js",
+    "start": "node index.js",
     "deploy": "node deploy.js",
     "test": "test"
   },
