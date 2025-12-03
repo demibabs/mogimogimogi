@@ -1106,9 +1106,12 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 
 	await interaction.editReply("rendering image...");
 	const trackName = await resolveRankStatsTrackName(loungeId, session?.trackName);
+	let userData = options?.userData || null;
 	if (!favorites) {
 		try {
-			const userData = await Database.getUserData(loungeId);
+			if (!userData) {
+				userData = await Database.getUserData(loungeId);
+			}
 			favorites = userData?.favorites || {};
 		}
 		catch (error) {
@@ -1116,6 +1119,31 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 			favorites = {};
 		}
 	}
+
+	let tipMessage = "";
+	const isSelf = interaction.user.id === (target.discordUser?.id || discordUser?.id);
+	if (isSelf && (!favorites || !favorites.track)) {
+		if (!userData) {
+			try {
+				userData = await Database.getUserData(loungeId);
+			}
+			catch (e) {
+				console.warn("failed to fetch user data for tip", e);
+			}
+		}
+
+		if (userData && !userData.customizeTipShown) {
+			tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
+			userData.customizeTipShown = true;
+			try {
+				await Database.saveUserData(loungeId, userData);
+			}
+			catch (e) {
+				console.warn("failed to save tip flag", e);
+			}
+		}
+	}
+
 	if (!favoriteCharacterImage || !favoriteVehicleImage) {
 		const [characterImage, vehicleImage] = await Promise.all([
 			favoriteCharacterImage ? Promise.resolve(favoriteCharacterImage) : loadFavoriteCharacterImage(favorites),
@@ -1188,7 +1216,7 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		},
 	};
 
-	return { success: true, attachment, content: linkMessage, filters, session: sessionPayload };
+	return { success: true, attachment, content: tipMessage + linkMessage, filters, session: sessionPayload };
 }
 
 function getPlayerEmoji(playerDetails) {
@@ -1415,10 +1443,29 @@ module.exports = {
 				}
 			}
 
+			let freshUserData = null;
+			try {
+				if (loungeId) {
+					freshUserData = await Database.getUserData(loungeId);
+					if (freshUserData?.favorites) {
+						if (cachedSession) {
+							cachedSession.favorites = freshUserData.favorites;
+							if (freshUserData.favorites.track) {
+								cachedSession.trackName = freshUserData.favorites.track;
+							}
+						}
+					}
+				}
+			}
+			catch (error) {
+				console.warn("failed to refresh favorites", error);
+			}
+
 			try {
 				const result = await generateRankStats(interaction, target, serverId, serverData, {
 					filters: nextFilters,
 					session: cachedSession && cachedSession.loungeId === loungeId ? cachedSession : null,
+					userData: freshUserData,
 				});
 
 				if (!isRankStatsRenderActive(messageId, renderToken)) {

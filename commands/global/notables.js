@@ -1063,6 +1063,24 @@ module.exports = {
 				cachedSession.pendingFilters = futureFilters;
 			}
 
+			let freshUserData = null;
+			try {
+				if (loungeId) {
+					freshUserData = await Database.getUserData(loungeId);
+					if (freshUserData?.favorites) {
+						if (cachedSession) {
+							cachedSession.favorites = freshUserData.favorites;
+							if (freshUserData.favorites.track) {
+								cachedSession.trackName = freshUserData.favorites.track;
+							}
+						}
+					}
+				}
+			}
+			catch (error) {
+				console.warn("failed to refresh favorites", error);
+			}
+
 			const renderToken = beginNotablesRender(messageId);
 			if (cachedSession) {
 				cachedSession.activeRequestToken = renderToken;
@@ -1078,7 +1096,7 @@ module.exports = {
 					playerCountFilter,
 					timeFilter,
 					serverData,
-					{ session: cachedSession, filtersOverride: futureFilters },
+					{ session: cachedSession, filtersOverride: futureFilters, userData: freshUserData },
 				);
 
 				if (isNotablesRenderActive(messageId, renderToken)) {
@@ -1198,10 +1216,38 @@ module.exports = {
 
 			await interaction.editReply("calculating...");
 
+			let userData = cacheOptions?.userData || null;
 			if (!favorites) {
-				const userData = await Database.getUserData(normalizedLoungeId);
+				if (!userData) {
+					userData = await Database.getUserData(normalizedLoungeId);
+				}
 				favorites = userData?.favorites || {};
 			}
+
+			let tipMessage = "";
+			const isSelf = interaction.user.id === (target.discordUser?.id || discordUser?.id);
+			if (isSelf && (!favorites || !favorites.track)) {
+				if (!userData) {
+					try {
+						userData = await Database.getUserData(normalizedLoungeId);
+					}
+					catch (e) {
+						console.warn("failed to fetch user data for tip", e);
+					}
+				}
+
+				if (userData && !userData.customizeTipShown) {
+					tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
+					userData.customizeTipShown = true;
+					try {
+						await Database.saveUserData(normalizedLoungeId, userData);
+					}
+					catch (e) {
+						console.warn("failed to save tip flag", e);
+					}
+				}
+			}
+
 			if (!trackName) {
 				trackName = favorites.track || GameData.getRandomTrack();
 			}
@@ -1275,7 +1321,7 @@ module.exports = {
 
 			return {
 				success: true,
-				content: linkMessage || "",
+				content: tipMessage + (linkMessage || ""),
 				files: [attachment],
 				session: updatedSession,
 			};
