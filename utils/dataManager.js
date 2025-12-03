@@ -163,7 +163,7 @@ class DataManager {
 				discordUser = guildMember.user;
 			}
 
-			if (discordUser && client) {
+			if (!discordUser && client) {
 				try {
 					discordUser = await client.users.fetch(discordId);
 				}
