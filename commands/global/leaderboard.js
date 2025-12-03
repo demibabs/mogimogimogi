@@ -418,12 +418,16 @@ async function renderLeaderboardImage({
 	}
 	ctx.font = `700 ${LAYOUT.headerTitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
 	ctx.fillStyle = palette.headerColor || "#000000";
-	await drawTextWithEmojis(ctx, serverName, textStartX, titleBaseline, {
+	const maxTitleWidth = headerFrame.left + headerFrame.width - textStartX - 20;
+	const fittedTitle = truncateTextWithEmojis(ctx, serverName, maxTitleWidth, {
+		font: ctx.font,
+		emojiSize: LAYOUT.headerTitleFontSize * 0.92,
+	});
+	await drawTextWithEmojis(ctx, fittedTitle, textStartX, titleBaseline, {
 		font: ctx.font,
 		fillStyle: ctx.fillStyle,
 		emojiSize: LAYOUT.headerTitleFontSize * 0.92,
 		lineHeight: LAYOUT.headerTitleFontSize * 1.2,
-		maxWidth: headerFrame.left + headerFrame.width - textStartX - 20,
 	});
 
 	ctx.font = `${LAYOUT.headerSubtitleFontSize}px ${Fonts.FONT_FAMILY_STACK}`;

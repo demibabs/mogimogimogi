@@ -24,6 +24,8 @@ const {
 	loadWebPAsPng,
 	getCountryFlag,
 	drawEmoji,
+	drawTextWithEmojis,
+	truncateTextWithEmojis,
 } = EmbedEnhancer;
 
 const EDGE_RADIUS = 30;
@@ -671,43 +673,6 @@ async function renderNotablesImage({
 	subtitleParts.push(eventsLabel);
 	const subtitleText = subtitleParts.join(" · ");
 
-	ctx.save();
-	ctx.textAlign = "left";
-	ctx.textBaseline = "alphabetic";
-	const playerEmoji = getCountryFlag(playerDetails?.countryCode);
-	const emojiSize = LAYOUT.headerEmojiSize;
-	const emojiGap = LAYOUT.headerEmojiGap;
-	const titleFontSize = LAYOUT.headerTitleFontSize;
-	const subtitleFontSize = LAYOUT.headerSubtitleFontSize;
-	const hasSubtitle = Boolean(subtitleText);
-	const textBlockHeight = titleFontSize + (hasSubtitle ? LAYOUT.headerSubtitleGap + subtitleFontSize : 0);
-	const textBlockTop = headerFrame.top + (headerFrame.height - textBlockHeight) / 2 + LAYOUT.headerTextVerticalAdjustment;
-	const titleBaseline = textBlockTop + titleFontSize;
-	const subtitleBaseline = hasSubtitle ? titleBaseline + LAYOUT.headerSubtitleGap + subtitleFontSize : null;
-	let textX = headerFrame.left + LAYOUT.headerPaddingHorizontal;
-
-	if (playerEmoji) {
-		const emojiY = headerFrame.top + (headerFrame.height - emojiSize) / 2;
-		try {
-			await drawEmoji(ctx, playerEmoji, textX, emojiY, emojiSize);
-		}
-		catch (emojiError) {
-			console.warn("failed to draw header emoji:", emojiError);
-		}
-		textX += emojiSize + emojiGap;
-	}
-
-	ctx.font = `700 ${titleFontSize}px Lexend`;
-	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
-	ctx.fillText(headerTitle, textX, titleBaseline);
-
-	if (hasSubtitle && subtitleBaseline !== null) {
-		ctx.font = `${subtitleFontSize}px Lexend`;
-		ctx.fillStyle = trackColors.statsTextColor || "#333333";
-		ctx.fillText(subtitleText, textX, subtitleBaseline);
-	}
-	ctx.restore();
-
 	const scaleToFavoriteFrame = image => {
 		const maxSize = LAYOUT.headerFavoriteMaxSize;
 		const width = Math.max(image?.width || 1, 1);
@@ -757,6 +722,78 @@ async function renderNotablesImage({
 			height: LAYOUT.headerAvatarSize,
 		});
 	}
+
+	const assetsWidth = headerAssets.reduce((sum, asset) => sum + asset.width, 0);
+	const assetsGaps = Math.max(headerAssets.length - 1, 0) * LAYOUT.headerAssetGap;
+	// Calculate how much space the assets take from the right edge of the header frame
+	// The assets start at headerFrame.left + headerFrame.width - LAYOUT.headerPaddingHorizontal + LAYOUT.headerAssetOffsetX
+	// And grow leftwards.
+	// Actually, let's just calculate the leftmost X of the assets.
+	let assetsLeftX = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingHorizontal + LAYOUT.headerAssetOffsetX;
+	// We need to simulate the loop to find the leftmost point
+	let tempCursor = assetsLeftX;
+	for (let index = headerAssets.length - 1; index >= 0; index--) {
+		const asset = headerAssets[index];
+		tempCursor -= asset.width;
+		if (index > 0) {
+			tempCursor -= LAYOUT.headerAssetGap;
+		}
+	}
+	assetsLeftX = tempCursor;
+
+	ctx.save();
+	ctx.textAlign = "left";
+	ctx.textBaseline = "alphabetic";
+	const playerEmoji = getCountryFlag(playerDetails?.countryCode);
+	const emojiSize = LAYOUT.headerEmojiSize;
+	const emojiGap = LAYOUT.headerEmojiGap;
+	const titleFontSize = LAYOUT.headerTitleFontSize;
+	const subtitleFontSize = LAYOUT.headerSubtitleFontSize;
+	const hasSubtitle = Boolean(subtitleText);
+	const textBlockHeight = titleFontSize + (hasSubtitle ? LAYOUT.headerSubtitleGap + subtitleFontSize : 0);
+	const textBlockTop = headerFrame.top + (headerFrame.height - textBlockHeight) / 2 + LAYOUT.headerTextVerticalAdjustment;
+	const titleBaseline = textBlockTop + titleFontSize;
+	const subtitleBaseline = hasSubtitle ? titleBaseline + LAYOUT.headerSubtitleGap + subtitleFontSize : null;
+	let textX = headerFrame.left + LAYOUT.headerPaddingHorizontal;
+
+	if (playerEmoji) {
+		const emojiY = headerFrame.top + (headerFrame.height - emojiSize) / 2;
+		try {
+			await drawEmoji(ctx, playerEmoji, textX, emojiY, emojiSize);
+		}
+		catch (emojiError) {
+			console.warn("failed to draw header emoji:", emojiError);
+		}
+		textX += emojiSize + emojiGap;
+	}
+
+	ctx.font = `700 ${titleFontSize}px Lexend`;
+	ctx.fillStyle = trackColors.headerColor || trackColors.statsTextColor || "#111111";
+
+	// Calculate available width for text
+	// textX is where text starts. assetsLeftX is where assets start.
+	// We want some padding between text and assets.
+	const textRightPadding = 20;
+	const maxTitleWidth = Math.max(0, assetsLeftX - textX - textRightPadding);
+
+	const fittedTitle = truncateTextWithEmojis(ctx, headerTitle, maxTitleWidth, {
+		font: ctx.font,
+		emojiSize: titleFontSize * 0.92,
+	});
+
+	await drawTextWithEmojis(ctx, fittedTitle, textX, titleBaseline, {
+		font: ctx.font,
+		fillStyle: ctx.fillStyle,
+		emojiSize: titleFontSize * 0.92,
+		lineHeight: titleFontSize * 1.2,
+	});
+
+	if (hasSubtitle && subtitleBaseline !== null) {
+		ctx.font = `${subtitleFontSize}px Lexend`;
+		ctx.fillStyle = trackColors.statsTextColor || "#333333";
+		ctx.fillText(subtitleText, textX, subtitleBaseline);
+	}
+	ctx.restore();
 
 	let assetCursor = headerFrame.left + headerFrame.width - LAYOUT.headerPaddingHorizontal + LAYOUT.headerAssetOffsetX;
 	for (let index = headerAssets.length - 1; index >= 0; index--) {
