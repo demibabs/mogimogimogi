@@ -163,7 +163,7 @@ class DataManager {
 				discordUser = guildMember.user;
 			}
 
-			if (!discordUser && client) {
+			if (discordUser && client) {
 				try {
 					discordUser = await client.users.fetch(discordId);
 				}
@@ -172,11 +172,6 @@ class DataManager {
 						console.warn(`failed to fetch discord user ${discordId}:`, error);
 					}
 				}
-			}
-
-			if (discordUser?.username && record.username !== discordUser.username) {
-				record.username = discordUser.username;
-				changed = true;
 			}
 
 			if (serverId && guildMember) {
@@ -298,8 +293,7 @@ class DataManager {
 			const userPayload = {
 				...existingUser,
 				loungeId,
-				username: user.username,
-				loungeName: loungeUser.name || existingUser?.loungeName || existingUser?.username || null,
+				loungeName: loungeUser.name || existingUser?.loungeName || null,
 				lastUpdated: new Date().toISOString(),
 				servers: Array.from(servers),
 				discordIds: Array.from(discordIds),

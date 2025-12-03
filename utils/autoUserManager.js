@@ -193,9 +193,6 @@ class AutoUserManager {
 			if (!target.loungeName && ensureResult.userRecord.loungeName) {
 				target.loungeName = ensureResult.userRecord.loungeName;
 			}
-			if (!target.displayName && ensureResult.userRecord.username) {
-				target.displayName = ensureResult.userRecord.username;
-			}
 			if (!loungeName && ensureResult.userRecord.loungeName) {
 				loungeName = ensureResult.userRecord.loungeName;
 			}

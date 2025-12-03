@@ -960,7 +960,6 @@ class Database {
 					const payload = {
 						loungeId: existing?.loungeId || normalizedId,
 						legacyDiscordId: userId,
-						username: userInfo.username || existing?.username || null,
 						loungeName: userInfo.loungeName || existing?.loungeName || null,
 						lastUpdated: userInfo.lastUpdated || existing?.lastUpdated || null,
 						servers: Array.from(servers),
