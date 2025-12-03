@@ -85,13 +85,21 @@ for (const folder of commandFolders) {
 	}
 }
 
-client.once(Events.ClientReady, readyClient => {
+function updatePresence() {
+	const serverCount = client.guilds.cache.size;
 	client.user.setActivity({
-		name: "your matches...",
-		type: ActivityType.Watching,
+		name: `/head-to-head • ${serverCount} servers`,
+		type: ActivityType.Custom,
 	});
+}
+
+client.once(Events.ClientReady, readyClient => {
+	updatePresence();
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
+
+client.on(Events.GuildCreate, () => updatePresence());
+client.on(Events.GuildDelete, () => updatePresence());
 
 client.on(Events.GuildMemberAdd, async member => {
 	try {
