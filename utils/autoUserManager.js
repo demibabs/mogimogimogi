@@ -203,8 +203,9 @@ class AutoUserManager {
 
 		if (ensureResult?.discordUser && !discordUser) {
 			discordUser = ensureResult.discordUser;
-			if (!target.displayName) {
-				target.displayName = ensureResult.discordUser.displayName || ensureResult.discordUser.username;
+			const discordName = ensureResult.discordUser.displayName || ensureResult.discordUser.username;
+			if (discordName) {
+				target.displayName = discordName;
 			}
 		}
 		if (ensureResult?.loungeProfile?.name && (!loungeName || loungeName === fallbackName)) {
