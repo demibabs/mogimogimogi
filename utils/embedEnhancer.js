@@ -328,8 +328,12 @@ function formatSignedNumber(value) {
 // We use a conservative emoji regex (covers standard pictographs, flags, keycaps, modifiers) and fall back
 // to regular text for anything not matched.
 
-// Simplified broad emoji regex: matches surrogate pairs & some symbols. Not exhaustive but avoids eslint char class issues.
-const EMOJI_REGEX = /(?:[\u231A-\u231B]|[\u23E9-\u23F3]|[\u23F8-\u23FA]|[\u2600-\u27BF]|[\u2B05-\u2B55]|[\u2934-\u2935]|[\u3297\u3299]|[\u3030\u303D]|[\u24C2]|[\u00A9\u00AE\u2122\u2139]|[\uD83C][\uDF00-\uDFFF]|[\uD83D][\uDC00-\uDE4F]|[\uD83D][\uDE80-\uDEFF]|[\uD83E][\uDD00-\uDDFF])/g;
+// Comprehensive emoji regex using Unicode Property Escapes (requires Node.js 10+)
+// Matches:
+// 1. Keycap sequences (e.g. 1️⃣)
+// 2. Regional Indicators (flags)
+// 3. Extended Pictographics (most emojis) with optional modifiers, variation selectors, and ZWJ sequences
+const EMOJI_REGEX = /(?:[0-9#*]\uFE0F\u20E3|\p{RI}\p{RI}|\p{Extended_Pictographic}(?:\p{EMod}|\uFE0F\u20E3?)?(?:\u200D\p{Extended_Pictographic}(?:\p{EMod}|\uFE0F\u20E3?)?)*)/gu;
 
 function splitRuns(text) {
 	if (!text) return [];
