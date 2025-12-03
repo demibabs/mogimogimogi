@@ -994,6 +994,9 @@ module.exports = {
 					if (result.serverData) {
 						serverData = result.serverData;
 					}
+					if (result.discordUser) {
+						target.discordUser = result.discordUser;
+					}
 				}
 				catch (ensureError) {
 					console.warn("failed to ensure user record:", ensureError);
