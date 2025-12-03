@@ -200,7 +200,7 @@ class AutoUserManager {
 
 		if (ensureResult?.discordUser && !discordUser) {
 			discordUser = ensureResult.discordUser;
-			const discordName = ensureResult.discordUser.displayName || ensureResult.discordUser.username;
+			const discordName = ensureResult.discordUser.displayName || ensureResult.discordUser.globalName;
 			if (discordName) {
 				target.displayName = discordName;
 			}

@@ -848,7 +848,7 @@ module.exports = {
 						.find(Boolean);
 					if (!loungeId || seenValues.has(loungeId)) continue;
 
-					const displayName = player.name || player.loungeName || player.playerName || player.username;
+					const displayName = player.name || player.loungeName || player.playerName;
 					if (!displayName) continue;
 
 					suggestions.push({

@@ -141,7 +141,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	// Handle slash commands
 	if (interaction.isChatInputCommand()) {
 		const guildName = interaction.guild?.name || "DM";
-		const displayName = interaction.member?.displayName || interaction.user?.globalName || interaction.user?.username || "unknown";
+		const displayName = interaction.member?.displayName || interaction.user?.globalName || "unknown";
 		console.log(`Chat input command: ${interaction.commandName} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
 
 		const command = interaction.client.commands.get(interaction.commandName);
@@ -169,7 +169,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	// Handle button interactions
 	else if (interaction.isButton()) {
 		const guildName = interaction.guild?.name || "DM";
-		const displayName = interaction.member?.displayName || interaction.user?.globalName || interaction.user?.username || "unknown";
+		const displayName = interaction.member?.displayName || interaction.user?.globalName || "unknown";
 		console.log(`Button interaction: ${interaction.customId} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
 
 		await trackButtonInteractionUsage(interaction);

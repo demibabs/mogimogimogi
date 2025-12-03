@@ -476,7 +476,7 @@ function ensureBucket(map, tier) {
 }
 
 function getPlayerLabel(player) {
-	return player?.playerName || player?.username || player?.loungeName || player?.playerDiscordId || `player ${player?.playerId || "?"}`;
+	return player?.playerName || player?.loungeName || player?.playerDiscordId || `player ${player?.playerId || "?"}`;
 }
 
 function buildMatchSummary({ opponent, tier, table, opponentPrevMmr, playerScore, opponentScore }) {
@@ -1262,7 +1262,7 @@ module.exports = {
 						.map(id => id === undefined || id === null ? null : String(id))
 						.find(Boolean);
 					if (!loungeId || seen.has(loungeId)) continue;
-					const displayName = player.name || player.loungeName || player.playerName || player.username;
+					const displayName = player.name || player.loungeName || player.playerName;
 					if (!displayName) continue;
 					suggestions.push({
 						name: displayName.length > 100 ? `${displayName.slice(0, 97)}...` : displayName,

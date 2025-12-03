@@ -262,9 +262,17 @@ module.exports = {
 		}
 
 		let ensureResult = null;
+		const target = {
+			loungeId,
+			loungeName,
+			displayName: interaction.member?.displayName || interaction.user.globalName || interaction.user.username,
+			discordUser: interaction.user,
+		};
+
 		try {
 			ensureResult = await AutoUserManager.ensureUserAndMembership({
 				interaction,
+				target,
 				serverId,
 				serverData,
 				loungeId,
@@ -348,7 +356,6 @@ module.exports = {
 			...baseUser,
 			loungeId,
 			userId,
-			username: ensureResult?.discordUser?.username || interaction.user.username,
 			loungeName: baseUser.loungeName || ensureResult?.loungeProfile?.name || null,
 			servers: Array.from(servers),
 			discordIds: Array.from(discordIds),

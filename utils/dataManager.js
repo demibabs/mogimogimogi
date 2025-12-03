@@ -229,7 +229,7 @@ class DataManager {
 						const cachedUser = await database.getUserData(resolvedLoungeId);
 						loungeUser = {
 							id: resolvedLoungeId,
-							name: cachedUser?.loungeName || cachedUser?.username || null,
+							name: cachedUser?.loungeName || null,
 						};
 					}
 				}
@@ -365,21 +365,9 @@ class DataManager {
 	 */
 	static async getUsernameFromId(userId, client, serverId = null) {
 		try {
-			// Try to get from stored data first (if serverId provided)
-			if (serverId) {
-				const serverData = await database.getServerData(serverId);
-				const loungeId = serverData?.discordIndex?.[String(userId)] || null;
-				if (loungeId) {
-					const storedUser = await database.getUserData(loungeId);
-					if (storedUser?.username) {
-						return storedUser.username;
-					}
-				}
-			}
-
 			// Fetch fresh from Discord
 			const user = await client.users.fetch(userId);
-			return user.username;
+			return user.globalName || user.username;
 		}
 		catch (error) {
 			console.error(`Error fetching username for ${userId}:`, error);

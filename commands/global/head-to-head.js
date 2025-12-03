@@ -656,7 +656,7 @@ function buildAutocompleteSuggestions(serverPlayers, query, limit = 10) {
 	const seen = new Set();
 
 	for (const entry of serverPlayers) {
-		const loungeName = entry.loungeName || entry.username;
+		const loungeName = entry.loungeName;
 		if (!loungeName) continue;
 		const lower = loungeName.toLowerCase();
 		if (normalizedQuery && !lower.includes(normalizedQuery)) continue;
@@ -717,7 +717,7 @@ module.exports = {
 						.map((v) => (v == null ? null : String(v)))
 						.find(Boolean);
 					if (!loungeId || seen.has(loungeId)) continue;
-					const name = player.name || player.loungeName || player.playerName || player.username;
+					const name = player.name || player.loungeName || player.playerName;
 					if (!name) continue;
 					suggestions.push({
 						name: name.length > 100 ? `${name.slice(0, 97)}...` : name,
