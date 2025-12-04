@@ -633,7 +633,7 @@ function buildMatchLinksMessage(bestWin, worstLoss) {
 	};
 	appendLink(bestWin, "best win");
 	appendLink(worstLoss, "toughest loss");
-	return parts.length ? `links: ${parts.join(", ")}` : "";
+	return parts.length ? `**links:** ${parts.join(", ")}` : "";
 }
 
 function buildFilterSubtitle(filters, tableCount) {
@@ -1133,7 +1133,7 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		}
 
 		if (userData && !userData.customizeTipShown) {
-			tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
+			tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n";
 			userData.customizeTipShown = true;
 			try {
 				await Database.saveUserData(loungeId, userData);

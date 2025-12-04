@@ -1003,7 +1003,7 @@ module.exports = {
 				}
 
 				if (userData && !userData.customizeTipShown) {
-					tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
+					tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n";
 					userData.customizeTipShown = true;
 					try {
 						await Database.saveUserData(normalizedLoungeId, userData);
@@ -1405,7 +1405,7 @@ module.exports = {
 
 			return {
 				success: true,
-				content: `${tipMessage}[link to ${displayName}'s lounge profile](https://lounge.mkcentral.com/mkworld/PlayerDetails/${normalizedLoungeId})`,
+				content: `${tipMessage}**link:** [${displayName}'s lounge profile](https://lounge.mkcentral.com/mkworld/PlayerDetails/${normalizedLoungeId})`,
 				files: [attachment],
 				session: updatedSession,
 			};

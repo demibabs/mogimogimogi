@@ -1246,7 +1246,7 @@ module.exports = {
 					`[${playerRight.displayName}'s biggest win](https://lounge.mkcentral.com/mkworld/TableDetails/${rightBestWin.tableId})`,
 				);
 			}
-			const content = linkParts.length ? `links: ${linkParts.join(", ")}` : "";
+			const content = linkParts.length ? `**links:** ${linkParts.join(", ")}` : "";
 
 			return {
 				success: true,

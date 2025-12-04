@@ -510,7 +510,7 @@ function buildTableLinksMessage(events) {
 		const label = event?.title ? `${event.title}` : "";
 		parts.push(`[${label}](${link})`.trim());
 	}
-	return "links: " + parts.join(", ");
+	return "**links:** " + parts.join(", ");
 }
 
 function drawEventsColumn(ctx, frame, trackColors, events) {
@@ -1237,7 +1237,7 @@ module.exports = {
 				}
 
 				if (userData && !userData.customizeTipShown) {
-					tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
+					tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n";
 					userData.customizeTipShown = true;
 					try {
 						await Database.saveUserData(normalizedLoungeId, userData);
