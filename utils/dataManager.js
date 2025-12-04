@@ -28,7 +28,7 @@ class DataManager {
 				discordUser: { id: userId },
 				client,
 			});
-			
+
 			return true;
 		}
 		catch (error) {
@@ -60,7 +60,7 @@ class DataManager {
 			loungeId: normalizedId,
 			discordIds: [],
 		};
-		
+
 		record.discordIds = Array.isArray(record.discordIds) ? record.discordIds.map(String) : [];
 		let changed = !existingRecord;
 

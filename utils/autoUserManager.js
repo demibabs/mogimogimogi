@@ -19,7 +19,7 @@ class AutoUserManager {
 		}
 		return {
 			success: false,
-			message: "this server hasn't been set up yet. please run `/setup` to enable commands.",
+			message: "this server hasn't been set up yet. please run </setup:1446020866356940867> to enable commands.",
 		};
 	}
 
