@@ -41,7 +41,7 @@ module.exports = {
 			try {
 				await interaction.editReply(`Processing guild ${processedGuilds}/${guilds.size}: ${guild.name}`);
 				const members = await guild.members.fetch();
-				
+
 				// We no longer track server-specific user lists, so we don't remove stale entries.
 				// We just ensure all current members are cached globally.
 
@@ -55,8 +55,8 @@ module.exports = {
 
 						const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
 						if (!loungeUser) continue;
-						
-						const ok = await DataManager.addServerUser(guildId, userId, client);
+
+						const ok = await DataManager.updateServerUser(guildId, userId, client, loungeUser);
 						if (ok) {
 							added++;
 							totalAdded++;

@@ -1,11 +1,12 @@
 const { SlashCommandBuilder } = require("discord.js");
 const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
+const DataManager = require("../../utils/dataManager");
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("setup")
-		.setDescription("scans the server to cache lounge players for faster commands."),
+		.setDescription("adds server lounge users to database."),
 
 	async execute(interaction) {
 		if (!interaction.guild) {
@@ -18,12 +19,11 @@ module.exports = {
 		try {
 			// Check if already setup
 			const existingState = await Database.getServerSetupState(interaction.guild.id);
-			if (existingState?.completed) {
-				await interaction.editReply("updating global cache... scanning members...");
-			}
-			else {
-				await interaction.editReply("setting up server... scanning members (this may take a while)...");
-			}
+			const baseMessage = existingState?.completed
+				? "updating server... scanning members"
+				: "scanning members (this may take a while)";
+
+			await interaction.editReply(`${baseMessage}...`);
 
 			const members = await interaction.guild.members.fetch();
 			const total = members.size;
@@ -49,11 +49,7 @@ module.exports = {
 						// Not cached, check API
 						const player = await LoungeApi.getPlayerByDiscordId(id);
 						if (player?.id) {
-							await Database.saveUserData(player.id, {
-								loungeName: player.name,
-								discordIds: [id],
-								countryCode: player.countryCode,
-							});
+							await DataManager.updateServerUser(interaction.guild.id, id, interaction.client, player);
 							found++;
 							newFound++;
 						}
@@ -64,14 +60,19 @@ module.exports = {
 				}));
 
 				processed += chunk.length;
+				await interaction.editReply(`${baseMessage}... (${processed}/${total})`);
 			}
 
 			await Database.markServerSetupComplete(interaction.guild.id, {
-				memberCount: total,
-				foundCount: found,
+				totalMembers: total,
+				detectedLoungers: found,
+				addedUsers: newFound,
+				removedUsers: 0,
+				initiatedBy: interaction.user.id,
+				source: "setup",
 			});
 
-			await interaction.editReply(`setup complete! scanned ${total} members. found ${found} lounge players (${newFound} new to cache).`);
+			await interaction.editReply("setup complete! use </about-me:1442446575287930960> for all commands.");
 		}
 		catch (error) {
 			console.error("setup error:", error);

@@ -105,6 +105,13 @@ async function resolveTargetPlayer(interaction, {
 				if (lookup?.id) {
 					targetLoungeId = String(lookup.id);
 					loungeName = lookup.name;
+					if (lookup.discordId) {
+						try {
+							discordUser = await interaction.client.users.fetch(lookup.discordId);
+							displayName = discordUser.globalName || discordUser.username;
+						}
+						catch (e) { /* ignore */ }
+					}
 				}
 			}
 			catch (error) {
@@ -151,11 +158,41 @@ async function resolveTargetPlayer(interaction, {
 	}
 
 	// 3. Final hydration if we have an ID but no name
-	if (!loungeName) {
+	if (!loungeName || !discordUser) {
 		try {
-			const player = await LoungeApi.getPlayerByLoungeId(targetLoungeId);
-			if (player?.name) {
-				loungeName = player.name;
+			// Try to find Discord ID from our DB first
+			let storedDiscordId = null;
+			try {
+				const userData = await Database.getUserData(targetLoungeId);
+				if (userData?.discordIds?.length) {
+					storedDiscordId = userData.discordIds[0];
+				}
+				if (userData?.loungeName && !loungeName) {
+					loungeName = userData.loungeName;
+				}
+			}
+			catch (e) { /* ignore */ }
+
+			// If not in DB, check API
+			if (!loungeName || !storedDiscordId) {
+				const player = await LoungeApi.getPlayerByLoungeId(targetLoungeId);
+				if (player) {
+					if (player.name && !loungeName) {
+						loungeName = player.name;
+					}
+					if (player.discordId && !storedDiscordId) {
+						storedDiscordId = String(player.discordId);
+					}
+				}
+			}
+
+			// If we found a Discord ID, fetch the user
+			if (storedDiscordId && !discordUser) {
+				try {
+					discordUser = await interaction.client.users.fetch(storedDiscordId);
+					displayName = discordUser.globalName || discordUser.username;
+				}
+				catch (e) { /* ignore */ }
 			}
 		}
 		catch (error) {

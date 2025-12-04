@@ -313,17 +313,21 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 				}
 				const changes = details.mmrChanges.filter(c => c.reason === "Table" && c.changeId > maxTableId);
 
-				for (const change of changes) {
-					try {
-						const tableData = await getTable(change.changeId);
-						if (tableData) {
-							tables[change.changeId] = tableData;
-							tablesToPersist.set(String(change.changeId), tableData);
+				const CHUNK_SIZE = 5;
+				for (let i = 0; i < changes.length; i += CHUNK_SIZE) {
+					const chunk = changes.slice(i, i + CHUNK_SIZE);
+					await Promise.all(chunk.map(async (change) => {
+						try {
+							const tableData = await getTable(change.changeId);
+							if (tableData) {
+								tables[change.changeId] = tableData;
+								tablesToPersist.set(String(change.changeId), tableData);
+							}
 						}
-					}
-					catch (error) {
-						console.warn(`Could not fetch table ${change.changeId}:`, error);
-					}
+						catch (error) {
+							console.warn(`Could not fetch table ${change.changeId}:`, error);
+						}
+					}));
 				}
 			}
 			catch (error) {
