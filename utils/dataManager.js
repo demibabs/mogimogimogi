@@ -21,20 +21,14 @@ class DataManager {
 				return false;
 			}
 
-			const loungeId = loungeUser.id;
-			const userRecord = await database.getUserData(loungeId);
-			if (userRecord?.servers?.includes(serverId)) {
-				const discordIds = new Set([...(userRecord.discordIds || []), String(userId)]);
-				if (discordIds.size !== (userRecord.discordIds || []).length) {
-					await database.saveUserData(loungeId, {
-						...userRecord,
-						discordIds: Array.from(discordIds),
-					});
-				}
-				return true;
-			}
-
-			await DataManager.updateServerUser(serverId, userId, client, loungeUser);
+			// Just ensure the user exists in the global database
+			await DataManager.ensureUserRecord({
+				loungeId: loungeUser.id,
+				loungeName: loungeUser.name,
+				discordUser: { id: userId },
+				client,
+			});
+			
 			return true;
 		}
 		catch (error) {
@@ -44,41 +38,8 @@ class DataManager {
 	}
 
 	static async removeServerUser(serverId, identifiers = {}) {
-		if (!serverId) {
-			return false;
-		}
-		const normalizedServerId = String(serverId);
-		let resolvedLoungeId = identifiers?.loungeId ? String(identifiers.loungeId) : null;
-		try {
-			if (!resolvedLoungeId && identifiers?.discordId) {
-				const serverData = await database.getServerData(normalizedServerId);
-				resolvedLoungeId = serverData?.discordIndex?.[String(identifiers.discordId)] || null;
-			}
-
-			if (!resolvedLoungeId) {
-				return false;
-			}
-
-			const userRecord = await database.getUserData(resolvedLoungeId);
-			if (!userRecord) {
-				return false;
-			}
-
-			const remainingServers = Array.from(new Set((userRecord.servers || [])
-				.map(String)
-				.filter(id => id !== normalizedServerId)));
-			await database.saveUserData(resolvedLoungeId, {
-				...userRecord,
-				servers: remainingServers,
-				updatedAt: new Date().toISOString(),
-			});
-
-			return true;
-		}
-		catch (error) {
-			console.error(`Error removing user ${identifiers?.discordId || identifiers?.loungeId || "unknown"} from server ${normalizedServerId}:`, error);
-			return false;
-		}
+		// We no longer track server membership, so there's nothing to remove.
+		return true;
 	}
 
 	static async ensureUserRecord({ loungeId, loungeName = null, serverId = null, client = null, guild = null, loungeProfileOverride = null }) {
@@ -97,10 +58,9 @@ class DataManager {
 
 		const record = existingRecord ? JSON.parse(JSON.stringify(existingRecord)) : {
 			loungeId: normalizedId,
-			servers: [],
 			discordIds: [],
 		};
-		record.servers = Array.isArray(record.servers) ? record.servers.map(String) : [];
+		
 		record.discordIds = Array.isArray(record.discordIds) ? record.discordIds.map(String) : [];
 		let changed = !existingRecord;
 
@@ -173,15 +133,6 @@ class DataManager {
 					}
 				}
 			}
-
-			if (serverId && guildMember) {
-				const serverSet = new Set((record.servers || []).map(String));
-				if (!serverSet.has(serverId)) {
-					serverSet.add(serverId);
-					record.servers = Array.from(serverSet);
-					changed = true;
-				}
-			}
 		}
 
 		if (!record.createdAt) {
@@ -212,31 +163,11 @@ class DataManager {
 	static async updateServerUser(serverId, userId, client, loungeUserOverride = null) {
 		try {
 			const discordId = String(userId);
-			const normalizedServerId = serverId ? String(serverId) : null;
 			// Fetch user info from Discord
 			const user = await client.users.fetch(discordId);
 
 			let loungeUser = loungeUserOverride || null;
 			let resolvedLoungeId = loungeUser?.id ? String(loungeUser.id) : (loungeUser?.playerId ? String(loungeUser.playerId) : null);
-
-			if (!loungeUser && normalizedServerId) {
-				// Prefer cached lounge mappings before hitting the Lounge API
-				try {
-					const serverData = await database.getServerData(normalizedServerId);
-					const mappedId = serverData?.discordIndex?.[discordId] || null;
-					if (mappedId) {
-						resolvedLoungeId = String(mappedId);
-						const cachedUser = await database.getUserData(resolvedLoungeId);
-						loungeUser = {
-							id: resolvedLoungeId,
-							name: cachedUser?.loungeName || null,
-						};
-					}
-				}
-				catch (error) {
-					console.warn(`failed to resolve cached lounge mapping for ${discordId}:`, error);
-				}
-			}
 
 			if (!loungeUser) {
 				loungeUser = await LoungeApi.getPlayerByDiscordId(discordId);
@@ -288,14 +219,12 @@ class DataManager {
 			}
 
 			const existingUser = await database.getUserData(loungeId);
-			const servers = new Set([...(existingUser?.servers || []), serverId]);
 			const discordIds = new Set([...(existingUser?.discordIds || []), discordId]);
 			const userPayload = {
 				...existingUser,
 				loungeId,
 				loungeName: loungeUser.name || existingUser?.loungeName || null,
 				lastUpdated: new Date().toISOString(),
-				servers: Array.from(servers),
 				discordIds: Array.from(discordIds),
 			};
 
@@ -314,19 +243,8 @@ class DataManager {
 	 * @returns {Promise<Array>} Array of table objects
 	 */
 	static async getUserTables(loungeId, serverId = null) {
-		const entries = await database.getUserTables(loungeId);
-		if (!serverId) {
-			return entries;
-		}
-		try {
-			const userRecord = await database.getUserData(loungeId);
-			const servers = Array.isArray(userRecord?.servers) ? userRecord.servers.map(String) : [];
-			return servers.includes(serverId) ? entries : [];
-		}
-		catch (error) {
-			console.warn(`failed to load user record ${loungeId} while filtering tables:`, error);
-			return [];
-		}
+		// We no longer filter by serverId as we don't track server membership
+		return await database.getUserTables(loungeId);
 	}
 
 	/**
@@ -381,49 +299,8 @@ class DataManager {
 	 * @returns {Promise<boolean>} Success status
 	 */
 	static async migrateServerData(serverId) {
-		try {
-			// Get current server data (might include embedded tables)
-			const fullData = await database.getServerData(serverId);
-
-			if (!fullData.tables) {
-				console.log(`Server ${serverId} has no tables to migrate`);
-				return true;
-			}
-
-			console.log(`Migrating ${Object.keys(fullData.tables).length} tables for server ${serverId}`);
-
-			// Extract and save each table
-			for (const [tableId, tableData] of Object.entries(fullData.tables)) {
-				await database.saveTable(tableId, tableData);
-
-				// Link users who participated in this table
-				if (tableData.players) {
-					for (const player of tableData.players) {
-						if (player.loungeName && fullData.users) {
-							// Find user ID by lounge name
-							const userId = Object.keys(fullData.users).find(uid =>
-								fullData.users[uid].loungeName === player.loungeName,
-							);
-							if (userId) {
-								await database.linkUserToTable(userId, tableId, serverId);
-							}
-						}
-					}
-				}
-			}
-
-			// Save server data without tables
-			const serverOnlyData = { ...fullData };
-			delete serverOnlyData.tables;
-			await database.saveServerData(serverId, serverOnlyData);
-
-			console.log(`Migration completed for server ${serverId}`);
-			return true;
-		}
-		catch (error) {
-			console.error(`Migration failed for server ${serverId}:`, error);
-			return false;
-		}
+		// No-op: server data is deprecated
+		return true;
 	}
 
 	/**
@@ -432,7 +309,8 @@ class DataManager {
 	 * @returns {Promise<boolean>} Success status
 	 */
 	static async deleteServerData(serverId) {
-		return await database.deleteServerData(serverId);
+		// No-op: server data is deprecated
+		return true;
 	}
 }
 

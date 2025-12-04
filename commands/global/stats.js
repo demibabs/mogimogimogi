@@ -568,50 +568,13 @@ module.exports = {
 			return;
 		}
 
-		const guild = interaction.guild;
-		if (!guild) {
-			await interaction.respond([]);
-			return;
-		}
-
 		const rawQuery = (focused.value || "").trim();
-		const normalizedQuery = rawQuery.toLowerCase();
-		const serverLimit = 5;
-		const globalLimit = 5;
-		const maxSuggestions = serverLimit + globalLimit;
 		const suggestions = [];
 		const seenValues = new Set();
 
-		try {
-			const serverData = await Database.getServerData(guild.id);
-			const users = Object.values(serverData?.users || {});
-			const byName = users
-				.filter(entry => entry?.loungeName)
-				.sort((a, b) => a.loungeName.localeCompare(b.loungeName));
-
-			for (const entry of byName) {
-				const loungeName = entry.loungeName;
-				const normalizedName = loungeName.toLowerCase();
-				if (normalizedQuery && !normalizedName.includes(normalizedQuery)) {
-					continue;
-				}
-				const value = String(entry.loungeId ?? entry.id ?? loungeName);
-				if (seenValues.has(value)) continue;
-				suggestions.push({
-					name: loungeName,
-					value,
-				});
-				seenValues.add(value);
-				if (suggestions.length >= serverLimit) break;
-			}
-		}
-		catch (error) {
-			console.warn("stats autocomplete error:", error);
-		}
-
-		if (rawQuery && suggestions.length < maxSuggestions) {
+		if (rawQuery) {
 			try {
-				const globalResults = await LoungeApi.searchPlayers(rawQuery, { limit: globalLimit });
+				const globalResults = await LoungeApi.searchPlayers(rawQuery, { limit: 10 });
 				for (const player of globalResults) {
 					const loungeId = [player.id, player.playerId, player.loungeId]
 						.map(id => id === undefined || id === null ? null : String(id))
@@ -626,7 +589,7 @@ module.exports = {
 						value: loungeId,
 					});
 					seenValues.add(loungeId);
-					if (suggestions.length >= maxSuggestions) break;
+					if (suggestions.length >= 10) break;
 				}
 			}
 			catch (error) {
@@ -634,7 +597,7 @@ module.exports = {
 			}
 		}
 
-		if (!suggestions.length && normalizedQuery) {
+		if (!suggestions.length && rawQuery) {
 			// allow raw query fallback for direct name or id lookups
 			suggestions.push({
 				name: `search "${rawQuery}"`,
@@ -642,7 +605,7 @@ module.exports = {
 			});
 		}
 
-		await interaction.respond(suggestions.slice(0, maxSuggestions));
+		await interaction.respond(suggestions);
 	},
 
 	async execute(interaction) {
@@ -651,12 +614,6 @@ module.exports = {
 
 			await interaction.editReply("validating user...");
 			const serverId = interaction.guildId;
-			const rawPlayer = interaction.options.getString("player");
-			const timeFilter = "alltime";
-			const queueFilter = "both";
-			const playerCountFilter = "both";
-			const currentFilters = { timeFilter, queueFilter, playerCountFilter };
-
 			const validation = await AutoUserManager.ensureServerReady(serverId);
 			if (!validation.success) {
 				await interaction.editReply({
@@ -667,11 +624,15 @@ module.exports = {
 				return;
 			}
 
-			const serverData = validation.serverData;
+			const rawPlayer = interaction.options.getString("player");
+			const timeFilter = "alltime";
+			const queueFilter = "both";
+			const playerCountFilter = "both";
+			const currentFilters = { timeFilter, queueFilter, playerCountFilter };
+
 			const target = await resolveTargetPlayer(interaction, {
 				rawInput: rawPlayer,
 				defaultToInvoker: !rawPlayer,
-				serverData,
 			});
 
 			if (target.error) {
@@ -690,7 +651,7 @@ module.exports = {
 				playerCountFilter,
 			});
 
-			const result = await this.generateStats(interaction, target, serverId, queueFilter, playerCountFilter, timeFilter, serverData);
+			const result = await this.generateStats(interaction, target, serverId, queueFilter, playerCountFilter, timeFilter);
 
 			if (!result.success) {
 				await interaction.editReply({
@@ -807,10 +768,8 @@ module.exports = {
 			}
 
 			const serverId = interaction.guild.id;
-			const serverData = await Database.getServerData(serverId);
 			const target = await resolveTargetPlayer(interaction, {
 				loungeId,
-				serverData,
 			});
 
 			if (target.error) {
@@ -849,7 +808,7 @@ module.exports = {
 					queueFilter,
 					playerCountFilter,
 					timeFilter,
-					serverData,
+					null,
 					{ session: cachedSession, filtersOverride: futureFilters, userData: freshUserData },
 				);
 
@@ -901,11 +860,6 @@ module.exports = {
 			const session = cacheOptions?.session || null;
 			const useSession = Boolean(session && session.playerDetails && session.allTables && session.trackName);
 
-			let serverData = serverDataOverride || null;
-			if (!serverData && !useSession) {
-				serverData = await Database.getServerData(serverId);
-			}
-
 			let displayName = target.displayName || target.loungeName || fallbackName;
 			let loungeName = target.loungeName || displayName || fallbackName;
 			let playerDetails = useSession ? session.playerDetails : null;
@@ -916,7 +870,7 @@ module.exports = {
 			let trackName = useSession ? session.trackName : null;
 			let globals = useSession ? session.globals || null : null;
 			let discordUser = target.discordUser || (useSession ? session.discordUser : null);
-			let storedRecord = (!useSession && serverData) ? serverData?.users?.[normalizedLoungeId] : null;
+			let storedRecord = null;
 
 			if (!playerDetails) {
 				playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
@@ -930,7 +884,7 @@ module.exports = {
 					interaction,
 					target,
 					serverId,
-					serverData,
+					serverData: null,
 					loungeId: normalizedLoungeId,
 					loungeName,
 					displayName,
@@ -940,7 +894,6 @@ module.exports = {
 					playerDetails,
 				});
 
-				serverData = result.serverData;
 				target = result.target;
 				loungeName = result.loungeName;
 				displayName = result.displayName;
@@ -1030,7 +983,7 @@ module.exports = {
 				globals = await LoungeApi.getGlobalStats();
 			}
 
-			const playerStats = await getPlayerStats(normalizedLoungeId, serverId, filteredTables, playerDetails, serverData);
+			const playerStats = await getPlayerStats(normalizedLoungeId, serverId, filteredTables, playerDetails, null);
 			const mmrRaw = Number(playerStats?.mmr);
 			const mmr = Number.isFinite(mmrRaw) ? mmrRaw : 0;
 			const mmrDeltaFromTables = PlayerStats.getTotalMmrDeltaFromTables(filteredTables, normalizedLoungeId);
@@ -1418,7 +1371,7 @@ module.exports = {
 };
 
 
-async function getPlayerStats(loungeId, serverId, tables, playerDetails = null, serverData = null) {
+async function getPlayerStats(loungeId, serverId, tables, playerDetails = null) {
 	try {
 		const normalizedLoungeId = String(loungeId);
 		const player = playerDetails || await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
@@ -1433,7 +1386,6 @@ async function getPlayerStats(loungeId, serverId, tables, playerDetails = null, 
 		const worstScore = PlayerStats.getWorstScore(tables, normalizedLoungeId);
 		const partnerAverage = PlayerStats.getPartnerAverage(tables, normalizedLoungeId);
 		const playerCount = PlayerStats.getAveragePlayerCount(tables, normalizedLoungeId);
-		const tH2H = await PlayerStats.getTotalH2H(tables, normalizedLoungeId, serverId, serverData);
 
 		return {
 			mmr,

@@ -133,14 +133,6 @@ class Database {
 			await this._ensureUserTablesSchema();
 
 			await this.pool.query(`
-				CREATE TABLE IF NOT EXISTS server_state (
-					server_id VARCHAR(20) PRIMARY KEY,
-					state JSONB NOT NULL,
-					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-				)
-			`);
-
-			await this.pool.query(`
 				CREATE TABLE IF NOT EXISTS command_usage (
 					command_name VARCHAR(50) PRIMARY KEY,
 					slash_count INTEGER NOT NULL DEFAULT 0,
@@ -209,12 +201,45 @@ class Database {
 		return await this._getUserDataFromFile(normalizedId);
 	}
 
+	async getUserByDiscordId(discordId) {
+		const normalizedDiscordId = String(discordId);
+		if (this.useDatabase) {
+			try {
+				const result = await this.pool.query(
+					`SELECT user_id, data
+					 FROM user_data
+					 WHERE (data -> 'discordIds') ? $1`,
+					[normalizedDiscordId],
+				);
+				if (result.rows.length === 0) return null;
+				const record = result.rows[0].data || {};
+				return {
+					loungeId: record.loungeId || result.rows[0].user_id,
+					...record,
+				};
+			}
+			catch (error) {
+				console.error(`database read error for discord user ${normalizedDiscordId}:`, error);
+				return null;
+			}
+		}
+
+		// File-based fallback (slow, but functional for dev)
+		await this._ensureLegacyMigration();
+		const allIds = await this._getAllUserIdsFromFiles();
+		for (const id of allIds) {
+			const data = await this._getUserDataFromFile(id);
+			if (data && Array.isArray(data.discordIds) && data.discordIds.includes(normalizedDiscordId)) {
+				return data;
+			}
+		}
+		return null;
+	}
+
 	async saveUserData(loungeId, data) {
 		const normalizedId = normalizeLoungeId(loungeId);
 		const payload = { ...data };
 		payload.loungeId = payload.loungeId || normalizedId;
-		const existingServers = Array.isArray(payload.servers) ? payload.servers : [];
-		payload.servers = Array.from(new Set(existingServers.map(String)));
 		const discordIds = Array.isArray(payload.discordIds) ? payload.discordIds.map(String) : [];
 		payload.discordIds = Array.from(new Set(discordIds));
 		payload.createdAt = payload.createdAt || new Date().toISOString();
@@ -258,30 +283,6 @@ class Database {
 		return await this._deleteUserDataFile(normalizedId);
 	}
 
-	async getUsersByServer(serverId) {
-		if (this.useDatabase) {
-			try {
-				const result = await this.pool.query(
-					`SELECT user_id, data
-					 FROM user_data
-					 WHERE (data -> 'servers') ? $1`,
-					[serverId],
-				);
-				return result.rows.map(row => ({
-					loungeId: row.data?.loungeId || row.user_id,
-					...row.data,
-				}));
-			}
-			catch (error) {
-				console.error(`database query error for server ${serverId}:`, error);
-				return [];
-			}
-		}
-
-		await this._ensureLegacyMigration();
-		return await this._getUsersByServerFromFiles(serverId);
-	}
-
 	async getAllUserIds() {
 		if (this.useDatabase) {
 			try {
@@ -299,43 +300,6 @@ class Database {
 	}
 
 	// --- Server-level views (derived from user data) -------------------------------
-
-	async getServerData(serverId) {
-		const users = await this.getUsersByServer(serverId);
-		const userMap = {};
-		const discordIndex = {};
-		let createdAt = null;
-		let updatedAt = null;
-
-		for (const user of users) {
-			const { loungeId, servers, discordIds = [], ...rest } = user;
-			if (!loungeId) continue;
-			userMap[loungeId] = {
-				loungeId,
-				servers,
-				discordIds,
-				...rest,
-			};
-			for (const discordId of discordIds) {
-				discordIndex[String(discordId)] = loungeId;
-			}
-			if (user.createdAt && (!createdAt || user.createdAt < createdAt)) {
-				createdAt = user.createdAt;
-			}
-			if (user.updatedAt && (!updatedAt || user.updatedAt > updatedAt)) {
-				updatedAt = user.updatedAt;
-			}
-		}
-
-		return {
-			serverId,
-			users: userMap,
-			discordIndex,
-			tables: {},
-			createdAt,
-			updatedAt,
-		};
-	}
 
 	async getServerSetupState(serverId) {
 		if (!serverId) {
@@ -402,70 +366,6 @@ class Database {
 		stateMap[normalizedId] = payload;
 		await this._writeServerStateMap(stateMap);
 		return payload;
-	}
-
-	async saveServerData(serverId, data) {
-		const incomingUsers = data?.users ? Object.entries(data.users) : [];
-		const currentUsers = await this.getUsersByServer(serverId);
-		const currentIds = new Set(currentUsers.map(user => user.loungeId));
-
-		for (const [loungeId, userInfo] of incomingUsers) {
-			const normalizedId = normalizeLoungeId(loungeId);
-			const existing = await this.getUserData(normalizedId);
-			const base = existing || { servers: [], discordIds: [] };
-			const mergedServers = new Set([...(base.servers || []), ...(userInfo.servers || []), serverId]);
-			const mergedDiscordIds = new Set([...(base.discordIds || []), ...(userInfo.discordIds || [])]);
-			const payload = {
-				...base,
-				...userInfo,
-				loungeId: normalizedId,
-				servers: Array.from(mergedServers),
-				discordIds: Array.from(mergedDiscordIds),
-				createdAt: base?.createdAt || data?.createdAt || new Date().toISOString(),
-			};
-			await this.saveUserData(normalizedId, payload);
-			currentIds.delete(normalizedId);
-		}
-
-		for (const orphanId of currentIds) {
-			const existing = await this.getUserData(orphanId);
-			if (!existing) continue;
-			const remainingServers = (existing.servers || []).filter(id => id !== serverId);
-			existing.servers = remainingServers;
-			existing.updatedAt = new Date().toISOString();
-			await this.saveUserData(orphanId, existing);
-		}
-
-		return true;
-	}
-
-	async deleteServerData(serverId) {
-		const users = await this.getUsersByServer(serverId);
-		for (const user of users) {
-			const remainingServers = (user.servers || []).filter(id => id !== serverId);
-			await this.saveUserData(user.loungeId, { ...user, servers: remainingServers });
-		}
-		return true;
-	}
-
-	async getAllServerIds() {
-		if (this.useDatabase) {
-			try {
-				const result = await this.pool.query(`
-					SELECT DISTINCT jsonb_array_elements_text(data->'servers') AS server_id
-					FROM user_data
-					WHERE data ? 'servers'
-				`);
-				return result.rows.map(row => row.server_id).filter(Boolean);
-			}
-			catch (error) {
-				console.error("database query error while listing servers:", error);
-				return [];
-			}
-		}
-
-		await this._ensureLegacyMigration();
-		return await this._getAllServerIdsFromFiles();
 	}
 
 	// --- Table management ---------------------------------------------------------
@@ -815,11 +715,9 @@ class Database {
 			const filePath = this._getUserDataPath(loungeId);
 			const data = await fs.readFile(filePath, "utf8");
 			const parsed = JSON.parse(data);
-			const servers = Array.isArray(parsed.servers) ? parsed.servers.map(String) : [];
 			return {
 				...parsed,
 				loungeId: parsed.loungeId || parsed.userId || loungeId,
-				servers: Array.from(new Set(servers)),
 			};
 		}
 		catch (error) {
@@ -857,34 +755,6 @@ class Database {
 		}
 	}
 
-	async _getUsersByServerFromFiles(serverId) {
-		try {
-			await this._ensureUsersDir();
-			const files = await fs.readdir(this.usersDir);
-			const matches = [];
-			for (const file of files) {
-				if (!file.endsWith(".json")) continue;
-				try {
-					const raw = await fs.readFile(path.join(this.usersDir, file), "utf8");
-					const data = JSON.parse(raw);
-					const servers = Array.isArray(data.servers) ? data.servers.map(String) : [];
-					if (servers.includes(serverId)) {
-						const loungeId = data.loungeId || data.userId || file.replace(".json", "");
-						matches.push({ ...data, loungeId, servers });
-					}
-				}
-				catch (error) {
-					console.error(`error parsing user file ${file}:`, error);
-				}
-			}
-			return matches;
-		}
-		catch (error) {
-			console.error(`error listing users for server ${serverId}:`, error);
-			return [];
-		}
-	}
-
 	async _getAllUserIdsFromFiles() {
 		try {
 			await this._ensureUsersDir();
@@ -909,71 +779,9 @@ class Database {
 		}
 	}
 
-	async _getAllServerIdsFromFiles() {
-		try {
-			await this._ensureUsersDir();
-			const files = await fs.readdir(this.usersDir);
-			const serverSet = new Set();
-			for (const file of files) {
-				if (!file.endsWith(".json")) continue;
-				try {
-					const raw = await fs.readFile(path.join(this.usersDir, file), "utf8");
-					const data = JSON.parse(raw);
-					for (const serverId of data.servers || []) {
-						serverSet.add(String(serverId));
-					}
-				}
-				catch (error) {
-					console.error(`error reading user file ${file} for servers:`, error);
-				}
-			}
-			return Array.from(serverSet);
-		}
-		catch (error) {
-			console.error("error collecting server ids from files:", error);
-			return [];
-		}
-	}
-
 	async _migrateLegacyServerFiles() {
-		await this._ensureUsersDir();
-		let files;
-		try {
-			files = await fs.readdir(this.legacyServersDir);
-		}
-		catch (error) {
-			if (error.code === "ENOENT") return;
-			throw error;
-		}
-
-		for (const file of files) {
-			if (!file.endsWith(".json")) continue;
-			const serverId = file.replace(".json", "");
-			try {
-				const raw = await fs.readFile(path.join(this.legacyServersDir, file), "utf8");
-				const legacyData = JSON.parse(raw);
-				const legacyUsers = legacyData.users || {};
-				for (const [userId, userInfo] of Object.entries(legacyUsers)) {
-					const normalizedId = normalizeLoungeId(userId);
-					const existing = await this._getUserDataFromFile(normalizedId);
-					const servers = new Set([...(existing?.servers || []), serverId]);
-					const payload = {
-						loungeId: existing?.loungeId || normalizedId,
-						legacyDiscordId: userId,
-						loungeName: userInfo.loungeName || existing?.loungeName || null,
-						lastUpdated: userInfo.lastUpdated || existing?.lastUpdated || null,
-						servers: Array.from(servers),
-						discordIds: existing?.discordIds || (userInfo.discordId ? [String(userInfo.discordId)] : []),
-						createdAt: existing?.createdAt || legacyData.createdAt || new Date().toISOString(),
-						updatedAt: new Date().toISOString(),
-					};
-					await this._saveUserDataToFile(normalizedId, payload);
-				}
-			}
-			catch (error) {
-				console.error(`error migrating legacy server file ${file}:`, error);
-			}
-		}
+		// No-op: legacy server files are no longer supported
+		return Promise.resolve();
 	}
 
 	// --- Legacy relationships for file storage -----------------------------------

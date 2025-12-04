@@ -23,15 +23,8 @@ module.exports = {
 
 		// Build server info list using serverData.users for tracked users
 		const serverInfos = await Promise.all(guilds.map(async guild => {
-			let trackedCount = 0;
-			try {
-				const serverData = await database.getServerData(guild.id);
-				trackedCount = serverData && serverData.users ? Object.keys(serverData.users).length : 0;
-			}
-			catch (e) {
-				trackedCount = 0;
-			}
-			return `**${guild.name}**\nTracked Users: ${trackedCount}\nTotal Members: ${guild.memberCount}`;
+			// Tracked users count is no longer available as we don't store server data
+			return `**${guild.name}**\nTotal Members: ${guild.memberCount}`;
 		}));
 
 		const pages = paginateServerInfos(serverInfos);

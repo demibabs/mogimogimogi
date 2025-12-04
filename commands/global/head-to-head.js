@@ -703,15 +703,12 @@ module.exports = {
 		}
 
 		try {
-			const serverData = await Database.getServerData(guild.id);
-			const serverUsers = Object.values(serverData?.users || {});
-			const serverSuggestions = buildAutocompleteSuggestions(serverUsers, rawQuery, 5);
+			// Global search only
+			const suggestions = [];
+			const seen = new Set();
 
-			const suggestions = [...serverSuggestions];
-			const seen = new Set(serverSuggestions.map((e) => e.value));
-
-			if (rawQuery && suggestions.length < 10) {
-				const globalResults = await LoungeApi.searchPlayers(rawQuery, { limit: 5 });
+			if (rawQuery) {
+				const globalResults = await LoungeApi.searchPlayers(rawQuery, { limit: 10 });
 				for (const player of globalResults) {
 					const loungeId = [player.id, player.playerId, player.loungeId]
 						.map((v) => (v == null ? null : String(v)))
@@ -762,11 +759,8 @@ module.exports = {
 				return;
 			}
 
-			const serverData = await Database.getServerData(serverId);
-
 			const target1 = await resolveTargetPlayer(interaction, {
 				rawInput: rawPlayer1,
-				serverData,
 			});
 			if (target1.error) {
 				await interaction.editReply({ content: target1.error, files: [] });
@@ -776,7 +770,6 @@ module.exports = {
 			const target2 = await resolveTargetPlayer(interaction, {
 				rawInput: rawPlayer2,
 				defaultToInvoker: !rawPlayer2,
-				serverData,
 			});
 			if (target2.error) {
 				await interaction.editReply({ content: target2.error, files: [] });
@@ -788,7 +781,6 @@ module.exports = {
 			const result = await this.generateHeadToHead(interaction, {
 				playerLeft: target1,
 				playerRight: target2,
-				serverData,
 				filters,
 			});
 
@@ -864,11 +856,9 @@ module.exports = {
 			}
 
 			const serverId = interaction.guildId;
-			const serverData = await Database.getServerData(serverId);
 
 			const target1 = await resolveTargetPlayer(interaction, {
 				loungeId: parsed.loungeId1,
-				serverData,
 			});
 			if (target1.error) {
 				await interaction.editReply({ content: target1.error, files: [] });
@@ -876,7 +866,6 @@ module.exports = {
 			}
 			const target2 = await resolveTargetPlayer(interaction, {
 				loungeId: parsed.loungeId2,
-				serverData,
 			});
 			if (target2.error) {
 				await interaction.editReply({ content: target2.error, files: [] });
@@ -896,7 +885,6 @@ module.exports = {
 				const result = await this.generateHeadToHead(interaction, {
 					playerLeft: target1,
 					playerRight: target2,
-					serverData,
 					filters,
 					session: cachedSession,
 				});
@@ -947,7 +935,6 @@ module.exports = {
 		{
 			playerLeft,
 			playerRight,
-			serverData,
 			filters,
 			session = null,
 		},
@@ -982,18 +969,14 @@ module.exports = {
 						interaction,
 						target,
 						serverId,
-						serverData,
 						loungeId: normalizedId,
 						loungeName: playerDetails?.name || target.loungeName || target.displayName || null,
 						displayName: target.displayName,
 						discordUser: target.discordUser,
-						storedRecord: serverData?.users?.[normalizedId],
 						fallbackName: `player ${normalizedId}`,
+						playerDetails,
 					});
 
-					if (result.serverData) {
-						serverData = result.serverData;
-					}
 					if (result.discordUser) {
 						target.discordUser = result.discordUser;
 					}

@@ -236,13 +236,15 @@ module.exports = {
 			await interaction.editReply("saving your preferences...");
 		}
 
-		const serverData = await database.getServerData(serverId);
-		let loungeId = serverData?.discordIndex?.[userId];
-		if (loungeId) {
-			loungeId = String(loungeId);
-		}
-
+		let loungeId = null;
 		let loungeName = null;
+
+		// Try to find user in cache first
+		const cachedUser = await database.getUserByDiscordId(userId);
+		if (cachedUser) {
+			loungeId = cachedUser.loungeId;
+			loungeName = cachedUser.loungeName;
+		}
 
 		if (!loungeId) {
 			try {
@@ -274,7 +276,7 @@ module.exports = {
 				interaction,
 				target,
 				serverId,
-				serverData,
+				serverData: null,
 				loungeId,
 				loungeName,
 			});
@@ -295,13 +297,10 @@ module.exports = {
 
 		const baseUser = ensureResult?.userRecord || storedUser || {
 			loungeId,
-			servers: [],
 			discordIds: [],
 			favorites: {},
 		};
 
-		const servers = new Set((baseUser.servers || []).map(String));
-		servers.add(serverId);
 		const discordIds = new Set((baseUser.discordIds || []).map(String));
 		discordIds.add(userId);
 		const existingFavorites = { ...(baseUser?.favorites || {}) };
@@ -357,10 +356,12 @@ module.exports = {
 			loungeId,
 			userId,
 			loungeName: baseUser.loungeName || ensureResult?.loungeProfile?.name || null,
-			servers: Array.from(servers),
 			discordIds: Array.from(discordIds),
 			favorites: existingFavorites,
 		};
+
+		// Remove legacy servers array if present
+		delete updatedUser.servers;
 
 		try {
 			await database.saveUserData(loungeId, updatedUser);

@@ -1,123 +1,81 @@
 const { SlashCommandBuilder } = require("discord.js");
-const DataManager = require("../../utils/dataManager");
+const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
-const database = require("../../utils/database");
-// cache system removed
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("setup")
-		.setDescription("adds every server user with a lounge account."),
+		.setDescription("scans the server to cache lounge players for faster commands."),
 
 	async execute(interaction) {
+		if (!interaction.guild) {
+			await interaction.reply({ content: "this command can only be used in a server.", ephemeral: true });
+			return;
+		}
+
+		await interaction.deferReply();
+
 		try {
-			await interaction.deferReply();
-			await interaction.editReply("starting setup process...");
+			// Check if already setup
+			const existingState = await Database.getServerSetupState(interaction.guild.id);
+			if (existingState?.completed) {
+				await interaction.editReply("updating global cache... scanning members...");
+			}
+			else {
+				await interaction.editReply("setting up server... scanning members (this may take a while)...");
+			}
 
-			const serverId = interaction.guild.id;
 			const members = await interaction.guild.members.fetch();
-			let serverData = await database.getServerData(serverId);
-			const setupState = await database.getServerSetupState(serverId);
-			const needsCleanup = Boolean(setupState?.completed);
+			const total = members.size;
+			let processed = 0;
+			let found = 0;
+			let newFound = 0;
 
-			const loungers = [];
-			const totalMembers = members.size;
-			let processedCount = 0;
-			const recordSetupCompletion = async (stats = {}) => {
-				try {
-					await database.markServerSetupComplete(serverId, {
-						initiatedBy: interaction.user?.id || null,
-						totalMembers,
-						...stats,
-					});
-				}
-				catch (stateError) {
-					console.warn("setup: failed to store setup metadata:", stateError);
-				}
-			};
+			const memberList = Array.from(members.values());
+			const chunkSize = 5;
 
-			let removedCount = 0;
-			if (needsCleanup) {
-				const storedUsers = Object.entries(serverData?.users || {});
-				if (storedUsers.length) {
-					await interaction.editReply(`verifying ${storedUsers.length} stored members before setup...`);
-					let inspected = 0;
-					for (const [loungeId, record] of storedUsers) {
-						inspected++;
-						const discordIds = Array.isArray(record?.discordIds)
-							? record.discordIds.map(String)
-							: [];
-						const stillMember = discordIds.some(discordId => members.has(discordId));
-						if (!stillMember) {
-							const removed = await DataManager.removeServerUser(serverId, { loungeId });
-							if (removed) {
-								removedCount++;
-							}
+			for (let i = 0; i < memberList.length; i += chunkSize) {
+				const chunk = memberList.slice(i, i + chunkSize);
+				await Promise.all(chunk.map(async (member) => {
+					const id = member.id;
+					try {
+						// Check cache first
+						const cached = await Database.getUserByDiscordId(id);
+						if (cached) {
+							found++;
+							return;
 						}
-						if (inspected % 25 === 0 || inspected === storedUsers.length) {
-							await interaction.editReply(`verifying stored members... (${inspected}/${storedUsers.length}) | removed ${removedCount}`);
+
+						// Not cached, check API
+						const player = await LoungeApi.getPlayerByDiscordId(id);
+						if (player?.id) {
+							await Database.saveUserData(player.id, {
+								loungeName: player.name,
+								discordIds: [id],
+								countryCode: player.countryCode,
+							});
+							found++;
+							newFound++;
 						}
 					}
-				}
-				serverData = await database.getServerData(serverId);
+					catch (e) {
+						// ignore
+					}
+				}));
+
+				processed += chunk.length;
 			}
 
-			await interaction.editReply(`processing ${totalMembers} server members...`);
-
-			// Find users with Lounge accounts who aren't already in server data
-			for (const [userId, member] of members) {
-				if (member.user.bot) continue;
-
-				try {
-					const loungeUser = await LoungeApi.getPlayerByDiscordId(userId);
-					if (!loungeUser) continue;
-					if (serverData?.discordIndex?.[userId]) continue;
-					loungers.push(userId);
-				}
-				catch (error) {
-					console.warn(`error checking user ${userId}:`, error);
-				}
-
-				processedCount++;
-
-				// Update progress every user
-				await interaction.editReply(`processing members... (${processedCount}/${totalMembers})`);
-			}
-
-			if (loungers.length === 0) {
-				await recordSetupCompletion({ detectedLoungers: 0, addedUsers: 0, removedUsers: removedCount });
-				return await interaction.editReply("setup complete! no users to add. :)");
-			}
-
-			await interaction.editReply(`adding ${loungers.length} new users to server data...`);
-
-			// Add new users
-			let addedCount = 0;
-			for (const lounger of loungers) {
-				try {
-					await DataManager.addServerUser(interaction.guild.id, lounger, interaction.client);
-					addedCount++;
-					// Update progress every user
-					await interaction.editReply(`adding users... (${addedCount}/${loungers.length})`);
-				}
-				catch (error) {
-					console.error(`failed to add user ${lounger}:`, error);
-				}
-			}
-
-			await recordSetupCompletion({
-				detectedLoungers: loungers.length,
-				addedUsers: addedCount,
-				removedUsers: removedCount,
+			await Database.markServerSetupComplete(interaction.guild.id, {
+				memberCount: total,
+				foundCount: found,
 			});
 
-			const removedSuffix = removedCount ? ` removed ${removedCount} stale entr${removedCount === 1 ? "y" : "ies"}.` : "";
-			await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
-				loungers.length === 1 ? "" : "s"}.${removedSuffix} use </about-me:1442446575287930960> to see all commands.`);
+			await interaction.editReply(`setup complete! scanned ${total} members. found ${found} lounge players (${newFound} new to cache).`);
 		}
 		catch (error) {
 			console.error("setup error:", error);
-			await interaction.editReply("an error occurred during setup. please check the console for details.");
+			await interaction.editReply("an error occurred during setup. please try again later.");
 		}
 	},
 };

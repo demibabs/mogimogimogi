@@ -1,14 +1,11 @@
-const Database = require("./database");
 const LoungeApi = require("./loungeApi");
+const Database = require("./database");
 
 async function resolveTargetPlayer(interaction, {
 	rawInput = null,
 	loungeId = null,
 	defaultToInvoker = false,
-	serverData: serverDataOverride = null,
 } = {}) {
-	const serverId = interaction.guildId;
-	const serverData = serverDataOverride || await Database.getServerData(serverId);
 	const invokingUser = interaction.user;
 	const trimmedInput = typeof rawInput === "string" ? rawInput.trim() : "";
 	let targetLoungeId = loungeId != null ? String(loungeId).trim() : null;
@@ -20,89 +17,140 @@ async function resolveTargetPlayer(interaction, {
 		targetLoungeId = null;
 	}
 
+	// 1. If we have a raw input, try to resolve it
 	if (!targetLoungeId && trimmedInput) {
+		// A. Is it a numeric ID?
 		if (/^\d+$/.test(trimmedInput)) {
-			targetLoungeId = trimmedInput;
-		}
-	}
+			// Could be a Lounge ID or a Discord ID.
+			// Let's assume Lounge ID first if it's short, or check both?
+			// Actually, Lounge IDs are usually short (e.g. 1234), Discord IDs are long (18 chars).
+			if (trimmedInput.length > 10) {
+				// Likely a Discord ID
+				try {
+					const cachedUser = await Database.getUserByDiscordId(trimmedInput);
+					if (cachedUser?.loungeId) {
+						targetLoungeId = cachedUser.loungeId;
+						loungeName = cachedUser.loungeName;
+					}
+					else {
+						const byDiscord = await LoungeApi.getPlayerByDiscordId(trimmedInput);
+						if (byDiscord?.id) {
+							targetLoungeId = String(byDiscord.id);
+							loungeName = byDiscord.name;
+							await Database.saveUserData(targetLoungeId, {
+								loungeName: byDiscord.name,
+								discordIds: [trimmedInput],
+								countryCode: byDiscord.countryCode,
+							});
+						}
+					}
 
-	if (!targetLoungeId && trimmedInput) {
-		const lower = trimmedInput.toLowerCase();
-		const matched = Object.values(serverData?.users || {}).find(user =>
-			user?.loungeName && user.loungeName.toLowerCase() === lower,
-		);
-		if (matched) {
-			targetLoungeId = String(matched.loungeId ?? matched.id ?? matched);
-			loungeName = matched.loungeName || loungeName;
-		}
-	}
-
-	if (!targetLoungeId && trimmedInput) {
-		try {
-			const lookup = await LoungeApi.getPlayer(trimmedInput);
-			if (lookup?.id) {
-				targetLoungeId = String(lookup.id);
-				loungeName = lookup.name ?? loungeName;
+					if (targetLoungeId) {
+						// Try to fetch the Discord user to get their display name
+						try {
+							discordUser = await interaction.client.users.fetch(trimmedInput);
+							displayName = discordUser.globalName || discordUser.username;
+						}
+						catch (e) { /* ignore */ }
+					}
+				}
+				catch (e) { /* ignore */ }
+			}
+			else {
+				// Likely a Lounge ID
+				targetLoungeId = trimmedInput;
 			}
 		}
-		catch (error) {
-			console.warn(`lounge player lookup for "${trimmedInput}" failed:`, error);
-		}
-	}
 
-	if (!targetLoungeId && defaultToInvoker) {
-		const mappedId = serverData?.discordIndex?.[String(invokingUser.id)];
-		if (mappedId) {
-			targetLoungeId = String(mappedId);
-			const stored = serverData?.users?.[targetLoungeId];
-			if (stored?.loungeName) {
-				loungeName = stored.loungeName;
+		// B. Is it a mention? <@123456789>
+		if (!targetLoungeId) {
+			const mentionMatch = trimmedInput.match(/^<@!?(\d+)>$/);
+			if (mentionMatch) {
+				const discordId = mentionMatch[1];
+				try {
+					const cachedUser = await Database.getUserByDiscordId(discordId);
+					if (cachedUser?.loungeId) {
+						targetLoungeId = cachedUser.loungeId;
+						loungeName = cachedUser.loungeName;
+					}
+					else {
+						const byDiscord = await LoungeApi.getPlayerByDiscordId(discordId);
+						if (byDiscord?.id) {
+							targetLoungeId = String(byDiscord.id);
+							loungeName = byDiscord.name;
+							await Database.saveUserData(targetLoungeId, {
+								loungeName: byDiscord.name,
+								discordIds: [discordId],
+								countryCode: byDiscord.countryCode,
+							});
+						}
+					}
+
+					if (targetLoungeId) {
+						try {
+							discordUser = await interaction.client.users.fetch(discordId);
+							displayName = discordUser.globalName || discordUser.username;
+						}
+						catch (e) { /* ignore */ }
+					}
+				}
+				catch (e) { /* ignore */ }
 			}
 		}
+
+		// C. Try searching by Lounge Name
 		if (!targetLoungeId) {
 			try {
-				const loungeUser = await LoungeApi.getPlayerByDiscordId(invokingUser.id);
-				if (loungeUser?.id) {
-					targetLoungeId = String(loungeUser.id);
-					loungeName = loungeUser.name ?? loungeName;
+				const lookup = await LoungeApi.getPlayer(trimmedInput);
+				if (lookup?.id) {
+					targetLoungeId = String(lookup.id);
+					loungeName = lookup.name;
 				}
 			}
 			catch (error) {
-				console.warn(`failed to resolve lounge profile for ${invokingUser.id}:`, error);
+				// console.warn(`lounge player lookup for "${trimmedInput}" failed:`, error);
 			}
 		}
+	}
+
+	// 2. If no target yet, and we should default to invoker
+	if (!targetLoungeId && defaultToInvoker) {
+		try {
+			// Try cache first
+			const cachedUser = await Database.getUserByDiscordId(invokingUser.id);
+			if (cachedUser?.loungeId) {
+				targetLoungeId = cachedUser.loungeId;
+				loungeName = cachedUser.loungeName;
+			}
+			else {
+				const loungeUser = await LoungeApi.getPlayerByDiscordId(invokingUser.id);
+				if (loungeUser?.id) {
+					targetLoungeId = String(loungeUser.id);
+					loungeName = loungeUser.name;
+					// Cache this result for future use
+					await Database.saveUserData(targetLoungeId, {
+						loungeName: loungeUser.name,
+						discordIds: [invokingUser.id],
+						countryCode: loungeUser.countryCode,
+					});
+				}
+			}
+		}
+		catch (error) {
+			// console.warn(`failed to resolve lounge profile for ${invokingUser.id}:`, error);
+		}
 		discordUser = invokingUser;
-		displayName = invokingUser.displayName;
+		displayName = invokingUser.globalName || invokingUser.username;
 	}
 
 	if (!targetLoungeId) {
 		if (trimmedInput) {
 			return { error: `couldn't find lounge player "${trimmedInput}".` };
 		}
-		return { error: "couldn't determine which player to show." };
+		return { error: "couldn't determine which player to show. try linking your discord to your lounge account." };
 	}
 
-	const storedRecord = serverData?.users?.[String(targetLoungeId)];
-	if (!loungeName && storedRecord?.loungeName) {
-		loungeName = storedRecord.loungeName;
-	}
-
-	if (!discordUser && storedRecord?.discordIds?.length) {
-		for (const discordId of storedRecord.discordIds) {
-			try {
-				const fetched = await interaction.client.users.fetch(discordId);
-				if (fetched) {
-					discordUser = fetched;
-					displayName = fetched.displayName;
-					break;
-				}
-			}
-			catch (error) {
-				console.warn(`failed to fetch linked discord user ${discordId} for lounge ${targetLoungeId}:`, error);
-			}
-		}
-	}
-
+	// 3. Final hydration if we have an ID but no name
 	if (!loungeName) {
 		try {
 			const player = await LoungeApi.getPlayerByLoungeId(targetLoungeId);
@@ -111,7 +159,7 @@ async function resolveTargetPlayer(interaction, {
 			}
 		}
 		catch (error) {
-			console.warn(`failed to load lounge player ${targetLoungeId}:`, error);
+			// console.warn(`failed to load lounge player ${targetLoungeId}:`, error);
 		}
 	}
 

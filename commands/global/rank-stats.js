@@ -1055,8 +1055,6 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 	let favoriteCharacterImage = session?.favoriteCharacterImage || null;
 	let favoriteVehicleImage = session?.favoriteVehicleImage || null;
 
-	let serverData = serverDataOverride || await Database.getServerData(serverId);
-
 	let playerDetails = hasSessionDetails ? session.playerDetails : null;
 	if (!playerDetails) {
 		playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(loungeId);
@@ -1069,16 +1067,15 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		interaction,
 		target,
 		serverId,
-		serverData,
+		serverData: null,
 		loungeId,
 		loungeName: target.loungeName,
 		displayName: target.displayName,
 		discordUser: target.discordUser,
-		storedRecord: serverData?.users?.[loungeId],
+		storedRecord: null,
 		fallbackName: `player ${loungeId}`,
 		playerDetails,
 	});
-	serverData = result.serverData;
 	const discordUser = result.discordUser;
 
 	await interaction.editReply("loading tables...");
@@ -1249,55 +1246,26 @@ module.exports = {
 			return;
 		}
 
-		const guild = interaction.guild;
-		if (!guild) {
-			await interaction.respond([]);
-			return;
-		}
-
 		const rawQuery = (focused.value || "").trim();
-		const normalizedQuery = rawQuery.toLowerCase();
-		const serverLimit = 5;
-		const globalLimit = 5;
 		const suggestions = [];
 		const seen = new Set();
 
-		try {
-			const serverData = await Database.getServerData(guild.id);
-			const users = Object.values(serverData?.users || {});
-			const filtered = users
-				.filter(entry => entry?.loungeName)
-				.filter(entry => !normalizedQuery || entry.loungeName.toLowerCase().includes(normalizedQuery))
-				.sort((a, b) => a.loungeName.localeCompare(b.loungeName));
-
-			for (const entry of filtered) {
-				const value = String(entry.loungeId ?? entry.id ?? entry.loungeName);
-				if (seen.has(value)) continue;
-				suggestions.push({ name: entry.loungeName, value });
-				seen.add(value);
-				if (suggestions.length >= serverLimit) break;
-			}
-		}
-		catch (error) {
-			console.warn("rank-stats autocomplete server fetch failed", error);
-		}
-
-		if (rawQuery && suggestions.length < serverLimit + globalLimit) {
+		if (rawQuery) {
 			try {
-				const globalResults = await LoungeApi.searchPlayers(rawQuery, { limit: globalLimit });
+				const globalResults = await LoungeApi.searchPlayers(rawQuery, { limit: 10 });
 				for (const player of globalResults) {
 					const loungeId = [player.id, player.playerId, player.loungeId]
 						.map(id => id === undefined || id === null ? null : String(id))
 						.find(Boolean);
 					if (!loungeId || seen.has(loungeId)) continue;
-					const displayName = player.name || player.loungeName || player.playerName;
+					const displayName = player.name;
 					if (!displayName) continue;
 					suggestions.push({
-						name: displayName.length > 100 ? `${displayName.slice(0, 97)}...` : displayName,
+						name: displayName.length > 100 ? displayName.slice(0, 97) + "..." : displayName,
 						value: loungeId,
 					});
 					seen.add(loungeId);
-					if (suggestions.length >= serverLimit + globalLimit) break;
+					if (suggestions.length >= 10) break;
 				}
 			}
 			catch (error) {
@@ -1305,11 +1273,11 @@ module.exports = {
 			}
 		}
 
-		if (!suggestions.length && normalizedQuery) {
+		if (!suggestions.length && rawQuery) {
 			suggestions.push({ name: `search "${rawQuery}"`, value: rawQuery });
 		}
 
-		await interaction.respond(suggestions.slice(0, serverLimit + globalLimit));
+		await interaction.respond(suggestions);
 	},
 
 	execute: async interaction => {
@@ -1318,21 +1286,24 @@ module.exports = {
 			await interaction.editReply("validating user...");
 
 			const serverId = interaction.guildId;
+
+			const validation = await AutoUserManager.ensureServerReady(serverId);
+			if (!validation.success) {
+				await interaction.editReply({
+					content: validation.message || "unable to validate command user.",
+					components: [],
+					files: [],
+				});
+				return;
+			}
+
 			const rawPlayer = interaction.options.getString("player");
 			const initialFilters = normalizeRankStatsFilters(DEFAULT_FILTERS);
 			let components = [];
 
-			const validation = await AutoUserManager.ensureServerReady(serverId);
-			if (!validation.success) {
-				await interaction.editReply({ content: validation.message || "unable to validate command user.", components, files: [] });
-				return;
-			}
-
-			const serverData = await Database.getServerData(serverId);
 			const target = await resolveTargetPlayer(interaction, {
 				rawInput: rawPlayer,
 				defaultToInvoker: !rawPlayer,
-				serverData,
 			});
 
 			if (target.error) {
@@ -1347,7 +1318,7 @@ module.exports = {
 				playerCountFilter: initialFilters.playerCountFilter,
 			});
 
-			const result = await generateRankStats(interaction, target, serverId, serverData, { filters: initialFilters });
+			const result = await generateRankStats(interaction, target, serverId, null, { filters: initialFilters });
 			if (!result.success) {
 				await interaction.editReply({ content: result.message || "unable to compute rank stats.", components, files: [] });
 				return;
@@ -1418,7 +1389,6 @@ module.exports = {
 				return true;
 			}
 
-			const serverData = await Database.getServerData(serverId);
 			let target = null;
 			if (cachedSession && cachedSession.loungeId === loungeId) {
 				target = {
@@ -1428,7 +1398,7 @@ module.exports = {
 				};
 			}
 			else {
-				target = await resolveTargetPlayer(interaction, { loungeId, serverData });
+				target = await resolveTargetPlayer(interaction, { loungeId });
 				if (target.error) {
 					await interaction.editReply({ content: target.error, components, files: [] });
 					return true;
@@ -1462,7 +1432,7 @@ module.exports = {
 			}
 
 			try {
-				const result = await generateRankStats(interaction, target, serverId, serverData, {
+				const result = await generateRankStats(interaction, target, serverId, null, {
 					filters: nextFilters,
 					session: cachedSession && cachedSession.loungeId === loungeId ? cachedSession : null,
 					userData: freshUserData,

@@ -667,6 +667,8 @@ class PlayerStats {
 		return totalSeed / matchesFound;
 	}
 
+	/*
+	// Deprecated: We no longer track server-specific user lists.
 	static async checkIfServerTable(userIdentifier, table, serverId) {
 		if (!serverId) {
 			return false;
@@ -695,6 +697,7 @@ class PlayerStats {
 		}
 		return false;
 	}
+	*/
 
 	static async getH2HTables(source, otherIdentifier, serverId = null) {
 		if (source && typeof source === "object" && !Array.isArray(source)) {
@@ -737,6 +740,8 @@ class PlayerStats {
 		return tables;
 	}
 
+	/*
+	// Deprecated: We no longer track server-specific user lists.
 	static async getTotalH2H(tables, playerIdentifier, serverId, serverDataOverride = null) {
 		const normalizedTargetId = PlayerStats.normalizeIdentifier(playerIdentifier);
 		const record = {
@@ -794,6 +799,7 @@ class PlayerStats {
 		}
 		return record;
 	}
+	*/
 
 	/**
 	 * Get head-to-head record between two specific players across all tables
