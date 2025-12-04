@@ -88,7 +88,7 @@ for (const folder of commandFolders) {
 function updatePresence() {
 	const serverCount = client.guilds.cache.size;
 	client.user.setActivity({
-		name: true ? "commands disabled temporarily (maintainance)" : `/head-to-head • ${serverCount} servers`,
+		name: `/head-to-head • ${serverCount} servers`,
 		type: ActivityType.Custom,
 	});
 }
