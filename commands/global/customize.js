@@ -223,9 +223,8 @@ module.exports = {
 				await costumeSelection.update({ content: "saving your preferences...", components: [] });
 			}
 			catch (error) {
-				console.error("customize costume selection failed", error);
-				await interaction.editReply({ content: "costume selection timed out. please run /customize again when you're ready.", components: [] });
-				return;
+				selectedCostume = "default";
+				await interaction.editReply({ content: "costume selection timed out. defaulting to 'default' costume...", components: [] });
 			}
 		}
 		else if (characterChoice?.type === "main" && characterChoice.costumes.length === 1) {

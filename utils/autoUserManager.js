@@ -36,7 +36,23 @@ class AutoUserManager {
 	}
 
 	static async handleGuildMemberAdd(member) {
-		// No longer needed
+		try {
+			const serverId = member.guild.id;
+			const userId = member.user.id;
+			const client = member.client;
+
+			// Check if server is set up
+			const setupState = await database.getServerSetupState(serverId);
+			if (!setupState?.completed) {
+				return; // Don't auto-add if server isn't set up
+			}
+
+			console.log(`auto-adding new member ${userId} to server ${serverId}`);
+			await DataManager.updateServerUser(serverId, userId, client);
+		}
+		catch (error) {
+			console.error("error in handleGuildMemberAdd:", error);
+		}
 	}
 
 	static async handleGuildMemberRemove(member) {

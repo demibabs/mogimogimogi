@@ -72,7 +72,7 @@ module.exports = {
 				source: "setup",
 			});
 
-			await interaction.editReply("setup complete! use </about-me:1442446575287930960> for all commands.");
+			await interaction.editReply("setup complete! use </about-me:1446020866356940860> for all commands.");
 		}
 		catch (error) {
 			console.error("setup error:", error);

@@ -956,7 +956,7 @@ module.exports = {
 				}
 
 				if (userData && !userData.customizeTipShown) {
-					tipMessage = "**note:** you can use </customize:1442446575287930961> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
+					tipMessage = "**note:** you can use </customize:1446020866356940861> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
 					userData.customizeTipShown = true;
 					try {
 						await Database.saveUserData(normalizedLoungeId, userData);
