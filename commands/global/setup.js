@@ -113,7 +113,7 @@ module.exports = {
 
 			const removedSuffix = removedCount ? ` removed ${removedCount} stale entr${removedCount === 1 ? "y" : "ies"}.` : "";
 			await interaction.editReply(`setup complete! added ${addedCount} of ${loungers.length} user${
-				loungers.length === 1 ? "" : "s"}.${removedSuffix} use /about-me to see all commands`);
+				loungers.length === 1 ? "" : "s"}.${removedSuffix} use </about-me:1442446575287930960> to see all commands.`);
 		}
 		catch (error) {
 			console.error("setup error:", error);
