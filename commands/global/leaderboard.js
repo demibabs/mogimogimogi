@@ -580,88 +580,89 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 	}
 }
 
-async function collectLeaderboardEntries({ serverId, serverData }) {
-	const users = Object.values(serverData?.users || {});
+async function collectLeaderboardEntries(interaction) {
+	const members = await interaction.guild.members.fetch();
+	const memberList = Array.from(members.values()).filter(m => !m.user.bot);
 	const entries = [];
+	const BATCH_SIZE = 5;
+	const total = memberList.length;
 
-	for (const record of users) {
-		const loungeId = record?.loungeId || record?.id || null;
-		if (!loungeId) continue;
-		try {
-			const details = await LoungeApi.getPlayerDetailsByLoungeId(loungeId);
-			if (!details) continue;
-
-			const mmr = Number(details.mmr ?? details.currentMmr ?? details.mmrValue);
-			if (!Number.isFinite(mmr)) {
-				continue;
+	for (let i = 0; i < total; i += BATCH_SIZE) {
+		const batch = memberList.slice(i, i + BATCH_SIZE);
+		if (i % 20 === 0 && i > 0) {
+			try {
+				await interaction.editReply(`scanning members... (${i}/${total})`);
 			}
-
-			const mmrChanges = Array.isArray(details.mmrChanges) ? details.mmrChanges : [];
-			const activity = computeActivityFlags(mmrChanges);
-			const weeklyDelta = PlayerStats.computeMmrDeltaForFilter({
-				playerDetails: details,
-				timeFilter: "weekly",
-			});
-			const seasonDelta = PlayerStats.computeMmrDeltaForFilter({
-				playerDetails: details,
-				timeFilter: "season",
-			});
-
-			entries.push({
-				loungeId: String(loungeId),
-				mmr,
-				activity,
-				countryCode: details.countryCode || null,
-				rankName: details.rankName || details.rank || null,
-				mmrChanges,
-				metrics: {
-					alltime: mmr,
-					weekly: weeklyDelta,
-					season: seasonDelta,
-				},
-				sourceRecord: record,
-				playerDetails: {
-					name: details.name || details.loungeName || null,
-				},
-			});
+			catch (e) { /* ignore */ }
 		}
-		catch (error) {
-			console.warn(`leaderboard: failed to load player details for lounge ${loungeId}:`, error);
-		}
+
+		const promises = batch.map(async (member) => {
+			try {
+				const details = await LoungeApi.getPlayerByDiscordIdDetailed(member.id);
+				if (!details) return null;
+
+				const mmr = Number(details.mmr ?? details.currentMmr ?? details.mmrValue);
+				if (!Number.isFinite(mmr)) {
+					return null;
+				}
+
+				const mmrChanges = Array.isArray(details.mmrChanges) ? details.mmrChanges : [];
+				const activity = computeActivityFlags(mmrChanges);
+				const weeklyDelta = PlayerStats.computeMmrDeltaForFilter({
+					playerDetails: details,
+					timeFilter: "weekly",
+				});
+				const seasonDelta = PlayerStats.computeMmrDeltaForFilter({
+					playerDetails: details,
+					timeFilter: "season",
+				});
+
+				return {
+					loungeId: String(details.id),
+					mmr,
+					activity,
+					countryCode: details.countryCode || null,
+					rankName: details.rankName || details.rank || null,
+					mmrChanges,
+					metrics: {
+						alltime: mmr,
+						weekly: weeklyDelta,
+						season: seasonDelta,
+					},
+					playerDetails: {
+						name: details.name || details.loungeName || null,
+					},
+					displayName: member.displayName,
+					flagEmoji: getCountryFlag(details.countryCode),
+				};
+			}
+			catch (error) {
+				// console.warn(`leaderboard: failed to load player details for ${member.displayName}:`, error);
+				return null;
+			}
+		});
+
+		const results = await Promise.all(promises);
+		entries.push(...results.filter(Boolean));
 	}
 
 	entries.sort((a, b) => b.mmr - a.mmr);
 	return entries;
 }
 
-async function hydrateEntryDisplay(interaction, entry, serverData) {
-	if (entry.displayName && entry.flagEmoji !== undefined) {
+async function hydrateEntryDisplay(interaction, entry) {
+	if (entry.displayName) {
 		return entry;
 	}
-
-	try {
-		const target = await resolveTargetPlayer(interaction, {
-			loungeId: entry.loungeId,
-			serverData,
-		});
-		const fallbackName = entry.playerDetails?.name || entry.sourceRecord?.loungeName || `player ${entry.loungeId}`;
-		entry.displayName = target.displayName || target.loungeName || fallbackName;
-		const countrySource = target.countryCode || entry.countryCode || entry.sourceRecord?.countryCode || null;
-		entry.flagEmoji = getCountryFlag(countrySource);
-	}
-	catch (error) {
-		console.warn(`leaderboard: failed to resolve display info for ${entry.loungeId}:`, error);
-		const fallbackName = entry.playerDetails?.name || entry.sourceRecord?.loungeName || `player ${entry.loungeId}`;
-		entry.displayName = entry.displayName || fallbackName;
-		entry.flagEmoji = entry.flagEmoji || "";
-	}
-
+	// Fallback if somehow missing
+	const fallbackName = entry.playerDetails?.name || `player ${entry.loungeId}`;
+	entry.displayName = fallbackName;
+	entry.flagEmoji = entry.flagEmoji || "";
 	return entry;
 }
 
 async function generateLeaderboard(interaction, {
 	timeFilter = "alltime",
-	serverDataOverride = null,
 	session: existingSession = null,
 } = {}) {
 	const serverId = interaction.guildId;
@@ -670,20 +671,14 @@ async function generateLeaderboard(interaction, {
 	const palette = getPalette();
 
 	let session = existingSession || null;
-	let serverData = serverDataOverride || existingSession?.serverData || null;
-
-	if (!serverData) {
-		serverData = await Database.getServerData(serverId);
-	}
 
 	if (!session) {
-		await interaction.editReply("getting server data...");
-		const entries = await collectLeaderboardEntries({ serverId, serverData });
+		await interaction.editReply("scanning members...");
+		const entries = await collectLeaderboardEntries(interaction);
 		session = {
 			serverId,
 			serverName: guildName,
 			entries,
-			serverData,
 			generatedAt: Date.now(),
 		};
 	}
@@ -704,7 +699,7 @@ async function generateLeaderboard(interaction, {
 	const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, timeFilter));
 	const topEntries = sortedPool.slice(0, MAX_ENTRIES);
 	for (const entry of topEntries) {
-		await hydrateEntryDisplay(interaction, entry, serverData);
+		await hydrateEntryDisplay(interaction, entry);
 	}
 
 	await interaction.editReply("rendering image...");
@@ -758,12 +753,8 @@ module.exports = {
 				return;
 			}
 
-			await interaction.editReply("getting server data...");
-
-			const serverData = await Database.getServerData(interaction.guildId);
 			const result = await generateLeaderboard(interaction, {
 				timeFilter: "alltime",
-				serverDataOverride: serverData,
 			});
 
 			if (!result.success) {
