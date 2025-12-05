@@ -318,7 +318,7 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 		paginationRow.addComponents(
 			new ButtonBuilder()
 				.setCustomId(buildLeaderboardCustomId("first", { timeFilter, serverId, page: 1 }))
-				.setLabel("first")
+				.setLabel("≪")
 				.setStyle(ButtonStyle.Primary)
 				.setDisabled(page <= 1),
 		);
@@ -327,12 +327,12 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 	paginationRow.addComponents(
 		new ButtonBuilder()
 			.setCustomId(buildLeaderboardCustomId("prev", { timeFilter, serverId, page: page - 1 }))
-			.setLabel("previous")
+			.setLabel("◀")
 			.setStyle(ButtonStyle.Primary)
 			.setDisabled(page <= 1),
 		new ButtonBuilder()
 			.setCustomId(buildLeaderboardCustomId("next", { timeFilter, serverId, page: page + 1 }))
-			.setLabel("next")
+			.setLabel("▶")
 			.setStyle(ButtonStyle.Primary)
 			.setDisabled(page >= totalPages),
 	);
@@ -341,7 +341,7 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 		paginationRow.addComponents(
 			new ButtonBuilder()
 				.setCustomId(buildLeaderboardCustomId("last", { timeFilter, serverId, page: totalPages }))
-				.setLabel("last")
+				.setLabel("≫")
 				.setStyle(ButtonStyle.Primary)
 				.setDisabled(page >= totalPages),
 		);
