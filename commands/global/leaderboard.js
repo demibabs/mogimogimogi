@@ -794,16 +794,22 @@ module.exports = {
 		}
 
 		try {
-			await interaction.deferUpdate();
-
 			const messageId = interaction.message?.id || null;
 			const session = messageId ? getLeaderboardSession(messageId) : null;
 			const fallbackTimeFilter = parsed.timeFilter || "alltime";
-			const nextTimeFilter = parsed.timeFilter || session?.pendingTimeFilter || session?.timeFilter || fallbackTimeFilter;
+			// Prefer the ID state (parsed.timeFilter) over the session state
+			const nextTimeFilter = parsed.timeFilter || fallbackTimeFilter;
 
 			if (session) {
 				session.pendingTimeFilter = nextTimeFilter;
 			}
+
+			const components = buildLeaderboardComponents({
+				timeFilter: nextTimeFilter,
+				serverId: parsed.serverId || interaction.guildId,
+			});
+
+			await interaction.update({ components });
 
 			const renderToken = beginLeaderboardRender(messageId);
 			if (session) {

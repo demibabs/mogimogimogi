@@ -1337,8 +1337,6 @@ module.exports = {
 		}
 
 		try {
-			await interaction.deferUpdate();
-
 			const messageId = interaction.message?.id || null;
 			const cachedSession = messageId ? getRankStatsSession(messageId) : null;
 			const fallbackFilters = normalizeRankStatsFilters({
@@ -1346,22 +1344,16 @@ module.exports = {
 				queueFilter: parsed.queueFilter,
 				playerCountFilter: parsed.playerCountFilter,
 			});
-			const baseFilters = normalizeRankStatsFilters(cachedSession?.pendingFilters || cachedSession?.filters || fallbackFilters);
+			// Prefer the ID state (fallbackFilters) over the session state, because the session might be stale
+			// (e.g. after an error where we updated buttons but not the session).
+			const baseFilters = normalizeRankStatsFilters(fallbackFilters);
 			let nextFilters = { ...baseFilters };
-			if (parsed.action === "time") {
-				nextFilters.timeFilter = parsed.timeFilter;
-			}
-			else if (parsed.action === "queue") {
-				nextFilters.queueFilter = parsed.queueFilter;
-			}
-			else if (parsed.action === "players") {
-				nextFilters.playerCountFilter = parsed.playerCountFilter;
-			}
+
 			nextFilters = normalizeRankStatsFilters(nextFilters);
 
 			const loungeId = parsed.loungeId || cachedSession?.loungeId;
 			if (!loungeId) {
-				await interaction.editReply({ content: "unable to determine which player to load.", components: [], files: [] });
+				await interaction.update({ content: "unable to determine which player to load.", components: [], files: [] });
 				return true;
 			}
 
@@ -1371,6 +1363,8 @@ module.exports = {
 				queueFilter: nextFilters.queueFilter,
 				playerCountFilter: nextFilters.playerCountFilter,
 			});
+
+			await interaction.update({ components });
 
 			const serverId = interaction.guild?.id;
 			if (!serverId) {

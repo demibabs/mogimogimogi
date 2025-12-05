@@ -714,8 +714,6 @@ module.exports = {
 		if (!parsed) return false;
 
 		try {
-			await interaction.deferUpdate();
-
 			const { action, timeFilter: rawTime, queueFilter: rawQueue, playerCountFilter: rawPlayers, loungeId } = parsed;
 
 			const messageId = interaction.message?.id || null;
@@ -725,11 +723,13 @@ module.exports = {
 				queueFilter: rawQueue || "both",
 				playerCountFilter: rawPlayers || "both",
 			};
-			const baseFilters = cachedSession?.pendingFilters || cachedSession?.filters || fallbackFilters;
+			// Prefer the ID state (fallbackFilters) over the session state, because the session might be stale
+			// (e.g. after an error where we updated buttons but not the session).
+			const baseFilters = fallbackFilters;
 
-			let timeFilter = baseFilters.timeFilter || fallbackFilters.timeFilter;
-			let queueFilter = baseFilters.queueFilter || fallbackFilters.queueFilter;
-			let playerCountFilter = baseFilters.playerCountFilter || fallbackFilters.playerCountFilter;
+			let timeFilter = baseFilters.timeFilter;
+			let queueFilter = baseFilters.queueFilter;
+			let playerCountFilter = baseFilters.playerCountFilter;
 
 			if (action === "queue") {
 				queueFilter = rawQueue || "both";
@@ -748,6 +748,15 @@ module.exports = {
 			if (cachedSession) {
 				cachedSession.pendingFilters = futureFilters;
 			}
+
+			const components = buildStatsComponentRows({
+				loungeId: loungeId || cachedSession?.loungeId,
+				timeFilter,
+				queueFilter,
+				playerCountFilter,
+			});
+
+			await interaction.update({ components });
 
 			let freshUserData = null;
 			try {
@@ -773,12 +782,6 @@ module.exports = {
 			});
 
 			if (target.error) {
-				const components = buildStatsComponentRows({
-					loungeId,
-					timeFilter,
-					queueFilter,
-					playerCountFilter,
-				});
 				await interaction.editReply({
 					content: target.error,
 					components,
@@ -786,13 +789,6 @@ module.exports = {
 				});
 				return true;
 			}
-
-			const components = buildStatsComponentRows({
-				loungeId: target.loungeId,
-				timeFilter,
-				queueFilter,
-				playerCountFilter,
-			});
 
 			const renderToken = beginStatsRender(messageId);
 			if (cachedSession) {

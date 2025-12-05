@@ -832,8 +832,6 @@ module.exports = {
 		if (!parsed) return false;
 
 		try {
-			await interaction.deferUpdate();
-
 			const messageId = interaction.message?.id || null;
 			const cachedSession = messageId ? getHeadToHeadSession(messageId) : null;
 
@@ -842,23 +840,24 @@ module.exports = {
 				queueFilter: parsed.queueFilter || DEFAULT_FILTERS.queueFilter,
 				playerCountFilter: parsed.playerCountFilter || DEFAULT_FILTERS.playerCountFilter,
 			};
-			const baseFilters = cachedSession?.pendingFilters || cachedSession?.filters || fallbackFilters;
+			// Prefer the ID state (fallbackFilters) over the session state, because the session might be stale
+			// (e.g. after an error where we updated buttons but not the session).
+			const baseFilters = fallbackFilters;
 
-			let { timeFilter, queueFilter, playerCountFilter } = baseFilters;
-			if (parsed.action === "time") {
-				timeFilter = parsed.timeFilter || fallbackFilters.timeFilter;
-			}
-			else if (parsed.action === "queue") {
-				queueFilter = parsed.queueFilter || fallbackFilters.queueFilter;
-			}
-			else if (parsed.action === "players") {
-				playerCountFilter = parsed.playerCountFilter || fallbackFilters.playerCountFilter;
-			}
+			const { timeFilter, queueFilter, playerCountFilter } = baseFilters;
 
 			const filters = { timeFilter, queueFilter, playerCountFilter };
 			if (cachedSession) {
 				cachedSession.pendingFilters = filters;
 			}
+
+			const components = buildComponentRows({
+				loungeId1: parsed.loungeId1,
+				loungeId2: parsed.loungeId2,
+				...filters,
+			});
+
+			await interaction.update({ components });
 
 			const serverId = interaction.guildId;
 
@@ -876,12 +875,6 @@ module.exports = {
 				await interaction.editReply({ content: target2.error, files: [] });
 				return true;
 			}
-
-			const components = buildComponentRows({
-				loungeId1: target1.loungeId,
-				loungeId2: target2.loungeId,
-				...filters,
-			});
 
 			const renderToken = beginHeadToHeadRender(messageId);
 			if (cachedSession) cachedSession.activeRequestToken = renderToken;
