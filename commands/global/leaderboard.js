@@ -263,11 +263,12 @@ function computeActivityFlags(mmrChanges = []) {
 	};
 }
 
-function buildLeaderboardCustomId(action, { timeFilter, serverId }) {
+function buildLeaderboardCustomId(action, { timeFilter, serverId, page }) {
 	const safeAction = action || "time";
 	const safeTime = (timeFilter && TIME_FILTERS.includes(timeFilter)) ? timeFilter : "alltime";
 	const safeServer = serverId ? String(serverId) : "";
-	return ["leaderboard", safeAction, safeTime, safeServer].join("|");
+	const safePage = page ? String(page) : "1";
+	return ["leaderboard", safeAction, safeTime, safeServer, safePage].join("|");
 }
 
 function parseLeaderboardInteraction(customId) {
@@ -278,34 +279,50 @@ function parseLeaderboardInteraction(customId) {
 	if (parts.length < 3) {
 		return null;
 	}
-	const [, action, timeFilter, serverId] = parts;
+	const [, action, timeFilter, serverId, page] = parts;
 	return {
 		action,
 		timeFilter: TIME_FILTERS.includes(timeFilter) ? timeFilter : "alltime",
 		serverId: serverId || null,
+		page: page ? parseInt(page, 10) : 1,
 	};
 }
 
-function buildLeaderboardComponents({ timeFilter, serverId }) {
-	const row = new ActionRowBuilder()
+function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages = 1 }) {
+	const timeRow = new ActionRowBuilder()
 		.addComponents(
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "alltime", serverId }))
+				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "alltime", serverId, page: 1 }))
 				.setLabel("current")
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(timeFilter === "alltime"),
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "weekly", serverId }))
+				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "weekly", serverId, page: 1 }))
 				.setLabel("past week")
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(timeFilter === "weekly"),
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "season", serverId }))
+				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "season", serverId, page: 1 }))
 				.setLabel("this season")
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(timeFilter === "season"),
 		);
-	return [row];
+
+	const paginationRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildLeaderboardCustomId("prev", { timeFilter, serverId, page: page - 1 }))
+				.setLabel("previous")
+				.setStyle(ButtonStyle.Primary)
+				.setDisabled(page <= 1),
+			new ButtonBuilder()
+				.setCustomId(buildLeaderboardCustomId("next", { timeFilter, serverId, page: page + 1 }))
+				.setLabel("next")
+				.setStyle(ButtonStyle.Primary)
+				.setDisabled(page >= totalPages),
+		);
+
+	return [timeRow, paginationRow];
 }
 
 function storeLeaderboardSession(messageId, session) {
@@ -344,6 +361,8 @@ async function renderLeaderboardImage({
 	palette,
 	totalEligible,
 	guildIcon,
+	page = 1,
+	totalPages = 1,
 }) {
 	const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 	const ctx = canvas.getContext("2d");
@@ -377,6 +396,9 @@ async function renderLeaderboardImage({
 	const timeLabel = TIME_LABELS[timeFilter] || timeFilter;
 	const playerCount = Number.isFinite(totalEligible) ? totalEligible : entries.length;
 	const subtitleParts = [timeLabel, `${playerCount} player${playerCount === 1 ? "" : "s"}`];
+	if (totalPages > 1) {
+		subtitleParts.push(`page ${page}/${totalPages}`);
+	}
 	const subtitleText = subtitleParts.join(" · ");
 
 	ctx.save();
@@ -465,8 +487,10 @@ async function renderLeaderboardImage({
 	const leftEntries = entries.slice(0, ENTRIES_PER_COLUMN);
 	const rightEntries = entries.slice(ENTRIES_PER_COLUMN, ENTRIES_PER_COLUMN * 2);
 
-	await drawLeaderboardColumn(ctx, columns[0], leftEntries, palette, 1, timeFilter);
-	await drawLeaderboardColumn(ctx, columns[1], rightEntries, palette, ENTRIES_PER_COLUMN + 1, timeFilter);
+	const startRank = (page - 1) * MAX_ENTRIES + 1;
+
+	await drawLeaderboardColumn(ctx, columns[0], leftEntries, palette, startRank, timeFilter);
+	await drawLeaderboardColumn(ctx, columns[1], rightEntries, palette, startRank + ENTRIES_PER_COLUMN, timeFilter);
 
 	const buffer = canvas.toBuffer("image/png");
 	return new AttachmentBuilder(buffer, { name: "leaderboard.png" });
@@ -663,11 +687,11 @@ async function hydrateEntryDisplay(interaction, entry) {
 
 async function generateLeaderboard(interaction, {
 	timeFilter = "alltime",
+	page = 1,
 	session: existingSession = null,
 } = {}) {
 	const serverId = interaction.guildId;
 	const guildName = (interaction.guild?.name || "server") + " leaderboard";
-	const components = buildLeaderboardComponents({ timeFilter, serverId });
 	const palette = getPalette();
 
 	let session = existingSession || null;
@@ -689,6 +713,7 @@ async function generateLeaderboard(interaction, {
 	});
 
 	if (!pool.length) {
+		const components = buildLeaderboardComponents({ timeFilter, serverId, page: 1, totalPages: 1 });
 		return {
 			success: false,
 			message: `no tracked players have mmr data for ${TIME_LABELS[timeFilter] || timeFilter}.`,
@@ -697,7 +722,13 @@ async function generateLeaderboard(interaction, {
 	}
 
 	const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, timeFilter));
-	const topEntries = sortedPool.slice(0, MAX_ENTRIES);
+
+	const totalPages = Math.ceil(sortedPool.length / MAX_ENTRIES) || 1;
+	const safePage = Math.max(1, Math.min(page, totalPages));
+	const startIndex = (safePage - 1) * MAX_ENTRIES;
+	const endIndex = startIndex + MAX_ENTRIES;
+	const topEntries = sortedPool.slice(startIndex, endIndex);
+
 	for (const entry of topEntries) {
 		await hydrateEntryDisplay(interaction, entry);
 	}
@@ -715,15 +746,25 @@ async function generateLeaderboard(interaction, {
 		palette,
 		totalEligible: pool.length,
 		guildIcon: iconForRender,
+		page: safePage,
+		totalPages,
 	});
 
 	session = {
 		...session,
 		timeFilter,
+		page: safePage,
+		totalPages,
 		pendingTimeFilter: null,
 		activeRequestToken: null,
 	};
 
+	const components = buildLeaderboardComponents({
+		timeFilter,
+		serverId,
+		page: safePage,
+		totalPages,
+	});
 
 	return {
 		success: true,
@@ -755,6 +796,7 @@ module.exports = {
 
 			const result = await generateLeaderboard(interaction, {
 				timeFilter: "alltime",
+				page: 1,
 			});
 
 			if (!result.success) {
@@ -800,6 +842,15 @@ module.exports = {
 			// Prefer the ID state (parsed.timeFilter) over the session state
 			const nextTimeFilter = parsed.timeFilter || fallbackTimeFilter;
 
+			const requestedPage = parsed.page || 1;
+			let totalPages = 1;
+
+			if (session && session.timeFilter === nextTimeFilter) {
+				// If filter hasn't changed, we can trust session.totalPages
+				totalPages = session.totalPages || 1;
+			}
+			// If filter changed, we assume 1 page until generated.
+
 			if (session) {
 				session.pendingTimeFilter = nextTimeFilter;
 			}
@@ -807,6 +858,8 @@ module.exports = {
 			const components = buildLeaderboardComponents({
 				timeFilter: nextTimeFilter,
 				serverId: parsed.serverId || interaction.guildId,
+				page: requestedPage,
+				totalPages: totalPages,
 			});
 
 			await interaction.update({ components });
@@ -820,6 +873,7 @@ module.exports = {
 			try {
 				result = await generateLeaderboard(interaction, {
 					timeFilter: nextTimeFilter,
+					page: requestedPage,
 					session,
 				});
 
