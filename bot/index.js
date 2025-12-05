@@ -93,9 +93,22 @@ function updatePresence() {
 	});
 }
 
-client.once(Events.ClientReady, readyClient => {
+client.once(Events.ClientReady, async readyClient => {
 	updatePresence();
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+
+	// Cache all members on startup
+	console.log("Caching guild members...");
+	for (const guild of client.guilds.cache.values()) {
+		try {
+			await guild.members.fetch();
+			console.log(`Cached members for guild: ${guild.name}`);
+		}
+		catch (error) {
+			console.warn(`Failed to cache members for guild ${guild.name}:`, error);
+		}
+	}
+	console.log("Member caching complete.");
 });
 
 client.on(Events.GuildCreate, () => updatePresence());
@@ -103,10 +116,30 @@ client.on(Events.GuildDelete, () => updatePresence());
 
 client.on(Events.GuildMemberAdd, async member => {
 	try {
+		// Ensure member is cached
+		await member.fetch().catch(() => {});
 		await AutoUserManager.handleGuildMemberAdd(member);
 	}
 	catch (error) {
 		console.error("guildMemberAdd handler failed:", error);
+	}
+});
+
+client.on(Events.GuildMemberUpdate, (oldMember, newMember) => {
+	// Discord.js automatically updates the cache for us.
+	// We log changes here to verify that the bot is receiving updates.
+	if (oldMember.nickname !== newMember.nickname) {
+		console.log(`Member nickname update for ${newMember.user.tag}: '${oldMember.nickname}' -> '${newMember.nickname}'`);
+	}
+});
+
+client.on(Events.UserUpdate, (oldUser, newUser) => {
+	// Handles username or global display name changes
+	if (oldUser.username !== newUser.username) {
+		console.log(`Username update: '${oldUser.username}' -> '${newUser.username}'`);
+	}
+	if (oldUser.globalName !== newUser.globalName) {
+		console.log(`Global name update for ${newUser.username}: '${oldUser.globalName}' -> '${newUser.globalName}'`);
 	}
 });
 

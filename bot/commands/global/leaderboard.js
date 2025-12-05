@@ -630,7 +630,8 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 }
 
 async function collectLeaderboardEntries(interaction) {
-	const members = await interaction.guild.members.fetch();
+	// Use the global cache which is populated on startup
+	const members = interaction.guild.members.cache;
 	const memberList = Array.from(members.values()).filter(m => !m.user.bot);
 	const entries = [];
 	const BATCH_SIZE = 5;
