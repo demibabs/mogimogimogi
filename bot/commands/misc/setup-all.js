@@ -40,6 +40,17 @@ module.exports = {
 			let considered = 0;
 			try {
 				await interaction.editReply(`Processing guild ${processedGuilds}/${guilds.size}: ${guild.name}`);
+
+				// Ensure cache is complete
+				if (guild.memberCount > guild.members.cache.size) {
+					try {
+						await guild.members.fetch();
+					}
+					catch (e) {
+						console.warn(`setup-all: failed to fetch members for ${guild.name}:`, e);
+					}
+				}
+
 				const members = guild.members.cache;
 
 				// We no longer track server-specific user lists, so we don't remove stale entries.

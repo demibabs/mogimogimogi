@@ -250,7 +250,7 @@ async function startBot() {
 }
 
 // Handle graceful shutdown
-process.on("SIGINT", () => ShutdownHandler.shutdown(client));
-process.on("SIGTERM", () => ShutdownHandler.shutdown(client));
+// process.on("SIGINT", () => ShutdownHandler.shutdown(client));
+// process.on("SIGTERM", () => ShutdownHandler.shutdown(client));
 
 module.exports = { startBot, client };

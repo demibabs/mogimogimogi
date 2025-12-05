@@ -1,5 +1,10 @@
 const { startBot, client } = require("./bot/index.js");
 const { startSite } = require("./site/server.js");
+const ShutdownHandler = require("./bot/utils/shutdownHandler");
+
+// Handle graceful shutdown
+process.on("SIGINT", () => ShutdownHandler.shutdown(client));
+process.on("SIGTERM", () => ShutdownHandler.shutdown(client));
 
 (async () => {
 	// Start the bot
