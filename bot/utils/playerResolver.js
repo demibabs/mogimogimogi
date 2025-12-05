@@ -48,7 +48,7 @@ async function resolveTargetPlayer(interaction, {
 					if (targetLoungeId) {
 						// Try to fetch the Discord user to get their display name
 						try {
-							discordUser = await interaction.client.users.fetch(trimmedInput);
+							discordUser = interaction.client.users.cache.get(trimmedInput) || await interaction.client.users.fetch(trimmedInput);
 							displayName = discordUser.globalName || discordUser.username;
 						}
 						catch (e) { /* ignore */ }
@@ -88,7 +88,7 @@ async function resolveTargetPlayer(interaction, {
 
 					if (targetLoungeId) {
 						try {
-							discordUser = await interaction.client.users.fetch(discordId);
+							discordUser = interaction.client.users.cache.get(discordId) || await interaction.client.users.fetch(discordId);
 							displayName = discordUser.globalName || discordUser.username;
 						}
 						catch (e) { /* ignore */ }
@@ -107,7 +107,7 @@ async function resolveTargetPlayer(interaction, {
 					loungeName = lookup.name;
 					if (lookup.discordId) {
 						try {
-							discordUser = await interaction.client.users.fetch(lookup.discordId);
+							discordUser = interaction.client.users.cache.get(lookup.discordId) || await interaction.client.users.fetch(lookup.discordId);
 							displayName = discordUser.globalName || discordUser.username;
 						}
 						catch (e) { /* ignore */ }
@@ -189,7 +189,7 @@ async function resolveTargetPlayer(interaction, {
 			// If we found a Discord ID, fetch the user
 			if (storedDiscordId && !discordUser) {
 				try {
-					discordUser = await interaction.client.users.fetch(storedDiscordId);
+					discordUser = interaction.client.users.cache.get(storedDiscordId) || await interaction.client.users.fetch(storedDiscordId);
 					displayName = discordUser.globalName || discordUser.username;
 				}
 				catch (e) { /* ignore */ }

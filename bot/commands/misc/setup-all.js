@@ -40,7 +40,7 @@ module.exports = {
 			let considered = 0;
 			try {
 				await interaction.editReply(`Processing guild ${processedGuilds}/${guilds.size}: ${guild.name}`);
-				const members = await guild.members.fetch();
+				const members = guild.members.cache;
 
 				// We no longer track server-specific user lists, so we don't remove stale entries.
 				// We just ensure all current members are cached globally.

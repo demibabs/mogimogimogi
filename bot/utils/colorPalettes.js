@@ -705,11 +705,11 @@ const leaderboardPalette = {
 
 const headToHeadPalette = {
 	backgroundColor: "#0b0b0b",
-	highlightPanelColor: "#1e232cda",
-	textColor: "#e2e8ffff",
-	middleTextColor: "#fbfcfffe",
-	headerColor: "#e1e7ffff",
-	baseColor: "#272e3ac0",
+	highlightPanelColor: "#1e2b2cda",
+	textColor: "#e2fffcff",
+	middleTextColor: "#fbfffefe",
+	headerColor: "#e1fffaff",
+	baseColor: "#27373ac0",
 	valuePositiveColor: "#30aa5bff",
 	valueNegativeColor: "#f35954ff",
 };
