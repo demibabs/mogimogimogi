@@ -1117,29 +1117,14 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		}
 	}
 
-	let tipMessage = "";
-	const isSelf = interaction.user.id === (target.discordUser?.id || discordUser?.id);
-	if (isSelf && (!favorites || !favorites.track)) {
-		if (!userData) {
-			try {
-				userData = await Database.getUserData(loungeId);
-			}
-			catch (e) {
-				console.warn("failed to fetch user data for tip", e);
-			}
-		}
-
-		if (userData && !userData.customizeTipShown) {
-			tipMessage = "**note:** you can use </customize:1446020866356940861> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
-			userData.customizeTipShown = true;
-			try {
-				await Database.saveUserData(loungeId, userData);
-			}
-			catch (e) {
-				console.warn("failed to save tip flag", e);
-			}
-		}
-	}
+	const tipMessage = await AutoUserManager.getCustomizeTip({
+		interaction,
+		target,
+		discordUser,
+		favorites,
+		userData,
+		loungeId,
+	});
 
 	if (!favoriteCharacterImage || !favoriteVehicleImage) {
 		const [characterImage, vehicleImage] = await Promise.all([
@@ -1356,8 +1341,12 @@ module.exports = {
 
 			const messageId = interaction.message?.id || null;
 			const cachedSession = messageId ? getRankStatsSession(messageId) : null;
-			const defaultFilters = normalizeRankStatsFilters(DEFAULT_FILTERS);
-			const baseFilters = normalizeRankStatsFilters(cachedSession?.pendingFilters || cachedSession?.filters || defaultFilters);
+			const fallbackFilters = normalizeRankStatsFilters({
+				timeFilter: parsed.timeFilter,
+				queueFilter: parsed.queueFilter,
+				playerCountFilter: parsed.playerCountFilter,
+			});
+			const baseFilters = normalizeRankStatsFilters(cachedSession?.pendingFilters || cachedSession?.filters || fallbackFilters);
 			let nextFilters = { ...baseFilters };
 			if (parsed.action === "time") {
 				nextFilters.timeFilter = parsed.timeFilter;

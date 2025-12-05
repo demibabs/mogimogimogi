@@ -47,11 +47,11 @@ class AutoUserManager {
 				return; // Don't auto-add if server isn't set up
 			}
 
-			console.log(`auto-adding new member ${userId} to server ${serverId}`);
+			console.log(`Auto-adding new member ${userId} to server ${serverId}`);
 			await DataManager.updateServerUser(serverId, userId, client);
 		}
 		catch (error) {
-			console.error("error in handleGuildMemberAdd:", error);
+			console.error("Error in handleGuildMemberAdd:", error);
 		}
 	}
 
@@ -114,6 +114,37 @@ class AutoUserManager {
 			discordUser,
 			storedRecord: null,
 		};
+	}
+
+	static async getCustomizeTip({ interaction, target, discordUser, favorites, userData, loungeId }) {
+		let tipMessage = "";
+		const isSelf = interaction.user.id === (target.discordUser?.id || discordUser?.id);
+
+		// Check if user has ANY favorites set (track, character, or vehicle)
+		const hasAnyFavorites = favorites && (favorites.track || favorites.character || favorites.vehicle);
+
+		if (isSelf && !hasAnyFavorites) {
+			if (!userData) {
+				try {
+					userData = await database.getUserData(loungeId);
+				}
+				catch (e) {
+					console.warn("failed to fetch user data for tip", e);
+				}
+			}
+
+			if (userData && !userData.customizeTipShown) {
+				tipMessage = "**note:** you can use </customize:1446020866356940861> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
+				userData.customizeTipShown = true;
+				try {
+					await database.saveUserData(loungeId, userData);
+				}
+				catch (e) {
+					console.warn("failed to save tip flag", e);
+				}
+			}
+		}
+		return tipMessage;
 	}
 }
 

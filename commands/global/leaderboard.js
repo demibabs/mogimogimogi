@@ -798,7 +798,8 @@ module.exports = {
 
 			const messageId = interaction.message?.id || null;
 			const session = messageId ? getLeaderboardSession(messageId) : null;
-			const nextTimeFilter = parsed.timeFilter || session?.pendingTimeFilter || session?.timeFilter || "alltime";
+			const fallbackTimeFilter = parsed.timeFilter || "alltime";
+			const nextTimeFilter = parsed.timeFilter || session?.pendingTimeFilter || session?.timeFilter || fallbackTimeFilter;
 
 			if (session) {
 				session.pendingTimeFilter = nextTimeFilter;

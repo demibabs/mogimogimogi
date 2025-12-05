@@ -837,17 +837,22 @@ module.exports = {
 			const messageId = interaction.message?.id || null;
 			const cachedSession = messageId ? getHeadToHeadSession(messageId) : null;
 
-			const baseFilters = cachedSession?.pendingFilters || cachedSession?.filters || DEFAULT_FILTERS;
+			const fallbackFilters = {
+				timeFilter: parsed.timeFilter || DEFAULT_FILTERS.timeFilter,
+				queueFilter: parsed.queueFilter || DEFAULT_FILTERS.queueFilter,
+				playerCountFilter: parsed.playerCountFilter || DEFAULT_FILTERS.playerCountFilter,
+			};
+			const baseFilters = cachedSession?.pendingFilters || cachedSession?.filters || fallbackFilters;
 
 			let { timeFilter, queueFilter, playerCountFilter } = baseFilters;
 			if (parsed.action === "time") {
-				timeFilter = parsed.timeFilter || DEFAULT_FILTERS.timeFilter;
+				timeFilter = parsed.timeFilter || fallbackFilters.timeFilter;
 			}
 			else if (parsed.action === "queue") {
-				queueFilter = parsed.queueFilter || DEFAULT_FILTERS.queueFilter;
+				queueFilter = parsed.queueFilter || fallbackFilters.queueFilter;
 			}
 			else if (parsed.action === "players") {
-				playerCountFilter = parsed.playerCountFilter || DEFAULT_FILTERS.playerCountFilter;
+				playerCountFilter = parsed.playerCountFilter || fallbackFilters.playerCountFilter;
 			}
 
 			const filters = { timeFilter, queueFilter, playerCountFilter };

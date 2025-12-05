@@ -967,16 +967,16 @@ module.exports = {
 			const { action, timeFilter: rawTime, queueFilter: rawQueue, playerCountFilter: rawPlayers, loungeId } = parsed;
 			const messageId = interaction.message?.id || null;
 			const cachedSession = messageId ? getNotablesSession(messageId) : null;
-			const defaultFilters = {
-				timeFilter: "alltime",
-				queueFilter: "both",
-				playerCountFilter: "both",
+			const fallbackFilters = {
+				timeFilter: rawTime || "alltime",
+				queueFilter: rawQueue || "both",
+				playerCountFilter: rawPlayers || "both",
 			};
-			const baseFilters = cachedSession?.pendingFilters || cachedSession?.filters || defaultFilters;
+			const baseFilters = cachedSession?.pendingFilters || cachedSession?.filters || fallbackFilters;
 
-			let timeFilter = baseFilters.timeFilter || defaultFilters.timeFilter;
-			let queueFilter = baseFilters.queueFilter || defaultFilters.queueFilter;
-			let playerCountFilter = baseFilters.playerCountFilter || defaultFilters.playerCountFilter;
+			let timeFilter = baseFilters.timeFilter || fallbackFilters.timeFilter;
+			let queueFilter = baseFilters.queueFilter || fallbackFilters.queueFilter;
+			let playerCountFilter = baseFilters.playerCountFilter || fallbackFilters.playerCountFilter;
 
 			if (action === "queue") {
 				queueFilter = rawQueue || "both";
@@ -1179,29 +1179,14 @@ module.exports = {
 				favorites = userData?.favorites || {};
 			}
 
-			let tipMessage = "";
-			const isSelf = interaction.user.id === (target.discordUser?.id || discordUser?.id);
-			if (isSelf && (!favorites || !favorites.track)) {
-				if (!userData) {
-					try {
-						userData = await Database.getUserData(normalizedLoungeId);
-					}
-					catch (e) {
-						console.warn("failed to fetch user data for tip", e);
-					}
-				}
-
-				if (userData && !userData.customizeTipShown) {
-					tipMessage = "**note:** you can use </customize:1446020866356940861> to set the track in the bg (and add your favorite character and vehicle too!).\n\n";
-					userData.customizeTipShown = true;
-					try {
-						await Database.saveUserData(normalizedLoungeId, userData);
-					}
-					catch (e) {
-						console.warn("failed to save tip flag", e);
-					}
-				}
-			}
+			const tipMessage = await AutoUserManager.getCustomizeTip({
+				interaction,
+				target,
+				discordUser,
+				favorites,
+				userData,
+				loungeId: normalizedLoungeId,
+			});
 
 			if (!trackName) {
 				trackName = favorites.track || GameData.getRandomTrack();
