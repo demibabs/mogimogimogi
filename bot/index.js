@@ -85,16 +85,22 @@ for (const folder of commandFolders) {
 	}
 }
 
+const statusCommands = ["/stats", "/notables", "/head-to-head", "/rank-stats", "/leaderboard"];
+let currentStatusIndex = 0;
+
 function updatePresence() {
 	const serverCount = client.guilds.cache.size;
+	const command = statusCommands[currentStatusIndex];
 	client.user.setActivity({
-		name: `/head-to-head • ${serverCount} servers`,
+		name: `${command} • ${serverCount} servers`,
 		type: ActivityType.Custom,
 	});
+	currentStatusIndex = (currentStatusIndex + 1) % statusCommands.length;
 }
 
 client.once(Events.ClientReady, async readyClient => {
 	updatePresence();
+	setInterval(updatePresence, 5000);
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 
 	// Cache all members on startup
@@ -112,7 +118,6 @@ client.once(Events.ClientReady, async readyClient => {
 });
 
 client.on(Events.GuildCreate, async (guild) => {
-	updatePresence();
 	try {
 		console.log(`Joined new guild: ${guild.name}. Caching members...`);
 		await guild.members.fetch();
@@ -122,7 +127,7 @@ client.on(Events.GuildCreate, async (guild) => {
 		console.warn(`Failed to cache members for new guild ${guild.name}:`, error);
 	}
 });
-client.on(Events.GuildDelete, () => updatePresence());
+// client.on(Events.GuildDelete, () => updatePresence());
 
 client.on(Events.GuildMemberAdd, async member => {
 	try {

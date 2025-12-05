@@ -175,7 +175,7 @@ class DataManager {
 			}
 
 			if (!loungeUser || !resolvedLoungeId) {
-				console.warn(`User ${discordId} not found in Lounge API`);
+				// console.warn(`User ${discordId} not found in Lounge API`);
 				return false;
 			}
 			const loungeId = resolvedLoungeId;

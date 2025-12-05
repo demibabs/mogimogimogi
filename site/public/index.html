@@ -4,42 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MogiBot</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f0f0f0; }
-        .stats { display: flex; justify-content: center; gap: 50px; margin-top: 30px; }
-        .stat-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .stat-value { font-size: 2em; font-weight: bold; color: #7289da; }
-        .stat-label { color: #666; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>MogiBot</h1>
-    <p>The ultimate Mario Kart discord bot.</p>
-
-    <div class="stats">
-        <div class="stat-box">
-            <div class="stat-value" id="server-count">-</div>
-            <div class="stat-label">Servers</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-value" id="user-count">-</div>
-            <div class="stat-label">Tracked Users</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-value" id="table-count">-</div>
-            <div class="stat-label">Tables Created</div>
-        </div>
-    </div>
-
-    <script>
-        fetch('/api/stats')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('server-count').textContent = data.servers;
-                document.getElementById('user-count').textContent = data.users;
-                document.getElementById('table-count').textContent = data.tables;
-            })
-            .catch(console.error);
-    </script>
+    
 </body>
 </html>
