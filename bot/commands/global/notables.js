@@ -108,6 +108,7 @@ const goodBSMessages = [
 	"isn't this game so good when you win?",
 	"unstoppable.",
 	"#gonein1.",
+	"holy moly!",
 ];
 
 const badBSMessages = [

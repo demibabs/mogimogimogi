@@ -366,7 +366,7 @@ async function renderHeadToHeadImage({
 		statsFrame,
 		palette?.baseColor || ColorPalettes.headToHeadPalette.panelColor,
 		EDGE_RADIUS,
-		{ highlightOpacity: 0 }
+		{ highlightOpacity: 0 },
 	);
 
 	const availableWidth = statsFrame.width - CENTER_GAP;
@@ -538,7 +538,7 @@ async function renderHeadToHeadImage({
 					panelFrame,
 					palette?.highlightPanelColor || ColorPalettes.headToHeadPalette.highlightPanelColor,
 					EDGE_RADIUS / 2,
-					{ highlightOpacity: 0 }
+					{ highlightOpacity: 0 },
 				);
 
 				ctx.save();
