@@ -308,21 +308,46 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 				.setDisabled(timeFilter === "season"),
 		);
 
-	const paginationRow = new ActionRowBuilder()
-		.addComponents(
+	if (totalPages <= 1) {
+		return [timeRow];
+	}
+
+	const paginationRow = new ActionRowBuilder();
+
+	if (totalPages > 2) {
+		paginationRow.addComponents(
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("prev", { timeFilter, serverId, page: page - 1 }))
-				.setLabel("previous")
+				.setCustomId(buildLeaderboardCustomId("first", { timeFilter, serverId, page: 1 }))
+				.setLabel("first")
 				.setStyle(ButtonStyle.Primary)
 				.setDisabled(page <= 1),
+		);
+	}
+
+	paginationRow.addComponents(
+		new ButtonBuilder()
+			.setCustomId(buildLeaderboardCustomId("prev", { timeFilter, serverId, page: page - 1 }))
+			.setLabel("previous")
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(page <= 1),
+		new ButtonBuilder()
+			.setCustomId(buildLeaderboardCustomId("next", { timeFilter, serverId, page: page + 1 }))
+			.setLabel("next")
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(page >= totalPages),
+	);
+
+	if (totalPages > 2) {
+		paginationRow.addComponents(
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("next", { timeFilter, serverId, page: page + 1 }))
-				.setLabel("next")
+				.setCustomId(buildLeaderboardCustomId("last", { timeFilter, serverId, page: totalPages }))
+				.setLabel("last")
 				.setStyle(ButtonStyle.Primary)
 				.setDisabled(page >= totalPages),
 		);
+	}
 
-	return [timeRow, paginationRow];
+	return [paginationRow, timeRow];
 }
 
 function storeLeaderboardSession(messageId, session) {
@@ -503,8 +528,8 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 
 	const cardGap = LAYOUT.entryCardGap;
 	const innerHeight = frame.height;
-	const totalGap = Math.max(entries.length - 1, 0) * cardGap;
-	const cardHeight = entries.length ? (innerHeight - totalGap) / entries.length : 0;
+	const totalGap = Math.max(ENTRIES_PER_COLUMN - 1, 0) * cardGap;
+	const cardHeight = (innerHeight - totalGap) / ENTRIES_PER_COLUMN;
 
 	for (let index = 0; index < entries.length; index++) {
 		const entry = entries[index];
@@ -656,7 +681,7 @@ async function collectLeaderboardEntries(interaction) {
 					playerDetails: {
 						name: details.name || details.loungeName || null,
 					},
-					displayName: member.displayName,
+					displayName: member.user.displayName,
 					flagEmoji: getCountryFlag(details.countryCode),
 				};
 			}
