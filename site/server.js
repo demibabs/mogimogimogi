@@ -9,6 +9,15 @@ function startSite(client) {
 	// Serve static files from public directory
 	app.use(express.static(path.join(__dirname, "public")));
 
+	// Clean URLs for terms and privacy
+	app.get("/terms", (req, res) => {
+		res.sendFile(path.join(__dirname, "public", "terms.html"));
+	});
+
+	app.get("/privacy", (req, res) => {
+		res.sendFile(path.join(__dirname, "public", "privacy.html"));
+	});
+
 	// API route for stats
 	app.get("/api/stats", async (req, res) => {
 		try {

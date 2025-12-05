@@ -160,7 +160,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	if (interaction.isChatInputCommand()) {
 		const guildName = interaction.guild?.name || "DM";
 		const displayName = interaction.user?.globalName || interaction.user?.username || "unknown";
-		console.log(`Chat input command: ${interaction.commandName} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
+		console.log(`Chat input command: ${interaction.toString()} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
 
 		const command = interaction.client.commands.get(interaction.commandName);
 
