@@ -47,7 +47,7 @@ class AutoUserManager {
 				return; // Don't auto-add if server isn't set up
 			}
 
-			console.log(`Auto-adding new member ${userId} to server ${serverId}`);
+			// console.log(`Auto-adding new member ${userId} to server ${serverId}`);
 			await DataManager.updateServerUser(serverId, userId, client);
 		}
 		catch (error) {

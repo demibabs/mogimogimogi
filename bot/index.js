@@ -102,7 +102,7 @@ client.once(Events.ClientReady, async readyClient => {
 	for (const guild of client.guilds.cache.values()) {
 		try {
 			await guild.members.fetch();
-			console.log(`Cached members for guild: ${guild.name}`);
+			// console.log(`Cached members for guild: ${guild.name}`);
 		}
 		catch (error) {
 			console.warn(`Failed to cache members for guild ${guild.name}:`, error);
@@ -125,32 +125,6 @@ client.on(Events.GuildMemberAdd, async member => {
 	}
 });
 
-client.on(Events.GuildMemberUpdate, (oldMember, newMember) => {
-	// Discord.js automatically updates the cache for us.
-	// We log changes here to verify that the bot is receiving updates.
-	if (oldMember.nickname !== newMember.nickname) {
-		console.log(`Member nickname update for ${newMember.user.tag}: '${oldMember.nickname}' -> '${newMember.nickname}'`);
-	}
-});
-
-client.on(Events.UserUpdate, (oldUser, newUser) => {
-	// Handles username or global display name changes
-	if (oldUser.username !== newUser.username) {
-		console.log(`Username update: '${oldUser.username}' -> '${newUser.username}'`);
-	}
-	if (oldUser.globalName !== newUser.globalName) {
-		console.log(`Global name update for ${newUser.username}: '${oldUser.globalName}' -> '${newUser.globalName}'`);
-	}
-});
-
-client.on(Events.GuildMemberRemove, async member => {
-	try {
-		await AutoUserManager.handleGuildMemberRemove(member);
-	}
-	catch (error) {
-		console.error("guildMemberRemove handler failed:", error);
-	}
-});
 
 client.on(Events.InteractionCreate, async interaction => {
 	console.log(`Received interaction: ${interaction.type}`);
@@ -247,7 +221,8 @@ client.on(Events.InteractionCreate, async interaction => {
 async function startBot() {
 	try {
 		await client.login(token);
-	} catch (error) {
+	}
+	catch (error) {
 		console.error("Failed to login:", error);
 		process.exit(1);
 	}

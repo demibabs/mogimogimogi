@@ -110,7 +110,7 @@ class DataManager {
 
 			if (guild) {
 				try {
-					guildMember = guild.members.cache.get(discordId) || await guild.members.fetch(discordId);
+					guildMember = await guild.members.fetch(discordId);
 				}
 				catch (error) {
 					if (error.code !== 10007 && error.status !== 404) {
@@ -125,7 +125,7 @@ class DataManager {
 
 			if (!discordUser && client) {
 				try {
-					discordUser = client.users.cache.get(discordId) || await client.users.fetch(discordId);
+					discordUser = await client.users.fetch(discordId);
 				}
 				catch (error) {
 					if (error.code !== 10013 && error.status !== 404) {
@@ -164,7 +164,7 @@ class DataManager {
 		try {
 			const discordId = String(userId);
 			// Fetch user info from Discord
-			const user = client.users.cache.get(discordId) || await client.users.fetch(discordId);
+			const user = await client.users.fetch(discordId);
 
 			let loungeUser = loungeUserOverride || null;
 			let resolvedLoungeId = loungeUser?.id ? String(loungeUser.id) : (loungeUser?.playerId ? String(loungeUser.playerId) : null);
@@ -284,7 +284,7 @@ class DataManager {
 	static async getUsernameFromId(userId, client, serverId = null) {
 		try {
 			// Fetch fresh from Discord
-			const user = client.users.cache.get(userId) || await client.users.fetch(userId);
+			const user = await client.users.fetch(userId);
 			return user.globalName || user.username;
 		}
 		catch (error) {
