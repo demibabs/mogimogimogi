@@ -3,8 +3,14 @@ const { startSite } = require("./site/server.js");
 const ShutdownHandler = require("./bot/utils/shutdownHandler");
 
 // Handle graceful shutdown
-process.on("SIGINT", () => ShutdownHandler.shutdown(client));
-process.on("SIGTERM", () => ShutdownHandler.shutdown(client));
+process.on("SIGINT", () => {
+	console.log("Received SIGINT in main.js");
+	ShutdownHandler.shutdown(client);
+});
+process.on("SIGTERM", () => {
+	console.log("Received SIGTERM in main.js");
+	ShutdownHandler.shutdown(client);
+});
 
 (async () => {
 	// Start the bot
