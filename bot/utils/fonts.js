@@ -34,7 +34,7 @@ function init() {
 		console.warn("canvas not available; skipping font registration", e?.message || e);
 		return;
 	}
-	const staticDir = path.join(__dirname, "..", "fonts", "Lexend", "static");
+	const staticDir = path.join(__dirname, "..", "..", "fonts", "Lexend", "static");
 	const weights = [
 		{ file: "Lexend-Regular.ttf", weight: "400" },
 		{ file: "Lexend-Medium.ttf", weight: "500" },
@@ -53,7 +53,7 @@ function init() {
 	// Optionally register a coverage font if present (e.g., IPA, symbols, misc. Unicode).
 	// This is optional: if the files are missing, we silently skip.
 	try {
-		const dejavuDir = path.join(__dirname, "..", "fonts", "dejavu-sans");
+		const dejavuDir = path.join(__dirname, "..", "..", "fonts", "dejavu-sans");
 		const dejavuCandidates = [
 			{ file: "DejaVuSans.ttf", family: "DejaVu Sans", weight: "400" },
 			{ file: "DejaVuSans-Bold.ttf", family: "DejaVu Sans", weight: "700" },
@@ -73,7 +73,7 @@ function init() {
 		}
 
 		// Register Noto Sans JP (CJK) if present for Japanese glyph coverage
-		const notoJpStatic = path.join(__dirname, "..", "fonts", "Noto_Sans_JP", "static");
+		const notoJpStatic = path.join(__dirname, "..", "..", "fonts", "Noto_Sans_JP", "static");
 		const notoJpWeights = [
 			{ file: "NotoSansJP-Thin.ttf", weight: "100" },
 			{ file: "NotoSansJP-ExtraLight.ttf", weight: "200" },
@@ -98,7 +98,7 @@ function init() {
 		}
 
 		// Register Noto Sans (broad Latin/Unicode) if present
-		const notoSansStatic = path.join(__dirname, "..", "fonts", "Noto_Sans", "static");
+		const notoSansStatic = path.join(__dirname, "..", "..", "fonts", "Noto_Sans", "static");
 		const notoSansWeights = [
 			{ file: "NotoSans-Regular.ttf", weight: "400" },
 			{ file: "NotoSans-Medium.ttf", weight: "500" },
@@ -135,7 +135,7 @@ function init() {
 		}
 		// Register Noto Sans Symbols if present
 		(() => {
-			const dir = path.join(__dirname, "..", "fonts", "Noto_Sans_Symbols");
+			const dir = path.join(__dirname, "..", "..", "fonts", "Noto_Sans_Symbols");
 			const regular = path.join(dir, "static", "NotoSansSymbols-Regular.ttf");
 			if (fs.existsSync(regular)) {
 				try {
@@ -149,7 +149,7 @@ function init() {
 
 		// Register Noto Sans Symbols 2 if present
 		(() => {
-			const dir = path.join(__dirname, "..", "fonts", "Noto_Sans_Symbols_2");
+			const dir = path.join(__dirname, "..", "..", "fonts", "Noto_Sans_Symbols_2");
 			const regular = path.join(dir, "NotoSansSymbols2-Regular.ttf");
 			if (fs.existsSync(regular)) {
 				try {
@@ -163,7 +163,7 @@ function init() {
 
 		// Register Noto Sans Math if present
 		(() => {
-			const dir = path.join(__dirname, "..", "fonts", "Noto_Sans_Math");
+			const dir = path.join(__dirname, "..", "..", "fonts", "Noto_Sans_Math");
 			const regular = path.join(dir, "NotoSansMath-Regular.ttf");
 			if (fs.existsSync(regular)) {
 				try {
@@ -177,7 +177,7 @@ function init() {
 
 		// Register Noto Music if present
 		(() => {
-			const dir = path.join(__dirname, "..", "fonts", "Noto_Music");
+			const dir = path.join(__dirname, "..", "..", "fonts", "Noto_Music");
 			const regular = path.join(dir, "NotoMusic-Regular.ttf");
 			if (fs.existsSync(regular)) {
 				try {

@@ -211,29 +211,13 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-// Simple web server for health checks (Railway requirement)
-const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 3000;
+async function startBot() {
+	try {
+		await client.login(token);
+	} catch (error) {
+		console.error("Failed to login:", error);
+		process.exit(1);
+	}
+}
 
-app.get("/", (req, res) => {
-	res.json({
-		status: "Bot is running!",
-		uptime: process.uptime(),
-		timestamp: new Date().toISOString(),
-	});
-});
-
-app.get("/health", (req, res) => {
-	res.json({
-		status: "healthy",
-		bot: client.user ? "online" : "offline",
-		guilds: client.guilds.cache.size,
-	});
-});
-
-app.listen(PORT, () => {
-	console.log(`Health check server running on port ${PORT}`);
-});
-
-client.login(token);
+module.exports = { startBot, client };

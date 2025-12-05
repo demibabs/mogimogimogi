@@ -18,10 +18,12 @@
   "license": "ISC",
   "author": "demibabs",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node index.js",
-    "deploy": "node deploy.js",
+    "start": "node main.js",
+    "dev": "node main.js --dev",
+    "deploy": "node bot/deploy.js",
+    "deploy:dev": "node bot/deploy.js --dev",
     "test": "test"
   },
   "engines": {

@@ -366,6 +366,7 @@ async function renderHeadToHeadImage({
 		statsFrame,
 		palette?.baseColor || ColorPalettes.headToHeadPalette.panelColor,
 		EDGE_RADIUS,
+		{ highlightOpacity: 0 }
 	);
 
 	const availableWidth = statsFrame.width - CENTER_GAP;
@@ -537,6 +538,7 @@ async function renderHeadToHeadImage({
 					panelFrame,
 					palette?.highlightPanelColor || ColorPalettes.headToHeadPalette.highlightPanelColor,
 					EDGE_RADIUS / 2,
+					{ highlightOpacity: 0 }
 				);
 
 				ctx.save();
@@ -617,7 +619,7 @@ async function renderHeadToHeadImage({
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
 	ctx.font = RECORD_VALUE_FONT;
-	ctx.fillStyle = palette?.textColor || ColorPalettes.headToHeadPalette.textColor;
+	ctx.fillStyle = palette?.middleTextColor || ColorPalettes.headToHeadPalette.middleTextColor;
 	ctx.fillText(formatRecordText(record), centerX, statsFrame.top + CENTER_RECORD_BASE_OFFSET);
 
 	ctx.font = RECORD_LABEL_FONT;

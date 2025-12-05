@@ -149,6 +149,23 @@ class Database {
 		}
 	}
 
+	async getGlobalStats() {
+		if (!this.useDatabase) {
+			return { tableCount: 0, userCount: 0 };
+		}
+		try {
+			const tableRes = await this.pool.query("SELECT COUNT(*) FROM tables");
+			const userRes = await this.pool.query("SELECT COUNT(DISTINCT user_id) FROM user_tables");
+			return {
+				tableCount: parseInt(tableRes.rows[0].count, 10),
+				userCount: parseInt(userRes.rows[0].count, 10)
+			};
+		} catch (error) {
+			console.error("failed to get global stats:", error);
+			return { tableCount: 0, userCount: 0 };
+		}
+	}
+
 	/**
 	 * Purge all persisted data (destructive!). Requires useDatabase=true.
 	 * Drops and recreates tables to ensure a clean slate.
