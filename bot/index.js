@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const database = require("./utils/database");
 const AutoUserManager = require("./utils/autoUserManager");
+const ShutdownHandler = require("./utils/shutdownHandler");
 const { resolveCommandFromButtonId, isGlobalCommand, normalizeCommandName } = require("./utils/globalCommands");
 const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST, ActivityType } = require("discord.js");
 
@@ -111,13 +112,23 @@ client.once(Events.ClientReady, async readyClient => {
 	console.log("Member caching complete.");
 });
 
-client.on(Events.GuildCreate, () => updatePresence());
+client.on(Events.GuildCreate, async (guild) => {
+	updatePresence();
+	try {
+		console.log(`Joined new guild: ${guild.name}. Caching members...`);
+		await guild.members.fetch();
+		console.log(`Cached members for ${guild.name}`);
+	}
+	catch (error) {
+		console.warn(`Failed to cache members for new guild ${guild.name}:`, error);
+	}
+});
 client.on(Events.GuildDelete, () => updatePresence());
 
 client.on(Events.GuildMemberAdd, async member => {
 	try {
 		// Ensure member is cached
-		await member.fetch().catch(() => {});
+		await member.fetch().catch((e) => console.warn("Failed to fetch member on join:", e));
 		await AutoUserManager.handleGuildMemberAdd(member);
 	}
 	catch (error) {
@@ -148,7 +159,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	// Handle slash commands
 	if (interaction.isChatInputCommand()) {
 		const guildName = interaction.guild?.name || "DM";
-		const displayName = interaction.member?.displayName || interaction.user?.globalName || "unknown";
+		const displayName = interaction.user?.globalName || interaction.user?.username || "unknown";
 		console.log(`Chat input command: ${interaction.commandName} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
 
 		const command = interaction.client.commands.get(interaction.commandName);
@@ -160,6 +171,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		await trackSlashCommandUsage(interaction, command.data?.name);
 
+		ShutdownHandler.add(interaction);
 		try {
 			await command.execute(interaction);
 		}
@@ -172,6 +184,9 @@ client.on(Events.InteractionCreate, async interaction => {
 				await interaction.reply({ content: "There was an error while executing this command!", flags: MessageFlags.Ephemeral });
 			}
 		}
+		finally {
+			ShutdownHandler.remove(interaction.id);
+		}
 	}
 	// Handle button interactions
 	else if (interaction.isButton()) {
@@ -180,40 +195,46 @@ client.on(Events.InteractionCreate, async interaction => {
 		console.log(`Button interaction: ${interaction.customId} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
 
 		await trackButtonInteractionUsage(interaction);
+		ShutdownHandler.add(interaction);
 
 		// Check if any command can handle this button interaction
 		let handled = false;
-		for (const command of interaction.client.commands.values()) {
-			if (command.handleButtonInteraction && typeof command.handleButtonInteraction === "function") {
-				try {
-					const result = await command.handleButtonInteraction(interaction);
-					if (result) {
+		try {
+			for (const command of interaction.client.commands.values()) {
+				if (command.handleButtonInteraction && typeof command.handleButtonInteraction === "function") {
+					try {
+						const result = await command.handleButtonInteraction(interaction);
+						if (result) {
+							handled = true;
+							break;
+						}
+					}
+					catch (error) {
+						console.error(`Error in button handler for ${command.data.name}:`, error);
+						if (!interaction.replied && !interaction.deferred) {
+							await interaction.reply({
+								content: "There was an error while handling this button interaction!",
+								flags: MessageFlags.Ephemeral,
+							});
+						}
 						handled = true;
 						break;
 					}
 				}
-				catch (error) {
-					console.error(`Error in button handler for ${command.data.name}:`, error);
-					if (!interaction.replied && !interaction.deferred) {
-						await interaction.reply({
-							content: "There was an error while handling this button interaction!",
-							flags: MessageFlags.Ephemeral,
-						});
-					}
-					handled = true;
-					break;
+			}
+
+			if (!handled) {
+				console.warn(`No handler found for button interaction: ${interaction.customId}`);
+				if (!interaction.replied && !interaction.deferred) {
+					await interaction.reply({
+						content: "This button interaction is no longer available.",
+						flags: MessageFlags.Ephemeral,
+					});
 				}
 			}
 		}
-
-		if (!handled) {
-			console.warn(`No handler found for button interaction: ${interaction.customId}`);
-			if (!interaction.replied && !interaction.deferred) {
-				await interaction.reply({
-					content: "This button interaction is no longer available.",
-					flags: MessageFlags.Ephemeral,
-				});
-			}
+		finally {
+			ShutdownHandler.remove(interaction.id);
 		}
 	}
 });
@@ -227,5 +248,9 @@ async function startBot() {
 		process.exit(1);
 	}
 }
+
+// Handle graceful shutdown
+process.on("SIGINT", () => ShutdownHandler.shutdown(client));
+process.on("SIGTERM", () => ShutdownHandler.shutdown(client));
 
 module.exports = { startBot, client };

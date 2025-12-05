@@ -25,7 +25,17 @@ module.exports = {
 
 			await interaction.editReply(`${baseMessage}...`);
 
-			const members = await interaction.guild.members.fetch();
+			// Ensure cache is complete
+			if (interaction.guild.memberCount > interaction.guild.members.cache.size) {
+				try {
+					await interaction.guild.members.fetch();
+				}
+				catch (e) {
+					console.warn("setup: failed to fetch members:", e);
+				}
+			}
+
+			const members = interaction.guild.members.cache;
 			const total = members.size;
 			let processed = 0;
 			let found = 0;
