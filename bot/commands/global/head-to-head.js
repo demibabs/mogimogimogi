@@ -679,7 +679,7 @@ module.exports = {
 		.addStringOption((option) =>
 			option
 				.setName("player")
-				.setDescription("lounge name or id for a player.")
+				.setDescription("lounge name, id, or discord id.")
 				.setAutocomplete(true)
 				.setRequired(true),
 		)

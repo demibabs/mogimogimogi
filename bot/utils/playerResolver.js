@@ -22,8 +22,7 @@ async function resolveTargetPlayer(interaction, {
 		// A. Is it a numeric ID?
 		if (/^\d+$/.test(trimmedInput)) {
 			// Could be a Lounge ID or a Discord ID.
-			// Let's assume Lounge ID first if it's short, or check both?
-			// Actually, Lounge IDs are usually short (e.g. 1234), Discord IDs are long (18 chars).
+			// Lounge IDs are usually short (e.g. 1234), Discord IDs are long (17-19 chars).
 			if (trimmedInput.length > 10) {
 				// Likely a Discord ID
 				try {
@@ -48,7 +47,7 @@ async function resolveTargetPlayer(interaction, {
 					if (targetLoungeId) {
 						// Try to fetch the Discord user to get their display name
 						try {
-							discordUser = await interaction.client.users.fetch(trimmedInput);
+							discordUser = interaction.client.users.cache.get(trimmedInput) || await interaction.client.users.fetch(trimmedInput);
 							displayName = discordUser.globalName || discordUser.username;
 						}
 						catch (e) { /* ignore */ }

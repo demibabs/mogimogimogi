@@ -825,7 +825,7 @@ module.exports = {
 		.setDescription("your best and worst mogis.")
 		.addStringOption(option =>
 			option.setName("player")
-				.setDescription("lounge name or id. leave blank for yourself.")
+				.setDescription("lounge name, id or disocrd id. leave blank for yourself.")
 				.setAutocomplete(true)),
 
 	autocomplete: async interaction => {

@@ -1221,7 +1221,7 @@ module.exports = {
 		.setDescription("see how you stack up vs. opponents of each rank.")
 		.addStringOption(option =>
 			option.setName("player")
-				.setDescription("lounge name or id. leave blank for yourself.")
+				.setDescription("lounge name, id or discord id. leave blank for yourself.")
 				.setAutocomplete(true)),
 
 	autocomplete: async interaction => {

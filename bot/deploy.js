@@ -22,7 +22,7 @@ const shouldClearGuild = args.includes("--clear-guild");
 const shouldClearAll = args.includes("--clear-all");
 const deployAll = args.includes("--all");
 const deployGlobal = args.includes("--global");
-const specificCommand = args.find(arg => !arg.startsWith("--"));
+const specificCommand = args.find(arg => !arg.startsWith("--") && arg !== "bot/deploy.js");
 
 // Function to load all commands
 function loadAllCommands(commandsDir = "commands") {

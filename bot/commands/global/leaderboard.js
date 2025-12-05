@@ -630,6 +630,17 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 }
 
 async function collectLeaderboardEntries(interaction) {
+	// Ensure cache is complete
+	if (interaction.guild.memberCount > interaction.guild.members.cache.size) {
+		try {
+			await interaction.editReply("fetching server members...");
+			await interaction.guild.members.fetch();
+		}
+		catch (e) {
+			console.warn("leaderboard: failed to fetch members:", e);
+		}
+	}
+
 	// Use the global cache which is populated on startup
 	const members = interaction.guild.members.cache;
 	const memberList = Array.from(members.values()).filter(m => !m.user.bot);

@@ -2,14 +2,14 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const database = require("../../utils/database");
 
 const GLOBAL_COMMANDS = [
-	{ name: "/stats", description: "lounge stats card" },
-	{ name: "/notables", description: "best and worst performances" },
-	{ name: "/rank-stats", description: "stats broken down by the ranks of your opponents" },
-	{ name: "/customize", description: "edit the appearance of the above commands" },
-	{ name: "/head-to-head", description: "two players compared across shared mogis" },
-	{ name: "/leaderboard", description: "server MMR leaderboard" },
-	{ name: "/setup", description: "fetches + saves server members' lounge data so that the other commands work" },
-	{ name: "/about-me", description: "this lol" },
+	{ name: "</stats:1446020866356940868>", description: "lounge stats card" },
+	{ name: "</notables:1446020866356940864>", description: "best and worst performances" },
+	{ name: "</rank-stats:1446020866356940865>", description: "stats broken down by the ranks of your opponents" },
+	{ name: "</customize:1446020866356940861>", description: "edit the appearance of the above commands" },
+	{ name: "</head-to-head:1446020866356940862>", description: "two players compared across shared mogis" },
+	{ name: "</leaderboard:1446020866356940863>", description: "server MMR leaderboard" },
+	{ name: "</setup:1446020866356940867>", description: "fetches + saves server members' lounge data so that the other commands work" },
+	{ name: "</about-me:1446020866356940860>", description: "this lol" },
 ];
 
 module.exports = {

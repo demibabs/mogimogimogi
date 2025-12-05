@@ -558,7 +558,7 @@ module.exports = {
 		.setDescription("check your (or someone else's) stats.")
 		.addStringOption(option =>
 			option.setName("player")
-				.setDescription("lounge name or id. leave blank for yourself.")
+				.setDescription("lounge name, id or discord id. leave blank for yourself.")
 				.setAutocomplete(true)),
 
 	autocomplete: async interaction => {
