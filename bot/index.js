@@ -2,7 +2,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const database = require("./utils/database");
 const AutoUserManager = require("./utils/autoUserManager");
-const ShutdownHandler = require("./utils/shutdownHandler");
 const { resolveCommandFromButtonId, isGlobalCommand, normalizeCommandName } = require("./utils/globalCommands");
 const { Client, Events, GatewayIntentBits, Collection, MessageFlags, REST, ActivityType } = require("discord.js");
 
@@ -171,7 +170,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		await trackSlashCommandUsage(interaction, command.data?.name);
 
-		ShutdownHandler.add(interaction);
 		try {
 			await command.execute(interaction);
 		}
@@ -184,9 +182,6 @@ client.on(Events.InteractionCreate, async interaction => {
 				await interaction.reply({ content: "There was an error while executing this command!", flags: MessageFlags.Ephemeral });
 			}
 		}
-		finally {
-			ShutdownHandler.remove(interaction.id);
-		}
 	}
 	// Handle button interactions
 	else if (interaction.isButton()) {
@@ -195,7 +190,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		console.log(`Button interaction: ${interaction.customId} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
 
 		await trackButtonInteractionUsage(interaction);
-		ShutdownHandler.add(interaction);
 
 		// Check if any command can handle this button interaction
 		let handled = false;
@@ -233,8 +227,8 @@ client.on(Events.InteractionCreate, async interaction => {
 				}
 			}
 		}
-		finally {
-			ShutdownHandler.remove(interaction.id);
+		catch (error) {
+			console.error("Unexpected error in button interaction handling:", error);
 		}
 	}
 });
