@@ -8,6 +8,8 @@ function startSite(client) {
 
 	// Serve static files from public directory
 	app.use(express.static(path.join(__dirname, "public")));
+	// Serve images directory
+	app.use("/images", express.static(path.join(__dirname, "../images")));
 
 	// Clean URLs for terms and privacy
 	app.get("/terms", (req, res) => {

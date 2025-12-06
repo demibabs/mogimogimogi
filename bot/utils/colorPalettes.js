@@ -487,7 +487,7 @@ const trackColors = {
 			youColor: "#000000ff",
 		},
 		notables: {
-			baseColor: "#d9f1fde8",
+			baseColor: "#b5e6ffe8",
 			headerColor: "#16161a",
 			statsTextColor: "#252525ff",
 		},

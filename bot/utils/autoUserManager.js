@@ -117,6 +117,9 @@ class AutoUserManager {
 	}
 
 	static async getCustomizeTip({ interaction, target, discordUser, favorites, userData, loungeId }) {
+		// Only show tip on slash commands, not button interactions
+		if (!interaction.isChatInputCommand()) return "";
+
 		let tipMessage = "";
 		const isSelf = interaction.user.id === (target.discordUser?.id || discordUser?.id);
 

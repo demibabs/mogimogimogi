@@ -3,10 +3,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MogiBot</title>
+    <title>mogimogimogi</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap');
+        body { font-family: 'Lexend', sans-serif; }
+        
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-scroll {
+            animation: scroll 30s linear infinite;
+            width: max-content;
+        }
+        .hover\:pause:hover {
+            animation-play-state: paused;
+        }
+    </style>
 </head>
-<body>
-    
+<body class="bg-zinc-900 text-zinc-100 min-h-screen flex flex-col items-center justify-start pt-12 p-6 lg:p-12 2xl:p-12">
+
+    <main class="w-full max-w-[95%] 2xl:max-w-[90%] space-y-12 lg:space-y-24 2xl:space-y-16">
+        
+        <!-- Header Section -->
+        <header class="text-center space-y-4 lg:space-y-6 2xl:space-y-6">
+            <h1 class="text-6xl lg:text-8xl 2xl:text-9xl font-bold tracking-tight text-white">mogimogimogi</h1>
+            <p class="text-xl lg:text-3xl 2xl:text-4xl text-zinc-400 max-w-3xl 2xl:max-w-5xl mx-auto">
+                detailed stats bot for competitive Mario Kart World.
+            </p>
+        </header>
+
+        <!-- Image Carousel -->
+        <div class="w-full overflow-hidden py-4 relative group">
+            <div class="flex gap-6 animate-scroll hover:pause">
+                <!-- Set 1 -->
+                <div class="flex-shrink-0 w-[32rem] h-[20rem] 2xl:w-[48rem] 2xl:h-[30rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="https://placehold.co/800x500/27272a/a1a1aa?text=Rank+Stats" alt="Preview" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                </div>
+                <div class="flex-shrink-0 w-[32rem] h-[20rem] 2xl:w-[48rem] 2xl:h-[30rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="https://placehold.co/800x500/27272a/a1a1aa?text=Leaderboards" alt="Preview" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                </div>
+                <div class="flex-shrink-0 w-[32rem] h-[20rem] 2xl:w-[48rem] 2xl:h-[30rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="https://placehold.co/800x500/27272a/a1a1aa?text=Match+History" alt="Preview" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                </div>
+                <div class="flex-shrink-0 w-[32rem] h-[20rem] 2xl:w-[48rem] 2xl:h-[30rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="https://placehold.co/800x500/27272a/a1a1aa?text=Head+to+Head" alt="Preview" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                </div>
+                
+                <!-- Set 2 (Duplicate for loop) -->
+                <div class="flex-shrink-0 w-[32rem] h-[20rem] 2xl:w-[48rem] 2xl:h-[30rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="https://placehold.co/800x500/27272a/a1a1aa?text=Rank+Stats" alt="Preview" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                </div>
+                <div class="flex-shrink-0 w-[32rem] h-[20rem] 2xl:w-[48rem] 2xl:h-[30rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="https://placehold.co/800x500/27272a/a1a1aa?text=Leaderboards" alt="Preview" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                </div>
+                <div class="flex-shrink-0 w-[32rem] h-[20rem] 2xl:w-[48rem] 2xl:h-[30rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="https://placehold.co/800x500/27272a/a1a1aa?text=Match+History" alt="Preview" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                </div>
+                <div class="flex-shrink-0 w-[32rem] h-[20rem] 2xl:w-[48rem] 2xl:h-[30rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="https://placehold.co/800x500/27272a/a1a1aa?text=Head+to+Head" alt="Preview" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                </div>
+            </div>
+            <!-- Fade edges -->
+            <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-zinc-900 to-transparent pointer-events-none z-10"></div>
+            <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-zinc-900 to-transparent pointer-events-none z-10"></div>
+        </div>
+
+        <!-- Bento Grid Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10 2xl:gap-16">
+            
+            <!-- Card 1: Servers -->
+            <div class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 lg:p-12 2xl:p-16 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+                <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-2xl font-medium mb-2">servers</span>
+                <span id="server-count" class="text-5xl lg:text-7xl 2xl:text-8xl font-bold text-indigo-400">-</span>
+            </div>
+
+            <!-- Card 2: Users -->
+            <div class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 lg:p-12 2xl:p-16 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+                <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-2xl font-medium mb-2">tracked users</span>
+                <span id="user-count" class="text-5xl lg:text-7xl 2xl:text-8xl font-bold text-emerald-400">-</span>
+            </div>
+
+            <!-- Card 3: Tables -->
+            <div class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 lg:p-12 2xl:p-16 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+                <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-2xl font-medium mb-2">tracked events</span>
+                <span id="table-count" class="text-5xl lg:text-7xl 2xl:text-8xl font-bold text-rose-400">-</span>
+            </div>
+
+        </div>
+
+        <!-- Stats Feature Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-32 2xl:gap-48 items-center py-12 lg:py-24 2xl:py-16">
+            <!-- Text Content -->
+            <div class="space-y-8">
+                <h2 class="text-5xl lg:text-7xl 2xl:text-8xl font-bold text-white">check out your (or anyone's!) stats</h2>
+                <p class="text-xl lg:text-2xl 2xl:text-3xl text-zinc-400 leading-relaxed">
+                    dive deep into the numbers for any competitve player. break them down by time, format and more if you love exploring all of the details.
+                </p>
+                
+                <!-- Hint Text -->
+                <div class="flex items-center gap-2 text-zinc-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                    </svg>
+                    <span class="text-sm lg:text-base 2xl:text-xl font-medium">click the cards to swap view</span>
+                </div>
+            </div>
+
+            <!-- Image Display (Stacked Cards) -->
+            <div class="flex flex-col w-full">
+                <div id="stats-card-container" class="relative w-full cursor-pointer group perspective-1000" onclick="cycleCards('card-1', 'card-2', 'card-8', 'stats-dots')">
+                    <!-- Card 1 (Front) -->
+                    <div id="card-1" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-30 transform translate-x-0 translate-y-0 scale-100 opacity-100 bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/stats card.png" class="w-full h-auto">
+                    </div>
+                    
+                    <!-- Card 2 (Middle) -->
+                    <div id="card-2" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-20 transform translate-x-12 translate-y-12 scale-95 opacity-80 group-hover:translate-x-14 group-hover:translate-y-14 bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/notables card.png" class="w-full h-auto">
+                    </div>
+
+                    <!-- Card 3 (Back) -->
+                    <div id="card-8" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-10 transform translate-x-24 translate-y-24 scale-90 opacity-50 group-hover:translate-x-28 group-hover:translate-y-28 bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/rank-stats card.png" class="w-full h-auto">
+                    </div>
+                </div>
+                <!-- Dots -->
+                <div id="stats-dots" class="flex justify-center gap-3 mt-32 z-0">
+                    <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
+                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compare Friends Feature Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-32 2xl:gap-48 items-center py-12 lg:py-24 2xl:py-16">
+            <!-- Image Display (Stacked Cards) - Order 2 on mobile, Order 1 on desktop -->
+            <div class="flex flex-col w-full order-2 lg:order-1">
+                <div id="compare-card-container" class="relative w-full cursor-pointer group perspective-1000" onclick="swapCards('card-3', 'card-4', 'compare-dots', true)">
+                    <!-- Card 3 (Initially Front) -->
+                    <div id="card-3" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-20 transform translate-x-0 translate-y-0 scale-100 opacity-100 bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/head-to-head card.png" class="w-full h-auto">
+                    </div>
+                    
+                    <!-- Card 4 (Initially Back) -->
+                    <div id="card-4" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-10 transform -translate-x-12 translate-y-12 scale-95 opacity-60 group-hover:opacity-80 group-hover:-translate-x-14 group-hover:translate-y-14 bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/leaderboard card.png" class="w-full h-auto">
+                    </div>
+                </div>
+                <!-- Dots -->
+                <div id="compare-dots" class="flex justify-center gap-3 mt-20 z-0">
+                    <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
+                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Text Content - Order 1 on mobile, Order 2 on desktop -->
+            <div class="space-y-8 order-1 lg:order-2">
+                <h2 class="text-5xl lg:text-7xl 2xl:text-8xl font-bold text-white">compare friends and rivals</h2>
+                <p class="text-xl lg:text-2xl 2xl:text-3xl text-zinc-400 leading-relaxed">
+                    settle the score. track head-to-head matchups with anyone in Lounge, and also see where you stack up within your server.
+                </p>
+                
+                <!-- Hint Text -->
+                <div class="flex items-center gap-2 text-zinc-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                    </svg>
+                    <span class="text-sm lg:text-base 2xl:text-xl font-medium">just don't make fun of the guy at the bottom of your server's mmr leaderboard. he already has it rough.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customize Feature Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-32 2xl:gap-48 items-center py-12 lg:py-24 2xl:py-16">
+            <!-- Text Content -->
+            <div class="space-y-8">
+                <h2 class="text-5xl lg:text-7xl 2xl:text-8xl font-bold text-white">customize your cards</h2>
+                <p class="text-xl lg:text-2xl 2xl:text-3xl text-zinc-400 leading-relaxed">
+                    your stats are unique to you, so make them look unique too! with /customize, you can add your favorite track, character and vehicle to your personal cards.
+                </p>
+                
+                <!-- Hint Text -->
+                <div class="flex items-center gap-2 text-zinc-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    <span class="text-sm lg:text-base 2xl:text-xl font-medium">maybe you can even be part of the 1% that doesn't use mach rocket, rob hog or baby blooper :)</span>
+                </div>
+            </div>
+
+            <!-- Image Display (Vertical Flow) -->
+            <div class="flex flex-col items-center gap-2 w-full">
+                <!-- Top Image (Standard Card Size) -->
+                <div id="customize-header-container" class="w-full bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700/50 shadow-lg relative group bg-[#1a1a1e] flex flex-col justify-center">
+                    <img src="/images/examples/site/cards/customize.png" class="w-full h-auto opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+                </div>
+
+                <!-- Arrow -->
+                <div class="text-zinc-600 animate-bounce mt-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                </div>
+
+                <!-- Bottom Image (3 Stacked Cards) -->
+                <div id="customize-card-container" class="relative w-full cursor-pointer group perspective-1000" onclick="cycleCards('card-5', 'card-6', 'card-7', 'customize-dots')">
+                    <!-- Card 1 (Front) -->
+                    <div id="card-5" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-30 transform translate-x-0 translate-y-0 scale-100 opacity-100 bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/customize stats.webp" class="w-full h-auto">
+                    </div>
+                    <!-- Card 2 (Middle) -->
+                    <div id="card-6" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-20 transform translate-x-12 translate-y-12 scale-95 opacity-80 group-hover:translate-x-14 group-hover:translate-y-14 bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/customize notables.webp" class="w-full h-auto">
+                    </div>
+                    <!-- Card 3 (Back) -->
+                    <div id="card-7" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-10 transform translate-x-24 translate-y-24 scale-90 opacity-50 group-hover:translate-x-28 group-hover:translate-y-28 bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/customize rank stats.webp" class="w-full h-auto">
+                    </div>
+                </div>
+                <!-- Dots -->
+                <div id="customize-dots" class="flex justify-center gap-3 mt-32 z-0">
+                    <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
+                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer / Links -->
+        <footer class="flex justify-center gap-8 text-zinc-500 pt-8">
+            <a href="/terms" class="hover:text-white transition-colors">Terms</a>
+            <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
+            <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+        </footer>
+
+    </main>
+
+    <script>
+        const swapStates = {};
+        
+        function updateDots(dotsId, activeIndex) {
+            const dotsContainer = document.getElementById(dotsId);
+            if (!dotsContainer) return;
+            
+            const dots = dotsContainer.children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i === activeIndex) {
+                    dots[i].classList.remove('bg-zinc-600');
+                    dots[i].classList.add('bg-white');
+                } else {
+                    dots[i].classList.remove('bg-white');
+                    dots[i].classList.add('bg-zinc-600');
+                }
+            }
+        }
+
+        function swapCards(id1, id2, dotsId, isMirrored) {
+            const card1 = document.getElementById(id1);
+            const card2 = document.getElementById(id2);
+            const pairId = id1 + id2;
+            
+            // Initialize state if not exists
+            if (swapStates[pairId] === undefined) swapStates[pairId] = false;
+            
+            // Define states
+            const frontState = ['z-20', 'translate-x-0', 'translate-y-0', 'scale-100', 'opacity-100'];
+            
+            const backState = [
+                'z-10', 
+                'translate-y-12', 
+                'scale-95', 
+                'opacity-60', 
+                'group-hover:opacity-80', 
+                'group-hover:translate-y-14'
+            ];
+            
+            if (isMirrored) {
+                backState.push('-translate-x-12', 'group-hover:-translate-x-14');
+            } else {
+                backState.push('translate-x-12', 'group-hover:translate-x-14');
+            }
+
+            swapStates[pairId] = !swapStates[pairId];
+
+            if (swapStates[pairId]) {
+                // Swap
+                card1.classList.remove(...frontState);
+                card1.classList.add(...backState);
+                
+                card2.classList.remove(...backState);
+                card2.classList.add(...frontState);
+                
+                updateDots(dotsId, 1);
+            } else {
+                // Reset
+                card1.classList.remove(...backState);
+                card1.classList.add(...frontState);
+                
+                card2.classList.remove(...frontState);
+                card2.classList.add(...backState);
+                
+                updateDots(dotsId, 0);
+            }
+        }
+
+        function cycleCards(id1, id2, id3, dotsId) {
+            const cards = [document.getElementById(id1), document.getElementById(id2), document.getElementById(id3)];
+            const pairId = id1 + id2 + id3;
+            
+            if (swapStates[pairId] === undefined) swapStates[pairId] = 0;
+            swapStates[pairId] = (swapStates[pairId] + 1) % 3;
+            const state = swapStates[pairId];
+
+            // Update dots
+            updateDots(dotsId, state);
+
+            // Define visual states
+            const states = [
+                ['z-30', 'translate-x-0', 'translate-y-0', 'scale-100', 'opacity-100'],
+                ['z-20', 'translate-x-12', 'translate-y-12', 'scale-95', 'opacity-80', 'group-hover:translate-x-14', 'group-hover:translate-y-14'],
+                ['z-10', 'translate-x-24', 'translate-y-24', 'scale-90', 'opacity-50', 'group-hover:translate-x-28', 'group-hover:translate-y-28']
+            ];
+
+            // Helper to clean classes
+            const allStateClasses = states.flat();
+            const clean = (el) => el.classList.remove(...allStateClasses);
+
+            cards.forEach((card, index) => {
+                clean(card);
+                const stateIndex = (index + state) % 3;
+                card.classList.add(...states[stateIndex]);
+            });
+        }
+
+        function adjustCardHeights() {
+            const containers = [
+                'stats-card-container',
+                'compare-card-container',
+                'customize-card-container',
+                'customize-header-container'
+            ];
+
+            containers.forEach(containerId => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                const images = container.querySelectorAll('img');
+                let minAspectRatio = Infinity; // width / height. Smaller is taller.
+
+                images.forEach(img => {
+                    if (img.naturalWidth && img.naturalHeight) {
+                        const ratio = img.naturalWidth / img.naturalHeight;
+                        if (ratio < minAspectRatio) {
+                            minAspectRatio = ratio;
+                        }
+                    }
+                });
+
+                if (minAspectRatio !== Infinity) {
+                    container.style.aspectRatio = `${minAspectRatio}`;
+                }
+            });
+        }
+
+        // Run on load and resize
+        window.addEventListener('load', adjustCardHeights);
+        window.addEventListener('resize', adjustCardHeights);
+        // Also run periodically in case images load late
+        setInterval(adjustCardHeights, 1000);
+
+        // Fetch stats from the API
+        fetch('/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                // Simple animation function
+                const animateValue = (obj, start, end, duration) => {
+                    let startTimestamp = null;
+                    const step = (timestamp) => {
+                        if (!startTimestamp) startTimestamp = timestamp;
+                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        }
+                    };
+                    window.requestAnimationFrame(step);
+                };
+
+                const serverEl = document.getElementById('server-count');
+                const userEl = document.getElementById('user-count');
+                const tableEl = document.getElementById('table-count');
+
+                if (data.servers) animateValue(serverEl, 0, data.servers, 1000);
+                if (data.users) animateValue(userEl, 0, data.users, 1500);
+                if (data.tables) animateValue(tableEl, 0, data.tables, 2000);
+            })
+            .catch(console.error);
+    </script>
 </body>
 </html>
