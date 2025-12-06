@@ -2,13 +2,13 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const database = require("../../utils/database");
 
 const GLOBAL_COMMANDS = [
+	{ name: "</setup:1446020866356940867>", description: "**you must use this to activate other commands** (it saves server members' lounge data)" },
 	{ name: "</stats:1446020866356940868>", description: "lounge stats card" },
 	{ name: "</notables:1446020866356940864>", description: "best and worst performances" },
 	{ name: "</rank-stats:1446020866356940865>", description: "stats broken down by the ranks of your opponents" },
 	{ name: "</customize:1446020866356940861>", description: "edit the appearance of the above commands" },
 	{ name: "</head-to-head:1446020866356940862>", description: "two players compared across shared mogis" },
 	{ name: "</leaderboard:1446020866356940863>", description: "server MMR leaderboard" },
-	{ name: "</setup:1446020866356940867>", description: "fetches + saves server members' lounge data so that the other commands work" },
 	{ name: "</about-me:1446020866356940860>", description: "this lol" },
 ];
 
