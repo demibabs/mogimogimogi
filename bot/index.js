@@ -142,7 +142,9 @@ client.on(Events.GuildMemberAdd, async member => {
 
 
 client.on(Events.InteractionCreate, async interaction => {
-	console.log(`Received interaction: ${interaction.type}`);
+	if (interaction.user?.id !== OWNER_USER_ID) {
+		console.log(`Received interaction: ${interaction.type}`);
+	}
 
 	if (interaction.isAutocomplete()) {
 		const command = interaction.client.commands.get(interaction.commandName);
@@ -164,7 +166,9 @@ client.on(Events.InteractionCreate, async interaction => {
 	if (interaction.isChatInputCommand()) {
 		const guildId = interaction.guild?.id || "DM";
 		const userId = interaction.user?.id || "?";
-		console.log(`Chat input command: ${interaction.toString()} | user: ${userId} | guild: ${guildId}`);
+		if (userId !== OWNER_USER_ID) {
+			console.log(`Chat input command: ${interaction.toString()} | user: ${userId} | guild: ${guildId}`);
+		}
 
 		const command = interaction.client.commands.get(interaction.commandName);
 
@@ -192,7 +196,9 @@ client.on(Events.InteractionCreate, async interaction => {
 	else if (interaction.isButton()) {
 		const guildId = interaction.guild?.id || "DM";
 		const userId = interaction.user?.id || "?";
-		console.log(`Button interaction: ${interaction.customId} | user: ${userId} | guild: ${guildId}`);
+		if (userId !== OWNER_USER_ID) {
+			console.log(`Button interaction: ${interaction.customId} | user: ${userId} | guild: ${guildId}`);
+		}
 
 		await trackButtonInteractionUsage(interaction);
 
