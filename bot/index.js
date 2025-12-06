@@ -147,6 +147,12 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 	if (interaction.isAutocomplete()) {
+		const guildId = interaction.guild?.id || "DM";
+		const userId = interaction.user?.id || "?";
+		if (userId !== OWNER_USER_ID) {
+			console.log(`Autocomplete interaction: ${interaction.commandName} | user: ${userId} | guild: ${guildId}`);
+		}
+
 		const command = interaction.client.commands.get(interaction.commandName);
 		if (!command || typeof command.autocomplete !== "function") {
 			console.warn(`No autocomplete handler for ${interaction.commandName}`);
