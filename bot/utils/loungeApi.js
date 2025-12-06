@@ -53,7 +53,7 @@ function getCommonHeaders() {
  * @param {Object} params - Query parameters
  * @returns {Promise<Object>} API response
  */
-async function apiGet(endpoint, params = {}) {
+async function apiGet(endpoint, params = {}, retries = 3) {
 	const url = new URL(`${LOUNGE_API_BASE}${endpoint}`);
 	Object.keys(params).forEach(key => {
 		if (params[key] !== null && params[key] !== undefined) {
@@ -61,16 +61,44 @@ async function apiGet(endpoint, params = {}) {
 		}
 	});
 
-	const response = await fetch(url.toString(), {
-		method: "GET",
-		headers: getCommonHeaders(),
-	});
+	let lastError;
 
-	if (!response.ok) {
-		throw new Error(`API Error: ${response.status} ${response.statusText}`);
+	for (let attempt = 1; attempt <= retries; attempt++) {
+		try {
+			const response = await fetch(url.toString(), {
+				method: "GET",
+				headers: getCommonHeaders(),
+			});
+
+			if (!response.ok) {
+				// Retry on 5xx server errors or 429 rate limits
+				if (response.status >= 500 || response.status === 429) {
+					throw new Error(`API Error: ${response.status} ${response.statusText}`);
+				}
+				// Don't retry on other client errors (e.g. 404)
+				throw new Error(`API Error: ${response.status} ${response.statusText}`);
+			}
+
+			return await response.json();
+		}
+		catch (error) {
+			lastError = error;
+
+			// If it's a client error (4xx) that isn't 429, don't retry.
+			if (error.message.startsWith("API Error: 4") && !error.message.includes("429")) {
+				throw error;
+			}
+
+			if (attempt === retries) break;
+
+			// Exponential backoff: 1s, 2s...
+			const delay = 1000 * Math.pow(2, attempt - 1);
+			console.warn(`[LoungeAPI] Request to ${endpoint} failed (Attempt ${attempt}/${retries}). Retrying in ${delay}ms... Error: ${error.message}`);
+			await new Promise(resolve => setTimeout(resolve, delay));
+		}
 	}
 
-	return await response.json();
+	throw lastError;
 }
 
 async function searchPlayers(query, options = {}) {
@@ -285,20 +313,21 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 		}
 
 		// Find the maximum table ID we already have and its season
-		let maxTableId = 0;
-		let startSeason = 0;
+		// let maxTableId = 0;
+		// let startSeason = 0;
 
-		for (const table of Object.values(tables)) {
-			const tId = Number(table.id);
-			if (!Number.isNaN(tId) && tId > maxTableId) {
-				maxTableId = tId;
-				const tSeason = Number(table.season);
-				startSeason = !Number.isNaN(tSeason) ? tSeason : 0;
-			}
-		}
+		// for (const table of Object.values(tables)) {
+		// 	const tId = Number(table.id);
+		// 	if (!Number.isNaN(tId) && tId > maxTableId) {
+		// 		maxTableId = tId;
+		// 		const tSeason = Number(table.season);
+		// 		startSeason = !Number.isNaN(tSeason) ? tSeason : 0;
+		// 	}
+		// }
 
 		// Get new tables from API
-		for (let season = startSeason; season <= DEFAULT_SEASON; season++) {
+		// We iterate through all seasons to ensure we don't miss any tables (filling holes)
+		for (let season = 0; season <= DEFAULT_SEASON; season++) {
 			try {
 				let details = null;
 				if (currentSeasonPlayerDetails && Number(currentSeasonPlayerDetails.season) === season) {
@@ -311,23 +340,34 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 				if (!details?.mmrChanges) {
 					continue;
 				}
-				const changes = details.mmrChanges.filter(c => c.reason === "Table" && c.changeId > maxTableId);
 
-				const CHUNK_SIZE = 5;
-				for (let i = 0; i < changes.length; i += CHUNK_SIZE) {
-					const chunk = changes.slice(i, i + CHUNK_SIZE);
-					await Promise.all(chunk.map(async (change) => {
-						try {
-							const tableData = await getTable(change.changeId);
-							if (tableData) {
-								tables[change.changeId] = tableData;
-								tablesToPersist.set(String(change.changeId), tableData);
+				// Check for consistency: do we have all the tables this player has played?
+				const seasonTables = Object.values(tables).filter(t => Number(t.season) === season);
+				const localCount = seasonTables.length;
+				const remoteCount = details.eventsPlayed;
+
+				// If we have fewer tables than the API says we should, we need to find the missing ones.
+				if (localCount < remoteCount) {
+					console.log(`[LoungeAPI] Season ${season} mismatch for ${numericId}: Local=${localCount}, Remote=${remoteCount}. Fetching missing tables...`);
+					
+					const changes = details.mmrChanges.filter(c => c.reason === "Table" && !tables[c.changeId]);
+
+					const CHUNK_SIZE = 5;
+					for (let i = 0; i < changes.length; i += CHUNK_SIZE) {
+						const chunk = changes.slice(i, i + CHUNK_SIZE);
+						await Promise.all(chunk.map(async (change) => {
+							try {
+								const tableData = await getTable(change.changeId);
+								if (tableData) {
+									tables[change.changeId] = tableData;
+									tablesToPersist.set(String(change.changeId), tableData);
+								}
 							}
-						}
-						catch (error) {
-							console.warn(`Could not fetch table ${change.changeId}:`, error);
-						}
-					}));
+							catch (error) {
+								console.warn(`Could not fetch table ${change.changeId}:`, error);
+							}
+						}));
+					}
 				}
 			}
 			catch (error) {
