@@ -111,7 +111,7 @@ client.once(Events.ClientReady, async readyClient => {
 			// console.log(`Cached members for guild: ${guild.name}`);
 		}
 		catch (error) {
-			console.warn(`Failed to cache members for guild ${guild.name}:`, error);
+			console.warn(`Failed to cache members for guild ${guild.id}:`, error);
 		}
 	}
 	console.log("Member caching complete.");
@@ -119,12 +119,12 @@ client.once(Events.ClientReady, async readyClient => {
 
 client.on(Events.GuildCreate, async (guild) => {
 	try {
-		console.log(`Joined new guild: ${guild.name}. Caching members...`);
+		console.log(`Joined new guild: ${guild.id}. Caching members...`);
 		await guild.members.fetch();
-		console.log(`Cached members for ${guild.name}`);
+		console.log(`Cached members for ${guild.id}`);
 	}
 	catch (error) {
-		console.warn(`Failed to cache members for new guild ${guild.name}:`, error);
+		console.warn(`Failed to cache members for new guild ${guild.id}:`, error);
 	}
 });
 // client.on(Events.GuildDelete, () => updatePresence());
@@ -162,9 +162,9 @@ client.on(Events.InteractionCreate, async interaction => {
 
 	// Handle slash commands
 	if (interaction.isChatInputCommand()) {
-		const guildName = interaction.guild?.name || "DM";
-		const displayName = interaction.user?.globalName || interaction.user?.username || "unknown";
-		console.log(`Chat input command: ${interaction.toString()} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
+		const guildId = interaction.guild?.id || "DM";
+		const userId = interaction.user?.id || "?";
+		console.log(`Chat input command: ${interaction.toString()} | user: ${userId} | guild: ${guildId}`);
 
 		const command = interaction.client.commands.get(interaction.commandName);
 
@@ -190,9 +190,9 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 	// Handle button interactions
 	else if (interaction.isButton()) {
-		const guildName = interaction.guild?.name || "DM";
-		const displayName = interaction.member?.displayName || interaction.user?.globalName || "unknown";
-		console.log(`Button interaction: ${interaction.customId} | user: ${displayName} (${interaction.user?.id || "?"}) | guild: ${guildName}`);
+		const guildId = interaction.guild?.id || "DM";
+		const userId = interaction.user?.id || "?";
+		console.log(`Button interaction: ${interaction.customId} | user: ${userId} | guild: ${guildId}`);
 
 		await trackButtonInteractionUsage(interaction);
 

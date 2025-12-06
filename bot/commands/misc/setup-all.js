@@ -39,7 +39,7 @@ module.exports = {
 			let added = 0;
 			let considered = 0;
 			try {
-				await interaction.editReply(`Processing guild ${processedGuilds}/${guilds.size}: ${guild.name}`);
+				await interaction.editReply(`Processing guild ${processedGuilds}/${guilds.size}: ${guild.id}`);
 
 				// Ensure cache is complete
 				if (guild.memberCount > guild.members.cache.size) {
@@ -47,7 +47,7 @@ module.exports = {
 						await guild.members.fetch();
 					}
 					catch (e) {
-						console.warn(`setup-all: failed to fetch members for ${guild.name}:`, e);
+						console.warn(`setup-all: failed to fetch members for ${guild.id}:`, e);
 					}
 				}
 
@@ -77,7 +77,7 @@ module.exports = {
 						console.warn(`Failed add attempt for ${userId} in guild ${guildId}:`, err.message);
 					}
 				}
-				perGuildSummary.push(`• ${guild.name}: scanned ${considered} members, cached ${added} new users`);
+				perGuildSummary.push(`• ${guild.id}: scanned ${considered} members, cached ${added} new users`);
 				try {
 					await database.markServerSetupComplete(guildId, {
 						initiatedBy: initiatorId,
@@ -94,7 +94,7 @@ module.exports = {
 			}
 			catch (error) {
 				console.error(`Setup-all error for guild ${guildId}:`, error);
-				perGuildSummary.push(`• ${guild.name}: error (${error.message})`);
+				perGuildSummary.push(`• ${guild.id}: error (${error.message})`);
 			}
 		}
 

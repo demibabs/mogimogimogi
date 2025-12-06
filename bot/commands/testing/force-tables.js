@@ -27,7 +27,7 @@ module.exports = {
 			const targetUser = interaction.options.getUser("user");
 			const serverId = interaction.guild.id;
 
-			await interaction.editReply(`Force populating tables for ${targetUser.username}...`);
+			await interaction.editReply(`Force populating tables for ${targetUser.id}...`);
 
 			// Get player details from API directly
 			const loungeUser = await LoungeApi.getPlayerByDiscordId(targetUser.id);
@@ -75,7 +75,7 @@ module.exports = {
 				}
 			}
 
-			await interaction.editReply(`✅ Successfully populated ${totalTables} tables for ${targetUser.username}!`);
+			await interaction.editReply(`✅ Successfully populated ${totalTables} tables for ${targetUser.id}!`);
 
 		}
 		catch (error) {
