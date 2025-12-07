@@ -130,7 +130,7 @@ client.on(Events.GuildCreate, async (guild) => {
 	// 	console.warn(`Failed to cache members for new guild ${guild.id}:`, error);
 	// }
 });
-// client.on(Events.GuildDelete, () => updatePresence());
+client.on(Events.GuildDelete, () => updatePresence());
 
 client.on(Events.GuildMemberAdd, async member => {
 	try {
