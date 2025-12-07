@@ -1041,6 +1041,14 @@ module.exports = {
 
 			const preferredBaseId = selectPreferredBaseId();
 
+			const isLeftPreferred = preferredBaseId === normalizedLeftId;
+			const preferredCachedCount = isLeftPreferred ? leftCachedTableCount : rightCachedTableCount;
+
+			if (preferredCachedCount === 0) {
+				const preferredDisplayName = isLeftPreferred ? playerLeft.displayName : playerRight.displayName;
+				await interaction.editReply(`getting ${playerLeft.displayName} & ${playerRight.displayName}'s mogis (${preferredDisplayName} is not in my database yet, so this will take longer than usual)...`);
+			}
+
 			let basePlayerId = targetSession.primaryPlayerId || null;
 			let basePlayerTables = targetSession.primaryPlayerTables || null;
 			if (basePlayerId !== preferredBaseId) {

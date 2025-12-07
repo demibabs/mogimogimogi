@@ -10,6 +10,17 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap');
         body { font-family: 'Lexend', sans-serif; }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        html, body {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
         
         @keyframes scroll {
             0% { transform: translateX(0); }
@@ -22,17 +33,59 @@
         .hover\:pause:hover {
             animation-play-state: paused;
         }
+        .bg-dot-pattern {
+            background-image:
+                radial-gradient(circle, #ffffff 1px, transparent 1px),
+                radial-gradient(circle, #ffffff 1px, transparent 1px);
+            background-size: 32px 32px, 36px 36px;
+            background-position: 0 0, 18px 18px;
+            animation: dots-move 28s ease-in-out infinite alternate;
+        }
+
+        @keyframes dots-move {
+            0%   { background-position: 0 0, 18px 18px; }
+            25%  { background-position: 10px -12px, 28px 12px; }
+            50%  { background-position: 20px 10px, 12px 24px; }
+            75%  { background-position: -12px 16px, 32px -8px; }
+            100% { background-position: 0 0, 18px 18px; }
+        }
+        
+        /* Scroll Animations */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: none;
+        }
     </style>
 </head>
-<body class="bg-zinc-900 text-zinc-100 min-h-screen flex flex-col items-center justify-start">
+<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-zinc-900">
+        <div class="absolute inset-0 bg-dot-pattern opacity-[0.07]"></div>
+        <div class="absolute -top-40 -left-40 w-96 h-96 lg:w-[50rem] lg:h-[50rem] rounded-full bg-indigo-600/10 blur-[128px]"></div>
+        <div class="absolute top-1/3 -right-20 w-80 h-80 lg:w-[40rem] lg:h-[40rem] rounded-full bg-emerald-600/5 blur-[128px]"></div>
+        <div class="absolute -bottom-40 left-1/3 w-96 h-96 lg:w-[50rem] lg:h-[50rem] rounded-full bg-rose-600/5 blur-[128px]"></div>
+    </div>
 
     <!-- Navigation -->
-    <nav class="w-full bg-[#151518] py-6 px-6 lg:px-12 flex justify-between items-center border-b border-white/5">
+    <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-6 px-6 lg:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
         <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img src="/images/profile/pfp.jpg" alt="Profile" class="w-10 h-10 rounded-full">
-            <span class="text-xl font-bold text-white">mogi³</span>
+            <span id="nav-title" class="text-xl font-bold text-white opacity-0 transition-opacity duration-300">mogimogimogi</span>
         </a>
-        <div class="flex gap-8">
+        <div class="flex items-center gap-8">
+            <a id="nav-add-button" href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="opacity-0 pointer-events-none translate-y-2 transition-all duration-300 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-full shadow-lg hover:shadow-indigo-500/25 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                add to server
+            </a>
             <a href="#" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">how it works</a>
             <a href="#" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">commands</a>
         </div>
@@ -41,25 +94,27 @@
     <main class="w-full max-w-[95%] lg:max-w-[85%] 2xl:max-w-[65%] space-y-8 lg:space-y-12 2xl:space-y-8 mt-8 lg:mt-12">
 
         <!-- Header Section -->
-        <header class="text-center space-y-4 lg:space-y-4 2xl:space-y-4">
-            <h1 class="text-6xl lg:text-6xl 2xl:text-6xl font-bold tracking-tight text-white">mogimogimogi</h1>
+        <header class="text-center space-y-4 lg:space-y-4 2xl:space-y-4 fade-in-section">
+            <h1 id="header-title" class="text-6xl lg:text-6xl 2xl:text-6xl font-bold tracking-tight text-white">mogimogimogi</h1>
             <p class="text-xl lg:text-2xl 2xl:text-xl text-zinc-400 max-w-3xl 2xl:max-w-5xl mx-auto">
-                detailed stats bot for competitive Mario Kart World.
+                detailed stats Discord bot for competitive Mario Kart World.
             </p>
         </header>
 
         <!-- Add to Server Button -->
-        <div class="flex justify-center w-full">
-            <a href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white text-xl font-bold rounded-full transition-colors duration-300 shadow-lg hover:shadow-indigo-500/25 flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                add to your server
-            </a>
+        <div id="hero-add-button-sentinel" class="w-full">
+            <div class="flex justify-center w-full fade-in-section">
+                <a href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white text-xl font-bold rounded-full transition-colors duration-300 shadow-lg hover:shadow-indigo-500/25 flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    add to your server
+                </a>
+            </div>
         </div>
 
         <!-- Image Carousel -->
-        <div class="w-full overflow-hidden py-4 relative group">
+        <div class="w-full overflow-hidden py-4 relative group fade-in-section [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
             <div class="flex gap-6 animate-scroll hover:pause">
                 <!-- Set 1 -->
                 <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
@@ -125,13 +180,12 @@
                     <img src="/images/examples/site/carousel/head-to-head2.webp" alt="Head to Head Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
                 </div>
             </div>
-            <!-- Fade edges -->
-            <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-zinc-900 to-transparent pointer-events-none z-10"></div>
-            <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-zinc-900 to-transparent pointer-events-none z-10"></div>
         </div>
 
         <!-- Bento Grid Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 2xl:gap-8">
+                <!-- Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto fade-in-section">
+            <!-- Large Card (Span 2 cols) -->
             
             <!-- Card 1: Servers -->
             <div class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
@@ -155,20 +209,20 @@
 
 
         <!-- Stats Feature Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12">
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12 fade-in-section">
             <!-- Text Content -->
             <div class="space-y-8 lg:pb-16">
                 <h2 class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-white">check out your (or anyone's!) stats</h2>
                 <p class="text-xl lg:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                    dive deep into the numbers for any competitve player. break them down by time, format and more if you love exploring all of the details.
+                    dive deep into the numbers for any competitve player. break them down by time, format and more if you love to explore the details.
                 </p>
                 
                 <!-- Hint Text -->
                 <div class="flex items-center gap-2 text-zinc-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
                     </svg>
-                    <span class="text-sm lg:text-base 2xl:text-lg font-medium">click the cards to swap view</span>
+                    <span class="text-sm lg:text-base 2xl:text-lg font-medium">find the perfect set of filters to make you look good at the game.</span>
                 </div>
             </div>
 
@@ -200,7 +254,7 @@
         </section>
 
         <!-- Compare Friends Feature Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12">
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12 fade-in-section">
             <!-- Image Display (Stacked Cards) - Order 2 on mobile, Order 1 on desktop -->
             <div class="flex flex-col w-full order-2 lg:order-1">
                 <div id="compare-card-container" class="relative w-full cursor-pointer group perspective-1000" onclick="swapCards('card-3', 'card-4', 'compare-dots', true)">
@@ -231,7 +285,7 @@
                 <!-- Hint Text -->
                 <div class="flex items-center gap-2 text-zinc-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span class="text-sm lg:text-base 2xl:text-lg font-medium">just don't make fun of the guy at the bottom of your server's mmr leaderboard. he already has it rough.</span>
                 </div>
@@ -239,7 +293,7 @@
         </section>
 
         <!-- Customize Feature Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12">
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12 fade-in-section">
             <!-- Text Content -->
             <div class="space-y-8 lg:pb-16">
                 <h2 class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-white">customize your cards</h2>
@@ -250,7 +304,7 @@
                 <!-- Hint Text -->
                 <div class="flex items-center gap-2 text-zinc-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                     </svg>
                     <span class="text-sm lg:text-base 2xl:text-lg font-medium">maybe you can even be part of the 1% that doesn't use mach rocket, rob hog or baby blooper :)</span>
                 </div>
@@ -445,6 +499,74 @@
                 }
             });
         }
+
+        // Intersection Observer for fade-in animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    } else {
+                        entry.target.classList.remove('is-visible');
+                    }
+                });
+            }, observerOptions);
+
+            const sections = document.querySelectorAll('.fade-in-section');
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Nav Button Observer
+            const heroButtonSentinel = document.getElementById('hero-add-button-sentinel');
+            const navButton = document.getElementById('nav-add-button');
+
+            if (heroButtonSentinel && navButton) {
+                const navObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        // If the button is not intersecting and is above the viewport (scrolled past)
+                        if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+                            navButton.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+                        } else {
+                            navButton.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+                        }
+                    });
+                }, {
+                    root: null,
+                    threshold: 0
+                });
+
+                navObserver.observe(heroButtonSentinel);
+            }
+
+            // Nav Title Observer
+            const headerTitle = document.getElementById('header-title');
+            const navTitle = document.getElementById('nav-title');
+
+            if (headerTitle && navTitle) {
+                const titleObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        // If the header title is not intersecting and is above the viewport (scrolled past)
+                        if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+                            navTitle.classList.remove('opacity-0');
+                        } else {
+                            navTitle.classList.add('opacity-0');
+                        }
+                    });
+                }, {
+                    root: null,
+                    threshold: 0
+                });
+
+                titleObserver.observe(headerTitle);
+            }
+        });
 
         // Run on load and resize
         window.addEventListener('load', adjustCardHeights);

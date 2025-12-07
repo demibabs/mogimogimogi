@@ -1149,7 +1149,12 @@ module.exports = {
 				target.discordUser = discordUser;
 			}
 
-			await interaction.editReply(`getting ${displayName}'s mogis...`);
+			const existingTables = await Database.getUserTables(normalizedLoungeId);
+			let loadingMessage = `getting ${displayName}'s mogis...`;
+			if (!existingTables || existingTables.length === 0) {
+				loadingMessage = `getting ${displayName}'s mogis (${displayName} is not in my database yet, so this will take longer than usual)...`;
+			}
+			await interaction.editReply(loadingMessage);
 
 			if (!allTables) {
 				allTables = await LoungeApi.getAllPlayerTables(normalizedLoungeId, serverId, playerDetails);

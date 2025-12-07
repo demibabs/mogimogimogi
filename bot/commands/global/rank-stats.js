@@ -1077,8 +1077,15 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		playerDetails,
 	});
 	const discordUser = result.discordUser;
+	const displayNameForMessage = result.displayName || target.displayName || `player ${loungeId}`;
 
-	await interaction.editReply("loading tables...");
+	const existingTables = await Database.getUserTables(loungeId);
+	let loadingMessage = `getting ${displayNameForMessage}'s mogis...`;
+	if (!existingTables || existingTables.length === 0) {
+		loadingMessage = `getting ${displayNameForMessage}'s mogis (${displayNameForMessage} is not in my database yet, so this will take longer than usual)...`;
+	}
+	await interaction.editReply(loadingMessage);
+
 	let allTables = hasSessionTables ? session.allTables : null;
 	if (!allTables) {
 		allTables = await LoungeApi.getAllPlayerTables(loungeId, serverId, playerDetails);

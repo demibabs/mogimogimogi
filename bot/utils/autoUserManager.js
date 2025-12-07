@@ -9,6 +9,13 @@ const database = require("./database");
 
 class AutoUserManager {
 	static async ensureServerReady(serverId) {
+		// Temporary bypass for setup requirement
+		return {
+			success: true,
+			serverData: null,
+			setupState: { completed: true },
+		};
+		/*
 		const state = await database.getServerSetupState(serverId);
 		if (state?.completed) {
 			return {
@@ -21,6 +28,7 @@ class AutoUserManager {
 			success: false,
 			message: "this server hasn't been set up yet. please run </setup:1446020866356940867> to enable commands.",
 		};
+		*/
 	}
 
 	/**

@@ -85,7 +85,7 @@ for (const folder of commandFolders) {
 	}
 }
 
-const statusCommands = ["/stats", "/notables", "/head-to-head", "/rank-stats", "/leaderboard"];
+const statusCommands = ["/stats", "/notables", "/head-to-head", "/rank-stats"];
 let currentStatusIndex = 0;
 
 function updatePresence() {
@@ -104,6 +104,7 @@ client.once(Events.ClientReady, async readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 
 	// Cache all members on startup
+	/*
 	console.log("Caching guild members...");
 	for (const guild of client.guilds.cache.values()) {
 		try {
@@ -115,17 +116,19 @@ client.once(Events.ClientReady, async readyClient => {
 		}
 	}
 	console.log("Member caching complete.");
+	*/
 });
 
 client.on(Events.GuildCreate, async (guild) => {
-	try {
-		console.log(`Joined new guild: ${guild.id}. Caching members...`);
-		await guild.members.fetch();
-		console.log(`Cached members for ${guild.id}`);
-	}
-	catch (error) {
-		console.warn(`Failed to cache members for new guild ${guild.id}:`, error);
-	}
+	updatePresence();
+	// try {
+	// 	console.log(`Joined new guild: ${guild.id}. Caching members...`);
+	// 	await guild.members.fetch();
+	// 	console.log(`Cached members for ${guild.id}`);
+	// }
+	// catch (error) {
+	// 	console.warn(`Failed to cache members for new guild ${guild.id}:`, error);
+	// }
 });
 // client.on(Events.GuildDelete, () => updatePresence());
 

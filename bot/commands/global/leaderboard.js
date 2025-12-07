@@ -818,6 +818,9 @@ module.exports = {
 		.setDescription("see your server's mmr leaderboard."),
 
 	async execute(interaction) {
+		await interaction.reply({ content: "due to limitations with Discord's API, this command is temporarily disabled. hopefully this is resolved within the week." });
+		return;
+		/*
 		try {
 			await interaction.deferReply();
 
@@ -952,5 +955,6 @@ module.exports = {
 			console.error("leaderboard button interaction error:", error);
 			return false;
 		}
+		*/
 	},
 };

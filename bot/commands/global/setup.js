@@ -9,6 +9,10 @@ module.exports = {
 		.setDescription("adds server lounge users to database."),
 
 	async execute(interaction) {
+		await interaction.reply({ content: "you no longer have to use this command for the time being. just keep in mind commands will be slower the first time you use them on someone.", ephemeral: true });
+		return;
+
+		/*
 		if (!interaction.guild) {
 			await interaction.reply({ content: "this command can only be used in a server.", ephemeral: true });
 			return;
@@ -45,6 +49,7 @@ module.exports = {
 			const chunkSize = 5;
 
 			for (let i = 0; i < memberList.length; i += chunkSize) {
+
 				const chunk = memberList.slice(i, i + chunkSize);
 				await Promise.all(chunk.map(async (member) => {
 					const id = member.id;
@@ -88,5 +93,6 @@ module.exports = {
 			console.error("setup error:", error);
 			await interaction.editReply("an error occurred during setup. please try again later.");
 		}
+		*/
 	},
 };
