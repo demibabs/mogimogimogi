@@ -479,6 +479,31 @@ class Database {
 		}
 	}
 
+	async getAllUserData() {
+		if (this.useDatabase) {
+			try {
+				const result = await this.pool.query("SELECT data FROM user_data");
+				return result.rows.map(row => row.data);
+			}
+			catch (error) {
+				console.error("database get all users error:", error);
+				return [];
+			}
+		}
+
+		// File-based
+		await this._ensureLegacyMigration();
+		const allIds = await this._getAllUserIdsFromFiles();
+		const allData = [];
+		for (const id of allIds) {
+			const data = await this._getUserDataFromFile(id);
+			if (data) {
+				allData.push(data);
+			}
+		}
+		return allData;
+	}
+
 	// --- Command usage analytics -------------------------------------------------
 
 	async recordCommandUsage(commandName, interactionType = "slash") {
