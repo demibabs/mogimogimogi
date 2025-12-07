@@ -108,20 +108,6 @@ class DataManager {
 				changed = true;
 			}
 
-			if (guild) {
-				try {
-					guildMember = await guild.members.fetch(discordId);
-				}
-				catch (error) {
-					if (error.code !== 10007 && error.status !== 404) {
-						console.warn(`failed to fetch guild member ${discordId}:`, error);
-					}
-				}
-			}
-
-			if (!discordUser && guildMember) {
-				discordUser = guildMember.user;
-			}
 
 			if (!discordUser && client) {
 				try {

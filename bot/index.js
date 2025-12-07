@@ -59,7 +59,7 @@ async function trackButtonInteractionUsage(interaction) {
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
-		GatewayIntentBits.GuildMembers,
+		// GatewayIntentBits.GuildMembers,
 	],
 });
 
@@ -132,16 +132,16 @@ client.on(Events.GuildCreate, async (guild) => {
 });
 client.on(Events.GuildDelete, () => updatePresence());
 
-client.on(Events.GuildMemberAdd, async member => {
-	try {
-		// Ensure member is cached
-		await member.fetch().catch((e) => console.warn("Failed to fetch member on join:", e));
-		await AutoUserManager.handleGuildMemberAdd(member);
-	}
-	catch (error) {
-		console.error("guildMemberAdd handler failed:", error);
-	}
-});
+// client.on(Events.GuildMemberAdd, async member => {
+// 	try {
+// 		// Ensure member is cached
+// 		await member.fetch().catch((e) => console.warn("Failed to fetch member on join:", e));
+// 		await AutoUserManager.handleGuildMemberAdd(member);
+// 	}
+// 	catch (error) {
+// 		console.error("guildMemberAdd handler failed:", error);
+// 	}
+// });
 
 
 client.on(Events.InteractionCreate, async interaction => {

@@ -19,6 +19,9 @@ module.exports = {
 		.setDescription("Run setup across all servers: adds every member with a Lounge account."),
 
 	async execute(interaction) {
+		await interaction.reply({ content: "this command is temporarily disabled for maintenance" });
+		return;
+		/*
 		// Restrict to bot owner / privileged users if desired: ephemeral + simple guard
 		await interaction.deferReply();
 		await interaction.editReply("Starting multi-server setup...");
@@ -113,6 +116,7 @@ module.exports = {
 				message: replyMessage,
 			});
 		}
+		*/
 	},
 
 	async handleButtonInteraction(interaction) {

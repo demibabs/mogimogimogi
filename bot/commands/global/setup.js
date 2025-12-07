@@ -9,7 +9,7 @@ module.exports = {
 		.setDescription("adds server lounge users to database."),
 
 	async execute(interaction) {
-		await interaction.reply({ content: "you no longer have to use this command for the time being. just keep in mind commands will be slower the first time you use them on someone.", ephemeral: true });
+		await interaction.reply({ content: "you no longer have to use this command for the time being. just keep in mind commands will be slower the first time you use them on someone." });
 		return;
 
 		/*
