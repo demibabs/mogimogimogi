@@ -1047,13 +1047,32 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		return { success: false, message: "unable to resolve lounge id for that user." };
 	}
 
-	const filters = normalizeRankStatsFilters(options.filters || {});
-	const session = options.session || null;
+	const {
+		session = null,
+		filters: rawFilters = {},
+		userData: userDataOption = null,
+		skipAutoUserAndMembership = false,
+		onProgress = null,
+	} = options || {};
+
+	const reportProgress = async message => {
+		if (!message) return;
+		if (typeof onProgress === "function") {
+			try { await onProgress(message); }
+			catch (error) { console.warn("rank-stats progress callback failed:", error); }
+		}
+		if (interaction?.editReply) {
+			try { await interaction.editReply(message); }
+			catch (error) { console.warn("rank-stats progress edit failed:", error); }
+		}
+	};
+
+	const filters = normalizeRankStatsFilters(rawFilters || {});
 	const hasSessionTables = Boolean(session?.allTables && Object.keys(session.allTables).length);
 	const hasSessionDetails = Boolean(session?.playerDetails);
 	let favorites = session?.favorites || null;
-	let favoriteCharacterImage = session?.favoriteCharacterImage || null;
-	let favoriteVehicleImage = session?.favoriteVehicleImage || null;
+	let favoriteCharacterImage = null;
+	let favoriteVehicleImage = null;
 
 	let playerDetails = hasSessionDetails ? session.playerDetails : null;
 	if (!playerDetails) {
@@ -1063,19 +1082,25 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		}
 	}
 
-	const result = await AutoUserManager.ensureUserAndMembership({
-		interaction,
-		target,
-		serverId,
-		serverData: null,
-		loungeId,
-		loungeName: target.loungeName,
-		displayName: target.displayName,
+	let result = {
 		discordUser: target.discordUser,
-		storedRecord: null,
-		fallbackName: `player ${loungeId}`,
-		playerDetails,
-	});
+		displayName: target.displayName,
+	};
+	if (!skipAutoUserAndMembership) {
+		result = await AutoUserManager.ensureUserAndMembership({
+			interaction,
+			target,
+			serverId,
+			serverData: null,
+			loungeId,
+			loungeName: target.loungeName,
+			displayName: target.displayName,
+			discordUser: target.discordUser,
+			storedRecord: null,
+			fallbackName: `player ${loungeId}`,
+			playerDetails,
+		});
+	}
 	const discordUser = result.discordUser;
 	const displayNameForMessage = result.displayName || target.displayName || `player ${loungeId}`;
 
@@ -1084,7 +1109,7 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 	if (!existingTables || existingTables.length === 0) {
 		loadingMessage = `getting ${displayNameForMessage}'s mogis (${displayNameForMessage} is not in my database yet, so this will take longer than usual)...`;
 	}
-	await interaction.editReply(loadingMessage);
+	await reportProgress(loadingMessage);
 
 	let allTables = hasSessionTables ? session.allTables : null;
 	if (!allTables) {
@@ -1102,15 +1127,15 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		return { success: false, message: "no tables matched those filters." };
 	}
 
-	await interaction.editReply("crunching matchup data...");
+	await reportProgress("crunching matchup data...");
 	const aggregation = aggregateRankStats(filteredTables, loungeId);
 	if (!aggregation.rows.length) {
 		return { success: false, message: "not enough matchup data to create rank stats." };
 	}
 
-	await interaction.editReply("rendering image...");
+	await reportProgress("rendering image...");
 	const trackName = await resolveRankStatsTrackName(loungeId, session?.trackName);
-	let userData = options?.userData || null;
+	let userData = userDataOption || null;
 	if (!favorites) {
 		try {
 			if (!userData) {
@@ -1203,9 +1228,18 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 			loungeId,
 			displayName,
 		},
+		userData,
 	};
 
-	return { success: true, attachment, content: tipMessage + linkMessage, filters, session: sessionPayload };
+	return {
+		success: true,
+		attachment,
+		files: [attachment],
+		content: tipMessage + linkMessage,
+		filters,
+		session: sessionPayload,
+		userData,
+	};
 }
 
 function getPlayerEmoji(playerDetails) {
@@ -1464,4 +1498,7 @@ module.exports = {
 			return false;
 		}
 	},
+
+	// exported for site preview rendering
+	generateRankStats,
 };

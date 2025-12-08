@@ -1097,11 +1097,43 @@ module.exports = {
 
 	async generateNotables(interaction, target, serverId, queueFilter, playerCountFilter, timeFilter = "alltime", serverDataOverride = null, cacheOptions = {}) {
 		try {
+			const {
+				session: sessionOption = null,
+				filtersOverride = null,
+				userData: userDataOption = null,
+				onProgress = null,
+				skipAutoUserAndMembership = false,
+			} = cacheOptions || {};
+
+			const reportProgress = async message => {
+				if (!message) return;
+				if (typeof onProgress === "function") {
+					try {
+						await onProgress(message);
+					}
+					catch (error) {
+						console.warn("notables progress callback failed:", error);
+					}
+				}
+				if (interaction?.editReply) {
+					try {
+						await interaction.editReply(message);
+					}
+					catch (error) {
+						console.warn("notables progress edit failed:", error);
+					}
+				}
+			};
+
 			const { loungeId } = target;
 			const normalizedLoungeId = String(loungeId);
 			const fallbackName = `player ${normalizedLoungeId}`;
-			const session = cacheOptions?.session || null;
+			const session = sessionOption;
 			const useSession = Boolean(session && session.playerDetails && session.allTables && session.trackName);
+			const filters = filtersOverride || { timeFilter, queueFilter, playerCountFilter };
+			timeFilter = filters.timeFilter || timeFilter;
+			queueFilter = filters.queueFilter || queueFilter;
+			playerCountFilter = filters.playerCountFilter || playerCountFilter;
 
 			let displayName = target.displayName || target.loungeName || fallbackName;
 			let loungeName = target.loungeName || displayName || fallbackName;
@@ -1121,7 +1153,7 @@ module.exports = {
 				}
 			}
 
-			if (!useSession) {
+			if (!useSession && !skipAutoUserAndMembership) {
 				const result = await AutoUserManager.ensureUserAndMembership({
 					interaction,
 					target,
@@ -1154,7 +1186,7 @@ module.exports = {
 			if (!existingTables || existingTables.length === 0) {
 				loadingMessage = `getting ${displayName}'s mogis (${displayName} is not in my database yet, so this will take longer than usual)...`;
 			}
-			await interaction.editReply(loadingMessage);
+			await reportProgress(loadingMessage);
 
 			if (!allTables) {
 				allTables = await LoungeApi.getAllPlayerTables(normalizedLoungeId, serverId, playerDetails);
@@ -1163,7 +1195,7 @@ module.exports = {
 				return { success: false, message: "no events found for this player." };
 			}
 
-			await interaction.editReply("filtering...");
+			await reportProgress("filtering...");
 
 			const filteredTables = PlayerStats.filterTablesByControls(allTables, { timeFilter, queueFilter, playerCountFilter });
 			const filteredTableIds = Object.keys(filteredTables);
@@ -1171,9 +1203,9 @@ module.exports = {
 				return { success: false, message: "no events found matching the specified filters." };
 			}
 
-			await interaction.editReply("calculating...");
+			await reportProgress("calculating...");
 
-			let userData = cacheOptions?.userData || null;
+			let userData = userDataOption || null;
 			if (!favorites) {
 				if (!userData) {
 					userData = await Database.getUserData(normalizedLoungeId);
@@ -1216,7 +1248,7 @@ module.exports = {
 			const { goodEvents, badEvents } = buildColumnEvents({ filteredTables, loungeId: normalizedLoungeId, metrics: { bestScore, worstScore, overperformance, underperformance, carry, anchor } });
 			const linkMessage = buildTableLinksMessage([...goodEvents, ...badEvents]);
 
-			await interaction.editReply("rendering image...");
+			await reportProgress("rendering image...");
 
 			const trackColors = ColorPalettes.notablesTrackColors[trackName] || ColorPalettes.notablesTrackColors[ColorPalettes.currentTrackName] || {
 				baseColor: "#ffffffd9",
@@ -1266,6 +1298,7 @@ module.exports = {
 				content: tipMessage + (linkMessage || ""),
 				files: [attachment],
 				session: updatedSession,
+				userData,
 			};
 		}
 		catch (error) {

@@ -98,7 +98,7 @@ class DataManager {
 
 		const discordId = loungeProfile?.discordId ? String(loungeProfile.discordId) : null;
 		let discordUser = null;
-		let guildMember = null;
+		const guildMember = null;
 
 		if (discordId) {
 			const discordIdSet = new Set((record.discordIds || []).map(String));

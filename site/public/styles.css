@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap');
+
+body {
+    font-family: 'Lexend', sans-serif;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html, body {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+    animation: scroll 60s linear infinite;
+    width: max-content;
+}
+
+.hover\:pause:hover {
+    animation-play-state: paused;
+}
+
+.bg-dot-pattern {
+    background-image:
+        radial-gradient(circle, #ffffff 1px, transparent 1px),
+        radial-gradient(circle, #ffffff 1px, transparent 1px);
+    background-size: 32px 32px, 36px 36px;
+    background-position: 0 0, 18px 18px;
+    animation: dots-move 28s ease-in-out infinite alternate;
+}
+
+@keyframes dots-move {
+    0%   { background-position: 0 0, 18px 18px; }
+    25%  { background-position: 10px -12px, 28px 12px; }
+    50%  { background-position: 20px 10px, 12px 24px; }
+    75%  { background-position: -12px 16px, 32px -8px; }
+    100% { background-position: 0 0, 18px 18px; }
+}
+
+/* Scroll Animations */
+.fade-in-section {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    will-change: opacity, transform;
+}
+
+.fade-in-section.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* Offset anchor scroll positions to account for sticky nav */
+[id^="cmd-"] {
+    scroll-margin-top: 100px;
+}

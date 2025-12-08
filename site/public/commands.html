@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commands • mogimogimogi</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative">
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-zinc-900">
+        <div class="absolute inset-0 bg-dot-pattern opacity-[0.07]"></div>
+        <div class="absolute -top-40 -left-40 w-96 h-96 lg:w-[50rem] lg:h-[50rem] rounded-full bg-indigo-600/10 blur-[128px]"></div>
+        <div class="absolute top-1/3 -right-20 w-80 h-80 lg:w-[40rem] lg:h-[40rem] rounded-full bg-emerald-600/5 blur-[128px]"></div>
+        <div class="absolute -bottom-40 left-1/3 w-96 h-96 lg:w-[50rem] lg:h-[50rem] rounded-full bg-rose-600/5 blur-[128px]"></div>
+    </div>
+
+    <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-6 px-6 lg:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
+        <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="/images/profile/pfp.jpg" alt="Profile" class="w-10 h-10 rounded-full">
+            <span id="nav-title" class="text-xl font-bold text-white opacity-100 transition-opacity duration-300">mogimogimogi</span>
+        </a>
+        <div class="flex items-center gap-8">
+            <a id="nav-add-button" href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="opacity-0 pointer-events-none translate-y-2 transition-all duration-300 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-full shadow-lg hover:shadow-indigo-500/25 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                add to server
+            </a>
+            <a href="/about.html" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
+            <a href="/commands.html" class="text-white transition-colors text-lg font-medium">commands</a>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-[95%] lg:max-w-[90%] 2xl:max-w-[80%] space-y-10 mt-10 lg:mt-14 pb-14">
+        <header class="space-y-4 fade-in-section text-center">
+            <h1 class="text-5xl lg:text-6xl font-bold tracking-tight text-white">command directory</h1>
+            <p class="text-lg lg:text-xl text-zinc-400 max-w-4xl mx-auto">learn more about my commands. click one on the left to jump to its section.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 lg:gap-12 fade-in-section">
+            <aside class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-6 lg:p-7 shadow-lg shadow-black/30 h-max sticky top-24">
+                <p class="text-sm text-zinc-300 mb-4 font-medium">jump to</p>
+                <div class="space-y-2">
+                    <a href="#cmd-setup" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/setup</a>
+                    <a href="#cmd-stats" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/stats</a>
+                    <a href="#cmd-notables" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/notables</a>
+                    <a href="#cmd-rank-stats" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/rank-stats</a>
+                    <a href="#cmd-head-to-head" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/head-to-head</a>
+                    <a href="#cmd-leaderboard" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/leaderboard</a>
+                    <a href="#cmd-customize" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/customize</a>
+                </div>
+            </aside>
+
+            <section class="space-y-6">
+                <div id="cmd-setup" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 text-xs font-semibold">temp disabled</span>
+                        <h2 class="text-3xl font-semibold text-white">/setup</h2>
+                    </div>
+                    <p class="text-zinc-400 leading-relaxed">Placeholder description for /setup. Explain how it scans and caches members, plus any prerequisites.</p>
+                    <p class="text-zinc-500 text-sm">Example usage placeholder and notes on expected runtime.</p>
+                </div>
+
+                <div id="cmd-stats" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-4">
+                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="stats-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="stats-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="stats-preview" alt="" class="absolute inset-0 w-full h-full object-contain" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="stats-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="stats-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="stats-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-white">/stats</h2>
+                    <p class="text-zinc-400 leading-relaxed">View any lounge player as a fully rendered card with mmr chart, win rates, placements, and session-aware caching. Filters match the in-Discord buttons so you can explore soloq, squads, or season views.</p>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div id="cmd-notables" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="notables-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="notables-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="notables-preview" alt="" class="absolute inset-0 w-full h-full object-contain" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="notables-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="notables-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="notables-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-white">/notables</h2>
+                    <p class="text-zinc-400 leading-relaxed">See a player's best and worst mogis, biggest over/under performances, and most dramatic carries—rendered as a single card with the lounge links baked in.</p>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div id="cmd-rank-stats" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="rank-stats-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="rank-stats-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="rank-stats-preview" alt="" class="absolute inset-0 w-full h-full object-contain hidden" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="rank-stats-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="rank-stats-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="rank-stats-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-white">/rank-stats</h2>
+                    <p class="text-zinc-400 leading-relaxed">Compare your performance versus every rank with matchup counts, win rates, and best/worst results, rendered as the Discord card.</p>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div id="cmd-head-to-head" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="head-to-head-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="head-to-head-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="head-to-head-preview" alt="" class="absolute inset-0 w-full h-full object-contain" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="head-to-head-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="head-to-head-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="head-to-head-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-white">/head-to-head</h2>
+                    <p class="text-zinc-400 leading-relaxed">Compare two lounge players side-by-side with shared events, record breakdown, and standout mogis. Preview defaults to Bowser vs Wario so you can see the full card right here.</p>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div id="cmd-leaderboard" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-3">
+                        <div class="aspect-video rounded-xl bg-gradient-to-br from-zinc-700/70 to-zinc-900/70 border border-white/5 overflow-hidden">
+                            <img src="/images/examples/site/carousel/leaderboard3.webp" alt="" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 text-xs font-semibold">temp disabled</span>
+                        <h2 class="text-3xl font-semibold text-white">/leaderboard</h2>
+                    </div>
+                    <p class="text-zinc-400 leading-relaxed">Server-wide standings and streaks with filters for queue, time window, and player count. Shows top movers, podium snapshots, and highlights when it returns.</p>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div id="cmd-customize" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <div id="customize-table" class="float-right w-[30rem] max-w-[60%] ml-4 mb-3">
+                        <div class="bg-white/5 border border-white/5 rounded-2xl p-4 min-h-[240px] flex items-center justify-center text-zinc-500 text-sm" data-placeholder>
+                            loading favorites…
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-white">/customize</h2>
+                    <p class="text-zinc-400 leading-relaxed">Set your favorite track, character, and vehicle so your cards match your vibe. The bot remembers your picks across commands and uses them for backgrounds and flair.</p>
+                    <div class="clear-both"></div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="flex justify-center gap-8 text-zinc-500 pt-8 mb-12">
+            <a href="/terms" class="hover:text-white transition-colors">Terms</a>
+            <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
+            <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+        </footer>
+    </main>
+
+    <script src="/main.js"></script>
+    <script>
+    (function() {
+        const container = document.getElementById("customize-table");
+        if (!container) return;
+
+        const placeholder = container.querySelector("[data-placeholder]");
+
+        function createColumn(items, label) {
+            const col = document.createElement("div");
+            col.className = "space-y-2";
+
+            const heading = document.createElement("p");
+            heading.className = "text-xs text-zinc-300 font-medium";
+            heading.textContent = label;
+            col.appendChild(heading);
+
+            const list = document.createElement("div");
+            list.className = "grid grid-rows-5 gap-2";
+
+            items.slice(0, 5).forEach((item, index) => {
+                const wrap = document.createElement("div");
+                wrap.className = "relative h-20 rounded-xl overflow-hidden bg-zinc-800/80 border border-white/5";
+
+                if (item.image) {
+                    const img = document.createElement("img");
+                    img.src = item.image;
+                    img.alt = item.name || label;
+                    img.className = label === "characters"
+                        ? "absolute inset-0 w-full h-full object-contain p-2"
+                        : label === "vehicles"
+                            ? "absolute inset-0 w-full h-full object-contain p-1.5"
+                            : "absolute inset-0 w-full h-full object-cover";
+                    wrap.appendChild(img);
+                }
+
+                const badge = document.createElement("div");
+                badge.className = "absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-full";
+                badge.textContent = `#${index + 1}`;
+                wrap.appendChild(badge);
+
+                list.appendChild(wrap);
+            });
+
+            col.appendChild(list);
+            return col;
+        }
+
+        function renderFavorites(data) {
+            const tracks = Array.isArray(data?.tracks) ? data.tracks : [];
+            const characters = Array.isArray(data?.characters) ? data.characters : [];
+            const vehicles = Array.isArray(data?.vehicles) ? data.vehicles : [];
+
+            if (placeholder) {
+                placeholder.remove();
+            }
+
+            const shell = document.createElement("div");
+            shell.className = "bg-white/5 border border-white/5 rounded-2xl p-4 shadow-inner space-y-3";
+
+            const title = document.createElement("p");
+            title.className = "text-sm text-zinc-200 font-medium";
+            title.textContent = "most popular";
+            shell.appendChild(title);
+
+            const grid = document.createElement("div");
+            grid.className = "grid grid-cols-1 sm:grid-cols-3 gap-3";
+
+            grid.appendChild(createColumn(tracks, "tracks"));
+            grid.appendChild(createColumn(characters, "characters"));
+            grid.appendChild(createColumn(vehicles, "vehicles"));
+
+            shell.appendChild(grid);
+
+            container.appendChild(shell);
+        }
+
+        fetch("/api/global-favorites")
+            .then(res => res.ok ? res.json() : Promise.reject(new Error("bad response")))
+            .then(renderFavorites)
+            .catch(() => {
+                if (placeholder) {
+                    placeholder.textContent = "unable to load favorites";
+                }
+            });
+    })();
+
+    (function() {
+        const preview = document.getElementById("stats-preview");
+        const loading = document.getElementById("stats-loading");
+        const placeholder = document.getElementById("stats-placeholder");
+        const rows = {
+            time: document.getElementById("stats-time-row"),
+            queue: document.getElementById("stats-queue-row"),
+            players: document.getElementById("stats-players-row"),
+        };
+
+        if (!preview || !rows.time || !rows.queue || !rows.players) return;
+
+        const state = {
+            time: "alltime",
+            queue: "both",
+            players: "both",
+        };
+        let hasImageLoaded = false;
+
+        const btnClasses = "text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all";
+        const activeClasses = "bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/20";
+
+        const groups = {
+            time: [
+                { value: "alltime", label: "all time" },
+                { value: "weekly", label: "past week" },
+                { value: "season", label: "this season" },
+            ],
+            queue: [
+                { value: "soloq", label: "soloq" },
+                { value: "squads", label: "squads" },
+                { value: "both", label: "both" },
+            ],
+            players: [
+                { value: "12p", label: "12p" },
+                { value: "24p", label: "24p" },
+                { value: "both", label: "both" },
+            ],
+        };
+
+        function setLoading(isLoading, message = "loading…") {
+            if (loading) loading.classList.toggle("hidden", !isLoading);
+            if (placeholder) {
+                if (!hasImageLoaded) {
+                    placeholder.textContent = message;
+                    placeholder.classList.toggle("hidden", !isLoading);
+                }
+                else {
+                    placeholder.classList.add("hidden");
+                }
+            }
+        }
+
+        function showError(message) {
+            if (loading) loading.classList.add("hidden");
+            if (placeholder && !hasImageLoaded) {
+                placeholder.textContent = message || "unable to render stats";
+                placeholder.classList.remove("hidden");
+            }
+        }
+
+        function refreshButtons() {
+            Object.entries(groups).forEach(([groupKey, options]) => {
+                const row = rows[groupKey];
+                row.innerHTML = "";
+                options.forEach(option => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.textContent = option.label;
+                    btn.dataset.group = groupKey;
+                    btn.dataset.value = option.value;
+                    btn.className = `${btnClasses} ${state[groupKey] === option.value ? activeClasses : "text-zinc-200"}`;
+                    btn.disabled = state[groupKey] === option.value;
+                    btn.addEventListener("click", () => {
+                        state[groupKey] = option.value;
+                        refreshButtons();
+                        refreshImage();
+                    });
+                    row.appendChild(btn);
+                });
+            });
+        }
+
+        function refreshImage() {
+            if (!preview) return;
+            setLoading(true, "loading…");
+            const cacheBust = `t=${Date.now()}`;
+            const url = `/api/command-stats?time=${state.time}&queue=${state.queue}&players=${state.players}&${cacheBust}`;
+
+            fetch(url)
+                .then(async res => {
+                    if (!res.ok) {
+                        let message = "unable to render stats";
+                        try {
+                            const data = await res.json();
+                            if (data?.error) message = data.error;
+                        }
+                        catch (error) {
+                            console.warn("stats preview error parse failed", error);
+                        }
+                        showError(message);
+                        return null;
+                    }
+                    return res.blob();
+                })
+                .then(blob => {
+                    if (!blob) return;
+                    const objectUrl = URL.createObjectURL(blob);
+                    const nextImage = new Image();
+                    nextImage.onload = () => {
+                        if (preview.dataset.objectUrl) {
+                            URL.revokeObjectURL(preview.dataset.objectUrl);
+                        }
+                        preview.dataset.objectUrl = objectUrl;
+                        preview.src = objectUrl;
+                    };
+                    nextImage.onerror = () => {
+                        URL.revokeObjectURL(objectUrl);
+                        showError("failed to load stats preview");
+                    };
+                    nextImage.src = objectUrl;
+                })
+                .catch(error => {
+                    console.warn("stats preview fetch failed", error);
+                    showError("failed to load stats preview");
+                });
+        }
+
+        preview.addEventListener("load", () => {
+            setLoading(false);
+            preview.classList.remove("hidden");
+            hasImageLoaded = true;
+            preview.style.visibility = "visible";
+            if (placeholder) placeholder.classList.add("hidden");
+        });
+        preview.addEventListener("error", () => {
+            showError("failed to load stats preview");
+        });
+
+        refreshButtons();
+        refreshImage();
+    })();
+
+    (function() {
+        const preview = document.getElementById("notables-preview");
+        const loading = document.getElementById("notables-loading");
+        const placeholder = document.getElementById("notables-placeholder");
+        const rows = {
+            time: document.getElementById("notables-time-row"),
+            queue: document.getElementById("notables-queue-row"),
+            players: document.getElementById("notables-players-row"),
+        };
+
+        if (!preview || !rows.time || !rows.queue || !rows.players) return;
+
+        const state = {
+            time: "alltime",
+            queue: "both",
+            players: "both",
+        };
+        let hasImageLoaded = false;
+
+        const btnClasses = "text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all";
+        const activeClasses = "bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/20";
+
+        const groups = {
+            time: [
+                { value: "alltime", label: "all time" },
+                { value: "weekly", label: "past week" },
+                { value: "season", label: "this season" },
+            ],
+            queue: [
+                { value: "soloq", label: "soloq" },
+                { value: "squads", label: "squads" },
+                { value: "both", label: "both" },
+            ],
+            players: [
+                { value: "12p", label: "12p" },
+                { value: "24p", label: "24p" },
+                { value: "both", label: "both" },
+            ],
+        };
+
+        function setLoading(isLoading, message = "loading…") {
+            if (loading) loading.classList.toggle("hidden", !isLoading);
+            if (placeholder) {
+                if (!hasImageLoaded) {
+                    placeholder.textContent = message;
+                    placeholder.classList.toggle("hidden", !isLoading);
+                }
+                else {
+                    placeholder.classList.add("hidden");
+                }
+            }
+        }
+
+        function showError(message) {
+            if (loading) loading.classList.add("hidden");
+            if (placeholder && !hasImageLoaded) {
+                placeholder.textContent = message || "unable to render notables";
+                placeholder.classList.remove("hidden");
+            }
+        }
+
+        function refreshButtons() {
+            Object.entries(groups).forEach(([groupKey, options]) => {
+                const row = rows[groupKey];
+                row.innerHTML = "";
+                options.forEach(option => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.textContent = option.label;
+                    btn.dataset.group = groupKey;
+                    btn.dataset.value = option.value;
+                    btn.className = `${btnClasses} ${state[groupKey] === option.value ? activeClasses : "text-zinc-200"}`;
+                    btn.disabled = state[groupKey] === option.value;
+                    btn.addEventListener("click", () => {
+                        state[groupKey] = option.value;
+                        refreshButtons();
+                        refreshImage();
+                    });
+                    row.appendChild(btn);
+                });
+            });
+        }
+
+        function refreshImage() {
+            if (!preview) return;
+            setLoading(true, "loading…");
+            const cacheBust = `t=${Date.now()}`;
+            const url = `/api/command-notables?time=${state.time}&queue=${state.queue}&players=${state.players}&${cacheBust}`;
+
+            fetch(url)
+                .then(async res => {
+                    if (!res.ok) {
+                        let message = "unable to render notables";
+                        try {
+                            const data = await res.json();
+                            if (data?.error) message = data.error;
+                        }
+                        catch (error) {
+                            console.warn("notables preview error parse failed", error);
+                        }
+                        showError(message);
+                        return null;
+                    }
+                    return res.blob();
+                })
+                .then(blob => {
+                    if (!blob) return;
+                    const objectUrl = URL.createObjectURL(blob);
+                    const nextImage = new Image();
+                    nextImage.onload = () => {
+                        if (preview.dataset.objectUrl) {
+                            URL.revokeObjectURL(preview.dataset.objectUrl);
+                        }
+                        preview.dataset.objectUrl = objectUrl;
+                        preview.src = objectUrl;
+                    };
+                    nextImage.onerror = () => {
+                        URL.revokeObjectURL(objectUrl);
+                        showError("failed to load notables preview");
+                    };
+                    nextImage.src = objectUrl;
+                })
+                .catch(error => {
+                    console.warn("notables preview fetch failed", error);
+                    showError("failed to load notables preview");
+                });
+        }
+
+        preview.addEventListener("load", () => {
+            setLoading(false);
+            preview.classList.remove("hidden");
+            hasImageLoaded = true;
+            preview.style.visibility = "visible";
+            if (placeholder) placeholder.classList.add("hidden");
+        });
+        preview.addEventListener("error", () => {
+            showError("failed to load notables preview");
+        });
+
+        refreshButtons();
+        refreshImage();
+    })();
+
+    (function() {
+        const preview = document.getElementById("rank-stats-preview");
+        const loading = document.getElementById("rank-stats-loading");
+        const placeholder = document.getElementById("rank-stats-placeholder");
+        const rows = {
+            time: document.getElementById("rank-stats-time-row"),
+            queue: document.getElementById("rank-stats-queue-row"),
+            players: document.getElementById("rank-stats-players-row"),
+        };
+
+        if (!preview || !rows.time || !rows.queue || !rows.players) return;
+
+        const state = {
+            time: "alltime",
+            queue: "both",
+            players: "both",
+        };
+        let hasImageLoaded = false;
+
+        const btnClasses = "text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all";
+        const activeClasses = "bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/20";
+
+        const groups = {
+            time: [
+                { value: "alltime", label: "all time" },
+                { value: "weekly", label: "past week" },
+                { value: "season", label: "this season" },
+            ],
+            queue: [
+                { value: "soloq", label: "soloq" },
+                { value: "squads", label: "squads" },
+                { value: "both", label: "both" },
+            ],
+            players: [
+                { value: "12p", label: "12p" },
+                { value: "24p", label: "24p" },
+                { value: "both", label: "both" },
+            ],
+        };
+
+        function setLoading(isLoading, message = "loading…") {
+            if (loading) loading.classList.toggle("hidden", !isLoading);
+            if (placeholder) {
+                if (!hasImageLoaded) {
+                    placeholder.textContent = message;
+                    placeholder.classList.toggle("hidden", !isLoading);
+                }
+                else {
+                    placeholder.classList.add("hidden");
+                }
+            }
+        }
+
+        function showError(message) {
+            if (loading) loading.classList.add("hidden");
+            if (placeholder && !hasImageLoaded) {
+                placeholder.textContent = message || "unable to render rank-stats";
+                placeholder.classList.remove("hidden");
+            }
+        }
+
+        function refreshButtons() {
+            Object.entries(groups).forEach(([groupKey, options]) => {
+                const row = rows[groupKey];
+                row.innerHTML = "";
+                options.forEach(option => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.textContent = option.label;
+                    btn.dataset.group = groupKey;
+                    btn.dataset.value = option.value;
+                    btn.className = `${btnClasses} ${state[groupKey] === option.value ? activeClasses : "text-zinc-200"}`;
+                    btn.disabled = state[groupKey] === option.value;
+                    btn.addEventListener("click", () => {
+                        state[groupKey] = option.value;
+                        refreshButtons();
+                        refreshImage();
+                    });
+                    row.appendChild(btn);
+                });
+            });
+        }
+
+        function refreshImage() {
+            if (!preview) return;
+            setLoading(true, "loading…");
+            const cacheBust = `t=${Date.now()}`;
+            const url = `/api/command-rank-stats?time=${state.time}&queue=${state.queue}&players=${state.players}&${cacheBust}`;
+
+            fetch(url)
+                .then(async res => {
+                    if (!res.ok) {
+                        let message = "unable to render rank-stats";
+                        try {
+                            const data = await res.json();
+                            if (data?.error) message = data.error;
+                        }
+                        catch (error) {
+                            console.warn("rank-stats preview error parse failed", error);
+                        }
+                        showError(message);
+                        return null;
+                    }
+                    return res.blob();
+                })
+                .then(blob => {
+                    if (!blob) return;
+                    const objectUrl = URL.createObjectURL(blob);
+                    const nextImage = new Image();
+                    nextImage.onload = () => {
+                        if (preview.dataset.objectUrl) {
+                            URL.revokeObjectURL(preview.dataset.objectUrl);
+                        }
+                        preview.dataset.objectUrl = objectUrl;
+                        preview.src = objectUrl;
+                    };
+                    nextImage.onerror = () => {
+                        URL.revokeObjectURL(objectUrl);
+                        showError("failed to load rank-stats preview");
+                    };
+                    nextImage.src = objectUrl;
+                })
+                .catch(error => {
+                    console.warn("rank-stats preview fetch failed", error);
+                    showError("failed to load rank-stats preview");
+                });
+        }
+
+        preview.addEventListener("load", () => {
+            setLoading(false);
+            preview.classList.remove("hidden");
+            hasImageLoaded = true;
+            preview.style.visibility = "visible";
+            if (placeholder) placeholder.classList.add("hidden");
+        });
+        preview.addEventListener("error", () => {
+            showError("failed to load rank-stats preview");
+        });
+
+        refreshButtons();
+        refreshImage();
+    })();
+
+    (function() {
+        const preview = document.getElementById("head-to-head-preview");
+        const loading = document.getElementById("head-to-head-loading");
+        const placeholder = document.getElementById("head-to-head-placeholder");
+        const rows = {
+            time: document.getElementById("head-to-head-time-row"),
+            queue: document.getElementById("head-to-head-queue-row"),
+            players: document.getElementById("head-to-head-players-row"),
+        };
+
+        if (!preview || !rows.time || !rows.queue || !rows.players) return;
+
+        const state = {
+            time: "alltime",
+            queue: "both",
+            players: "both",
+        };
+        let hasImageLoaded = false;
+
+        const btnClasses = "text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all";
+        const activeClasses = "bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/20";
+
+        const groups = {
+            time: [
+                { value: "alltime", label: "all time" },
+                { value: "weekly", label: "past week" },
+                { value: "season", label: "this season" },
+            ],
+            queue: [
+                { value: "soloq", label: "soloq" },
+                { value: "squads", label: "squads" },
+                { value: "both", label: "both" },
+            ],
+            players: [
+                { value: "12p", label: "12p" },
+                { value: "24p", label: "24p" },
+                { value: "both", label: "both" },
+            ],
+        };
+
+        function setLoading(isLoading, message = "loading…") {
+            if (loading) loading.classList.toggle("hidden", !isLoading);
+            if (placeholder) {
+                if (!hasImageLoaded) {
+                    placeholder.textContent = message;
+                    placeholder.classList.toggle("hidden", !isLoading);
+                }
+                else {
+                    placeholder.classList.add("hidden");
+                }
+            }
+        }
+
+        function showError(message) {
+            if (loading) loading.classList.add("hidden");
+            if (placeholder && !hasImageLoaded) {
+                placeholder.textContent = message || "unable to render head-to-head";
+                placeholder.classList.remove("hidden");
+            }
+        }
+
+        function refreshButtons() {
+            Object.entries(groups).forEach(([groupKey, options]) => {
+                const row = rows[groupKey];
+                row.innerHTML = "";
+                options.forEach(option => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.textContent = option.label;
+                    btn.dataset.group = groupKey;
+                    btn.dataset.value = option.value;
+                    btn.className = `${btnClasses} ${state[groupKey] === option.value ? activeClasses : "text-zinc-200"}`;
+                    btn.disabled = state[groupKey] === option.value;
+                    btn.addEventListener("click", () => {
+                        state[groupKey] = option.value;
+                        refreshButtons();
+                        refreshImage();
+                    });
+                    row.appendChild(btn);
+                });
+            });
+        }
+
+        function refreshImage() {
+            if (!preview) return;
+            setLoading(true, "loading…");
+            const cacheBust = `t=${Date.now()}`;
+            const url = `/api/command-head-to-head?time=${state.time}&queue=${state.queue}&players=${state.players}&${cacheBust}`;
+
+            fetch(url)
+                .then(async res => {
+                    if (!res.ok) {
+                        let message = "unable to render head-to-head";
+                        try {
+                            const data = await res.json();
+                            if (data?.error) message = data.error;
+                        }
+                        catch (error) {
+                            console.warn("head-to-head preview error parse failed", error);
+                        }
+                        showError(message);
+                        return null;
+                    }
+                    return res.blob();
+                })
+                .then(blob => {
+                    if (!blob) return;
+                    const objectUrl = URL.createObjectURL(blob);
+                    const nextImage = new Image();
+                    nextImage.onload = () => {
+                        if (preview.dataset.objectUrl) {
+                            URL.revokeObjectURL(preview.dataset.objectUrl);
+                        }
+                        preview.dataset.objectUrl = objectUrl;
+                        preview.src = objectUrl;
+                    };
+                    nextImage.onerror = () => {
+                        URL.revokeObjectURL(objectUrl);
+                        showError("failed to load head-to-head preview");
+                    };
+                    nextImage.src = objectUrl;
+                })
+                .catch(error => {
+                    console.warn("head-to-head preview fetch failed", error);
+                    showError("failed to load head-to-head preview");
+                });
+        }
+
+        preview.addEventListener("load", () => {
+            setLoading(false);
+            preview.classList.remove("hidden");
+            hasImageLoaded = true;
+            preview.style.visibility = "visible";
+            if (placeholder) placeholder.classList.add("hidden");
+        });
+        preview.addEventListener("error", () => {
+            showError("failed to load head-to-head preview");
+        });
+
+        refreshButtons();
+        refreshImage();
+    })();
+    </script>
+</body>
+</html>

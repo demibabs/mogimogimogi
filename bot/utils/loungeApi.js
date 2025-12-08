@@ -348,8 +348,8 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 
 				// If we have fewer tables than the API says we should, we need to find the missing ones.
 				if (localCount < remoteCount) {
-					console.log(`[LoungeAPI] Season ${season} mismatch for ${numericId}: Local=${localCount}, Remote=${remoteCount}. Fetching missing tables...`);
-					
+					// console.log(`[LoungeAPI] Season ${season} mismatch for ${numericId}: Local=${localCount}, Remote=${remoteCount}. Fetching missing tables...`);
+
 					const changes = details.mmrChanges.filter(c => c.reason === "Table" && !tables[c.changeId]);
 
 					const CHUNK_SIZE = 5;
