@@ -121,6 +121,7 @@ client.once(Events.ClientReady, async readyClient => {
 
 client.on(Events.GuildCreate, async (guild) => {
 	updatePresence();
+	console.log(`Joined new guild: ${guild.id}.`);
 	// try {
 	// 	console.log(`Joined new guild: ${guild.id}. Caching members...`);
 	// 	await guild.members.fetch();
@@ -145,9 +146,9 @@ client.on(Events.GuildDelete, () => updatePresence());
 
 
 client.on(Events.InteractionCreate, async interaction => {
-	if (interaction.user?.id !== OWNER_USER_ID) {
-		console.log(`Received interaction: ${interaction.type}`);
-	}
+	// if (interaction.user?.id !== OWNER_USER_ID) {
+	// 	console.log(`Received interaction: ${interaction.type}`);
+	// }
 
 	if (interaction.isAutocomplete()) {
 		const command = interaction.client.commands.get(interaction.commandName);

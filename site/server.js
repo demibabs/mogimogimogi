@@ -131,11 +131,15 @@ function startSite(client) {
 	// Serve static assets (images/fonts) before public so missing files fall through correctly
 	app.use("/images", express.static(path.join(__dirname, "../images")));
 	app.use("/fonts", express.static(path.join(__dirname, "../fonts")));
-	app.get("/styles.css", (req, res) => {
-		res.type("text/css");
-		res.sendFile(path.join(__dirname, "public", "styles.css"));
-	});
-	app.use(express.static(path.join(__dirname, "public")));
+
+	// Serve public directory with explicit CSS mime type handling
+	app.use(express.static(path.join(__dirname, "public"), {
+		setHeaders: (res, filePath) => {
+			if (filePath.endsWith(".css")) {
+				res.setHeader("Content-Type", "text/css");
+			}
+		}
+	}));
 
 	// Clean URLs for terms and privacy
 	app.get("/terms", (req, res) => {
