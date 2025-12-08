@@ -8,7 +8,7 @@ const GLOBAL_COMMANDS = [
 	{ name: "</rank-stats:1446020866356940865>", description: "stats broken down by the ranks of your opponents" },
 	{ name: "</customize:1446020866356940861>", description: "edit the appearance of the above commands" },
 	{ name: "</head-to-head:1446020866356940862>", description: "two players compared across shared mogis" },
-	{ name: "</leaderboard:1446020866356940863>", description: "server MMR leaderboard (temp disabled" },
+	{ name: "</leaderboard:1446020866356940863>", description: "server MMR leaderboard (temp disabled)" },
 	{ name: "</about-me:1446020866356940860>", description: "this lol" },
 ];
 
