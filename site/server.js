@@ -17,6 +17,7 @@ const previewHeadToHeadCache = new Map();
 const IMAGES_ROOT = path.join(__dirname, "../images");
 const TRACK_THUMBNAILS_DIR = path.join(IMAGES_ROOT, "track thumbnails");
 const CHARACTER_MAIN_DIR = path.join(IMAGES_ROOT, "characters", "mains");
+const CHARACTER_NPC_DIR = path.join(IMAGES_ROOT, "characters", "npcs");
 const VEHICLE_DIR = path.join(IMAGES_ROOT, "vehicles");
 
 const characterDefaultImageMap = buildCharacterDefaultMap();
@@ -24,21 +25,27 @@ const characterBaseNames = Object.keys(characterDefaultImageMap).sort((a, b) => 
 
 function buildCharacterDefaultMap() {
 	const map = {};
-	try {
-		const files = fs.readdirSync(CHARACTER_MAIN_DIR);
-		for (const file of files) {
-	 const ext = path.extname(file).toLowerCase();
-	 if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") continue;
-	 const stem = path.basename(file, ext).toLowerCase();
-	 const base = stem.endsWith(" default") ? stem.slice(0, -8) : stem;
-	 if (stem.endsWith(" default") || !map[base]) {
-				map[base] = file;
-	 }
+	const loadDir = (dir, subpath) => {
+		try {
+			const files = fs.readdirSync(dir);
+			for (const file of files) {
+				const ext = path.extname(file).toLowerCase();
+				if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") continue;
+				const stem = path.basename(file, ext).toLowerCase();
+				const base = stem.endsWith(" default") ? stem.slice(0, -8) : stem;
+				// Prefer explicit defaults; otherwise first seen wins per base
+				if (stem.endsWith(" default") || !map[base]) {
+					map[base] = path.join(subpath, file);
+				}
+			}
 		}
-	}
-	catch (error) {
-		console.error("failed to build character default map:", error);
-	}
+		catch (error) {
+			console.error(`failed to build character map from ${dir}:`, error);
+		}
+	};
+
+	loadDir(CHARACTER_MAIN_DIR, "characters/mains");
+	loadDir(CHARACTER_NPC_DIR, "characters/npcs");
 	return map;
 }
 
@@ -57,7 +64,8 @@ function normalizeCharacterKey(rawName) {
 function getCharacterImagePath(key) {
 	const file = characterDefaultImageMap[key];
 	if (!file) return null;
-	return `/images/characters/mains/${encodeURIComponent(file)}`;
+	// file already contains subpath (mains or npcs)
+	return `/images/${encodeURIComponent(file).replace(/%2F/g, "/")}`;
 }
 
 function normalizeVehicleKey(rawName) {
@@ -120,10 +128,10 @@ function startSite(client) {
 	const app = express();
 	const PORT = process.env.PORT || 3000;
 
-	// Serve static files from public directory
-	app.use(express.static(path.join(__dirname, "public")));
-	// Serve images directory
+	// Serve static assets (images/fonts) before public so missing files fall through correctly
 	app.use("/images", express.static(path.join(__dirname, "../images")));
+	app.use("/fonts", express.static(path.join(__dirname, "../fonts")));
+	app.use(express.static(path.join(__dirname, "public")));
 
 	// Clean URLs for terms and privacy
 	app.get("/terms", (req, res) => {
