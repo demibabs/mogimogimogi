@@ -284,7 +284,7 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 		// Get existing tables from normalized storage
 		let existingTables = [];
 		try {
-			existingTables = await database.getUserTables(normalizedId);
+			existingTables = await database.getUserTablesWithData(normalizedId);
 		}
 		catch (error) {
 			console.warn(`Could not get existing tables for lounge user ${normalizedId}:`, error);
@@ -295,15 +295,9 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 		const tablesToPersist = new Map();
 
 		// Load existing tables into the result
-		for (const userTable of existingTables) {
-			try {
-				const tableData = await database.getTable(userTable.id);
-				if (tableData) {
-					tables[userTable.id] = tableData;
-				}
-			}
-			catch (error) {
-				console.warn(`Could not load table ${userTable.id}:`, error);
+		for (const { id, data } of existingTables) {
+			if (data) {
+				tables[id] = data;
 			}
 		}
 

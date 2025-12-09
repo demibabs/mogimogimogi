@@ -479,6 +479,51 @@ class Database {
 		}
 	}
 
+	async getUserTablesWithData(loungeId) {
+		const normalizedId = normalizeLoungeId(loungeId);
+		if (!this.useDatabase) {
+			// Fallback for file-based mode (returns just IDs, caller must fetch data)
+			// Or we could implement file-based data fetching here if needed, 
+			// but for now we'll return empty or just the IDs and let the caller handle it?
+			// The caller expects { id, data } objects.
+			// Let's just return empty array for file mode optimization for now, 
+			// or we can implement it properly if file mode is important.
+			// Given the user asked for DB optimization, let's stick to DB.
+			// But to be safe for file mode users, let's return what getUserTables returns but with null data?
+			// Actually, the caller logic I proposed replaces the loop. 
+			// So if I return empty here for file mode, file mode users get nothing.
+			// I should probably implement a basic file mode fallback or just return null 
+			// and let the caller decide what to do.
+			// Better yet, let's just implement the file mode loop here too so the API is consistent.
+			
+			const tables = await this._getUserTablesFromFile(normalizedId);
+			const results = [];
+			for (const t of tables) {
+				const data = await this._getTableFromFile(t.id);
+				if (data) {
+					results.push({ id: t.id, data });
+				}
+			}
+			return results;
+		}
+
+		try {
+			const result = await this.pool.query(
+				`SELECT t.table_id, t.table_data
+				 FROM user_tables ut
+				 JOIN tables t ON ut.table_id = t.table_id
+				 WHERE ut.user_id = $1
+				 ORDER BY ut.created_at DESC`,
+				[normalizedId],
+			);
+			return result.rows.map(row => ({ id: row.table_id, data: row.table_data }));
+		}
+		catch (error) {
+			console.error("database user tables with data query error:", error);
+			return [];
+		}
+	}
+
 	async getAllUserData() {
 		if (this.useDatabase) {
 			try {
