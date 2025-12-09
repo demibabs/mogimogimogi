@@ -85,7 +85,7 @@ for (const folder of commandFolders) {
 	}
 }
 
-const statusCommands = ["/stats", "/notables", "/head-to-head", "/rank-stats"];
+const statusCommands = ["/stats", "/rank-stats", "/notables", "/head-to-head"];
 let currentStatusIndex = 0;
 
 function updatePresence() {

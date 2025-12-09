@@ -150,6 +150,14 @@ function startSite(client) {
 		res.sendFile(path.join(__dirname, "public", "privacy.html"));
 	});
 
+	app.get("/commands", (req, res) => {
+		res.sendFile(path.join(__dirname, "public", "commands.html"));
+	});
+
+	app.get("/about", (req, res) => {
+		res.sendFile(path.join(__dirname, "public", "about.html"));
+	});
+
 	// API route for stats
 	app.get("/api/stats", async (req, res) => {
 		try {

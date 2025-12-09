@@ -6,9 +6,25 @@
     <title>mogimogimogi</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    screens: {
+                        'md': '896px',
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative bg-zinc-900">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 z-[100] bg-zinc-900 flex items-center justify-center transition-opacity duration-500">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+    </div>
 
     <!-- Background -->
     <div class="fixed inset-0 -z-10">
@@ -17,38 +33,38 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-6 px-6 lg:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
+    <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-4 md:py-6 px-4 md:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
         <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img src="/images/profile/pfp.png" alt="Profile" class="w-10 h-10 rounded-full">
-            <span id="nav-title" class="text-xl font-bold text-white opacity-0 transition-opacity duration-300">mogimogimogi</span>
+            <span id="nav-title" class="text-xl font-bold text-white hidden md:block opacity-0 transition-opacity duration-300">mogimogimogi</span>
         </a>
-        <div class="flex items-center gap-8">
-            <a id="nav-add-button" href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="opacity-0 pointer-events-none translate-y-2 transition-all duration-300 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-full shadow-lg hover:shadow-indigo-500/25 flex items-center gap-2">
+        <div class="flex items-center gap-4 md:gap-8">
+            <a id="nav-add-button" href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="opacity-0 pointer-events-none translate-y-2 transition-all duration-300 p-2 md:px-4 md:py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-full shadow-lg hover:shadow-indigo-500/25 flex items-center gap-0 md:gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                add to server
+                <span class="hidden md:inline">add to server</span>
             </a>
-            <a href="/commands.html" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">commands</a>
-            <a href="/about.html" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
+            <a href="/commands" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">commands</a>
+            <a href="/about" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
         </div>
     </nav>
 
-    <main class="w-full max-w-[95%] lg:max-w-[85%] 2xl:max-w-[65%] space-y-8 lg:space-y-12 2xl:space-y-8 mt-8 lg:mt-12 pb-14">
+    <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] space-y-8 md:space-y-12 2xl:space-y-8 mt-8 md:mt-12 pb-8">
 
         <!-- Header Section -->
-        <header class="text-center space-y-4 lg:space-y-4 2xl:space-y-4 fade-in-section">
-            <h1 id="header-title" class="text-6xl lg:text-6xl 2xl:text-6xl font-bold tracking-tight text-white">mogimogimogi</h1>
-            <p class="text-xl lg:text-2xl 2xl:text-xl text-zinc-400 max-w-3xl 2xl:max-w-5xl mx-auto">
-                detailed stats Discord bot for competitive Mario Kart World.
+        <header class="text-center space-y-4 md:space-y-4 2xl:space-y-4 fade-in-section">
+            <h1 id="header-title" class="text-[min(8vw,3.75rem)] leading-none font-bold tracking-tight text-white mx-auto">mogimogimogi</h1>
+            <p class="text-xl md:text-2xl 2xl:text-xl text-zinc-400 max-w-3xl 2xl:max-w-5xl mx-auto px-6">
+                Discord bot for detailed competitive Mario Kart World stats.
             </p>
         </header>
 
         <!-- Add to Server Button -->
         <div id="hero-add-button-sentinel" class="w-full">
             <div class="flex justify-center w-full fade-in-section">
-                <a href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white text-xl font-bold rounded-full transition-colors duration-300 shadow-lg hover:shadow-indigo-500/25 flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <a href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="max-w-[60vw] px-[min(4vw,2rem)] py-[min(2vw,1rem)] bg-indigo-600 hover:bg-indigo-500 text-white text-[min(2.8vw,1.25rem)] font-bold rounded-full transition-colors duration-300 shadow-lg hover:shadow-indigo-500/25 flex items-center justify-center gap-[min(1.5vw,0.75rem)] whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-[min(4vw,1.5rem)] w-[min(4vw,1.5rem)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     add to your server
@@ -60,121 +76,120 @@
         <div class="w-full overflow-hidden py-4 relative group fade-in-section [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
             <div class="flex gap-6 animate-scroll hover:pause">
                 <!-- Set 1 -->
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/stats1.webp" alt="Stats Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/stats1.webp" alt="Stats Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')" fetchpriority="high" data-critical="true">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/rank-stats1.webp" alt="Rank Stats Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/rank-stats1.webp" alt="Rank Stats Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')" fetchpriority="high" data-critical="true">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/notables1.webp" alt="Notables Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/notables1.webp" alt="Notables Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')" fetchpriority="high" data-critical="true">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/leaderboard1.webp" alt="Leaderboard Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/leaderboard1.webp" alt="Leaderboard Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')" fetchpriority="high" data-critical="true">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/head-to-head1.webp" alt="Head to Head Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/head-to-head1.webp" alt="Head to Head Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/stats2.webp" alt="Stats Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/stats2.webp" alt="Stats Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/rank-stats2.webp" alt="Rank Stats Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/rank-stats2.webp" alt="Rank Stats Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/notables2.webp" alt="Notables Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/notables2.webp" alt="Notables Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/leaderboard2.webp" alt="Leaderboard Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/leaderboard2.webp" alt="Leaderboard Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/head-to-head2.webp" alt="Head to Head Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/head-to-head2.webp" alt="Head to Head Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
 
                 <!-- Set 2 (Duplicate for loop) -->
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/stats1.webp" alt="Stats Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/stats1.webp" alt="Stats Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/rank-stats1.webp" alt="Rank Stats Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/rank-stats1.webp" alt="Rank Stats Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/notables1.webp" alt="Notables Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/notables1.webp" alt="Notables Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/leaderboard1.webp" alt="Leaderboard Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/leaderboard1.webp" alt="Leaderboard Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/head-to-head1.webp" alt="Head to Head Preview 1" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/head-to-head1.webp" alt="Head to Head Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/stats2.webp" alt="Stats Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/stats2.webp" alt="Stats Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/rank-stats2.webp" alt="Rank Stats Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/rank-stats2.webp" alt="Rank Stats Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/notables2.webp" alt="Notables Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/notables2.webp" alt="Notables Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/leaderboard2.webp" alt="Leaderboard Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/leaderboard2.webp" alt="Leaderboard Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
-                <div class="flex-shrink-0 w-[34rem] aspect-video lg:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/head-to-head2.webp" alt="Head to Head Preview 2" class="w-full h-full object-cover opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex-shrink-0 w-[34rem] max-w-[65vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/head-to-head2.webp" alt="Head to Head Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
             </div>
         </div>
 
         <!-- Bento Grid Stats -->
                 <!-- Bento Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto fade-in-section">
+        <div class="grid grid-cols-3 gap-2 md:gap-6 max-w-6xl mx-auto fade-in-section px-2 md:px-0">
             <!-- Large Card (Span 2 cols) -->
             
             <!-- Card 1: Servers -->
-            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
-                <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-xl font-medium mb-2">servers</span>
-                <span id="server-count" class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-indigo-400">-</span>
+            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-2xl md:rounded-3xl px-2 py-6 md:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+                <span class="text-zinc-400 text-xs md:text-xl 2xl:text-xl font-medium mb-0 md:mb-2 text-center">servers</span>
+                <span id="server-count" class="text-xl md:text-5xl 2xl:text-5xl font-bold text-indigo-400">-</span>
             </div>
 
             <!-- Card 2: Users -->
-            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
-                <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-xl font-medium mb-2">tracked users</span>
-                <span id="user-count" class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-emerald-400">-</span>
+            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-2xl md:rounded-3xl px-2 py-6 md:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+                <span class="text-zinc-400 text-xs md:text-xl 2xl:text-xl font-medium mb-0 md:mb-2 text-center">
+                    <span class="md:hidden">users</span>
+                    <span class="hidden md:inline">tracked users</span>
+                </span>
+                <span id="user-count" class="text-xl md:text-5xl 2xl:text-5xl font-bold text-emerald-400">-</span>
             </div>
 
             <!-- Card 3: Tables -->
-            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
-                <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-xl font-medium mb-2">tracked events</span>
-                <span id="table-count" class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-rose-400">-</span>
+            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-2xl md:rounded-3xl px-2 py-6 md:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+                <span class="text-zinc-400 text-xs md:text-xl 2xl:text-xl font-medium mb-0 md:mb-2 text-center">
+                    <span class="md:hidden">events</span>
+                    <span class="hidden md:inline">tracked events</span>
+                </span>
+                <span id="table-count" class="text-xl md:text-5xl 2xl:text-5xl font-bold text-rose-400">-</span>
             </div>
 
         </div>
 
 
         <!-- Stats Feature Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12 fade-in-section">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center py-12 md:py-12 2xl:py-12 fade-in-section">
             <!-- Text Content -->
-            <div class="space-y-8 lg:pb-16">
-                <h2 class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-white">check out your (or anyone's!) stats</h2>
-                <p class="text-xl lg:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                    dive deep into the numbers for any competitve player. break them down by time, format and more if you love to explore the details.
+            <div class="space-y-8 px-6 md:px-0 md:pb-16">
+                <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">personal stat cards</h2>
+                <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
+                    with <b>/stats</b>, <b>/rank-stats</b> and <b>/notables</b>, you get detailed numbers about your performances, along with recaps of your best and worst mogis.
+                    you can also use the filters to break them down by time and format.
                 </p>
-                
-                <!-- Hint Text -->
-                <div class="flex items-center gap-2 text-zinc-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
-                    </svg>
-                    <span class="text-sm lg:text-base 2xl:text-lg font-medium">find the perfect set of filters to make you look good at the game.</span>
-                </div>
             </div>
 
             <!-- Image Display (Simple Carousel) -->
-            <div class="flex flex-col w-full">
-                <div id="stats-card-container" class="relative w-full cursor-pointer" onclick="cycleCarousel('stats-card-container', 'stats-dots')">
+            <div class="flex flex-col w-full items-center max-h-[85vh]">
+                <div id="stats-card-container" class="relative w-auto min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('stats-card-container', 'stats-dots')">
                     <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
                         <!-- Images -->
-                        <img src="/images/examples/site/cards/stats card.png" class="w-full h-auto transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                        <img src="/images/examples/site/cards/stats card.png" class="w-auto h-auto max-w-full max-h-[calc(85vh-4rem)] transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
                         <img src="/images/examples/site/cards/rank-stats card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
                         <img src="/images/examples/site/cards/notables card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="2">
                     </div>
@@ -189,13 +204,13 @@
         </section>
 
         <!-- Compare Friends Feature Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12 fade-in-section">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center py-12 md:py-12 2xl:py-12 fade-in-section">
             <!-- Image Display (Simple Carousel) - Order 2 on mobile, Order 1 on desktop -->
-            <div class="flex flex-col w-full order-2 lg:order-1">
-                <div id="compare-card-container" class="relative w-full cursor-pointer" onclick="cycleCarousel('compare-card-container', 'compare-dots')">
+            <div class="flex flex-col w-full order-2 md:order-1 items-center max-h-[85vh]">
+                <div id="compare-card-container" class="relative w-auto min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('compare-card-container', 'compare-dots')">
                     <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
                         <!-- Images -->
-                        <img src="/images/examples/site/cards/head-to-head card.png" class="w-full h-auto transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                        <img src="/images/examples/site/cards/head-to-head card.png" class="w-auto h-auto max-w-full max-h-[calc(85vh-4rem)] transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
                         <img src="/images/examples/site/cards/leaderboard card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
                     </div>
                 </div>
@@ -207,59 +222,38 @@
             </div>
 
             <!-- Text Content - Order 1 on mobile, Order 2 on desktop -->
-            <div class="space-y-8 order-1 lg:order-2 lg:pb-12">
-                <h2 class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-white">compare friends and rivals</h2>
-                <p class="text-xl lg:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                    settle the score. track head-to-head matchups with anyone in Lounge, and also see where you stack up within your server.
+            <div class="space-y-8 px-6 md:px-0 order-1 md:order-2 md:pb-12">
+                <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">player comparisons</h2>
+                <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
+                    with <b>/head-to-head</b>, you can compare any two players across shared mogis, and with <b>/leaderboard,</b> you can compare mmr across your entire server.
+                    settle the score with your friends and rivals!
                 </p>
-                
-                <!-- Hint Text -->
-                <div class="flex items-center gap-2 text-zinc-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span class="text-sm lg:text-base 2xl:text-lg font-medium">just don't make fun of the guy at the bottom of your server's mmr leaderboard. he already has it rough.</span>
-                </div>
             </div>
         </section>
 
         <!-- Customize Feature Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12 fade-in-section">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center py-12 md:py-12 2xl:py-12 fade-in-section">
             <!-- Text Content -->
-            <div class="space-y-8 lg:pb-16">
-                <h2 class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-white">customize your cards</h2>
-                <p class="text-xl lg:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                    your stats are unique to you, so make them look unique too! with /customize, you can add your favorite track, character and vehicle to your personal cards.
+            <div class="space-y-8 px-6 md:px-0 md:pb-16">
+                <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">card customization</h2>
+                <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
+                    with <b>/customize</b>, add your favorite track, character and vehicle to your personal cards. 
+                    your stats are unique to you, so you can make them look unique as well :)
                 </p>
-                
-                <!-- Hint Text -->
-                <div class="flex items-center gap-2 text-zinc-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 2xl:h-8 2xl:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
-                    <span class="text-sm lg:text-base 2xl:text-lg font-medium">maybe you can even be part of the 1% that doesn't use mach rocket, rob hog or baby blooper :)</span>
-                </div>
             </div>
 
             <!-- Image Display (Vertical Flow) -->
-            <div class="flex flex-col items-center gap-2 w-full">
+            <div class="flex flex-col items-center gap-2 w-full max-h-[85vh]">
                 <!-- Top Image (Standard Card Size) -->
-                <div id="customize-header-container" class="w-full bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700/50 shadow-lg relative group bg-[#1a1a1e] flex flex-col justify-center">
-                    <img src="/images/examples/site/cards/customize.png" class="w-full h-auto opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-                </div>
-
-                <!-- Arrow -->
-                <div class="text-zinc-600 animate-bounce mt-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
+                <div id="customize-header-container" class="w-auto min-h-0 flex-shrink bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700/50 shadow-lg relative group bg-[#1a1a1e] flex flex-col justify-center">
+                    <img src="/images/examples/site/cards/customize.png" class="w-auto h-auto max-w-full max-h-[38vh] opacity-90 group-hover:opacity-100 transition-opacity duration-300">
                 </div>
 
                 <!-- Bottom Image (Simple Carousel) -->
-                <div id="customize-card-container" class="relative w-full cursor-pointer" onclick="cycleCarousel('customize-card-container', 'customize-dots')">
+                <div id="customize-card-container" class="relative w-auto min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('customize-card-container', 'customize-dots')">
                     <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
                         <!-- Images -->
-                        <img src="/images/examples/site/cards/customize stats.webp" class="w-full h-auto transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                        <img src="/images/examples/site/cards/customize stats.webp" class="w-auto h-auto max-w-full max-h-[38vh] transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
                         <img src="/images/examples/site/cards/customize rank stats.webp" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
                         <img src="/images/examples/site/cards/customize notables.webp" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="2">
                     </div>
@@ -275,9 +269,9 @@
 
         <!-- Footer / Links -->
         <footer class="flex justify-center gap-8 text-zinc-500 pt-8 mb-12">
-            <a href="/terms" class="hover:text-white transition-colors">Terms</a>
-            <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
-            <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+            <a href="/terms" class="hover:text-white transition-colors">terms</a>
+            <a href="/privacy" class="hover:text-white transition-colors">privacy</a>
+            <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">github</a>
         </footer>
 
     </main>

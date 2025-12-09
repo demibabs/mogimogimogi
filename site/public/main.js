@@ -25,7 +25,7 @@ function cycleCarousel(containerId, dotsId) {
 	if (images.length === 0) return;
 
 	if (carouselStates[containerId] === undefined) carouselStates[containerId] = 0;
-	
+
 	// Calculate next index
 	const nextIndex = (carouselStates[containerId] + 1) % images.length;
 	carouselStates[containerId] = nextIndex;
@@ -82,16 +82,16 @@ document.addEventListener("DOMContentLoaded", () => {
 	function handleScrollAnimations() {
 		const sections = document.querySelectorAll(".fade-in-section");
 		const windowHeight = window.innerHeight;
-		const fadeDistance = windowHeight * 0.6; // Fade over 60% of the screen height
+		const fadeDistance = windowHeight * 0.3; // Fade over 30% of the screen height
 
 		sections.forEach(section => {
 			const rect = section.getBoundingClientRect();
 			// Calculate opacity: 0 at bottom of screen, 1 when it's moved up by fadeDistance
 			let opacity = (windowHeight - rect.top) / fadeDistance;
-			
+
 			// Clamp between 0 and 1
 			opacity = Math.max(0, Math.min(1, opacity));
-			
+
 			section.style.opacity = opacity;
 		});
 	}
@@ -150,6 +150,40 @@ document.addEventListener("DOMContentLoaded", () => {
 		else {
 			navTitle.classList.remove("opacity-0");
 		}
+	}
+
+	// Loading Screen Logic
+	const loadingScreen = document.getElementById("loading-screen");
+	const criticalImages = document.querySelectorAll("img[data-critical='true']");
+	let loadedCount = 0;
+
+	function checkLoaded() {
+		loadedCount++;
+		if (loadedCount >= criticalImages.length) {
+			loadingScreen.classList.add("opacity-0", "pointer-events-none");
+			setTimeout(() => {
+				loadingScreen.remove();
+			}, 500);
+		}
+	}
+
+	if (criticalImages.length > 0) {
+		criticalImages.forEach(img => {
+			if (img.complete) {
+				checkLoaded();
+			}
+			else {
+				img.addEventListener("load", checkLoaded);
+				img.addEventListener("error", checkLoaded); // Proceed even if error
+			}
+		});
+	}
+	else {
+		// Fallback if no critical images found
+		loadingScreen.classList.add("opacity-0", "pointer-events-none");
+		setTimeout(() => {
+			loadingScreen.remove();
+		}, 500);
 	}
 });
 
