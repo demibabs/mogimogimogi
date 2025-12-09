@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commands • mogimogimogi</title>
+    <title>commands • mogimogimogi</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative">
-    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-zinc-900">
-        <div class="absolute inset-0 bg-dot-pattern opacity-[0.07]"></div>
-        <div class="absolute -top-40 -left-40 w-96 h-96 lg:w-[50rem] lg:h-[50rem] rounded-full bg-indigo-600/10 blur-[128px]"></div>
-        <div class="absolute top-1/3 -right-20 w-80 h-80 lg:w-[40rem] lg:h-[40rem] rounded-full bg-emerald-600/5 blur-[128px]"></div>
-        <div class="absolute -bottom-40 left-1/3 w-96 h-96 lg:w-[50rem] lg:h-[50rem] rounded-full bg-rose-600/5 blur-[128px]"></div>
+<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative bg-zinc-900">
+
+    <!-- Background -->
+    <div class="fixed inset-0 -z-10">
+        <img src="/images/tracks%20unblurred/rMC_notables.png" alt="" class="absolute inset-0 w-full h-full object-cover opacity-10">
+        <div class="absolute inset-0 bg-zinc-900/50"></div>
     </div>
 
     <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-6 px-6 lg:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
@@ -28,25 +28,24 @@
                 </svg>
                 add to server
             </a>
-            <a href="/about.html" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
             <a href="/commands.html" class="text-white transition-colors text-lg font-medium">commands</a>
+            <a href="/about.html" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
         </div>
     </nav>
 
     <main class="w-full max-w-[95%] lg:max-w-[90%] 2xl:max-w-[80%] space-y-10 mt-10 lg:mt-14 pb-14">
         <header class="space-y-4 fade-in-section text-center">
-            <h1 class="text-5xl lg:text-6xl font-bold tracking-tight text-white">command directory</h1>
+            <h1 class="text-5xl lg:text-6xl font-bold tracking-tight text-white">commands</h1>
             <p class="text-lg lg:text-xl text-zinc-400 max-w-4xl mx-auto">learn more about my commands. click one on the left to jump to its section.</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 lg:gap-12 fade-in-section">
-            <aside class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-6 lg:p-7 shadow-lg shadow-black/30 h-max sticky top-24">
+            <aside class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-6 lg:p-7 shadow-lg shadow-black/30 h-max sticky top-24">
                 <p class="text-sm text-zinc-300 mb-4 font-medium">jump to</p>
                 <div class="space-y-2">
-                    <a href="#cmd-setup" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/setup</a>
                     <a href="#cmd-stats" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/stats</a>
-                    <a href="#cmd-notables" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/notables</a>
                     <a href="#cmd-rank-stats" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/rank-stats</a>
+                    <a href="#cmd-notables" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/notables</a>
                     <a href="#cmd-head-to-head" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/head-to-head</a>
                     <a href="#cmd-leaderboard" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/leaderboard</a>
                     <a href="#cmd-customize" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/customize</a>
@@ -54,16 +53,7 @@
             </aside>
 
             <section class="space-y-6">
-                <div id="cmd-setup" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
-                    <div class="flex items-center gap-3">
-                        <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 text-xs font-semibold">temp disabled</span>
-                        <h2 class="text-3xl font-semibold text-white">/setup</h2>
-                    </div>
-                    <p class="text-zinc-400 leading-relaxed">Placeholder description for /setup. Explain how it scans and caches members, plus any prerequisites.</p>
-                    <p class="text-zinc-500 text-sm">Example usage placeholder and notes on expected runtime.</p>
-                </div>
-
-                <div id="cmd-stats" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-4">
+                <div id="cmd-stats" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-4">
                     <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
@@ -86,30 +76,7 @@
                     <div class="clear-both"></div>
                 </div>
 
-                <div id="cmd-notables" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
-                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
-                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
-                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
-                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
-                                <div id="notables-loading" class="text-xs text-indigo-300 hidden">loading…</div>
-                            </div>
-                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
-                                <div id="notables-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
-                                <img id="notables-preview" alt="" class="absolute inset-0 w-full h-full object-contain" style="visibility:hidden;">
-                            </div>
-                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
-                                <div class="grid grid-cols-3 gap-2" id="notables-time-row"></div>
-                                <div class="grid grid-cols-3 gap-2" id="notables-queue-row"></div>
-                                <div class="grid grid-cols-3 gap-2" id="notables-players-row"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <h2 class="text-3xl font-semibold text-white">/notables</h2>
-                    <p class="text-zinc-400 leading-relaxed">See a player's best and worst mogis, biggest over/under performances, and most dramatic carries—rendered as a single card with the lounge links baked in.</p>
-                    <div class="clear-both"></div>
-                </div>
-
-                <div id="cmd-rank-stats" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                <div id="cmd-rank-stats" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
                     <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
@@ -132,7 +99,30 @@
                     <div class="clear-both"></div>
                 </div>
 
-                <div id="cmd-head-to-head" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                <div id="cmd-notables" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="notables-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="notables-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="notables-preview" alt="" class="absolute inset-0 w-full h-full object-contain" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="notables-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="notables-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="notables-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-white">/notables</h2>
+                    <p class="text-zinc-400 leading-relaxed">See a player's best and worst mogis, biggest over/under performances, and most dramatic carries—rendered as a single card with the lounge links baked in.</p>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div id="cmd-head-to-head" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
                     <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
@@ -155,8 +145,8 @@
                     <div class="clear-both"></div>
                 </div>
 
-                <div id="cmd-leaderboard" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
-                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-3">
+                <div id="cmd-leaderboard" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <div class="float-right w-[30rem] max-w-[60%] ml-4 mb-4">
                         <div class="aspect-video rounded-xl bg-gradient-to-br from-zinc-700/70 to-zinc-900/70 border border-white/5 overflow-hidden">
                             <img src="/images/examples/site/carousel/leaderboard3.webp" alt="" class="w-full h-full object-cover">
                         </div>
@@ -169,7 +159,7 @@
                     <div class="clear-both"></div>
                 </div>
 
-                <div id="cmd-customize" class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                <div id="cmd-customize" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
                     <div id="customize-table" class="float-right w-[30rem] max-w-[60%] ml-4 mb-3">
                         <div class="bg-white/5 border border-white/5 rounded-2xl p-4 min-h-[240px] flex items-center justify-center text-zinc-500 text-sm" data-placeholder>
                             loading favorites…

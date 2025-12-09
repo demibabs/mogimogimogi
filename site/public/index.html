@@ -8,14 +8,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative">
+<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative bg-zinc-900">
 
-    <!-- Background Effects -->
-    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-zinc-900">
-        <div class="absolute inset-0 bg-dot-pattern opacity-[0.07]"></div>
-        <div class="absolute -top-40 -left-40 w-96 h-96 lg:w-[50rem] lg:h-[50rem] rounded-full bg-indigo-600/10 blur-[128px]"></div>
-        <div class="absolute top-1/3 -right-20 w-80 h-80 lg:w-[40rem] lg:h-[40rem] rounded-full bg-emerald-600/5 blur-[128px]"></div>
-        <div class="absolute -bottom-40 left-1/3 w-96 h-96 lg:w-[50rem] lg:h-[50rem] rounded-full bg-rose-600/5 blur-[128px]"></div>
+    <!-- Background -->
+    <div class="fixed inset-0 -z-10">
+        <img src="/images/tracks%20unblurred/rMC_notables.png" alt="" class="absolute inset-0 w-full h-full object-cover opacity-10">
+        <div class="absolute inset-0 bg-zinc-900/50"></div>
     </div>
 
     <!-- Navigation -->
@@ -31,8 +29,8 @@
                 </svg>
                 add to server
             </a>
-            <a href="/about.html" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
             <a href="/commands.html" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">commands</a>
+            <a href="/about.html" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
         </div>
     </nav>
 
@@ -133,19 +131,19 @@
             <!-- Large Card (Span 2 cols) -->
             
             <!-- Card 1: Servers -->
-            <div class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
                 <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-xl font-medium mb-2">servers</span>
                 <span id="server-count" class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-indigo-400">-</span>
             </div>
 
             <!-- Card 2: Users -->
-            <div class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
                 <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-xl font-medium mb-2">tracked users</span>
                 <span id="user-count" class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-emerald-400">-</span>
             </div>
 
             <!-- Card 3: Tables -->
-            <div class="bg-zinc-800/50 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
+            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 lg:p-8 2xl:p-8 flex flex-col items-center justify-center hover:bg-zinc-800 transition-colors duration-300">
                 <span class="text-zinc-400 text-lg lg:text-xl 2xl:text-xl font-medium mb-2">tracked events</span>
                 <span id="table-count" class="text-5xl lg:text-5xl 2xl:text-5xl font-bold text-rose-400">-</span>
             </div>
@@ -171,26 +169,18 @@
                 </div>
             </div>
 
-            <!-- Image Display (Stacked Cards) -->
+            <!-- Image Display (Simple Carousel) -->
             <div class="flex flex-col w-full">
-                <div id="stats-card-container" class="relative w-full cursor-pointer group perspective-1000" onclick="cycleCards('card-1', 'card-2', 'card-8', 'stats-dots')">
-                    <!-- Card 1 (Front) -->
-                    <div id="card-1" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-30 transform translate-x-0 translate-y-0 scale-100 opacity-100 bg-[#1a1a1e] flex flex-col justify-center">
-                        <img src="/images/examples/site/cards/stats card.png" class="w-full h-auto">
-                    </div>
-                    
-                    <!-- Card 2 (Middle) -->
-                    <div id="card-2" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-20 transform translate-x-8 translate-y-8 scale-95 opacity-70 group-hover:translate-x-10 group-hover:translate-y-10 bg-[#1a1a1e] flex flex-col justify-center">
-                        <img src="/images/examples/site/cards/notables card.png" class="w-full h-auto">
-                    </div>
-
-                    <!-- Card 3 (Back) -->
-                    <div id="card-8" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-10 transform translate-x-16 translate-y-16 scale-90 opacity-40 group-hover:translate-x-20 group-hover:translate-y-20 bg-[#1a1a1e] flex flex-col justify-center">
-                        <img src="/images/examples/site/cards/rank-stats card.png" class="w-full h-auto">
+                <div id="stats-card-container" class="relative w-full cursor-pointer" onclick="cycleCarousel('stats-card-container', 'stats-dots')">
+                    <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
+                        <!-- Images -->
+                        <img src="/images/examples/site/cards/stats card.png" class="w-full h-auto transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                        <img src="/images/examples/site/cards/rank-stats card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
+                        <img src="/images/examples/site/cards/notables card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="2">
                     </div>
                 </div>
                 <!-- Dots -->
-                <div id="stats-dots" class="flex justify-center gap-3 mt-16 z-0">
+                <div id="stats-dots" class="flex justify-center gap-3 mt-8">
                     <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
                     <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
                     <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
@@ -200,21 +190,17 @@
 
         <!-- Compare Friends Feature Section -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 2xl:gap-24 items-center py-12 lg:py-12 2xl:py-12 fade-in-section">
-            <!-- Image Display (Stacked Cards) - Order 2 on mobile, Order 1 on desktop -->
+            <!-- Image Display (Simple Carousel) - Order 2 on mobile, Order 1 on desktop -->
             <div class="flex flex-col w-full order-2 lg:order-1">
-                <div id="compare-card-container" class="relative w-full cursor-pointer group perspective-1000" onclick="swapCards('card-3', 'card-4', 'compare-dots', true)">
-                    <!-- Card 3 (Initially Front) -->
-                    <div id="card-3" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-20 transform translate-x-0 translate-y-0 scale-100 opacity-100 bg-[#1a1a1e] flex flex-col justify-center">
-                        <img src="/images/examples/site/cards/head-to-head card.png" class="w-full h-auto">
-                    </div>
-                    
-                    <!-- Card 4 (Initially Back) -->
-                    <div id="card-4" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-10 transform -translate-x-8 translate-y-8 scale-95 opacity-40 group-hover:opacity-60 group-hover:-translate-x-10 group-hover:translate-y-10 bg-[#1a1a1e] flex flex-col justify-center">
-                        <img src="/images/examples/site/cards/leaderboard card.png" class="w-full h-auto">
+                <div id="compare-card-container" class="relative w-full cursor-pointer" onclick="cycleCarousel('compare-card-container', 'compare-dots')">
+                    <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
+                        <!-- Images -->
+                        <img src="/images/examples/site/cards/head-to-head card.png" class="w-full h-auto transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                        <img src="/images/examples/site/cards/leaderboard card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
                     </div>
                 </div>
                 <!-- Dots -->
-                <div id="compare-dots" class="flex justify-center gap-3 mt-12 z-0">
+                <div id="compare-dots" class="flex justify-center gap-3 mt-8">
                     <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
                     <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
                 </div>
@@ -269,23 +255,17 @@
                     </svg>
                 </div>
 
-                <!-- Bottom Image (3 Stacked Cards) -->
-                <div id="customize-card-container" class="relative w-full cursor-pointer group perspective-1000" onclick="cycleCards('card-5', 'card-6', 'card-7', 'customize-dots')">
-                    <!-- Card 1 (Front) -->
-                    <div id="card-5" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-30 transform translate-x-0 translate-y-0 scale-100 opacity-100 bg-[#1a1a1e] flex flex-col justify-center">
-                        <img src="/images/examples/site/cards/customize stats.webp" class="w-full h-auto">
-                    </div>
-                    <!-- Card 2 (Middle) -->
-                    <div id="card-6" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-20 transform translate-x-8 translate-y-8 scale-95 opacity-40 group-hover:translate-x-10 group-hover:translate-y-10 bg-[#1a1a1e] flex flex-col justify-center">
-                        <img src="/images/examples/site/cards/customize notables.webp" class="w-full h-auto">
-                    </div>
-                    <!-- Card 3 (Back) -->
-                    <div id="card-7" class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl transition-all duration-500 ease-in-out z-10 transform translate-x-16 translate-y-16 scale-90 opacity-10 group-hover:translate-x-20 group-hover:translate-y-20 bg-[#1a1a1e] flex flex-col justify-center">
-                        <img src="/images/examples/site/cards/customize rank stats.webp" class="w-full h-auto">
+                <!-- Bottom Image (Simple Carousel) -->
+                <div id="customize-card-container" class="relative w-full cursor-pointer" onclick="cycleCarousel('customize-card-container', 'customize-dots')">
+                    <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
+                        <!-- Images -->
+                        <img src="/images/examples/site/cards/customize stats.webp" class="w-full h-auto transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                        <img src="/images/examples/site/cards/customize rank stats.webp" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
+                        <img src="/images/examples/site/cards/customize notables.webp" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="2">
                     </div>
                 </div>
                 <!-- Dots -->
-                <div id="customize-dots" class="flex justify-center gap-3 mt-16 z-0">
+                <div id="customize-dots" class="flex justify-center gap-3 mt-8">
                     <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
                     <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
                     <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>

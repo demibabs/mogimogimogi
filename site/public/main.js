@@ -1,4 +1,4 @@
-const swapStates = {};
+const carouselStates = {};
 
 function updateDots(dotsId, activeIndex) {
 	const dotsContainer = document.getElementById(dotsId);
@@ -17,93 +17,34 @@ function updateDots(dotsId, activeIndex) {
 	}
 }
 
-function swapCards(id1, id2, dotsId, isMirrored) {
-	const card1 = document.getElementById(id1);
-	const card2 = document.getElementById(id2);
-	const pairId = id1 + id2;
+function cycleCarousel(containerId, dotsId) {
+	const container = document.getElementById(containerId);
+	if (!container) return;
 
-	if (swapStates[pairId] === undefined) swapStates[pairId] = false;
+	const images = container.querySelectorAll("img");
+	if (images.length === 0) return;
 
-	const frontState = ["z-20", "translate-x-0", "translate-y-0", "scale-100", "opacity-100"];
+	if (carouselStates[containerId] === undefined) carouselStates[containerId] = 0;
+	
+	// Calculate next index
+	const nextIndex = (carouselStates[containerId] + 1) % images.length;
+	carouselStates[containerId] = nextIndex;
 
-	const backState = [
-		"z-10",
-		"translate-y-8",
-		"scale-95",
-		"opacity-40",
-		"group-hover:opacity-60",
-		"group-hover:translate-y-10",
-	];
-
-	if (isMirrored) {
-		backState.push("-translate-x-8", "group-hover:-translate-x-10");
-	}
-	else {
-		backState.push("translate-x-8", "group-hover:translate-x-10");
-	}
-
-	swapStates[pairId] = !swapStates[pairId];
-
-	if (swapStates[pairId]) {
-		card1.classList.remove(...frontState);
-		card1.classList.add(...backState);
-
-		card2.classList.remove(...backState);
-		card2.classList.add(...frontState);
-
-		updateDots(dotsId, 1);
-	}
-	else {
-		card1.classList.remove(...backState);
-		card1.classList.add(...frontState);
-
-		card2.classList.remove(...frontState);
-		card2.classList.add(...backState);
-
-		updateDots(dotsId, 0);
-	}
-}
-
-function cycleCards(id1, id2, id3, dotsId) {
-	const cards = [document.getElementById(id1), document.getElementById(id2), document.getElementById(id3)];
-	const pairId = id1 + id2 + id3;
-
-	if (swapStates[pairId] === undefined) swapStates[pairId] = 0;
-	swapStates[pairId] = (swapStates[pairId] + 1) % 3;
-	const state = swapStates[pairId];
-
-	updateDots(dotsId, state);
-
-	let states;
-	if (dotsId === "customize-dots") {
-		states = [
-			["z-30", "translate-x-0", "translate-y-0", "scale-100", "opacity-100"],
-			["z-20", "translate-x-8", "translate-y-8", "scale-95", "opacity-25", "group-hover:translate-x-10", "group-hover:translate-y-10"],
-			["z-10", "translate-x-16", "translate-y-16", "scale-90", "opacity-10", "group-hover:translate-x-20", "group-hover:translate-y-20"],
-		];
-	}
-	else {
-		states = [
-			["z-30", "translate-x-0", "translate-y-0", "scale-100", "opacity-100"],
-			["z-20", "translate-x-8", "translate-y-8", "scale-95", "opacity-70", "group-hover:translate-x-10", "group-hover:translate-y-10"],
-			["z-10", "translate-x-16", "translate-y-16", "scale-90", "opacity-40", "group-hover:translate-x-20", "group-hover:translate-y-20"],
-		];
-	}
-
-	const allStateClasses = [
-		"z-30", "z-20", "z-10",
-		"translate-x-0", "translate-y-0", "translate-x-8", "translate-y-8", "translate-x-16", "translate-y-16",
-		"scale-100", "scale-95", "scale-90",
-		"opacity-100", "opacity-70", "opacity-60", "opacity-40", "opacity-25", "opacity-10",
-		"group-hover:translate-x-10", "group-hover:translate-y-10", "group-hover:translate-x-20", "group-hover:translate-y-20",
-	];
-	const clean = (el) => el.classList.remove(...allStateClasses);
-
-	cards.forEach((card, index) => {
-		clean(card);
-		const stateIndex = (index + state) % 3;
-		card.classList.add(...states[stateIndex]);
+	// Update images
+	images.forEach((img, index) => {
+		if (index === nextIndex) {
+			// Active image: relative, visible
+			img.classList.remove("absolute", "top-1/2", "left-1/2", "-translate-x-1/2", "-translate-y-1/2", "opacity-0", "z-0");
+			img.classList.add("relative", "opacity-100", "z-10");
+		}
+		else {
+			// Inactive images: absolute, hidden/transparent
+			img.classList.remove("relative", "opacity-100", "z-10");
+			img.classList.add("absolute", "top-1/2", "left-1/2", "-translate-x-1/2", "-translate-y-1/2", "opacity-0", "z-0");
+		}
 	});
+
+	updateDots(dotsId, nextIndex);
 }
 
 function adjustCardHeights() {
@@ -136,29 +77,28 @@ function adjustCardHeights() {
 	});
 }
 
-// Intersection Observer for fade-in animations
+// Scroll-linked fade animation
 document.addEventListener("DOMContentLoaded", () => {
-	const observerOptions = {
-		root: null,
-		rootMargin: "0px",
-		threshold: 0.1,
-	};
+	function handleScrollAnimations() {
+		const sections = document.querySelectorAll(".fade-in-section");
+		const windowHeight = window.innerHeight;
+		const fadeDistance = windowHeight * 0.6; // Fade over 60% of the screen height
 
-	const observer = new IntersectionObserver((entries) => {
-		entries.forEach(entry => {
-			if (entry.isIntersecting) {
-				entry.target.classList.add("is-visible");
-			}
-			else {
-				entry.target.classList.remove("is-visible");
-			}
+		sections.forEach(section => {
+			const rect = section.getBoundingClientRect();
+			// Calculate opacity: 0 at bottom of screen, 1 when it's moved up by fadeDistance
+			let opacity = (windowHeight - rect.top) / fadeDistance;
+			
+			// Clamp between 0 and 1
+			opacity = Math.max(0, Math.min(1, opacity));
+			
+			section.style.opacity = opacity;
 		});
-	}, observerOptions);
+	}
 
-	const sections = document.querySelectorAll(".fade-in-section");
-	sections.forEach(section => {
-		observer.observe(section);
-	});
+	window.addEventListener("scroll", handleScrollAnimations);
+	window.addEventListener("resize", handleScrollAnimations);
+	handleScrollAnimations(); // Initial check
 
 	const heroButtonSentinel = document.getElementById("hero-add-button-sentinel");
 	const navButton = document.getElementById("nav-add-button");

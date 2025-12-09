@@ -54,14 +54,7 @@ html, body {
 /* Scroll Animations */
 .fade-in-section {
     opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-    will-change: opacity, transform;
-}
-
-.fade-in-section.is-visible {
-    opacity: 1;
-    transform: none;
+    will-change: opacity;
 }
 
 /* Offset anchor scroll positions to account for sticky nav */
