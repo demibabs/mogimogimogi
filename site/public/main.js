@@ -52,6 +52,7 @@ function adjustCardHeights() {
 		"stats-card-container",
 		"compare-card-container",
 		"customize-header-container",
+		"hero-mobile-carousel",
 	];
 
 	containers.forEach(containerId => {

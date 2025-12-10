@@ -43,13 +43,13 @@
 
     <!-- Hero Background Wrapper -->
     <div class="w-screen ml-[calc(50%-50vw)] relative z-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]">
-      <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] mx-auto space-y-8 md:space-y-12 2xl:space-y-8 pt-8 md:pt-12 pb-32 md:pb-48">
+      <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] mx-auto space-y-8 md:space-y-12 2xl:space-y-8 pt-8 md:pt-12 pb-16 md:pb-24">
 
         <!-- Header Section -->
         <header class="text-center space-y-4 md:space-y-4 2xl:space-y-4 fade-in-section">
             <h1 id="header-title" class="text-[min(8vw,3.75rem)] leading-none font-bold tracking-tight text-white mx-auto">mogimogimogi</h1>
             <p class="text-xl md:text-2xl 2xl:text-xl text-zinc-400 max-w-3xl 2xl:max-w-5xl mx-auto px-6">
-                Discord bot for detailed competitive Mario Kart World stats.
+                discord bot for detailed competitive mario kart world stats.
             </p>
         </header>
 
@@ -66,7 +66,7 @@
         </div>
 
         <!-- Image Carousel -->
-        <div class="w-screen ml-[calc(50%-50vw)] overflow-hidden py-4 relative group fade-in-section [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        <div class="hidden md:block w-screen ml-[calc(50%-50vw)] overflow-hidden py-4 relative group fade-in-section [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
             <div class="flex gap-6 animate-scroll hover:pause">
                 <!-- Set 1 -->
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
@@ -79,10 +79,10 @@
                     <img src="/images/examples/site/carousel/notables1.webp" alt="Notables Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')" fetchpriority="high" data-critical="true">
                 </div>
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/leaderboard1.webp" alt="Leaderboard Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')" fetchpriority="high" data-critical="true">
+                    <img src="/images/examples/site/carousel/head-to-head1.webp" alt="Head to Head Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/head-to-head1.webp" alt="Head to Head Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
+                    <img src="/images/examples/site/carousel/leaderboard1.webp" alt="Leaderboard Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')" fetchpriority="high" data-critical="true">
                 </div>
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
                     <img src="/images/examples/site/carousel/stats2.webp" alt="Stats Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
@@ -94,11 +94,12 @@
                     <img src="/images/examples/site/carousel/notables2.webp" alt="Notables Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/leaderboard2.webp" alt="Leaderboard Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
-                </div>
-                <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
                     <img src="/images/examples/site/carousel/head-to-head2.webp" alt="Head to Head Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
+                <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/leaderboard2.webp" alt="Leaderboard Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
+                </div>
+
 
                 <!-- Set 2 (Duplicate for loop) -->
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
@@ -111,10 +112,10 @@
                     <img src="/images/examples/site/carousel/notables1.webp" alt="Notables Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/leaderboard1.webp" alt="Leaderboard Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
+                    <img src="/images/examples/site/carousel/head-to-head1.webp" alt="Head to Head Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/head-to-head1.webp" alt="Head to Head Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
+                    <img src="/images/examples/site/carousel/leaderboard1.webp" alt="Leaderboard Preview 1" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
                     <img src="/images/examples/site/carousel/stats2.webp" alt="Stats Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
@@ -126,11 +127,44 @@
                     <img src="/images/examples/site/carousel/notables2.webp" alt="Notables Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
                 <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
-                    <img src="/images/examples/site/carousel/leaderboard2.webp" alt="Leaderboard Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
-                </div>
-                <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
                     <img src="/images/examples/site/carousel/head-to-head2.webp" alt="Head to Head Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
                 </div>
+                <div class="flex-shrink-0 w-[34rem] max-w-[80vw] aspect-video md:w-[30rem] 2xl:w-[26rem] bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg">
+                    <img src="/images/examples/site/carousel/leaderboard2.webp" alt="Leaderboard Preview 2" class="w-full h-full object-cover opacity-0 hover:opacity-100 transition-opacity duration-700" onload="this.classList.remove('opacity-0'); this.classList.add('opacity-75')">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Image Carousel (Mobile Card Style) -->
+        <div class="md:hidden w-full flex flex-col items-center fade-in-section mb-12">
+            <div id="hero-mobile-carousel" class="relative w-[75vw] min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('hero-mobile-carousel', 'hero-mobile-dots')">
+                <div class="relative w-full h-full rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg bg-zinc-800 flex items-center justify-center">
+                    <!-- Images -->
+                    <img src="/images/examples/site/carousel/stats1.webp" class="w-full h-auto relative opacity-100 z-10 transition-opacity duration-500" data-index="0">
+                    <img src="/images/examples/site/carousel/rank-stats1.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="1">
+                    <img src="/images/examples/site/carousel/notables1.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="2">
+                    <img src="/images/examples/site/carousel/head-to-head1.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="4">
+                    <img src="/images/examples/site/carousel/leaderboard1.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="3">
+                    <img src="/images/examples/site/carousel/stats2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="5">
+                    <img src="/images/examples/site/carousel/rank-stats2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="6">
+                    <img src="/images/examples/site/carousel/notables2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="7">
+                    <img src="/images/examples/site/carousel/head-to-head2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="9">
+                    <img src="/images/examples/site/carousel/leaderboard2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="8">
+                </div>
+            </div>
+            <!-- Dots -->
+            <div id="hero-mobile-dots" class="flex justify-center gap-3 mt-4 flex-wrap px-4">
+                <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
             </div>
         </div>
 
@@ -173,9 +207,9 @@
             <div class="max-w-[90%] md:max-w-[80%] 2xl:max-w-[60%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center skew-y-1">
                 <!-- Text Content -->
                 <div class="bg-indigo-950/30 backdrop-blur-sm border border-indigo-500/20 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-8">
-                    <h2 class="text-3xl md:text-5xl 2xl:text-5xl font-bold text-white">individual stats</h2>
+                    <h2 class="text-3xl md:text-5xl 2xl:text-5xl font-bold text-white">lots of numbers</h2>
                     <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                        with <b>/stats</b>, <b>/rank-stats</b> and <b>/notables</b>, you get detailed numbers about your performances, along with recaps of your best and worst mogis.
+                        with <b>/stats</b>, <b>/rank-stats</b> and <b>/notables</b>, see detailed data from all of your (or any player's!) matches, along with highlights and lowlights.
                         you can also use the filters to break them down by time and format.
                     </p>
                 </div>
@@ -223,7 +257,7 @@
                 <div class="bg-emerald-950/30 backdrop-blur-sm border border-emerald-500/20 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-8 order-1 md:order-2">
                     <h2 class="text-3xl md:text-5xl 2xl:text-5xl font-bold text-white">player comparisons</h2>
                     <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                        with <b>/head-to-head</b>, you can compare any two players across shared mogis, and with <b>/leaderboard,</b> you can compare mmr across your entire server.
+                        with <b>/head-to-head</b>, you can compare any two players across shared mogis, and with <b>/leaderboard,</b> you can see server-wide mmr rankings. 
                         settle the score with your friends and rivals!
                     </p>
                 </div>
