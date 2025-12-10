@@ -85,14 +85,17 @@ for (const folder of commandFolders) {
 	}
 }
 
-// const statusCommands = ["/stats", "/rank-stats", "/notables", "/head-to-head", "/leaderboard"];
-// let currentStatusIndex = 0;
+const statusCommands = ["/stats", "/rank-stats", "/notables", "/head-to-head", "/leaderboard"];
+let currentStatusIndex = 0;
 
 function updatePresence() {
+	const serverCount = client.guilds.cache.size;
+	const command = statusCommands[currentStatusIndex];
 	client.user.setActivity({
-		name: "/leaderboard is back :)",
+		name: `${command} • ${serverCount} servers`,
 		type: ActivityType.Custom,
 	});
+	currentStatusIndex = (currentStatusIndex + 1) % statusCommands.length;
 }
 
 client.once(Events.ClientReady, async readyClient => {
