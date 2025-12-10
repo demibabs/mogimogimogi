@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#151518">
-    <title>mogimogimogi</title>
+    <title>mogimogimogi • stats for mario kart world lounge</title>
     <link rel="icon" href="/images/profile/favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -138,19 +138,19 @@
 
         <!-- Image Carousel (Mobile Card Style) -->
         <div class="md:hidden w-full flex flex-col items-center fade-in-section mb-12">
-            <div id="hero-mobile-carousel" class="relative w-[85vw] min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('hero-mobile-carousel', 'hero-mobile-dots')">
+            <div id="hero-mobile-carousel" class="relative w-[85vw] aspect-video min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('hero-mobile-carousel', 'hero-mobile-dots')">
                 <div class="relative w-full h-full rounded-xl overflow-hidden border border-zinc-700/50 shadow-lg bg-zinc-800 flex items-center justify-center">
                     <!-- Images -->
-                    <img src="/images/examples/site/carousel/stats1.webp" class="w-full h-auto relative opacity-100 z-10 transition-opacity duration-500" data-index="0">
-                    <img src="/images/examples/site/carousel/rank-stats1.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="1">
-                    <img src="/images/examples/site/carousel/notables1.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="2">
-                    <img src="/images/examples/site/carousel/head-to-head1.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="4">
-                    <img src="/images/examples/site/carousel/leaderboard1.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="3">
-                    <img src="/images/examples/site/carousel/stats2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="5">
-                    <img src="/images/examples/site/carousel/rank-stats2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="6">
-                    <img src="/images/examples/site/carousel/notables2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="7">
-                    <img src="/images/examples/site/carousel/head-to-head2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="9">
-                    <img src="/images/examples/site/carousel/leaderboard2.webp" class="w-full h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0 transition-opacity duration-500" data-index="8">
+                    <img src="/images/examples/site/carousel/stats1.webp" class="w-full h-full object-cover absolute inset-0 opacity-100 z-10 transition-opacity duration-500" data-index="0" fetchpriority="high">
+                    <img src="/images/examples/site/carousel/rank-stats1.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="1">
+                    <img src="/images/examples/site/carousel/notables1.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="2">
+                    <img src="/images/examples/site/carousel/head-to-head1.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="4">
+                    <img src="/images/examples/site/carousel/leaderboard1.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="3">
+                    <img src="/images/examples/site/carousel/stats2.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="5">
+                    <img src="/images/examples/site/carousel/rank-stats2.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="6">
+                    <img src="/images/examples/site/carousel/notables2.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="7">
+                    <img src="/images/examples/site/carousel/head-to-head2.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="9">
+                    <img src="/images/examples/site/carousel/leaderboard2.webp" class="w-full h-full object-cover absolute inset-0 opacity-0 z-0 transition-opacity duration-500" data-index="8">
                 </div>
             </div>
             <!-- Dots -->
@@ -303,7 +303,7 @@
         </section>
 
         <!-- Footer / Links -->
-        <section class="relative z-0 w-screen ml-[calc(50%-50vw)] !-mt-8 md:!-mt-16 pt-24 md:pt-32 pb-12 bg-zinc-900 bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:24px_24px]">
+        <section class="relative z-0 w-screen ml-[calc(50%-50vw)] !-mt-8 md:!-mt-16 pt-24 pb-8 bg-zinc-900 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] bg-[size:24px_24px]">
             <footer class="flex justify-center gap-8 text-zinc-500">
                 <a href="/terms" class="hover:text-white transition-colors">terms</a>
                 <a href="/privacy" class="hover:text-white transition-colors">privacy</a>

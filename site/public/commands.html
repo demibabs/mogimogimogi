@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#151518">
     <title>commands • mogimogimogi</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
+    <link rel="icon" href="/images/profile/favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -42,16 +42,18 @@
         </div>
     </nav>
 
-    <main class="w-full max-w-[95%] md:max-w-[90%] 2xl:max-w-[80%] space-y-10 mt-10 md:mt-14 pb-8">
+    <div class="w-full flex-grow relative z-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] bg-[size:24px_24px]">
+    <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] mx-auto space-y-10 mt-10 md:mt-14 pb-8">
         <header class="space-y-4 fade-in-section text-center">
             <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white">commands</h1>
-            <p class="text-lg md:text-xl text-zinc-400 max-w-4xl mx-auto">learn more about what it does.</p>
+            <p class="text-lg md:text-xl text-zinc-400 max-w-4xl mx-auto">learn more about what the bot does.</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-[minmax(200px,_320px)_1fr] gap-8 md:gap-12 fade-in-section">
-            <aside class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-6 md:p-7 shadow-lg shadow-black/30 h-max md:sticky md:top-32">
+        <div class="space-y-6 md:space-y-8">
+        <div class="flex flex-col gap-6 md:gap-8 fade-in-section">
+            <aside class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-6 md:p-7 shadow-lg shadow-black/30 w-full">
                 <p class="text-sm text-zinc-300 mb-4 font-medium">jump to</p>
-                <div class="space-y-2">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                     <a href="#cmd-stats" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/stats</a>
                     <a href="#cmd-rank-stats" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/rank-stats</a>
                     <a href="#cmd-notables" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/notables</a>
@@ -61,9 +63,9 @@
                 </div>
             </aside>
 
-            <section class="space-y-6">
+            <section class="space-y-6 md:space-y-8">
                 <div id="cmd-stats" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-4">
-                    <div class="order-2 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
                                 <p class="text-sm text-zinc-300 font-semibold">preview</p>
@@ -81,12 +83,25 @@
                         </div>
                     </div>
                     <h2 class="order-1 text-3xl font-semibold text-white">/stats</h2>
-                    <p class="order-3 text-zinc-400 leading-relaxed">View any lounge player as a fully rendered card with mmr chart, win rates, placements, and session-aware caching. Filters match the in-Discord buttons so you can explore soloq, squads, or season views.</p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        this command generates a card with a bunch of your stats on it (shocking, i know). 
+                        along with info about your mmr, scores and placements, you are given data to help contextualize it, such as your average seed, room mmr and room score/player count.
+                    </p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        the card also has a nifty chart showing where you lie in the overall mmr distribution. 
+                        it's one thing to know you're in the top x percent of players, but i think actually being able to see it provides some neat perspective.
+                    </p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        all commands provide you with buttons that let you regenerate the image with new filters. 
+                        on this page, you will be provided with preview cards to mess around with the commands and filters.
+                        these are generated live using data from real players.
+                    </p>
+
                     <div class="clear-both order-4"></div>
                 </div>
 
                 <div id="cmd-rank-stats" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div class="order-2 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
                                 <p class="text-sm text-zinc-300 font-semibold">preview</p>
@@ -104,12 +119,23 @@
                         </div>
                     </div>
                     <h2 class="order-1 text-3xl font-semibold text-white">/rank-stats</h2>
-                    <p class="order-3 text-zinc-400 leading-relaxed">Compare your performance versus every rank with matchup counts, win rates, and best/worst results, rendered as the Discord card.</p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        similar to stats, but it solely tracks head-to-head matchups (including with teammates) and average scores. 
+                        the table shows how your performance changes as you play against better and better opponents. 
+                        below the table, you can see the highest ranked player you've beaten and the lowest you've lost to (based on their mmr at the time you competed, not currently).
+                    </p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        as is obvious, players typically have a positive win rate and above average scores vs. lower ranks, and then fall below average around their own rank or the one above. 
+                        however, there are exceptions, especially with small sample sizes (and with players who've found ways to "game" the mmr system). 
+                    </p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        this is my personal favorite command. it shows pretty well that even though the mmr system isn't perfect, it's still very accurate at measuring your skill relative to other players.
+                    </p>
                     <div class="clear-both order-4"></div>
                 </div>
 
                 <div id="cmd-notables" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div class="order-2 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
                                 <p class="text-sm text-zinc-300 font-semibold">preview</p>
@@ -127,12 +153,25 @@
                         </div>
                     </div>
                     <h2 class="order-1 text-3xl font-semibold text-white break-all">/notables</h2>
-                    <p class="order-3 text-zinc-400 leading-relaxed">See a player's best and worst mogis, biggest over/under performances, and most dramatic carries—rendered as a single card with the lounge links baked in.</p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        this command highlights 6 of your "notable" mogis, measured by either your score, your placement relative to your seed (normalized for player count), or your score relative to your teammates. 
+                        of course, accompanied with me either congratulating you or making fun of you :)
+                    </p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        the point of notables is not to make you fixate on any particular mogis you've played. 
+                        it's moreso meant to serve as a reminder that we all have our great and terrible events regardless of skill level. 
+                        that's just the way it goes in competitive!
+                    </p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        otherwise, there's not too much to say about this command, since it's pretty straightforward. 
+                        if you think of a message that would be funny to add to one of these, please do suggest it, and i'll probably add it.
+                    </p>
+
                     <div class="clear-both order-4"></div>
                 </div>
 
                 <div id="cmd-head-to-head" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div class="order-2 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
                                 <p class="text-sm text-zinc-300 font-semibold">preview</p>
@@ -150,18 +189,18 @@
                         </div>
                     </div>
                     <h2 class="order-1 text-3xl font-semibold text-white">/head-to-head</h2>
-                    <p class="order-3 text-zinc-400 leading-relaxed">Compare two lounge players side-by-side with shared events, record breakdown, and standout mogis. Preview defaults to Bowser vs Wario so you can see the full card right here.</p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">blah blah blah blah.</p>
                     <div class="clear-both order-4"></div>
                 </div>
 
                 <div id="cmd-leaderboard" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div class="order-2 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
                         <div class="aspect-video rounded-xl bg-gradient-to-br from-zinc-700/70 to-zinc-900/70 border border-white/5 overflow-hidden">
                             <img src="/images/examples/site/carousel/leaderboard3.webp" alt="" class="w-full h-full object-cover">
                         </div>
                     </div>
                     <h2 class="order-1 text-3xl font-semibold text-white break-all">/leaderboard</h2>
-                    <p class="order-3 text-zinc-400 leading-relaxed">Server-wide standings and streaks with filters for queue, time window, and player count. Shows top movers, podium snapshots, and highlights when it returns.</p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">blah blah blah blah blah</p>
                     <div class="clear-both order-4"></div>
                 </div>
 
@@ -172,18 +211,20 @@
                         </div>
                     </div>
                     <h2 class="order-1 text-3xl font-semibold text-white break-all">/customize</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">Set your favorite track, character, and vehicle so your cards match your vibe. The bot remembers your picks across commands and uses them for backgrounds and flair.</p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">blah blah blah blah.</p>
                     <div class="clear-both order-4"></div>
                 </div>
             </section>
         </div>
 
-        <footer class="flex justify-center gap-8 text-zinc-500 pt-8 mb-12">
+        <footer class="flex justify-center gap-8 text-zinc-500 mb-12">
             <a href="/terms" class="hover:text-white transition-colors">terms</a>
             <a href="/privacy" class="hover:text-white transition-colors">privacy</a>
             <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">github</a>
         </footer>
+        </div>
     </main>
+    </div>
 
     <script src="/main.js"></script>
     <script src="/scroll-anchor.js"></script>

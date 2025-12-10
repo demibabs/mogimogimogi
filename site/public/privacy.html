@@ -1,37 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Privacy Policy | mogimogimogi</title>
-	<style>
-		body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 2rem; background: #f9f9f9; color: #222; }
-		h1, h2, h3 { color: #2a4d7a; }
-		a { color: #2a4d7a; text-decoration: underline; }
-		code { background: #eee; padding: 2px 4px; border-radius: 3px; }
-		footer { margin-top: 2rem; font-size: 0.9em; color: #888; }
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#151518">
+    <title>privacy policy • mogimogimogi</title>
+    <link rel="icon" href="/images/profile/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    screens: {
+                        'md': '896px',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
-	<h1>Privacy Policy</h1>
-	<p>This policy explains what data mogimogimogi collects and how it is used:</p>
-	<h2>1. What We Collect</h2>
-	<ul>
-		<li>Discord user IDs, server IDs, and game-related data.</li>
-		<li>No sensitive personal information (such as email, password, or real name, or even server names or Discord usernames) is collected or stored.</li>
-	</ul>
-	<h2>2. How We Use Data</h2>
-	<ul>
-		<li>Data is used solely for providing bot features like leaderboards and stats.</li>
-		<li>Data is not shared with third parties except as required by law or Discord's policies.</li>
-	</ul>
-	<h2>3. Data Removal</h2>
-	<ul>
-		<li>Server owners may delete their server's data by removing the bot from their server.</li>
-		<li>Users may delete their data by contacting the bot owner.</li>
-	</ul>
-	<footer>
-		&copy; 2025 mogimogimogi | <a href="/terms.html">Terms of Service</a>
-	</footer>
+<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative bg-zinc-900">
+
+    <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-4 md:py-6 px-4 md:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
+        <div class="absolute bottom-full left-0 w-full h-[50vh] bg-[#151518]/80 backdrop-blur-md pointer-events-none"></div>
+        <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="/images/profile/pfp.png" alt="Profile" class="w-10 h-10 rounded-full">
+            <span id="nav-title" class="text-xl font-bold text-white hidden md:block opacity-100 transition-opacity duration-300">mogimogimogi</span>
+        </a>
+        <div class="flex items-center gap-4 md:gap-8">
+            <a id="nav-add-button" href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="opacity-0 pointer-events-none translate-y-2 transition-all duration-300 p-2 md:px-4 md:py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-full shadow-lg hover:shadow-indigo-500/25 flex items-center gap-0 md:gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span class="hidden md:inline">add to server</span>
+            </a>
+            <a href="/commands" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">commands</a>
+            <a href="/about" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
+        </div>
+    </nav>
+
+    <div class="w-full flex-grow relative z-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] bg-[size:24px_24px]">
+    <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] mx-auto space-y-10 md:space-y-12 mt-10 md:mt-14 pb-8">
+        <header class="text-center space-y-4 fade-in-section">
+            <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white">privacy policy</h1>
+            <p class="text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto">your data.</p>
+        </header>
+
+        <div class="space-y-6 md:space-y-8">
+            <div class="fade-in-section bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30">
+                <p class="text-zinc-300 text-lg leading-relaxed">this policy explains what data mogimogimogi collects and how it is used:</p>
+            </div>
+
+            <div class="fade-in-section bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-4">
+                <h2 class="text-2xl font-bold text-white">1. what it collects</h2>
+                <ul class="list-disc list-inside space-y-2 pl-4 text-zinc-300 text-lg leading-relaxed">
+                    <li>discord user ids, server ids, and game-related data.</li>
+                    <li>no sensitive personal information (such as email, password, or real name, or even server names or discord usernames) is collected or stored.</li>
+                </ul>
+            </div>
+
+            <div class="fade-in-section bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-4">
+                <h2 class="text-2xl font-bold text-white">2. how it uses data</h2>
+                <ul class="list-disc list-inside space-y-2 pl-4 text-zinc-300 text-lg leading-relaxed">
+                    <li>data is used solely for providing bot features like leaderboards and stats.</li>
+                    <li>data is not shared with third parties except as required by law or discord's policies.</li>
+                </ul>
+            </div>
+
+            <div class="fade-in-section bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-4">
+                <h2 class="text-2xl font-bold text-white">3. data removal</h2>
+                <ul class="list-disc list-inside space-y-2 pl-4 text-zinc-300 text-lg leading-relaxed">
+                    <li>server owners may delete their server's data by removing the bot from their server.</li>
+                    <li>users may delete their data by contacting the bot owner.</li>
+                </ul>
+            </div>
+		<footer class="flex justify-center gap-8 text-zinc-500 mb-12">
+            <a href="/terms" class="hover:text-white transition-colors">terms</a>
+            <a href="/privacy" class="hover:text-white transition-colors">privacy</a>
+            <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">github</a>
+        </footer>
+
+        </div>
+    </main>
+    </div>
+    <script src="/main.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#151518">
     <title>about • mogimogimogi</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
+    <link rel="icon" href="/images/profile/favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -42,62 +42,62 @@
         </div>
     </nav>
 
-    <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] space-y-10 md:space-y-12 mt-10 md:mt-14 pb-8">
+    <div class="w-full flex-grow relative z-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] bg-[size:24px_24px]">
+    <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] mx-auto space-y-10 md:space-y-12 mt-10 md:mt-14 pb-8">
         <header class="text-center space-y-4 fade-in-section">
             <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white">about me</h1>
             <p class="text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto">in case you were curious.</p>
         </header>
 
-        <section class="grid grid-cols-1 gap-6 md:gap-8 fade-in-section">
-            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
-                <h2 class="text-3xl font-semibold text-white">how it works</h2>
-                <p class="text-zinc-400 leading-relaxed">
-                    this bot relies on a database of match tables that grows as more people use it. 
-                </p>
-                <p class="text-zinc-400 leading-relaxed">
-                    when you run a command, it checks the database for your tables, while also automatically adding any matches you've played that aren't there yet. 
-                    it then uses them to calculate the stats you asked for.
-                </p>
-                <p class="text-zinc-400 leading-relaxed">
-                    there are a few advantages to this approach. 
-                    the main one is that this bot is able to provide more detailed stats than you can get elsewhere (along with head to heads), with better filtering as well. 
-                    being able to calculate directly from full table data gives me a lot of freedom.
-                </p>
-                <p class="text-zinc-400 leading-relaxed">
-                    but as with everything, there are tradeoffs. 
-                    i don't think this bot is <em>that</em> slow, but it's definitely slower than other stats bots, especially if you've played a lot of mogis, and <b>especially</b> if you're trying to get the stats of someone who's not yet in my database. 
-                </p>
-                <p class="text-zinc-400 leading-relaxed">
-                    so, this isn't meant to be a replacement for other similar bots. 
-                    just something that can provide interesting data for people who are nerds about game stats like me :)
-                </p>
+        <div class="space-y-6 md:space-y-8">
+            <section class="grid grid-cols-1 gap-6 md:gap-8 fade-in-section">
+                <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <h2 class="text-3xl font-semibold text-white">how it works</h2>
+                    <p class="text-zinc-400 leading-relaxed">
+                        this bot relies on a database of match tables that grows as more people use it. 
+                    </p>
+                    <p class="text-zinc-400 leading-relaxed">
+                        when you run a command, it checks the database for your tables, while also automatically adding any matches you've played that aren't there yet. 
+                        it then uses them to calculate the stats you asked for.
+                    </p>
+                    <p class="text-zinc-400 leading-relaxed">
+                        there are a few advantages to this approach. 
+                        the main one is that this bot is able to provide more detailed stats than you can get elsewhere (along with head to heads), with better filtering as well. 
+                        being able to calculate directly from full table data gives me a lot of freedom.
+                    </p>
+                    <p class="text-zinc-400 leading-relaxed">
+                        but as with everything, there are tradeoffs. 
+                        i don't think this bot is <em>that</em> slow, but it's definitely slower than other stats bots, especially if you've played a lot of mogis, and <b>especially</b> if you're trying to get the stats of someone who's not yet in my database. 
+                    </p>
+                    <p class="text-zinc-400 leading-relaxed">
+                        so, this isn't meant to be a replacement for other similar bots. 
+                        just something that can provide interesting data for people who are nerds about game stats like me :)
+                    </p>
 
-            </div>
-            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
-                <h2 class="text-3xl font-semibold text-white">Why I made this</h2>
-                <p class="text-zinc-400 leading-relaxed">Placeholder note on the itch this solves: faster lookups, better visuals, less manual scraping.</p>
-            </div>
+                </div>
+                <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <h2 class="text-3xl font-semibold text-white">why i made this</h2>
+                    <p class="text-zinc-400 leading-relaxed">blah blah blah.</p>
+                </div>
 
-            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
-                <h2 class="text-3xl font-semibold text-white">What's coming next</h2>
-                <ul class="space-y-2 text-zinc-400 list-disc list-inside">
-                    <li>Placeholder: richer team dashboards.</li>
-                    <li>Placeholder: smarter filters + presets.</li>
-                    <li>Placeholder: seasonal recaps and highlight reels.</li>
-                </ul>
-            </div>
-            <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
-                <h2 class="text-3xl font-semibold text-white">Contact</h2>
-                <p class="text-zinc-300 text-lg">Placeholder contact details — Discord handle, support email, or server invite.</p>
-            </div>
-        </section>
+                <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <h2 class="text-3xl font-semibold text-white">what's coming next</h2>
+                    <p class="text-zinc-400 leading-relaxed">blah blah blah.</p>
+                </div>
+                <div class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-3">
+                    <h2 class="text-3xl font-semibold text-white">contact</h2>
+                    <p class="text-zinc-400 leading-relaxed">blah blah blah.</p>
+                </div>
+            </section>
 
-        <footer class="flex justify-center gap-8 text-zinc-500 pt-8 mb-12">
-            <a href="/terms" class="hover:text-white transition-colors">terms</a>
-            <a href="/privacy" class="hover:text-white transition-colors">privacy</a>
-            <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">github</a>
-        </footer>
+            <footer class="flex justify-center gap-8 text-zinc-500 mb-12">
+                <a href="/terms" class="hover:text-white transition-colors">terms</a>
+                <a href="/privacy" class="hover:text-white transition-colors">privacy</a>
+                <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">github</a>
+            </footer>
+        </div>
     </main>
+    </div>
 
     <script src="/main.js"></script>
 </body>

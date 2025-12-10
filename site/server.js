@@ -247,7 +247,7 @@ function startSite(client) {
 		try {
 			const renderResult = await StatsCommand.renderStats({
 				interaction: null,
-				target: { loungeId, displayName: "Baby Daisy" },
+				target: { loungeId, displayName: "baby daisy" },
 				loungeId,
 				serverId: null,
 				queueFilter,
@@ -296,7 +296,7 @@ function startSite(client) {
 		try {
 			const result = await NotablesCommand.generateNotables(
 				null,
-				{ loungeId, displayName: "Spike" },
+				{ loungeId, displayName: "spike" },
 				null,
 				queueFilter,
 				playerCountFilter,
@@ -344,7 +344,7 @@ function startSite(client) {
 		const userData = cached && cached.expiresAt > now ? cached.userData : null;
 
 		try {
-			const result = await RankStatsCommand.generateRankStats(null, { loungeId, displayName: "Nabbit" }, null, null, {
+			const result = await RankStatsCommand.generateRankStats(null, { loungeId, displayName: "nabbit" }, null, null, {
 				session,
 				filters: { timeFilter, queueFilter, playerCountFilter },
 				userData,
@@ -399,8 +399,8 @@ function startSite(client) {
 			const result = await HeadToHeadCommand.generateHeadToHead(
 				interactionStub,
 				{
-					playerLeft: { loungeId: loungeIdLeft, displayName: "Bowser" },
-					playerRight: { loungeId: loungeIdRight, displayName: "Wario" },
+					playerLeft: { loungeId: loungeIdLeft, displayName: "bowser" },
+					playerRight: { loungeId: loungeIdRight, displayName: "wario" },
 					filters: { timeFilter, queueFilter, playerCountFilter },
 					session,
 				},
