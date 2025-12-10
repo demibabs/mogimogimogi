@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#151518">
     <title>commands • mogimogimogi</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +23,7 @@
 <body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative bg-zinc-900">
 
     <!-- Background -->
-    <div class="fixed inset-0 -z-10">
+    <div class="fixed top-0 left-0 w-full h-[100vh] -z-10">
         <img src="/images/tracks%20unblurred/rMC_notables.png" alt="" class="absolute inset-0 w-full h-full object-cover opacity-10">
         <div class="absolute inset-0 bg-zinc-900/50"></div>
     </div>
@@ -47,7 +48,7 @@
     <main class="w-full max-w-[95%] md:max-w-[90%] 2xl:max-w-[80%] space-y-10 mt-10 md:mt-14 pb-8">
         <header class="space-y-4 fade-in-section text-center">
             <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white">commands</h1>
-            <p class="text-lg md:text-xl text-zinc-400 max-w-4xl mx-auto">learn more about my commands.</p>
+            <p class="text-lg md:text-xl text-zinc-400 max-w-4xl mx-auto">learn more about what it does.</p>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-[minmax(200px,_320px)_1fr] gap-8 md:gap-12 fade-in-section">
@@ -188,6 +189,7 @@
     </main>
 
     <script src="/main.js"></script>
+    <script src="/scroll-anchor.js"></script>
     <script>
     (function() {
         const container = document.getElementById("customize-table");
@@ -208,6 +210,14 @@
             list.className = "grid grid-cols-5 sm:grid-cols-1 gap-2";
 
             items.slice(0, 5).forEach((item, index) => {
+                const itemContainer = document.createElement("div");
+                itemContainer.className = "flex flex-col gap-1";
+
+                const mobileNumber = document.createElement("span");
+                mobileNumber.className = "text-[10px] text-zinc-500 font-bold sm:hidden pl-1";
+                mobileNumber.textContent = `#${index + 1}`;
+                itemContainer.appendChild(mobileNumber);
+
                 const wrap = document.createElement("div");
                 wrap.className = "relative aspect-square sm:aspect-auto sm:h-20 rounded-xl overflow-hidden bg-zinc-800/80 border border-white/5";
 
@@ -218,17 +228,18 @@
                     img.className = label === "characters"
                         ? "absolute inset-0 w-full h-full object-contain p-2"
                         : label === "vehicles"
-                                ? "absolute inset-0 w-full h-full object-contain p-[0.8rem]"
+                                ? "absolute inset-0 w-full h-full object-contain p-1 sm:p-[0.8rem]"
                             : "absolute inset-0 w-full h-full object-cover";
                     wrap.appendChild(img);
                 }
 
                 const badge = document.createElement("div");
-                badge.className = "absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-full";
+                badge.className = "hidden sm:block absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-full";
                 badge.textContent = `#${index + 1}`;
                 wrap.appendChild(badge);
 
-                list.appendChild(wrap);
+                itemContainer.appendChild(wrap);
+                list.appendChild(itemContainer);
             });
 
             col.appendChild(list);

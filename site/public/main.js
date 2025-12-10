@@ -51,7 +51,6 @@ function adjustCardHeights() {
 	const containers = [
 		"stats-card-container",
 		"compare-card-container",
-		"customize-card-container",
 		"customize-header-container",
 	];
 

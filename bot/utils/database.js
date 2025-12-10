@@ -155,7 +155,7 @@ class Database {
 		}
 		try {
 			const tableRes = await this.pool.query("SELECT COUNT(*) FROM tables");
-			const userRes = await this.pool.query("SELECT COUNT(DISTINCT user_id) FROM user_tables");
+			const userRes = await this.pool.query("SELECT COUNT(*) FROM user_data");
 			return {
 				tableCount: parseInt(tableRes.rows[0].count, 10),
 				userCount: parseInt(userRes.rows[0].count, 10)
