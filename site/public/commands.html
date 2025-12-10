@@ -23,12 +23,13 @@
 <body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative bg-zinc-900">
 
     <!-- Background -->
-    <div class="fixed top-0 left-0 w-full h-[100vh] -z-10">
+    <div class="fixed top-0 left-0 w-full h-[100lvh] -z-10">
         <img src="/images/tracks%20unblurred/rMC_notables.png" alt="" class="absolute inset-0 w-full h-full object-cover opacity-10">
         <div class="absolute inset-0 bg-zinc-900/50"></div>
     </div>
 
     <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-4 md:py-6 px-4 md:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
+        <div class="absolute bottom-full left-0 w-full h-[50vh] bg-[#151518]/80 backdrop-blur-md pointer-events-none"></div>
         <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img src="/images/profile/pfp.png" alt="Profile" class="w-10 h-10 rounded-full">
             <span id="nav-title" class="text-xl font-bold text-white hidden md:block opacity-100 transition-opacity duration-300">mogimogimogi</span>
@@ -226,7 +227,7 @@
                     img.src = item.image;
                     img.alt = item.name || label;
                     img.className = label === "characters"
-                        ? "absolute inset-0 w-full h-full object-contain p-2"
+                        ? "absolute inset-0 w-full h-full object-contain p-1.5 sm:p-2"
                         : label === "vehicles"
                                 ? "absolute inset-0 w-full h-full object-contain p-1 sm:p-[0.8rem]"
                             : "absolute inset-0 w-full h-full object-cover";
@@ -303,6 +304,7 @@
             players: "both",
         };
         let hasImageLoaded = false;
+        let currentFetchId = 0;
 
         const btnClasses = "text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all";
         const activeClasses = "bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/20";
@@ -340,9 +342,12 @@
 
         function showError(message) {
             if (loading) loading.classList.add("hidden");
-            if (placeholder && !hasImageLoaded) {
+            if (placeholder) {
                 placeholder.textContent = message || "unable to render stats";
                 placeholder.classList.remove("hidden");
+            }
+            if (preview) {
+                preview.classList.add("hidden");
             }
         }
 
@@ -370,12 +375,14 @@
 
         function refreshImage() {
             if (!preview) return;
+            const fetchId = ++currentFetchId;
             setLoading(true, "loading…");
             const cacheBust = `t=${Date.now()}`;
             const url = `/api/command-stats?time=${state.time}&queue=${state.queue}&players=${state.players}&${cacheBust}`;
 
             fetch(url)
                 .then(async res => {
+                    if (fetchId !== currentFetchId) return null;
                     if (!res.ok) {
                         let message = "unable to render stats";
                         try {
@@ -391,10 +398,12 @@
                     return res.blob();
                 })
                 .then(blob => {
+                    if (fetchId !== currentFetchId) return;
                     if (!blob) return;
                     const objectUrl = URL.createObjectURL(blob);
                     const nextImage = new Image();
                     nextImage.onload = () => {
+                        if (fetchId !== currentFetchId) return;
                         if (preview.dataset.objectUrl) {
                             URL.revokeObjectURL(preview.dataset.objectUrl);
                         }
@@ -402,12 +411,14 @@
                         preview.src = objectUrl;
                     };
                     nextImage.onerror = () => {
+                        if (fetchId !== currentFetchId) return;
                         URL.revokeObjectURL(objectUrl);
                         showError("failed to load stats preview");
                     };
                     nextImage.src = objectUrl;
                 })
                 .catch(error => {
+                    if (fetchId !== currentFetchId) return;
                     console.warn("stats preview fetch failed", error);
                     showError("failed to load stats preview");
                 });
@@ -446,6 +457,7 @@
             players: "both",
         };
         let hasImageLoaded = false;
+        let currentFetchId = 0;
 
         const btnClasses = "text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all";
         const activeClasses = "bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/20";
@@ -483,9 +495,12 @@
 
         function showError(message) {
             if (loading) loading.classList.add("hidden");
-            if (placeholder && !hasImageLoaded) {
+            if (placeholder) {
                 placeholder.textContent = message || "unable to render notables";
                 placeholder.classList.remove("hidden");
+            }
+            if (preview) {
+                preview.classList.add("hidden");
             }
         }
 
@@ -513,12 +528,14 @@
 
         function refreshImage() {
             if (!preview) return;
+            const fetchId = ++currentFetchId;
             setLoading(true, "loading…");
             const cacheBust = `t=${Date.now()}`;
             const url = `/api/command-notables?time=${state.time}&queue=${state.queue}&players=${state.players}&${cacheBust}`;
 
             fetch(url)
                 .then(async res => {
+                    if (fetchId !== currentFetchId) return null;
                     if (!res.ok) {
                         let message = "unable to render notables";
                         try {
@@ -534,10 +551,12 @@
                     return res.blob();
                 })
                 .then(blob => {
+                    if (fetchId !== currentFetchId) return;
                     if (!blob) return;
                     const objectUrl = URL.createObjectURL(blob);
                     const nextImage = new Image();
                     nextImage.onload = () => {
+                        if (fetchId !== currentFetchId) return;
                         if (preview.dataset.objectUrl) {
                             URL.revokeObjectURL(preview.dataset.objectUrl);
                         }
@@ -545,12 +564,14 @@
                         preview.src = objectUrl;
                     };
                     nextImage.onerror = () => {
+                        if (fetchId !== currentFetchId) return;
                         URL.revokeObjectURL(objectUrl);
                         showError("failed to load notables preview");
                     };
                     nextImage.src = objectUrl;
                 })
                 .catch(error => {
+                    if (fetchId !== currentFetchId) return;
                     console.warn("notables preview fetch failed", error);
                     showError("failed to load notables preview");
                 });
@@ -589,6 +610,7 @@
             players: "both",
         };
         let hasImageLoaded = false;
+        let currentFetchId = 0;
 
         const btnClasses = "text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all";
         const activeClasses = "bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/20";
@@ -626,9 +648,12 @@
 
         function showError(message) {
             if (loading) loading.classList.add("hidden");
-            if (placeholder && !hasImageLoaded) {
+            if (placeholder) {
                 placeholder.textContent = message || "unable to render rank-stats";
                 placeholder.classList.remove("hidden");
+            }
+            if (preview) {
+                preview.classList.add("hidden");
             }
         }
 
@@ -656,12 +681,14 @@
 
         function refreshImage() {
             if (!preview) return;
+            const fetchId = ++currentFetchId;
             setLoading(true, "loading…");
             const cacheBust = `t=${Date.now()}`;
             const url = `/api/command-rank-stats?time=${state.time}&queue=${state.queue}&players=${state.players}&${cacheBust}`;
 
             fetch(url)
                 .then(async res => {
+                    if (fetchId !== currentFetchId) return null;
                     if (!res.ok) {
                         let message = "unable to render rank-stats";
                         try {
@@ -677,10 +704,12 @@
                     return res.blob();
                 })
                 .then(blob => {
+                    if (fetchId !== currentFetchId) return;
                     if (!blob) return;
                     const objectUrl = URL.createObjectURL(blob);
                     const nextImage = new Image();
                     nextImage.onload = () => {
+                        if (fetchId !== currentFetchId) return;
                         if (preview.dataset.objectUrl) {
                             URL.revokeObjectURL(preview.dataset.objectUrl);
                         }
@@ -688,12 +717,14 @@
                         preview.src = objectUrl;
                     };
                     nextImage.onerror = () => {
+                        if (fetchId !== currentFetchId) return;
                         URL.revokeObjectURL(objectUrl);
                         showError("failed to load rank-stats preview");
                     };
                     nextImage.src = objectUrl;
                 })
                 .catch(error => {
+                    if (fetchId !== currentFetchId) return;
                     console.warn("rank-stats preview fetch failed", error);
                     showError("failed to load rank-stats preview");
                 });
@@ -732,6 +763,7 @@
             players: "both",
         };
         let hasImageLoaded = false;
+        let currentFetchId = 0;
 
         const btnClasses = "text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all";
         const activeClasses = "bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/20";
@@ -769,9 +801,12 @@
 
         function showError(message) {
             if (loading) loading.classList.add("hidden");
-            if (placeholder && !hasImageLoaded) {
+            if (placeholder) {
                 placeholder.textContent = message || "unable to render head-to-head";
                 placeholder.classList.remove("hidden");
+            }
+            if (preview) {
+                preview.classList.add("hidden");
             }
         }
 
@@ -799,12 +834,14 @@
 
         function refreshImage() {
             if (!preview) return;
+            const fetchId = ++currentFetchId;
             setLoading(true, "loading…");
             const cacheBust = `t=${Date.now()}`;
             const url = `/api/command-head-to-head?time=${state.time}&queue=${state.queue}&players=${state.players}&${cacheBust}`;
 
             fetch(url)
                 .then(async res => {
+                    if (fetchId !== currentFetchId) return null;
                     if (!res.ok) {
                         let message = "unable to render head-to-head";
                         try {
@@ -820,10 +857,12 @@
                     return res.blob();
                 })
                 .then(blob => {
+                    if (fetchId !== currentFetchId) return;
                     if (!blob) return;
                     const objectUrl = URL.createObjectURL(blob);
                     const nextImage = new Image();
                     nextImage.onload = () => {
+                        if (fetchId !== currentFetchId) return;
                         if (preview.dataset.objectUrl) {
                             URL.revokeObjectURL(preview.dataset.objectUrl);
                         }
@@ -831,12 +870,14 @@
                         preview.src = objectUrl;
                     };
                     nextImage.onerror = () => {
+                        if (fetchId !== currentFetchId) return;
                         URL.revokeObjectURL(objectUrl);
                         showError("failed to load head-to-head preview");
                     };
                     nextImage.src = objectUrl;
                 })
                 .catch(error => {
+                    if (fetchId !== currentFetchId) return;
                     console.warn("head-to-head preview fetch failed", error);
                     showError("failed to load head-to-head preview");
                 });

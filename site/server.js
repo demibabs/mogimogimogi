@@ -138,7 +138,7 @@ function startSite(client) {
 			if (filePath.endsWith(".css")) {
 				res.setHeader("Content-Type", "text/css");
 			}
-		}
+		},
 	}));
 
 	// Clean URLs for terms and privacy
