@@ -188,12 +188,6 @@ module.exports = {
 		const userId = interaction.user.id;
 		const serverId = interaction.guild.id;
 
-		const validation = await AutoUserManager.ensureServerReady(serverId);
-		if (!validation.success) {
-			await interaction.editReply(validation.message || "you need to finish setup before using this command.");
-			return;
-		}
-
 		let selectedCostume = null;
 		let promptedForCostume = false;
 		if (characterChoice?.type === "main" && characterChoice.costumes.length > 1) {

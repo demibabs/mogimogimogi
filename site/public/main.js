@@ -17,7 +17,7 @@ function updateDots(dotsId, activeIndex) {
 	}
 }
 
-function cycleCarousel(containerId, dotsId) {
+function cycleCarousel(containerId, dotsId, direction = 1) {
 	const container = document.getElementById(containerId);
 	if (!container) return;
 
@@ -27,7 +27,9 @@ function cycleCarousel(containerId, dotsId) {
 	if (carouselStates[containerId] === undefined) carouselStates[containerId] = 0;
 
 	// Calculate next index
-	const nextIndex = (carouselStates[containerId] + 1) % images.length;
+	let nextIndex = (carouselStates[containerId] + direction) % images.length;
+	if (nextIndex < 0) nextIndex = images.length - 1;
+	
 	carouselStates[containerId] = nextIndex;
 
 	// Update images
@@ -45,6 +47,46 @@ function cycleCarousel(containerId, dotsId) {
 	});
 
 	updateDots(dotsId, nextIndex);
+}
+
+function enableSwipe(containerId, dotsId) {
+	const container = document.getElementById(containerId);
+	if (!container) return;
+
+	let touchStartX = 0;
+	let touchEndX = 0;
+
+	container.addEventListener("touchstart", e => {
+		touchStartX = e.changedTouches[0].screenX;
+	}, { passive: true });
+
+	container.addEventListener("touchend", e => {
+		touchEndX = e.changedTouches[0].screenX;
+		handleSwipe();
+	}, { passive: true });
+
+	function handleSwipe() {
+		const threshold = 50;
+		if (touchEndX < touchStartX - threshold) {
+			// Swipe Left -> Next
+			cycleCarousel(containerId, dotsId, 1);
+		}
+		if (touchEndX > touchStartX + threshold) {
+			// Swipe Right -> Prev
+			cycleCarousel(containerId, dotsId, -1);
+		}
+	}
+}
+
+function initSwipes() {
+	const carousels = [
+		{ container: "hero-mobile-carousel", dots: "hero-mobile-dots" },
+		{ container: "stats-card-container", dots: "stats-dots" },
+		{ container: "compare-card-container", dots: "compare-dots" },
+		{ container: "customize-card-container", dots: "customize-dots" },
+	];
+
+	carousels.forEach(c => enableSwipe(c.container, c.dots));
 }
 
 function adjustCardHeights() {
@@ -154,6 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.addEventListener("load", adjustCardHeights);
+window.addEventListener("load", initSwipes);
 window.addEventListener("resize", adjustCardHeights);
 setInterval(adjustCardHeights, 1000);
 

@@ -752,14 +752,6 @@ module.exports = {
 			const serverId = interaction.guildId;
 			const rawPlayer1 = interaction.options.getString("player");
 			const rawPlayer2 = interaction.options.getString("player2");
-			const validation = await AutoUserManager.ensureServerReady(serverId);
-			if (!validation.success) {
-				await interaction.editReply({
-					content: validation.message || "unable to validate command user.",
-					files: [],
-				});
-				return;
-			}
 
 			const target1 = await resolveTargetPlayer(interaction, {
 				rawInput: rawPlayer1,

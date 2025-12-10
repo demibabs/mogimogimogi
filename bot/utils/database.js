@@ -95,7 +95,6 @@ class Database {
 		this.useDatabase = !!process.env.DATABASE_URL;
 		this.usersDir = path.join(__dirname, "..", "data", "users");
 		this.legacyServersDir = path.join(__dirname, "..", "data", "servers");
-		this.serverStatePath = path.join(__dirname, "..", "data", "server_state.json");
 		this._legacyMigrationPromise = null;
 		this._userTablesFileMigrationPromise = null;
 
@@ -318,72 +317,7 @@ class Database {
 
 	// --- Server-level views (derived from user data) -------------------------------
 
-	async getServerSetupState(serverId) {
-		if (!serverId) {
-			return null;
-		}
-		const normalizedId = String(serverId);
-		if (this.useDatabase) {
-			try {
-				const result = await this.pool.query(
-					"SELECT state FROM server_state WHERE server_id = $1",
-					[normalizedId],
-				);
-				if (!result.rows.length) {
-					return null;
-				}
-				return result.rows[0].state || null;
-			}
-			catch (error) {
-				console.error(`database server_state read error for server ${normalizedId}:`, error);
-				return null;
-			}
-		}
-
-		const stateMap = await this._readServerStateMap();
-		return stateMap[normalizedId] || null;
-	}
-
-	async markServerSetupComplete(serverId, metadata = {}) {
-		if (!serverId) {
-			throw new Error("serverId is required to mark setup complete");
-		}
-		const normalizedId = String(serverId);
-		const existing = await this.getServerSetupState(normalizedId);
-		const timestamp = new Date().toISOString();
-		const payload = {
-			...(existing || {}),
-			...metadata,
-			serverId: normalizedId,
-			completed: true,
-			lastSetupAt: timestamp,
-		};
-		if (!payload.firstSetupAt) {
-			payload.firstSetupAt = timestamp;
-		}
-
-		if (this.useDatabase) {
-			try {
-				await this.pool.query(
-					`INSERT INTO server_state (server_id, state, updated_at)
-					 VALUES ($1, $2, CURRENT_TIMESTAMP)
-					 ON CONFLICT (server_id)
-					 DO UPDATE SET state = $2, updated_at = CURRENT_TIMESTAMP`,
-					[normalizedId, JSON.stringify(payload)],
-				);
-				return payload;
-			}
-			catch (error) {
-				console.error(`database server_state write error for server ${normalizedId}:`, error);
-				return payload;
-			}
-		}
-
-		const stateMap = await this._readServerStateMap();
-		stateMap[normalizedId] = payload;
-		await this._writeServerStateMap(stateMap);
-		return payload;
-	}
+	/* getServerSetupState and markServerSetupComplete removed */
 
 	// --- Table management ---------------------------------------------------------
 
@@ -754,29 +688,7 @@ class Database {
 		await this._legacyMigrationPromise;
 	}
 
-	async _readServerStateMap() {
-		try {
-			const raw = await fs.readFile(this.serverStatePath, "utf8");
-			return JSON.parse(raw) || {};
-		}
-		catch (error) {
-			if (error.code === "ENOENT") {
-				return {};
-			}
-			console.error("error reading server_state cache:", error);
-			return {};
-		}
-	}
-
-	async _writeServerStateMap(stateMap) {
-		try {
-			await fs.mkdir(path.dirname(this.serverStatePath), { recursive: true });
-			await fs.writeFile(this.serverStatePath, JSON.stringify(stateMap, null, 2));
-		}
-		catch (error) {
-			console.error("error writing server_state cache:", error);
-		}
-	}
+	/* _readServerStateMap and _writeServerStateMap removed */
 
 	_getUserDataPath(loungeId) {
 		const normalizedId = normalizeLoungeId(loungeId);

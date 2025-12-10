@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const database = require("../bot/utils/database");
+const LoungeApi = require("../bot/utils/loungeApi");
 const { trackAbbreviationsToNames } = require("../bot/utils/gameData");
 const StatsCommand = require("../bot/commands/global/stats");
 const NotablesCommand = require("../bot/commands/global/notables");
@@ -128,6 +129,32 @@ function startSite(client) {
 	const app = express();
 	const PORT = process.env.PORT || 3000;
 
+	async function fetchDiscordUser(loungeId) {
+		if (!client) {
+			console.warn("fetchDiscordUser: client is not available");
+			return null;
+		}
+		if (!loungeId) return null;
+		try {
+			const details = await LoungeApi.getPlayerByLoungeId(loungeId);
+			// console.log(`fetchDiscordUser: details for ${loungeId}:`, details ? "found" : "null", details?.discordId);
+			if (details && details.discordId) {
+				const user = await client.users.fetch(details.discordId).catch(err => {
+					console.error(`fetchDiscordUser: failed to fetch user ${details.discordId}:`, err.message);
+					return null;
+				});
+				return user;
+			}
+			else {
+				console.warn(`fetchDiscordUser: no discordId found for loungeId ${loungeId}`);
+			}
+		}
+		catch (e) {
+			console.error(`Failed to fetch discord user for loungeId ${loungeId}:`, e);
+		}
+		return null;
+	}
+
 	// Serve static assets (images/fonts) before public so missing files fall through correctly
 	app.use("/images", express.static(path.join(__dirname, "../images")));
 	app.use("/fonts", express.static(path.join(__dirname, "../fonts")));
@@ -244,10 +271,13 @@ function startSite(client) {
 		const session = cached && cached.expiresAt > now ? cached.session : null;
 		const userData = cached && cached.expiresAt > now ? cached.userData : null;
 
+		const discordUser = await fetchDiscordUser(loungeId);
+		const displayName = discordUser ? (discordUser.globalName || discordUser.username) : "baby daisy";
+
 		try {
 			const renderResult = await StatsCommand.renderStats({
 				interaction: null,
-				target: { loungeId, displayName: "baby daisy" },
+				target: { loungeId, displayName, discordUser },
 				loungeId,
 				serverId: null,
 				queueFilter,
@@ -293,10 +323,13 @@ function startSite(client) {
 		const session = cached && cached.expiresAt > now ? cached.session : null;
 		const userData = cached && cached.expiresAt > now ? cached.userData : null;
 
+		const discordUser = await fetchDiscordUser(loungeId);
+		const displayName = discordUser ? (discordUser.globalName || discordUser.username) : "spike";
+
 		try {
 			const result = await NotablesCommand.generateNotables(
 				null,
-				{ loungeId, displayName: "spike" },
+				{ loungeId, displayName, discordUser },
 				null,
 				queueFilter,
 				playerCountFilter,
@@ -343,8 +376,11 @@ function startSite(client) {
 		const session = cached && cached.expiresAt > now ? cached.session : null;
 		const userData = cached && cached.expiresAt > now ? cached.userData : null;
 
+		const discordUser = await fetchDiscordUser(loungeId);
+		const displayName = discordUser ? (discordUser.globalName || discordUser.username) : "nabbit";
+
 		try {
-			const result = await RankStatsCommand.generateRankStats(null, { loungeId, displayName: "nabbit" }, null, null, {
+			const result = await RankStatsCommand.generateRankStats(null, { loungeId, displayName, discordUser }, null, null, {
 				session,
 				filters: { timeFilter, queueFilter, playerCountFilter },
 				userData,
@@ -390,6 +426,12 @@ function startSite(client) {
 		const cached = previewHeadToHeadCache.get(cacheKey);
 		const session = cached && cached.expiresAt > now ? cached.session : null;
 
+		const discordUserLeft = await fetchDiscordUser(loungeIdLeft);
+		const displayNameLeft = discordUserLeft ? (discordUserLeft.globalName || discordUserLeft.username) : "bowser";
+
+		const discordUserRight = await fetchDiscordUser(loungeIdRight);
+		const displayNameRight = discordUserRight ? (discordUserRight.globalName || discordUserRight.username) : "wario";
+
 		const interactionStub = {
 			guildId: null,
 			editReply: async () => null,
@@ -399,8 +441,8 @@ function startSite(client) {
 			const result = await HeadToHeadCommand.generateHeadToHead(
 				interactionStub,
 				{
-					playerLeft: { loungeId: loungeIdLeft, displayName: "bowser" },
-					playerRight: { loungeId: loungeIdRight, displayName: "wario" },
+					playerLeft: { loungeId: loungeIdLeft, displayName: displayNameLeft, discordUser: discordUserLeft },
+					playerRight: { loungeId: loungeIdRight, displayName: displayNameRight, discordUser: discordUserRight },
 					filters: { timeFilter, queueFilter, playerCountFilter },
 					session,
 				},

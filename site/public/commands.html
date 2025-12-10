@@ -43,13 +43,13 @@
     </nav>
 
     <div class="w-full flex-grow relative z-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] bg-[size:24px_24px]">
-    <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] mx-auto space-y-10 mt-10 md:mt-14 pb-8">
+    <main class="w-full max-w-[95%] md:max-w-[90%] 2xl:max-w-[75%] mx-auto space-y-10 mt-10 md:mt-14 pb-8">
         <header class="space-y-4 fade-in-section text-center">
             <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white">commands</h1>
             <p class="text-lg md:text-xl text-zinc-400 max-w-4xl mx-auto">learn more about what the bot does.</p>
         </header>
 
-        <div class="space-y-6 md:space-y-8">
+        <div class="space-y-8">
         <div class="flex flex-col gap-6 md:gap-8 fade-in-section">
             <aside class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-6 md:p-7 shadow-lg shadow-black/30 w-full">
                 <p class="text-sm text-zinc-300 mb-4 font-medium">jump to</p>
@@ -63,7 +63,7 @@
                 </div>
             </aside>
 
-            <section class="space-y-6 md:space-y-8">
+            <section class="space-y-8">
                 <div id="cmd-stats" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-4">
                     <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
@@ -189,7 +189,18 @@
                         </div>
                     </div>
                     <h2 class="order-1 text-3xl font-semibold text-white">/head-to-head</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">blah blah blah blah.</p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        this command shows two players' record against each other in mogis where they both played (regardless of whether they were teammates or opponents).
+                    </p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        it displays info about scores, placements and mmr gains, along with each player's biggest win (measured by point differential). 
+                        i'm considering adding "most recent matchup" as well, but i'm not sure how to do that without changing the card layout.
+                    </p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        when you use /head-to-head, you are given two fields to put player names, but if you want to compare someone with yourself, you can just leave the second one blank.
+                    </p>
+
+
                     <div class="clear-both order-4"></div>
                 </div>
 
@@ -200,7 +211,10 @@
                         </div>
                     </div>
                     <h2 class="order-1 text-3xl font-semibold text-white break-all">/leaderboard</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">blah blah blah blah blah</p>
+                    <p class="order-2 text-zinc-400 leading-relaxed">
+                        this command generates a server mmr leaderboard, which you can sort by weekly or seasonal gains. you're also given buttons that you can use to scroll through users by page.
+                    </p>
+
                     <div class="clear-both order-4"></div>
                 </div>
 

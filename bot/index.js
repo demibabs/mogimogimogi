@@ -59,7 +59,7 @@ async function trackButtonInteractionUsage(interaction) {
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
-		// GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildMembers,
 	],
 });
 
@@ -85,7 +85,7 @@ for (const folder of commandFolders) {
 	}
 }
 
-const statusCommands = ["/stats", "/rank-stats", "/notables", "/head-to-head"];
+const statusCommands = ["/stats", "/rank-stats", "/notables", "/head-to-head", "/leaderboard"];
 let currentStatusIndex = 0;
 
 function updatePresence() {
@@ -104,7 +104,6 @@ client.once(Events.ClientReady, async readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 
 	// Cache all members on startup
-	/*
 	console.log("Caching guild members...");
 	for (const guild of client.guilds.cache.values()) {
 		try {
@@ -116,33 +115,25 @@ client.once(Events.ClientReady, async readyClient => {
 		}
 	}
 	console.log("Member caching complete.");
-	*/
 });
 
 client.on(Events.GuildCreate, async (guild) => {
 	updatePresence();
-	console.log(`Joined new guild: ${guild.id}.`);
-	// try {
-	// 	console.log(`Joined new guild: ${guild.id}. Caching members...`);
-	// 	await guild.members.fetch();
-	// 	console.log(`Cached members for ${guild.id}`);
-	// }
-	// catch (error) {
-	// 	console.warn(`Failed to cache members for new guild ${guild.id}:`, error);
-	// }
+	try {
+		console.log(`Joined new guild: ${guild.id}. Caching members...`);
+		await guild.members.fetch();
+		console.log(`Cached members for ${guild.id}`);
+	}
+	catch (error) {
+		console.warn(`Failed to cache members for new guild ${guild.id}:`, error);
+	}
 });
 client.on(Events.GuildDelete, () => updatePresence());
 
-// client.on(Events.GuildMemberAdd, async member => {
-// 	try {
-// 		// Ensure member is cached
-// 		await member.fetch().catch((e) => console.warn("Failed to fetch member on join:", e));
-// 		await AutoUserManager.handleGuildMemberAdd(member);
-// 	}
-// 	catch (error) {
-// 		console.error("guildMemberAdd handler failed:", error);
-// 	}
-// });
+client.on(Events.GuildMemberAdd, async member => {
+	await member.fetch().catch((e) => console.warn("Failed to fetch member on join:", e));
+
+});
 
 
 client.on(Events.InteractionCreate, async interaction => {

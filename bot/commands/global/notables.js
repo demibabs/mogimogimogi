@@ -883,15 +883,6 @@ module.exports = {
 
 			const serverId = interaction.guildId;
 
-			const validation = await AutoUserManager.ensureServerReady(serverId);
-			if (!validation.success) {
-				await interaction.editReply({
-					content: validation.message || "unable to validate command user.",
-					components: [],
-					files: [],
-				});
-				return;
-			}
 
 			const rawPlayer = interaction.options.getString("player");
 			const timeFilter = "alltime";
