@@ -5,7 +5,7 @@
 
 	// Identify the section currently in view
 	function updateAnchor() {
-		const sections = document.querySelectorAll("[id^=\"cmd-\"]");
+		const sections = document.querySelectorAll(".scroll-anchor-section");
 		if (sections.length === 0) return;
 
 		let closest = null;

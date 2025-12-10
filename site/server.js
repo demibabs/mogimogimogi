@@ -209,10 +209,12 @@ function startSite(client) {
 			const characterCounts = {};
 			const trackCounts = {};
 			const vehicleCounts = {};
+			let usersWithFavorites = 0;
 
 			for (const user of allUserData) {
 				const favorites = user?.favorites;
 				if (!favorites) continue;
+				usersWithFavorites++;
 
 				const characterKey = normalizeCharacterKey(favorites.character?.name);
 				if (characterKey) {
@@ -246,6 +248,7 @@ function startSite(client) {
 					key => titleCaseWords(key),
 					key => getVehicleImagePath(key),
 				),
+				totalUsers: usersWithFavorites,
 			};
 
 			res.json(response);

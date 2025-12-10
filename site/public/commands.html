@@ -64,8 +64,30 @@
             </aside>
 
             <section class="space-y-8">
-                <div id="cmd-stats" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-4">
-                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                <div id="cmd-stats" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white">/stats</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            generates a card with a bunch of your stats on it. 
+                            along with data about your mmr, scores and placements, you are given info to help contextualize it, such as your average seed, room mmr and room player count.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            the card also has a nifty chart showing where you lie in the overall mmr distribution. 
+                            it's one thing to know you're in the top x percent of players, but i think actually being able to see it provides some neat perspective.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            all commands provide you with buttons that let you regenerate the image with new filters. 
+                            on this page, you will be provided with preview cards to mess around with the commands and filters.
+                            these are generated live using data from real players.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            also, all commands can be used on anyone in lounge. 
+                            you can search by lounge name (where you will be provided with autocomplete), lounge id or discord user id. 
+                            if you just want your own stats, leave the player field blank.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
                                 <p class="text-sm text-zinc-300 font-semibold">preview</p>
@@ -82,26 +104,28 @@
                             </div>
                         </div>
                     </div>
-                    <h2 class="order-1 text-3xl font-semibold text-white">/stats</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        this command generates a card with a bunch of your stats on it (shocking, i know). 
-                        along with info about your mmr, scores and placements, you are given data to help contextualize it, such as your average seed, room mmr and room score/player count.
-                    </p>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        the card also has a nifty chart showing where you lie in the overall mmr distribution. 
-                        it's one thing to know you're in the top x percent of players, but i think actually being able to see it provides some neat perspective.
-                    </p>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        all commands provide you with buttons that let you regenerate the image with new filters. 
-                        on this page, you will be provided with preview cards to mess around with the commands and filters.
-                        these are generated live using data from real players.
-                    </p>
-
-                    <div class="clear-both order-4"></div>
                 </div>
 
-                <div id="cmd-rank-stats" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                <div id="cmd-rank-stats" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white">/rank-stats</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            similar to <b>/stats</b>, but it solely tracks head-to-head matchups (including with teammates) and average scores. 
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            the table shows how your performance changes as you play against better and better opponents. 
+                            below the table, you can see the highest ranked player you've beaten and the lowest you've lost to (based on their mmr at the time you competed).
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            as is obvious, players typically have a positive win rate and above average scores vs. lower ranks, and then fall below average around their own rank or the one above. 
+                            however, there are exceptions, especially with small sample sizes. 
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            this is my personal favorite command. it shows pretty well that even though the mmr system isn't perfect, it's still very accurate at measuring your skill relative to other players.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
                                 <p class="text-sm text-zinc-300 font-semibold">preview</p>
@@ -118,24 +142,26 @@
                             </div>
                         </div>
                     </div>
-                    <h2 class="order-1 text-3xl font-semibold text-white">/rank-stats</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        similar to stats, but it solely tracks head-to-head matchups (including with teammates) and average scores. 
-                        the table shows how your performance changes as you play against better and better opponents. 
-                        below the table, you can see the highest ranked player you've beaten and the lowest you've lost to (based on their mmr at the time you competed, not currently).
-                    </p>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        as is obvious, players typically have a positive win rate and above average scores vs. lower ranks, and then fall below average around their own rank or the one above. 
-                        however, there are exceptions, especially with small sample sizes (and with players who've found ways to "game" the mmr system). 
-                    </p>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        this is my personal favorite command. it shows pretty well that even though the mmr system isn't perfect, it's still very accurate at measuring your skill relative to other players.
-                    </p>
-                    <div class="clear-both order-4"></div>
                 </div>
 
-                <div id="cmd-notables" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                <div id="cmd-notables" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white break-all">/notables</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            highlights 6 of your notable mogis, measured by either your score, your placement relative to your seed, or your score relative to your teammates. 
+                            of course, accompanied with me either congratulating you or making fun of you :)
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            the point of notables is not to make you fixate on any particular mogis you've played. 
+                            it's moreso meant to serve as a reminder that we all have our great and terrible events regardless of skill level. 
+                            that's just the way it goes in competitive!
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            if you think of a message that would be funny to add to one of these, please do suggest it, and i'll probably add it.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
                                 <p class="text-sm text-zinc-300 font-semibold">preview</p>
@@ -152,26 +178,24 @@
                             </div>
                         </div>
                     </div>
-                    <h2 class="order-1 text-3xl font-semibold text-white break-all">/notables</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        this command highlights 6 of your "notable" mogis, measured by either your score, your placement relative to your seed (normalized for player count), or your score relative to your teammates. 
-                        of course, accompanied with me either congratulating you or making fun of you :)
-                    </p>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        the point of notables is not to make you fixate on any particular mogis you've played. 
-                        it's moreso meant to serve as a reminder that we all have our great and terrible events regardless of skill level. 
-                        that's just the way it goes in competitive!
-                    </p>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        otherwise, there's not too much to say about this command, since it's pretty straightforward. 
-                        if you think of a message that would be funny to add to one of these, please do suggest it, and i'll probably add it.
-                    </p>
-
-                    <div class="clear-both order-4"></div>
                 </div>
 
-                <div id="cmd-head-to-head" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                <div id="cmd-head-to-head" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white">/head-to-head</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            shows two players' record against each other in mogis where they both competed (regardless of whether they were teammates or opponents).
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            it displays info about scores, placements and mmr gains, along with each player's biggest win (measured by point differential). 
+                            i'm considering adding "most recent matchup" as well, but i'm not sure how to do that without changing the card layout.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            when you use this command, you are given two fields to put player names, but if you want to compare someone with yourself, just leave the second one blank.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
                         <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
                                 <p class="text-sm text-zinc-300 font-semibold">preview</p>
@@ -188,45 +212,53 @@
                             </div>
                         </div>
                     </div>
-                    <h2 class="order-1 text-3xl font-semibold text-white">/head-to-head</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        this command shows two players' record against each other in mogis where they both played (regardless of whether they were teammates or opponents).
-                    </p>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        it displays info about scores, placements and mmr gains, along with each player's biggest win (measured by point differential). 
-                        i'm considering adding "most recent matchup" as well, but i'm not sure how to do that without changing the card layout.
-                    </p>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        when you use /head-to-head, you are given two fields to put player names, but if you want to compare someone with yourself, you can just leave the second one blank.
-                    </p>
-
-
-                    <div class="clear-both order-4"></div>
                 </div>
 
-                <div id="cmd-leaderboard" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-4">
+                <div id="cmd-leaderboard" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white break-all">/leaderboard</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            generates a server mmr leaderboard, which you can sort by weekly or seasonal gains. 
+                            you're also given buttons that you can use to scroll through users by page.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            if you use it in a large server, be mindful that this command will take a while to run, as it requires fetching a large amount of data from lounge.
+                        </p>
+
+                        <p class="text-zinc-400 leading-relaxed">
+                            (no preview for this one, sorry. but, i mean, it's pretty clear what it does.)
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
                         <div class="aspect-video rounded-xl bg-gradient-to-br from-zinc-700/70 to-zinc-900/70 border border-white/5 overflow-hidden">
                             <img src="/images/examples/site/carousel/leaderboard3.webp" alt="" class="w-full h-full object-cover">
                         </div>
                     </div>
-                    <h2 class="order-1 text-3xl font-semibold text-white break-all">/leaderboard</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">
-                        this command generates a server mmr leaderboard, which you can sort by weekly or seasonal gains. you're also given buttons that you can use to scroll through users by page.
-                    </p>
-
-                    <div class="clear-both order-4"></div>
                 </div>
 
-                <div id="cmd-customize" class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-4 md:block md:space-y-3">
-                    <div id="customize-table" class="order-3 w-full md:float-right md:w-[30rem] md:max-w-[60%] md:ml-4 md:mb-3">
+                <div id="cmd-customize" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white break-all">/customize</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            lets you change how your cards look, both by setting the background and adding images of your favorite character and vehicle. 
+                            you can choose the character's outfit too, if they have any. 
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            these will also be shown to other people who view your stats. 
+                            if you have not customized, your cards will feature a random track background with no character/vehicle icons.
+
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            this only affects <b>/stats</b>, <b>/rank-stats</b> and <b>/notables</b>.
+                        </p>
+                    </div>
+
+                    <div id="customize-table" class="w-full md:w-[30rem] md:max-w-[50%]">
                         <div class="bg-white/5 border border-white/5 rounded-2xl p-4 min-h-[240px] flex items-center justify-center text-zinc-500 text-sm" data-placeholder>
                             loading favorites…
                         </div>
                     </div>
-                    <h2 class="order-1 text-3xl font-semibold text-white break-all">/customize</h2>
-                    <p class="order-2 text-zinc-400 leading-relaxed">blah blah blah blah.</p>
-                    <div class="clear-both order-4"></div>
                 </div>
             </section>
         </div>
@@ -312,7 +344,7 @@
 
             const title = document.createElement("p");
             title.className = "text-sm text-zinc-200 font-medium";
-            title.textContent = "most popular";
+            title.textContent = `most popular (${data.totalUsers || 0} customized players)`;
             shell.appendChild(title);
 
             const grid = document.createElement("div");

@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	function handleScrollAnimations() {
 		const sections = document.querySelectorAll(".fade-in-section");
 		const windowHeight = window.innerHeight;
-		const fadeDistance = windowHeight * 0.15; // Fade over 15% of the screen height
+		const fadeDistance = windowHeight * 0.20; // Fade over 20% of the screen height
 
 		sections.forEach(section => {
 			const rect = section.getBoundingClientRect();
