@@ -22,17 +22,6 @@
 </head>
 <body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative bg-zinc-900">
 
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="fixed inset-0 z-[100] bg-zinc-900 flex items-center justify-center transition-opacity duration-500">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
-    </div>
-
-    <!-- Background -->
-    <div class="fixed top-0 left-0 w-full h-[100lvh] -z-10">
-        <img src="/images/tracks%20unblurred/rMC_notables.png" alt="" class="absolute inset-0 w-full h-full object-cover opacity-10">
-        <div class="absolute inset-0 bg-zinc-900/50"></div>
-    </div>
-
     <!-- Navigation -->
     <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-4 md:py-6 px-4 md:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
         <div class="absolute bottom-full left-0 w-full h-[50vh] bg-[#151518]/80 backdrop-blur-md pointer-events-none"></div>
@@ -52,7 +41,9 @@
         </div>
     </nav>
 
-    <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] space-y-8 md:space-y-12 2xl:space-y-8 mt-8 md:mt-12 pb-8">
+    <!-- Hero Background Wrapper -->
+    <div class="w-screen ml-[calc(50%-50vw)] relative z-0 bg-[linear-gradient(rgba(24,24,27,0.95),rgba(24,24,27,0.95)),url('/images/tracks%20unblurred/rSGB_charts.png')] bg-cover bg-center">
+      <main class="w-full max-w-[95%] md:max-w-[85%] 2xl:max-w-[65%] mx-auto space-y-8 md:space-y-12 2xl:space-y-8 pt-8 md:pt-12 pb-32 md:pb-48">
 
         <!-- Header Section -->
         <header class="text-center space-y-4 md:space-y-4 2xl:space-y-4 fade-in-section">
@@ -173,110 +164,118 @@
             </div>
 
         </div>
+      </main>
+    </div>
 
 
         <!-- Stats Feature Section -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center py-12 md:py-12 2xl:py-12 fade-in-section">
-            <!-- Text Content -->
-            <div class="space-y-8 px-6 md:px-0 md:pb-16">
-                <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">individual stats</h2>
-                <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                    with <b>/stats</b>, <b>/rank-stats</b> and <b>/notables</b>, you get detailed numbers about your performances, along with recaps of your best and worst mogis.
-                    you can also use the filters to break them down by time and format.
-                </p>
-            </div>
-
-            <!-- Image Display (Simple Carousel) -->
-            <div class="flex flex-col w-full items-center max-h-[85vh]">
-                <div id="stats-card-container" class="relative w-auto min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('stats-card-container', 'stats-dots')">
-                    <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
-                        <!-- Images -->
-                        <img src="/images/examples/site/cards/stats card.png" class="w-auto h-auto max-w-full max-h-[calc(85vh-4rem)] transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
-                        <img src="/images/examples/site/cards/rank-stats card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
-                        <img src="/images/examples/site/cards/notables card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="2">
-                    </div>
+        <section class="relative z-0 w-screen ml-[calc(50%-50vw)] !-mt-8 md:!-mt-16 py-20 md:py-32 -skew-y-1 bg-zinc-900 border-y border-white/5 bg-[linear-gradient(rgba(99,102,241,0.1),rgba(99,102,241,0.1)),linear-gradient(rgba(24,24,27,0.95),rgba(24,24,27,0.95)),url('/images/tracks%20unblurred/rDKP_charts.png')] bg-cover bg-center fade-in-section">
+            <div class="max-w-[90%] md:max-w-[80%] 2xl:max-w-[60%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center skew-y-1">
+                <!-- Text Content -->
+                <div class="bg-indigo-950/30 backdrop-blur-sm border border-indigo-500/20 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-8">
+                    <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">individual stats</h2>
+                    <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
+                        with <b>/stats</b>, <b>/rank-stats</b> and <b>/notables</b>, you get detailed numbers about your performances, along with recaps of your best and worst mogis.
+                        you can also use the filters to break them down by time and format.
+                    </p>
                 </div>
-                <!-- Dots -->
-                <div id="stats-dots" class="flex justify-center gap-3 mt-8">
-                    <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
-                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
-                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+
+                <!-- Image Display (Simple Carousel) -->
+                <div class="flex flex-col w-full items-center max-h-[85vh]">
+                    <div id="stats-card-container" class="relative w-auto min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('stats-card-container', 'stats-dots')">
+                        <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
+                            <!-- Images -->
+                            <img src="/images/examples/site/cards/stats card.png" class="w-auto h-auto max-w-full max-h-[calc(85vh-4rem)] transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                            <img src="/images/examples/site/cards/rank-stats card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
+                            <img src="/images/examples/site/cards/notables card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="2">
+                        </div>
+                    </div>
+                    <!-- Dots -->
+                    <div id="stats-dots" class="flex justify-center gap-3 mt-8">
+                        <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Compare Friends Feature Section -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center py-12 md:py-12 2xl:py-12 fade-in-section">
-            <!-- Image Display (Simple Carousel) - Order 2 on mobile, Order 1 on desktop -->
-            <div class="flex flex-col w-full order-2 md:order-1 items-center max-h-[85vh]">
-                <div id="compare-card-container" class="relative w-auto min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('compare-card-container', 'compare-dots')">
-                    <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
-                        <!-- Images -->
-                        <img src="/images/examples/site/cards/head-to-head card.png" class="w-auto h-auto max-w-full max-h-[calc(85vh-4rem)] transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
-                        <img src="/images/examples/site/cards/leaderboard card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
+        <section class="relative z-10 w-screen ml-[calc(50%-50vw)] !-mt-8 md:!-mt-16 py-20 md:py-32 skew-y-1 bg-zinc-900 border-y border-white/5 bg-[linear-gradient(rgba(16,185,129,0.1),rgba(16,185,129,0.1)),linear-gradient(rgba(24,24,27,0.95),rgba(24,24,27,0.95)),url('/images/tracks%20unblurred/rDDJ_ranks.png')] bg-cover bg-center fade-in-section">
+            <div class="max-w-[90%] md:max-w-[80%] 2xl:max-w-[60%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center -skew-y-1">
+                <!-- Image Display (Simple Carousel) - Order 2 on mobile, Order 1 on desktop -->
+                <div class="flex flex-col w-full order-2 md:order-1 items-center max-h-[85vh]">
+                    <div id="compare-card-container" class="relative w-auto min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('compare-card-container', 'compare-dots')">
+                        <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
+                            <!-- Images -->
+                            <img src="/images/examples/site/cards/head-to-head card.png" class="w-auto h-auto max-w-full max-h-[calc(85vh-4rem)] transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                            <img src="/images/examples/site/cards/leaderboard card.png" class="w-full h-auto transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
+                        </div>
+                    </div>
+                    <!-- Dots -->
+                    <div id="compare-dots" class="flex justify-center gap-3 mt-8">
+                        <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
                     </div>
                 </div>
-                <!-- Dots -->
-                <div id="compare-dots" class="flex justify-center gap-3 mt-8">
-                    <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
-                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
-                </div>
-            </div>
 
-            <!-- Text Content - Order 1 on mobile, Order 2 on desktop -->
-            <div class="space-y-8 px-6 md:px-0 order-1 md:order-2 md:pb-12">
-                <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">player comparisons</h2>
-                <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                    with <b>/head-to-head</b>, you can compare any two players across shared mogis, and with <b>/leaderboard,</b> you can compare mmr across your entire server.
-                    settle the score with your friends and rivals!
-                </p>
+                <!-- Text Content - Order 1 on mobile, Order 2 on desktop -->
+                <div class="bg-emerald-950/30 backdrop-blur-sm border border-emerald-500/20 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-8 order-1 md:order-2">
+                    <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">player comparisons</h2>
+                    <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
+                        with <b>/head-to-head</b>, you can compare any two players across shared mogis, and with <b>/leaderboard,</b> you can compare mmr across your entire server.
+                        settle the score with your friends and rivals!
+                    </p>
+                </div>
             </div>
         </section>
 
         <!-- Customize Feature Section -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center py-12 md:py-12 2xl:py-12 fade-in-section">
-            <!-- Text Content -->
-            <div class="space-y-8 px-6 md:px-0 md:pb-16">
-                <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">personalized cards</h2>
-                <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
-                    with <b>/customize</b>, add your favorite track, character and vehicle to your personal cards. 
-                    your stats are unique to you, so you can make them look unique as well :)
-                </p>
-            </div>
-
-            <!-- Image Display (Vertical Flow) -->
-            <div class="flex flex-col items-center gap-2 w-full max-h-[85vh]">
-                <!-- Top Image (Standard Card Size) -->
-                <div id="customize-header-container" class="w-auto min-h-0 flex-shrink bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700/50 shadow-lg relative group bg-[#1a1a1e] flex flex-col justify-center">
-                    <img src="/images/examples/site/cards/customize.png" class="w-auto h-auto max-w-full max-h-[38vh] opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+        <section class="relative z-20 w-screen ml-[calc(50%-50vw)] !-mt-8 md:!-mt-16 py-20 md:py-32 -skew-y-1 bg-zinc-900 border-y border-white/5 bg-[linear-gradient(rgba(244,63,94,0.1),rgba(244,63,94,0.1)),linear-gradient(rgba(24,24,27,0.95),rgba(24,24,27,0.95)),url('/images/tracks%20unblurred/DBB_charts.png')] bg-cover bg-center fade-in-section">
+            <div class="max-w-[90%] md:max-w-[80%] 2xl:max-w-[60%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 2xl:gap-16 items-center skew-y-1">
+                <!-- Text Content -->
+                <div class="bg-rose-950/30 backdrop-blur-sm border border-rose-500/20 rounded-3xl p-8 shadow-lg shadow-black/30 space-y-8">
+                    <h2 class="text-5xl md:text-5xl 2xl:text-5xl font-bold text-white">personalized cards</h2>
+                    <p class="text-xl md:text-xl 2xl:text-xl text-zinc-400 leading-relaxed">
+                        with <b>/customize</b>, add your favorite track, character and vehicle to your personal cards. 
+                        your stats are unique to you, so you can make them look unique as well :)
+                    </p>
                 </div>
 
-                <!-- Bottom Image (Simple Carousel) -->
-                <div id="customize-card-container" class="relative w-full min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('customize-card-container', 'customize-dots')">
-                    <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
-                        <!-- Images -->
-                        <img src="/images/examples/site/cards/customize stats.webp" class="w-full h-auto max-h-full object-contain transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
-                        <img src="/images/examples/site/cards/customize rank stats.webp" class="w-full h-auto max-h-full object-contain transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
-                        <img src="/images/examples/site/cards/customize notables.webp" class="w-full h-auto max-h-full object-contain transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="2">
+                <!-- Image Display (Vertical Flow) -->
+                <div class="flex flex-col items-center gap-2 w-full max-h-[85vh]">
+                    <!-- Top Image (Standard Card Size) -->
+                    <div id="customize-header-container" class="w-auto min-h-0 flex-shrink bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700/50 shadow-lg relative group bg-[#1a1a1e] flex flex-col justify-center">
+                        <img src="/images/examples/site/cards/customize.png" class="w-auto h-auto max-w-full max-h-[38vh] opacity-90 group-hover:opacity-100 transition-opacity duration-300">
                     </div>
-                </div>
-                <!-- Dots -->
-                <div id="customize-dots" class="flex justify-center gap-3 mt-8">
-                    <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
-                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
-                    <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+
+                    <!-- Bottom Image (Simple Carousel) -->
+                    <div id="customize-card-container" class="relative w-full min-h-0 flex-shrink cursor-pointer" onclick="cycleCarousel('customize-card-container', 'customize-dots')">
+                        <div class="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-700/50 shadow-2xl bg-[#1a1a1e] flex items-center justify-center">
+                            <!-- Images -->
+                            <img src="/images/examples/site/cards/customize stats.webp" class="w-full h-auto max-h-full object-contain transition-opacity duration-500 relative opacity-100 z-10" data-index="0">
+                            <img src="/images/examples/site/cards/customize rank stats.webp" class="w-full h-auto max-h-full object-contain transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="1">
+                            <img src="/images/examples/site/cards/customize notables.webp" class="w-full h-auto max-h-full object-contain transition-opacity duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-0" data-index="2">
+                        </div>
+                    </div>
+                    <!-- Dots -->
+                    <div id="customize-dots" class="flex justify-center gap-3 mt-8">
+                        <div class="w-2 h-2 rounded-full bg-white transition-colors duration-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-zinc-600 transition-colors duration-300"></div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Footer / Links -->
-        <footer class="flex justify-center gap-8 text-zinc-500 pt-8 mb-12">
-            <a href="/terms" class="hover:text-white transition-colors">terms</a>
-            <a href="/privacy" class="hover:text-white transition-colors">privacy</a>
-            <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">github</a>
-        </footer>
-
-    </main>
+        <section class="relative z-0 w-screen ml-[calc(50%-50vw)] !-mt-8 md:!-mt-16 pt-24 md:pt-32 pb-12 bg-zinc-900 bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:24px_24px]">
+            <footer class="flex justify-center gap-8 text-zinc-500">
+                <a href="/terms" class="hover:text-white transition-colors">terms</a>
+                <a href="/privacy" class="hover:text-white transition-colors">privacy</a>
+                <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">github</a>
+            </footer>
+        </section>
 
     <script src="main.js"></script>
 </body>
