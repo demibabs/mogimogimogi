@@ -61,7 +61,7 @@ const MMR_OFFSET_Y = 70;
 const STATS_LABEL_OFFSET = 80;
 
 const SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
-const BACKGROUND_RESOURCE = "images/other backgrounds blurred/headtoheadbg.png";
+const BACKGROUND_RESOURCE = "bot/images/other backgrounds blurred/headtoheadbg.png";
 
 const DEFAULT_FILTERS = {
 	timeFilter: "alltime", // alltime | weekly | season
@@ -137,7 +137,7 @@ async function getRankIcon(rankName, mmr) {
 	PlayerStats.getRankIconFilename(rankName) ||
 	PlayerStats.getRankIconFilenameForMmr(mmr);
 	if (!filename) return null;
-	return loadImageResource(`images/ranks/${filename}`, `rank icon ${rankName || mmr}`);
+	return loadImageResource(`bot/images/ranks/${filename}`, `rank icon ${rankName || mmr}`);
 }
 function formatRecordText(record) {
 	if (!record) return "-";

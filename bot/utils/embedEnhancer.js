@@ -206,8 +206,8 @@ async function loadFavoriteCharacterImage(favorites) {
 
 	const baseName = character.name.toLowerCase();
 	const costume = character.costume?.toLowerCase();
-	const mainsRoot = "images/characters/mains";
-	const npcRoot = "images/characters/npcs";
+	const mainsRoot = "bot/images/characters/mains";
+	const npcRoot = "bot/images/characters/npcs";
 	const candidates = [];
 
 	const sanitize = value => normalizeWhitespace(value).replace(/\s+/g, " ");
@@ -244,8 +244,8 @@ async function loadFavoriteVehicleImage(favorites) {
 
 	const baseName = normalizeWhitespace(vehicle.toLowerCase());
 	const candidates = [
-		`images/vehicles/${baseName}.png`,
-		`images/vehicles/${baseName.replace(/\s+/g, "_")}.png`,
+		`bot/images/vehicles/${baseName}.png`,
+		`bot/images/vehicles/${baseName.replace(/\s+/g, "_")}.png`,
 	];
 
 	const tried = new Set();

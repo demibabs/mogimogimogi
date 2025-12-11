@@ -29,7 +29,7 @@ const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const LEADERBOARD_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
 const MAX_ENTRIES = 10;
 const ENTRIES_PER_COLUMN = 5;
-const BACKGROUND_RESOURCE = "images/other backgrounds blurred/leaderboardbg.png";
+const BACKGROUND_RESOURCE = "bot/images/other backgrounds blurred/leaderboardbg.png";
 
 const leaderboardSessionCache = new Map();
 const leaderboardSessionExpiryTimers = new Map();
@@ -107,7 +107,7 @@ async function getRankIconImage(rankName) {
 	if (!filename) {
 		return null;
 	}
-	return loadImageResource(`images/ranks/${filename}`, `rank icon ${rankName}`);
+	return loadImageResource(`bot/images/ranks/${filename}`, `rank icon ${rankName}`);
 }
 
 function getMetricValue(entry, timeFilter) {

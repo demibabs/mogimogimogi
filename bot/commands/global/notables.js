@@ -609,7 +609,7 @@ async function renderNotablesImage({
 	ctx.quality = "best";
 
 	try {
-		const backgroundImage = await loadImageResource(`images/tracks blurred/${trackName}_notables.png`);
+		const backgroundImage = await loadImageResource(`bot/images/tracks blurred/${trackName}_notables.png`);
 		if (backgroundImage) {
 			ctx.drawImage(backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 		}

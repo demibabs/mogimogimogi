@@ -15,8 +15,8 @@ const previewNotablesCache = new Map();
 const previewRankStatsCache = new Map();
 const previewHeadToHeadCache = new Map();
 
-const IMAGES_ROOT = path.join(__dirname, "../images");
-const TRACK_THUMBNAILS_DIR = path.join(IMAGES_ROOT, "track thumbnails");
+const IMAGES_ROOT = path.join(__dirname, "public/images");
+const TRACK_THUMBNAILS_DIR = path.join(IMAGES_ROOT, "tracks");
 const CHARACTER_MAIN_DIR = path.join(IMAGES_ROOT, "characters", "mains");
 const CHARACTER_NPC_DIR = path.join(IMAGES_ROOT, "characters", "npcs");
 const VEHICLE_DIR = path.join(IMAGES_ROOT, "vehicles");
@@ -31,7 +31,7 @@ function buildCharacterDefaultMap() {
 			const files = fs.readdirSync(dir);
 			for (const file of files) {
 				const ext = path.extname(file).toLowerCase();
-				if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") continue;
+				if (ext !== ".webp") continue;
 				const stem = path.basename(file, ext).toLowerCase();
 				const base = stem.endsWith(" default") ? stem.slice(0, -8) : stem;
 				// Prefer explicit defaults; otherwise first seen wins per base
@@ -80,9 +80,9 @@ function normalizeVehicleKey(rawName) {
 
 function getVehicleImagePath(key) {
 	if (!key) return null;
-	if (key === "mach rocket") return "/images/vehicles/mach%20rocket%20red.png";
-	if (key === "rob hog") return "/images/vehicles/rob%20hog%20red.png";
-	const file = `${key}.png`;
+	if (key === "mach rocket") return "/images/vehicles/mach%20rocket%20red.webp";
+	if (key === "rob hog") return "/images/vehicles/rob%20hog%20red.webp";
+	const file = `${key}.webp`;
 	const full = path.join(VEHICLE_DIR, file);
 	if (fs.existsSync(full)) {
 		return `/images/vehicles/${encodeURIComponent(file)}`;
@@ -101,10 +101,8 @@ function normalizeTrackKey(rawAbbr) {
 
 function getTrackImagePath(abbr) {
 	if (!abbr) return null;
-	const pngPath = path.join(TRACK_THUMBNAILS_DIR, `${abbr}.png`);
-	const jpgPath = path.join(TRACK_THUMBNAILS_DIR, `${abbr}.jpg`);
-	if (fs.existsSync(pngPath)) return `/images/track%20thumbnails/${abbr}.png`;
-	if (fs.existsSync(jpgPath)) return `/images/track%20thumbnails/${abbr}.jpg`;
+	const webpPath = path.join(TRACK_THUMBNAILS_DIR, `${abbr}.webp`);
+	if (fs.existsSync(webpPath)) return `/images/tracks/${abbr}.webp`;
 	return null;
 }
 
@@ -155,8 +153,7 @@ function startSite(client) {
 		return null;
 	}
 
-	// Serve static assets (images/fonts) before public so missing files fall through correctly
-	app.use("/images", express.static(path.join(__dirname, "../images")));
+	// Serve static assets (fonts) before public so missing files fall through correctly
 	app.use("/fonts", express.static(path.join(__dirname, "../fonts")));
 
 	// Serve public directory with explicit CSS mime type handling

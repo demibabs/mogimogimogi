@@ -284,7 +284,7 @@ async function getRankIcon(tier) {
 		console.warn(`no icon found for tier ${tier}, skipping`);
 		return null;
 	}
-	return loadImageResource(`images/ranks/${filename}`, `rank icon ${tier}`);
+	return loadImageResource(`bot/images/ranks/${filename}`, `rank icon ${tier}`);
 }
 
 async function getDivisionChart(trackName, trackColors, globals) {
@@ -908,7 +908,7 @@ async function renderStats({
 	const ctx = canvas.getContext("2d");
 
 	try {
-		const backgroundImage = await loadImageResource(`images/tracks blurred/${trackName}_stats.png`, `${trackName} stats background`);
+		const backgroundImage = await loadImageResource(`bot/images/tracks blurred/${trackName}_stats.png`, `${trackName} stats background`);
 		if (backgroundImage) {
 			ctx.drawImage(backgroundImage, 0, 0, canvasWidth, canvasHeight);
 		}

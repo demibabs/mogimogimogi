@@ -584,7 +584,7 @@ async function loadRankIcon(filename) {
 	if (!filename) {
 		return null;
 	}
-	const resource = `images/ranks/${filename}`;
+	const resource = `bot/images/ranks/${filename}`;
 	try {
 		return await loadImage(resource);
 	}
@@ -772,7 +772,7 @@ async function renderRankStatsImage({
 	const ctx = canvas.getContext("2d");
 
 	try {
-		const backgroundResource = trackName ? `images/tracks blurred/${trackName}_ranks.png` : null;
+		const backgroundResource = trackName ? `bot/images/tracks blurred/${trackName}_ranks.png` : null;
 		const backgroundImage = backgroundResource ? await loadImageResource(backgroundResource, `${trackName} background`) : null;
 		if (backgroundImage) {
 			ctx.drawImage(backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);

@@ -176,10 +176,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			const titleObserver = new IntersectionObserver((entries) => {
 				entries.forEach(entry => {
 					if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
-						navTitle.classList.remove("opacity-0");
+						navTitle.classList.remove("opacity-0", "pointer-events-none");
 					}
 					else {
-						navTitle.classList.add("opacity-0");
+						navTitle.classList.add("opacity-0", "pointer-events-none");
 					}
 				});
 			}, {
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			titleObserver.observe(headerTitle);
 		}
 		else {
-			navTitle.classList.remove("opacity-0");
+			navTitle.classList.remove("opacity-0", "pointer-events-none");
 		}
 	}
 });

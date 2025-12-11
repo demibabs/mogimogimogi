@@ -7,7 +7,7 @@ const database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const { trackAbbreviationsToNames } = require("../../utils/gameData");
 
-const assetsRoot = path.join(__dirname, "..", "..", "..", "images");
+const assetsRoot = path.join(__dirname, "..", "..", "images");
 const tracksDir = resolveAssetDirectory(["tracks blurred", "tracks"]);
 const vehiclesDir = path.join(assetsRoot, "vehicles");
 const mainsDir = path.join(assetsRoot, "characters", "mains");
