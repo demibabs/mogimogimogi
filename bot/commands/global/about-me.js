@@ -54,7 +54,7 @@ module.exports = {
 		   const embed = new EmbedBuilder()
 			   .setTitle("about me")
 			   .setColor("Aqua")
-			   .setDescription("detailed mario kart world lounge stats bot.")
+			   .setDescription("learn more: https://mogimogimogi.com")
 			  .addFields(
 				{ name: "commands", value: commandSummary, inline: false },
 				  { name: "servers:", value: String(serverCount), inline: true },
