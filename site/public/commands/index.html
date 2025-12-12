@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#27272a">
+    <title>commands • mogimogimogi</title>
+
+    <!-- Open Graph / Discord -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mogimogimogi.com/commands">
+    <meta property="og:title" content="commands • mogimogimogi">
+    <meta property="og:description" content="get detailed match data and player comparisons in the form of customizable cards.">
+    <meta property="og:image" content="https://mogimogimogi.com/images/profile/site-banner.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://mogimogimogi.com/commands">
+    <meta name="twitter:title" content="commands • mogimogimogi">
+    <meta name="twitter:description" content="get detailed match data and player comparisons in the form of customizable cards.">
+    <meta name="twitter:image" content="https://mogimogimogi.com/images/profile/site-banner.png">
+
+    <link rel="icon" href="/images/profile/favicon.webp">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-start relative bg-zinc-900">
+
+
+
+    <nav class="w-full bg-[#151518]/80 backdrop-blur-md py-4 md:py-6 px-4 md:px-12 flex justify-between items-center border-b border-white/5 sticky top-0 z-50">
+        <div class="absolute bottom-full left-0 w-full h-[50vh] bg-[#151518]/80 backdrop-blur-md pointer-events-none"></div>
+        <div class="flex items-center gap-3">
+            <a href="/" class="hover:opacity-80 transition-opacity">
+                <img src="/images/profile/pfp.webp" alt="Profile" class="w-10 h-10 rounded-full">
+            </a>
+            <a href="/" id="nav-title" class="text-xl font-bold text-white hidden md:block opacity-100 transition-opacity duration-300 hover:opacity-80">mogimogimogi</a>
+        </div>
+        <div class="flex items-center gap-4 md:gap-8">
+            <a id="nav-add-button" href="https://discord.com/oauth2/authorize?client_id=1424099836042543226" target="_blank" class="opacity-0 pointer-events-none translate-y-2 transition-all duration-300 p-2 md:px-4 md:py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-full shadow-lg hover:shadow-indigo-500/25 flex items-center gap-0 md:gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span class="hidden md:inline">add to server</span>
+            </a>
+            <a href="/commands" class="text-white transition-colors text-lg font-medium">commands</a>
+            <a href="/about" class="text-zinc-400 hover:text-white transition-colors text-lg font-medium">about me</a>
+        </div>
+    </nav>
+
+    <div class="w-full flex-grow relative z-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] bg-[size:24px_24px]">
+    <main class="w-full max-w-[95%] md:max-w-[90%] 2xl:max-w-[75%] mx-auto space-y-10 mt-10 md:mt-14 pb-8">
+        <header class="space-y-4 fade-in-section text-center">
+            <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white">commands</h1>
+            <p class="text-lg md:text-xl text-zinc-400 max-w-4xl mx-auto">learn more about what the bot does.</p>
+        </header>
+
+        <div class="space-y-8">
+        <div class="flex flex-col gap-6 md:gap-8 fade-in-section">
+            <aside class="bg-zinc-800/95 border border-zinc-700/50 rounded-3xl p-6 md:p-7 shadow-lg shadow-black/30 w-full">
+                <p class="text-sm text-zinc-300 mb-4 font-medium">jump to</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <a href="#cmd-stats" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/stats</a>
+                    <a href="#cmd-rank-stats" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/rank-stats</a>
+                    <a href="#cmd-notables" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/notables</a>
+                    <a href="#cmd-head-to-head" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/head-to-head</a>
+                    <a href="#cmd-leaderboard" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/leaderboard</a>
+                    <a href="#cmd-customize" class="block px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">/customize</a>
+                </div>
+            </aside>
+
+            <section class="space-y-8">
+                <div id="cmd-stats" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 md:bg-white/5 md:rounded-2xl md:p-6 md:border md:border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white">/stats</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            generates a card with a bunch of your stats on it. 
+                            along with data about your mmr, scores and placements, you are given info to help contextualize it, such as your average seed, room mmr and room player count.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            the card also has a nifty chart showing where you lie in the overall mmr distribution. 
+                            it's one thing to know you're in the top x percent of players, but i think actually being able to see it provides some neat perspective.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            all commands provide you with buttons that let you regenerate the image with new filters. 
+                            on this page, you will be provided with preview cards to mess around with the commands and filters.
+                            these are generated live using data from real players.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            also, all commands can be used on anyone in lounge. 
+                            you can search by lounge name (where you will be provided with autocomplete), lounge id or discord user id. 
+                            if you just want your own stats, leave the player field blank.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="stats-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="stats-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="stats-preview" alt="" class="absolute inset-0 w-full h-full object-contain" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="stats-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="stats-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="stats-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cmd-rank-stats" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 md:bg-white/5 md:rounded-2xl md:p-6 md:border md:border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white">/rank-stats</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            similar to <b>/stats</b>, but it solely tracks head-to-head matchups (including with teammates) and average scores. 
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            the table shows how your performance changes as you play against better and better opponents. 
+                            below the table, you can see the highest ranked player you've beaten and the lowest you've lost to (based on their mmr at the time you competed).
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            as is obvious, players typically have a positive win rate and above average scores vs. lower ranks, and then fall below average around their own rank or the one above. 
+                            however, there are exceptions, especially with small sample sizes. 
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            this is my personal favorite command. it shows pretty well that even though the mmr system isn't perfect, it's still very accurate at measuring your skill relative to other players.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="rank-stats-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="rank-stats-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="rank-stats-preview" alt="" class="absolute inset-0 w-full h-full object-contain hidden" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="rank-stats-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="rank-stats-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="rank-stats-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cmd-notables" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 md:bg-white/5 md:rounded-2xl md:p-6 md:border md:border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white break-all">/notables</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            highlights 6 of your notable mogis, measured by either your score, your placement relative to your seed, or your score relative to your teammates. 
+                            of course, accompanied with me either congratulating you or making fun of you :)
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            the point of notables is not to make you fixate on any particular mogis you've played. 
+                            it's moreso meant to serve as a reminder that we all have our great and terrible events regardless of skill level. 
+                            that's just the way it goes in competitive!
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            if you think of a message that would be funny to add to one of these, please do suggest it, and i'll probably add it.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="notables-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="notables-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="notables-preview" alt="" class="absolute inset-0 w-full h-full object-contain" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="notables-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="notables-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="notables-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cmd-head-to-head" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 md:bg-white/5 md:rounded-2xl md:p-6 md:border md:border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white">/head-to-head</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            shows two players' record against each other in mogis where they both competed (regardless of whether they were teammates or opponents).
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            it displays info about scores, placements and mmr gains, along with each player's biggest win (measured by point differential). 
+                            i'm considering adding "most recent matchup" as well, but i'm not sure how to do that without changing the card layout.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            when you use this command, you are given two fields to put player names, but if you want to compare someone with yourself, just leave the second one blank.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
+                        <div class="rounded-2xl bg-white/5 border border-white/10 overflow-hidden shadow-inner">
+                            <div class="bg-zinc-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                                <p class="text-sm text-zinc-300 font-semibold">preview</p>
+                                <div id="head-to-head-loading" class="text-xs text-indigo-300 hidden">loading…</div>
+                            </div>
+                            <div class="relative bg-gradient-to-br from-zinc-900 to-zinc-800 aspect-video">
+                                <div id="head-to-head-placeholder" class="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">loading…</div>
+                                <img id="head-to-head-preview" alt="" class="absolute inset-0 w-full h-full object-contain" style="visibility:hidden;">
+                            </div>
+                            <div class="p-3 space-y-2 bg-zinc-900/60 border-t border-white/5">
+                                <div class="grid grid-cols-3 gap-2" id="head-to-head-time-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="head-to-head-queue-row"></div>
+                                <div class="grid grid-cols-3 gap-2" id="head-to-head-players-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cmd-leaderboard" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 md:bg-white/5 md:rounded-2xl md:p-6 md:border md:border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white break-all">/leaderboard</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            generates a server mmr leaderboard, which you can sort by weekly or seasonal gains. 
+                            you're also given buttons that you can use to scroll through users by page.
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            if you use it in a large server, be mindful that this command will take a while to run, as it requires fetching a large amount of data from lounge.
+                        </p>
+
+                        <p class="text-zinc-400 leading-relaxed">
+                            (no preview for this one, sorry. but, i mean, it's pretty clear what it does.)
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-[30rem] md:max-w-[50%]">
+                        <div class="aspect-video rounded-xl bg-gradient-to-br from-zinc-700/70 to-zinc-900/70 border border-white/5 overflow-hidden">
+                            <img src="/images/carousel/leaderboard3.webp" alt="" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cmd-customize" class="scroll-anchor-section bg-zinc-800/60 border border-zinc-700/50 rounded-3xl p-8 shadow-lg shadow-black/30 flex flex-col gap-8 md:flex-row md:items-start">
+                    <div class="flex-1 md:bg-white/5 md:rounded-2xl md:p-6 md:border md:border-white/10 flex flex-col justify-center gap-4">
+                        <h2 class="text-3xl font-semibold text-white break-all">/customize</h2>
+                        <p class="text-zinc-400 leading-relaxed">
+                            lets you change how your cards look, both by setting the background and adding images of your favorite character and vehicle. 
+                            you can choose the character's outfit too, if they have any. 
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            these will also be shown to other people who view your stats. 
+                            if you have not customized, your cards will feature a random track background with no character/vehicle icons.
+
+                        </p>
+                        <p class="text-zinc-400 leading-relaxed">
+                            this only affects <b>/stats</b>, <b>/rank-stats</b> and <b>/notables</b>.
+                        </p>
+                    </div>
+
+                    <div id="customize-table" class="w-full md:w-[30rem] md:max-w-[50%]">
+                        <div class="bg-white/5 border border-white/5 rounded-2xl p-4 min-h-[240px] flex items-center justify-center text-zinc-500 text-sm" data-placeholder>
+                            loading favorites…
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="flex justify-center gap-8 text-zinc-500 mb-12">
+            <a href="/terms" class="hover:text-white transition-colors">terms</a>
+            <a href="/privacy" class="hover:text-white transition-colors">privacy</a>
+            <a href="https://github.com/demibabs/mogibot" target="_blank" class="hover:text-white transition-colors">github</a>
+        </footer>
+        </div>
+    </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/scroll-anchor.js"></script>
+    <script src="/js/commands.js"></script>
+</body>
+</html>

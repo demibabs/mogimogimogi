@@ -167,19 +167,19 @@ function startSite(client) {
 
 	// Clean URLs for terms and privacy
 	app.get("/terms", (req, res) => {
-		res.sendFile(path.join(__dirname, "public", "terms.html"));
+		res.sendFile(path.join(__dirname, "public", "terms", "index.html"));
 	});
 
 	app.get("/privacy", (req, res) => {
-		res.sendFile(path.join(__dirname, "public", "privacy.html"));
+		res.sendFile(path.join(__dirname, "public", "privacy", "index.html"));
 	});
 
 	app.get("/commands", (req, res) => {
-		res.sendFile(path.join(__dirname, "public", "commands.html"));
+		res.sendFile(path.join(__dirname, "public", "commands", "index.html"));
 	});
 
 	app.get("/about", (req, res) => {
-		res.sendFile(path.join(__dirname, "public", "about.html"));
+		res.sendFile(path.join(__dirname, "public", "about", "index.html"));
 	});
 
 	// API route for stats
