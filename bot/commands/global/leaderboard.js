@@ -821,6 +821,11 @@ module.exports = {
 		try {
 			await interaction.deferReply();
 
+			if (!interaction.inGuild()) {
+				await interaction.editReply("this command can only be used inside a server.");
+				return;
+			}
+
 			const result = await generateLeaderboard(interaction, {
 				timeFilter: "alltime",
 				page: 1,

@@ -153,11 +153,6 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		if (!interaction.inGuild()) {
-			await interaction.editReply("this command can only be used inside a server.");
-			return;
-		}
-
 		const trackValue = interaction.options.getString("track")?.toLowerCase() ?? null;
 		const vehicleValue = interaction.options.getString("vehicle")?.toLowerCase() ?? null;
 		const characterValue = interaction.options.getString("character")?.toLowerCase() ?? null;
@@ -186,7 +181,7 @@ module.exports = {
 		}
 
 		const userId = interaction.user.id;
-		const serverId = interaction.guild.id;
+		const serverId = interaction.guild?.id || null;
 
 		let selectedCostume = null;
 		let promptedForCostume = false;
