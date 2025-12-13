@@ -222,7 +222,7 @@ function drawStatsGrid(ctx, frame, trackColors, gridConfig) {
 			let valueX = cellCenterX;
 
 			if (cell.icon) {
-				const iconSize = LAYOUT.statsValueFontSize * 0.8;
+				const iconSize = LAYOUT.statsValueFontSize * 0.85;
 				const iconGap = 10;
 				const textMetrics = ctx.measureText(valueText);
 				const totalWidth = iconSize + iconGap + textMetrics.width;
