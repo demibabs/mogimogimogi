@@ -217,17 +217,32 @@ function drawStatsGrid(ctx, frame, trackColors, gridConfig) {
 			if (valueY < minValueY) {
 				valueY = minValueY;
 			}
+
+			const valueText = cell.value ?? "-";
+			let valueX = cellCenterX;
+
+			if (cell.icon) {
+				const iconSize = LAYOUT.statsValueFontSize * 0.85;
+				const iconGap = 12;
+				const textMetrics = ctx.measureText(valueText);
+				const totalWidth = iconSize + iconGap + textMetrics.width;
+				const startX = cellCenterX - totalWidth / 2;
+
+				ctx.drawImage(cell.icon, startX, valueY - iconSize / 2, iconSize, iconSize);
+				valueX = startX + iconSize + iconGap + textMetrics.width / 2;
+			}
+
 			if (valueOutlineColor) {
 				ctx.save();
 				ctx.lineWidth = 4;
 				ctx.strokeStyle = valueOutlineColor;
 				ctx.lineJoin = "round";
-				ctx.strokeText(cell.value ?? "-", cellCenterX, valueY);
+				ctx.strokeText(valueText, valueX, valueY);
 				ctx.restore();
 			}
-			ctx.fillText(cell.value ?? "-", cellCenterX, valueY);
+			ctx.fillText(valueText, valueX, valueY);
 
-			if (cell.subLabel) {
+			if (cell.subLabel || cell.subLabelPrefix) {
 				ctx.font = subLabelFont;
 				ctx.fillStyle = defaultTextColor;
 				let subY = yOffset + cellBottom - LAYOUT.statsCellAdditionalBottomPadding;
@@ -238,7 +253,32 @@ function drawStatsGrid(ctx, frame, trackColors, gridConfig) {
 				if (subY < minSubY) {
 					subY = minSubY;
 				}
-				ctx.fillText(cell.subLabel, cellCenterX, subY);
+
+				const subText = cell.subLabel || "";
+				const subPrefix = cell.subLabelPrefix || "";
+				let subX = cellCenterX;
+
+				if (cell.subLabelIcon) {
+					const subIconSize = LAYOUT.statsSubLabelFontSize * 1.2;
+					const subIconGap = 6;
+					const subPrefixMetrics = ctx.measureText(subPrefix);
+					const subTextMetrics = ctx.measureText(subText);
+					const totalSubWidth = subPrefixMetrics.width + subIconSize + subIconGap + subTextMetrics.width;
+					const startX = cellCenterX - totalSubWidth / 2;
+
+					if (subPrefix) {
+						ctx.fillText(subPrefix, startX + subPrefixMetrics.width / 2, subY);
+					}
+
+					const iconX = startX + subPrefixMetrics.width;
+					ctx.drawImage(cell.subLabelIcon, iconX, subY - subIconSize / 2, subIconSize, subIconSize);
+
+					const textX = iconX + subIconSize + subIconGap + subTextMetrics.width / 2;
+					ctx.fillText(subText, textX, subY);
+				}
+				else {
+					ctx.fillText(subPrefix + subText, subX, subY);
+				}
 			}
 		});
 	});
@@ -838,14 +878,38 @@ async function renderStats({
 	const mmrDisplay = showCurrentMmr ? formatNumber(mmrRaw) : formatSignedNumber(mmrDeltaForFilter);
 	const mmrFormatted = formatNumber(mmrRaw);
 	let mmrSubLabel = null;
+	let mmrSubLabelPrefix = null;
+
 	if (showCurrentMmr) {
 		if (Number.isFinite(peakMmr)) {
-			mmrSubLabel = `(peak: ${formatNumber(Math.round(peakMmr))})`;
+			mmrSubLabelPrefix = "(peak: ";
+			mmrSubLabel = `${formatNumber(Math.round(peakMmr))})`;
 		}
 	}
 	else if (mmrFormatted !== "-") {
-		mmrSubLabel = `(current: ${mmrFormatted})`;
+		mmrSubLabelPrefix = "(current: ";
+		mmrSubLabel = `${mmrFormatted})`;
 	}
+
+	let mmrIcon = null;
+	let mmrIconFilename = null;
+	if (showCurrentMmr) {
+		const iconFilename = PlayerStats.getRankIconFilenameForMmr(mmr);
+		if (iconFilename) {
+			mmrIconFilename = iconFilename;
+			mmrIcon = await loadImageResource(`bot/images/ranks/${iconFilename}`, "mmr rank icon");
+		}
+	}
+
+	let mmrSubLabelIcon = null;
+	const subLabelMmrValue = showCurrentMmr ? peakMmr : mmr;
+	if (Number.isFinite(subLabelMmrValue)) {
+		const subIconFilename = PlayerStats.getRankIconFilenameForMmr(subLabelMmrValue);
+		if (subIconFilename && subIconFilename !== mmrIconFilename) {
+			mmrSubLabelIcon = await loadImageResource(`bot/images/ranks/${subIconFilename}`, "mmr sublabel icon");
+		}
+	}
+
 	const averageRoomMmr = PlayerStats.computeAverageRoomMmr(filteredTables);
 	const averageRoomMmrDisplay = Number.isFinite(averageRoomMmr) ? formatNumber(Math.round(averageRoomMmr)) : "-";
 
@@ -1091,6 +1155,9 @@ async function renderStats({
 				label: "mmr",
 				value: mmrDisplay,
 				subLabel: mmrSubLabel || undefined,
+				subLabelPrefix: mmrSubLabelPrefix || undefined,
+				icon: mmrIcon,
+				subLabelIcon: mmrSubLabelIcon,
 			},
 			{ label: "rank", value: rank, subLabel: percent ? `(top ${percent}%)` : undefined },
 			{ label: "team\nwin rate", value: winRateText, subLabel: winLossRecord ? `(${winLossRecord})` : undefined },
