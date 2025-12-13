@@ -222,8 +222,8 @@ function drawStatsGrid(ctx, frame, trackColors, gridConfig) {
 			let valueX = cellCenterX;
 
 			if (cell.icon) {
-				const iconSize = LAYOUT.statsValueFontSize * 0.75;
-				const iconGap = 8;
+				const iconSize = LAYOUT.statsValueFontSize * 0.8;
+				const iconGap = 10;
 				const textMetrics = ctx.measureText(valueText);
 				const totalWidth = iconSize + iconGap + textMetrics.width;
 				const startX = cellCenterX - totalWidth / 2;
@@ -259,7 +259,7 @@ function drawStatsGrid(ctx, frame, trackColors, gridConfig) {
 				const subX = cellCenterX;
 
 				if (cell.subLabelIcon) {
-					const subIconSize = LAYOUT.statsSubLabelFontSize * 1.2;
+					const subIconSize = LAYOUT.statsSubLabelFontSize * 1.1;
 					const subIconGap = 6;
 					const subPrefixMetrics = ctx.measureText(subPrefix);
 					const subTextMetrics = ctx.measureText(subText);
