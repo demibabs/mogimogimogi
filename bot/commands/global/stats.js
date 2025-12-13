@@ -260,7 +260,7 @@ function drawStatsGrid(ctx, frame, trackColors, gridConfig) {
 
 				if (cell.subLabelIcon) {
 					const subIconSize = LAYOUT.statsSubLabelFontSize * 1.1;
-					const subIconGap = 6;
+					const subIconGap = 4;
 					const subPrefixMetrics = ctx.measureText(subPrefix);
 					const subTextMetrics = ctx.measureText(subText);
 					const totalSubWidth = subPrefixMetrics.width + subIconSize + subIconGap + subTextMetrics.width;
