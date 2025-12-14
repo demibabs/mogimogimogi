@@ -1541,7 +1541,7 @@ module.exports = {
 				console.warn("failed to refresh favorites", error);
 			}
 
-			const serverId = interaction.guild.id;
+			const serverId = interaction.guild?.id || "DM";
 			const target = await resolveTargetPlayer(interaction, {
 				loungeId,
 			});

@@ -994,7 +994,7 @@ module.exports = {
 
 			await interaction.update({ components });
 
-			const serverId = interaction.guild.id;
+			const serverId = interaction.guild?.id || "DM";
 			const target = await resolveTargetPlayer(interaction, {
 				loungeId,
 			});

@@ -1398,11 +1398,7 @@ module.exports = {
 
 			await interaction.update({ components });
 
-			const serverId = interaction.guild?.id;
-			if (!serverId) {
-				await interaction.editReply({ content: "unable to determine server context for this request.", components, files: [] });
-				return true;
-			}
+			const serverId = interaction.guild?.id || "DM";
 
 			let target = null;
 			if (cachedSession && cachedSession.loungeId === loungeId) {
