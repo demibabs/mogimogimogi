@@ -57,10 +57,9 @@ module.exports = {
 			}
 		}
 
-		const getTop5 = (counts, nameMap = null) => {
+		const getAllRanked = (counts, nameMap = null) => {
 			return Object.entries(counts)
 				.sort(([, a], [, b]) => b - a)
-				.slice(0, 5)
 				.map(([key, count], index) => {
 					const name = nameMap ? (nameMap[key] || key) : key;
 					return `${index + 1}. **${name}** (${count})`;
@@ -68,18 +67,18 @@ module.exports = {
 				.join("\n") || "No data yet.";
 		};
 
-		const topCharacters = getTop5(characterCounts);
-		const topTracks = getTop5(trackCounts, trackAbbreviationsToNames);
-		const topVehicles = getTop5(vehicleCounts);
+		const rankedCharacters = getAllRanked(characterCounts);
+		const rankedTracks = getAllRanked(trackCounts, trackAbbreviationsToNames);
+		const rankedVehicles = getAllRanked(vehicleCounts);
 
 		const embed = new EmbedBuilder()
 			.setTitle("Global Favorites")
 			.setDescription(`Most popular choices across ${usersWithFavorites} users with set favorites.`)
 			.setColor("Gold")
 			.addFields(
-				{ name: "Top Characters", value: topCharacters, inline: true },
-				{ name: "Top Tracks", value: topTracks, inline: true },
-				{ name: "Top Vehicles", value: topVehicles, inline: true },
+				{ name: "Characters", value: rankedCharacters, inline: true },
+				{ name: "Tracks", value: rankedTracks, inline: true },
+				{ name: "Vehicles", value: rankedVehicles, inline: true },
 			)
 			.setTimestamp();
 
