@@ -652,7 +652,7 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 	}
 }
 
-async function collectLeaderboardEntries(interaction, game, roleId = null) {
+async function collectLeaderboardEntries(interaction, roleId = null) {
 	// Ensure cache is complete
 	if (interaction.guild.memberCount > interaction.guild.members.cache.size) {
 		try {
@@ -672,7 +672,8 @@ async function collectLeaderboardEntries(interaction, game, roleId = null) {
 		memberList = memberList.filter(m => m.roles.cache.has(roleId));
 	}
 	
-	const entries = [];
+	const entries12p = [];
+	const entries24p = [];
 	const BATCH_SIZE = 5;
 	const total = memberList.length;
 
@@ -687,56 +688,75 @@ async function collectLeaderboardEntries(interaction, game, roleId = null) {
 
 		const promises = batch.map(async (member) => {
 			try {
-				const details = await LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, game);
-				if (!details) return null;
+				const [details12p, details24p] = await Promise.all([
+					LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, "mkworld12p"),
+					LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, "mkworld24p")
+				]);
 
-				const mmr = Number(details.mmr ?? details.currentMmr ?? details.mmrValue);
-				if (!Number.isFinite(mmr)) {
-					return null;
-				}
+				const processDetails = (details) => {
+					if (!details) return null;
+					const mmr = Number(details.mmr ?? details.currentMmr ?? details.mmrValue);
+					if (!Number.isFinite(mmr)) return null;
 
-				const mmrChanges = Array.isArray(details.mmrChanges) ? details.mmrChanges : [];
-				const activity = computeActivityFlags(mmrChanges);
-				const weeklyDelta = PlayerStats.computeMmrDeltaForFilter({
-					playerDetails: details,
-					timeFilter: "weekly",
-				});
-				const seasonDelta = PlayerStats.computeMmrDeltaForFilter({
-					playerDetails: details,
-					timeFilter: "season",
-				});
+					const mmrChanges = Array.isArray(details.mmrChanges) ? details.mmrChanges : [];
+					const activity = computeActivityFlags(mmrChanges);
+					const weeklyDelta = PlayerStats.computeMmrDeltaForFilter({
+						playerDetails: details,
+						timeFilter: "weekly",
+					});
+					const seasonDelta = PlayerStats.computeMmrDeltaForFilter({
+						playerDetails: details,
+						timeFilter: "season",
+					});
+
+					return {
+						loungeId: String(details.id),
+						mmr,
+						activity,
+						countryCode: details.countryCode || null,
+						rankName: details.rankName || details.rank || null,
+						mmrChanges,
+						metrics: {
+							alltime: mmr,
+							weekly: weeklyDelta,
+							season: seasonDelta,
+						},
+						playerDetails: {
+							name: details.name || details.loungeName || null,
+						},
+						displayName: member.user.displayName,
+						flagEmoji: getCountryFlag(details.countryCode),
+					};
+				};
 
 				return {
-					loungeId: String(details.id),
-					mmr,
-					activity,
-					countryCode: details.countryCode || null,
-					rankName: details.rankName || details.rank || null,
-					mmrChanges,
-					metrics: {
-						alltime: mmr,
-						weekly: weeklyDelta,
-						season: seasonDelta,
-					},
-					playerDetails: {
-						name: details.name || details.loungeName || null,
-					},
-					displayName: member.user.displayName,
-					flagEmoji: getCountryFlag(details.countryCode),
+					entry12p: processDetails(details12p),
+					entry24p: processDetails(details24p)
 				};
 			}
 			catch (error) {
-				// console.warn(`leaderboard: failed to load player details for ${member.displayName}:`, error);
 				return null;
 			}
 		});
 
 		const results = await Promise.all(promises);
-		entries.push(...results.filter(Boolean));
+		for (const result of results) {
+			if (result) {
+				if (result.entry12p) entries12p.push(result.entry12p);
+				if (result.entry24p) entries24p.push(result.entry24p);
+			}
+		}
 	}
 
-	entries.sort((a, b) => b.mmr - a.mmr);
-	return entries;
+	entries12p.sort((a, b) => b.mmr - a.mmr);
+	entries24p.sort((a, b) => b.mmr - a.mmr);
+	
+	// Hydrate immediately to fix display names
+	// Wait, hydrateEntryDisplay is async? 
+	// No, it handles fallback logic.
+	// We can do it in generateLeaderboard or here.
+	
+	return { entries12p, entries24p };
 }
 
 async function hydrateEntryDisplay(interaction, entry) {
@@ -786,29 +806,31 @@ async function generateLeaderboard(interaction, {
 		};
 	}
 
-	// Regenerate session (fetch data) if cache is stale or if game mode or role changed
-	// 5 minute data freshness cache
+	// Regenerate session (fetch data) if cache is stale or if role changed
 	const isStale = (Date.now() - (session.generatedAt || 0)) > (5 * 60 * 1000);
-	if (!session.entries?.length || session.game !== selectedGame || session.roleId !== selectedRoleId || isStale) {
-		
-		// If it's just a pagination or time filter change on existing valid data, we wouldn't be here unless data is missing/stale.
-		// However, generateLeaderboard is called with an existing session most times.
-		// But wait, the 'game' param passed in takes precedence, so we check if it matches session.
-		
+	const hasEntries = session.entries12p?.length > 0 || session.entries24p?.length > 0;
+	
+	if (!hasEntries || session.roleId !== selectedRoleId || isStale) {
 		await interaction.editReply("scanning members...");
-		const entries = await collectLeaderboardEntries(interaction, selectedGame, selectedRoleId);
+		const { entries12p, entries24p } = await collectLeaderboardEntries(interaction, selectedRoleId);
 		session = {
 			...session,
 			serverId,
 			serverName: guildName,
-			game: selectedGame,
+			game: selectedGame, // Just for reference
 			roleId: selectedRoleId,
-			entries,
+			entries12p,
+			entries24p,
 			generatedAt: Date.now(),
 		};
 	}
+
 	await interaction.editReply("sorting players...");
-	const pool = session.entries.filter(entry => {
+	
+	// Select the correct list based on game mode
+	const currentEntries = selectedGame.includes("24p") ? (session.entries24p || []) : (session.entries12p || []);
+	
+	const pool = currentEntries.filter(entry => {
 		if (timeFilter === "alltime") return true;
 		return Boolean(entry.activity?.[timeFilter]);
 	});
@@ -865,6 +887,8 @@ async function generateLeaderboard(interaction, {
 		serverId,
 		page: safePage,
 		totalPages,
+		game: selectedGame, // Fix: pass game mode to component builder
+		roleId: selectedRoleId,
 	});
 
 	return {
