@@ -405,6 +405,7 @@ function getLeaderboardSession(messageId) {
 async function renderLeaderboardImage({
 	serverName,
 	timeFilter,
+	gameLabel,
 	entries,
 	palette,
 	totalEligible,
@@ -443,7 +444,7 @@ async function renderLeaderboardImage({
 
 	const timeLabel = TIME_LABELS[timeFilter] || timeFilter;
 	const playerCount = Number.isFinite(totalEligible) ? totalEligible : entries.length;
-	const subtitleParts = [timeLabel, `${playerCount} player${playerCount === 1 ? "" : "s"}`];
+	const subtitleParts = [gameLabel, timeLabel, `${playerCount} player${playerCount === 1 ? "" : "s"}`];
 	if (totalPages > 1) {
 		subtitleParts.push(`page ${page}/${totalPages}`);
 	}
@@ -780,7 +781,7 @@ async function generateLeaderboard(interaction, {
 	const serverId = interaction.guildId;
 			const selectedGame = game || existingSession?.game || "mkworld12p";
 	const selectedRoleId = roleId || existingSession?.roleId || null;
-	const formatLabel = selectedGame.includes("24p") ? " (24p)" : "";
+	const gameLabel = selectedGame.includes("24p") ? "24p" : "12p";
 	
 	let roleName = "";
 	if (selectedRoleId) {
@@ -790,7 +791,7 @@ async function generateLeaderboard(interaction, {
 		}
 	}
 	
-	const guildName = (interaction.guild?.name || "server") + roleName + " leaderboard" + formatLabel;
+	const guildName = (interaction.guild?.name || "server") + roleName + " leaderboard";
 	const palette = getPalette();
 
 	// If no session, make a dummy one for logic below, but we'll overwrite it
@@ -865,6 +866,7 @@ async function generateLeaderboard(interaction, {
 	const attachment = await renderLeaderboardImage({
 		serverName: session.serverName || guildName,
 		timeFilter,
+		gameLabel,
 		entries: topEntries,
 		palette,
 		totalEligible: pool.length,
