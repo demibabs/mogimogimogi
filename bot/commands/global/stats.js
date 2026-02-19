@@ -538,6 +538,7 @@ function drawMMRMarker(ctx, mmr, trackName, {
 	metrics,
 	iconSize,
 	iconGap,
+	gameMode = "mkworld12p",
 }) {
 	const mmrValue = Number(mmr);
 	if (!Number.isFinite(mmrValue)) {
@@ -545,7 +546,7 @@ function drawMMRMarker(ctx, mmr, trackName, {
 	}
 
 	const tierInfos = Array.isArray(labels)
-		? labels.map(label => PlayerStats.getRankThresholdByName(label))
+		? labels.map(label => PlayerStats.getRankThresholdByName(label, gameMode))
 		: [];
 	if (!tierInfos.length) {
 		return;
@@ -566,7 +567,7 @@ function drawMMRMarker(ctx, mmr, trackName, {
 	}
 
 	if (tierIndex === -1) {
-		const fallbackTier = PlayerStats.getRankThresholdForMmr(mmrValue);
+		const fallbackTier = PlayerStats.getRankThresholdForMmr(mmrValue, gameMode);
 		if (fallbackTier) {
 			const matchingIndex = tierInfos.findIndex(info => info?.key === fallbackTier.key);
 			if (matchingIndex !== -1) {
@@ -700,6 +701,18 @@ async function renderStats({
 	let displayName = target?.displayName || target?.loungeName || fallbackName;
 	let loungeName = target?.loungeName || displayName || fallbackName;
 	let playerDetails = useSession ? session.playerDetails : null;
+
+	// Invalidate playerDetails if it doesn't match the specific requested mode
+	if (playerDetails && playerCountFilter && playerCountFilter !== "both") {
+		const expectedMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+		if (playerDetails.gameMode !== expectedMode) {
+			playerDetails = null;
+		}
+	} else if (playerDetails && playerCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
+		// If switching back to "both" from a specific filter, invalidate to allow smart selection logic to run again
+		playerDetails = null;
+	}
+
 	let allTables = useSession ? session.allTables : null;
 	let favorites = useSession ? session.favorites || {} : null;
 	let favoriteCharacterImage = null;
@@ -710,10 +723,50 @@ async function renderStats({
 	let storedRecord = null;
 
 	if (!playerDetails) {
-		playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
-		if (!playerDetails) {
+		let gameMode = "mkworld12p";
+		let details = null;
+		
+		if (playerCountFilter && playerCountFilter !== "both") {
+			// Specific mode requested
+			gameMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+			details = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, gameMode);
+		} else {
+			// "both" or unspecified -> fetch both and compare
+			const [details12p, details24p] = await Promise.all([
+				LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld12p"),
+				LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld24p")
+			]);
+
+			if (!details12p && !details24p) {
+				return { success: false, message: "couldn't find that player in mkw lounge." };
+			}
+
+			if (details12p && !details24p) {
+				details = details12p;
+				gameMode = "mkworld12p";
+			} else if (!details12p && details24p) {
+				details = details24p;
+				gameMode = "mkworld24p";
+			} else {
+				// Both exist, compare MMR
+				const mmr12p = details12p.mmr || 0;
+				const mmr24p = details24p.mmr || 0;
+				if (mmr24p > mmr12p) {
+					details = details24p;
+					gameMode = "mkworld24p";
+				} else {
+					details = details12p;
+					gameMode = "mkworld12p";
+				}
+			}
+		}
+
+		if (!details) {
 			return { success: false, message: "couldn't find that player in mkw lounge." };
 		}
+		playerDetails = details;
+		// Inject the gameMode so getAllPlayerTables can use it
+		playerDetails.gameMode = gameMode;
 	}
 
 	if (!useSession && !skipAutoUserAndMembership) {
@@ -809,7 +862,8 @@ async function renderStats({
 	}
 
 	if (!globals) {
-		globals = await LoungeApi.getGlobalStats();
+		const globalStatsGameMode = playerDetails?.gameMode || "mkworld12p";
+		globals = await LoungeApi.getGlobalStats(undefined, globalStatsGameMode);
 	}
 
 	const playerStats = await getPlayerStats(normalizedLoungeId, serverId, filteredTables, playerDetails, null);
@@ -825,76 +879,104 @@ async function renderStats({
 			queueFilter,
 			playerCountFilter,
 		});
+
+	// Determine what to show based on filters
+	// If playerCountFilter is "both" (or unspecified), we show current MMR + Peak/GameMode label
+	// If playerCountFilter is specific, we calculate Peak for that mode (Season 2+)
+	
+	const isSpecificPlayerCount = playerCountFilter === "12p" || playerCountFilter === "24p" || playerCountFilter === "mkworld12p" || playerCountFilter === "mkworld24p";
+	const isAllTimeOrSeason = timeFilter === "alltime" || timeFilter === "season";
+	const isQueueAny = queueFilter === "both" || !queueFilter;
 	const filtersAreBoth = queueFilter === "both" && playerCountFilter === "both";
-	const isAllTimeView = timeFilter === "alltime";
-	const isSeasonView = timeFilter === "season";
-	const showCurrentMmr = filtersAreBoth && (isAllTimeView || isSeasonView);
+
+	// Show current MMR if filters are both+alltime/season OR specific count+queue any+alltime/season
+	const showCurrentMmr = (isSpecificPlayerCount && isQueueAny && isAllTimeOrSeason) || (filtersAreBoth && isAllTimeOrSeason);
+
 	let peakMmr = null;
+	const targetGameMode = (playerCountFilter && playerCountFilter.includes("24p")) ? "mkworld24p" : "mkworld12p";
+
+	// Calculate Peak MMR if we are showing current MMR and filters support it
 	if (showCurrentMmr) {
-		if (isSeasonView) {
-			const seasonPeak = Number(playerDetails?.maxMmr);
-			if (Number.isFinite(seasonPeak)) {
-				peakMmr = seasonPeak;
-			}
+		const peaks = [];
+		const currentSeasonPeak = Number(playerDetails?.maxMmr);
+		if (Number.isFinite(currentSeasonPeak)) {
+			peaks.push(currentSeasonPeak);
 		}
-		else if (isAllTimeView) {
-			const peaks = [];
-			const currentSeasonPeak = Number(playerDetails?.maxMmr);
-			if (Number.isFinite(currentSeasonPeak)) {
-				peaks.push(currentSeasonPeak);
+
+		if (isSpecificPlayerCount && isAllTimeOrSeason) {
+			// Search history for peak in this specific mode, starting from Season 2
+			// Season 0 and 1 are ignored as requested
+			const startSeason = 2; 
+			const currentSeason = Number(LoungeApi.DEFAULT_SEASON) || 15; // Fallback if constant missing
+			const targetGameMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+
+			const pastSeasons = [];
+			for (let s = startSeason; s < currentSeason; s++) {
+				pastSeasons.push(s);
 			}
-			const maxSeason = Number(LoungeApi.DEFAULT_SEASON);
-			if (Number.isFinite(maxSeason) && maxSeason > 0) {
-				const seasonIndices = [];
-				for (let seasonIndex = 0; seasonIndex < maxSeason; seasonIndex++) {
-					seasonIndices.push(seasonIndex);
-				}
-				if (seasonIndices.length) {
-					const seasonResults = await Promise.all(seasonIndices.map(async seasonIndex => {
-						try {
-							return await LoungeApi.getPlayerByLoungeId(normalizedLoungeId, seasonIndex);
-						}
-						catch (seasonError) {
-							console.warn(`failed to fetch season ${seasonIndex} peak mmr for ${normalizedLoungeId}:`, seasonError);
-							return null;
-						}
-					}));
-					seasonResults.forEach(seasonData => {
-						const seasonalPeak = Number(seasonData?.maxMmr);
-						if (Number.isFinite(seasonalPeak)) {
-							peaks.push(seasonalPeak);
-						}
-					});
-				}
+
+			if (pastSeasons.length > 0) {
+				const seasonResults = await Promise.all(pastSeasons.map(async s => {
+					try {
+						return await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, s, targetGameMode);
+					} catch (e) {
+						console.warn(`failed to fetch season ${s} details for ${normalizedLoungeId}:`, e);
+						return null;
+					}
+				}));
+
+				seasonResults.forEach(seasonData => {
+					const sPeak = Number(seasonData?.maxMmr);
+					if (Number.isFinite(sPeak)) {
+						peaks.push(sPeak);
+					}
+				});
 			}
-			if (peaks.length) {
-				peakMmr = Math.max(...peaks);
-			}
+		} 
+		
+		if (peaks.length > 0) {
+			peakMmr = Math.max(...peaks);
 		}
+
+		// Fallback to current MMR if peak logic failed but current exists
 		if (!Number.isFinite(peakMmr) && Number.isFinite(mmr)) {
 			peakMmr = mmr;
 		}
 	}
-	const mmrDisplay = showCurrentMmr ? formatNumber(mmrRaw) : formatSignedNumber(mmrDeltaForFilter);
-	const mmrFormatted = formatNumber(mmrRaw);
+
+	const mmrDisplay = showCurrentMmr && Number.isFinite(mmr) ? formatNumber(Math.round(mmr)) : formatSignedNumber(mmrDeltaForFilter);
+	const mmrFormatted = formatNumber(mmrRaw); 
+	
 	let mmrSubLabel = null;
 	let mmrSubLabelPrefix = null;
 
 	if (showCurrentMmr) {
-		if (Number.isFinite(peakMmr)) {
-			mmrSubLabelPrefix = "(peak: ";
-			mmrSubLabel = `${formatNumber(Math.round(peakMmr))})`;
+		if (isSpecificPlayerCount) {
+			// Case: Specific Mode - Show Peak MMR (Season 2+)
+			if (Number.isFinite(peakMmr)) {
+				mmrSubLabelPrefix = "(peak: ";
+				mmrSubLabel = `${formatNumber(Math.round(peakMmr))})`;
+			}
+		} else {
+			// Case: Both Modes - Show "12p" or "24p"
+			// The current MMR displayed comes from `playerDetails.gameMode` (logic added previously)
+			const mode = playerDetails?.gameMode === "mkworld24p" ? "24p" : "12p";
+			mmrSubLabelPrefix = "";
+			mmrSubLabel = `(${mode})`;
 		}
 	}
 	else if (mmrFormatted !== "-") {
+		// Not showing current MMR (e.g. standard view showing delta) -> sublabel is current MMR
 		mmrSubLabelPrefix = "(current: ";
 		mmrSubLabel = `${mmrFormatted})`;
 	}
 
+
 	let mmrIcon = null;
 	let mmrIconFilename = null;
 	if (showCurrentMmr) {
-		const iconFilename = PlayerStats.getRankIconFilenameForMmr(mmr);
+		const rankGameMode = playerDetails?.gameMode || "mkworld12p";
+		const iconFilename = PlayerStats.getRankIconFilenameForMmr(mmr, rankGameMode);
 		if (iconFilename) {
 			mmrIconFilename = iconFilename;
 			mmrIcon = await loadImageResource(`bot/images/ranks/${iconFilename}`, "mmr rank icon");
@@ -903,8 +985,14 @@ async function renderStats({
 
 	let mmrSubLabelIcon = null;
 	const subLabelMmrValue = showCurrentMmr ? peakMmr : mmr;
-	if (Number.isFinite(subLabelMmrValue)) {
-		const subIconFilename = PlayerStats.getRankIconFilenameForMmr(subLabelMmrValue);
+
+	// Only show sublabel rank icon if we are showing peak MMR (when specific player count filter is active)
+	// OR if we are showing current MMR in the sublabel (when showCurrentMmr is false)
+	const shouldShowSubLabelIcon = (showCurrentMmr && isSpecificPlayerCount) || (!showCurrentMmr);
+
+	if (shouldShowSubLabelIcon && Number.isFinite(subLabelMmrValue)) {
+		const subRankGameMode = playerDetails?.gameMode || "mkworld12p";
+		const subIconFilename = PlayerStats.getRankIconFilenameForMmr(subLabelMmrValue, subRankGameMode);
 		if (subIconFilename && subIconFilename !== mmrIconFilename) {
 			mmrSubLabelIcon = await loadImageResource(`bot/images/ranks/${subIconFilename}`, "mmr sublabel icon");
 		}
@@ -913,8 +1001,14 @@ async function renderStats({
 	const averageRoomMmr = PlayerStats.computeAverageRoomMmr(filteredTables);
 	const averageRoomMmrDisplay = Number.isFinite(averageRoomMmr) ? formatNumber(Math.round(averageRoomMmr)) : "-";
 
-	const rank = playerStats?.rank ?? "-";
-	const percent = globals?.totalPlayers ? Math.ceil(100 * (rank / globals.totalPlayers)) : null;
+	let rank = playerStats?.rank ?? "-";
+	let percent = globals?.totalPlayers ? Math.ceil(100 * (rank / globals.totalPlayers)) : null;
+
+	if (percent !== null && percent >= 100) {
+		rank = "N/A";
+		percent = null; // Hide percentile if rank is N/A
+	}
+
 	const tWR = playerStats?.winRate || null;
 	if (tWR && typeof tWR.winRate === "number") {
 		tWR.winRate = (tWR.winRate * 100).toFixed(1);
@@ -1197,6 +1291,7 @@ async function renderStats({
 		metrics: chartMetrics,
 		iconSize: ICON_SIZE,
 		iconGap: ICON_GAP,
+		gameMode: playerDetails?.gameMode || "mkworld12p",
 	});
 
 	const pngBuffer = canvas.toBuffer("image/png");
@@ -1330,7 +1425,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("stats")
 		.setDescription("check your (or someone else's) stats.")
-		.addStringOption(option =>
+		.addStringOption(option => // line 1424
 			option.setName("player")
 				.setDescription("lounge name, id or discord id. leave blank for yourself.")
 				.setAutocomplete(true)),

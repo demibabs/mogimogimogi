@@ -349,11 +349,13 @@ function buildRankStatsComponentRows({ loungeId, timeFilter, queueFilter, player
 	return rows;
 }
 
-function getTierForMmr(mmr) {
+function getTierForMmr(mmr, mode = "12p") {
 	if (!Number.isFinite(mmr)) {
 		return null;
 	}
-	return PlayerStats.getRankThresholdForMmr(mmr) || null;
+	// Map specific mode strings or default to 12p
+	const resolveMode = (mode && mode.includes("24p")) ? "mkworld24p" : "mkworld12p";
+	return PlayerStats.getRankThresholdForMmr(mmr, resolveMode) || null;
 }
 
 function getTableTimestamp(table) {
@@ -511,6 +513,7 @@ function aggregateRankStats(tables, playerIdentifier) {
 
 	for (const table of tableEntries) {
 		if (!table) continue;
+		const gameMode = table.game || "mkworld12p";
 		const players = PlayerStats.getPlayersFromTable(table);
 		if (!players.length) continue;
 
@@ -523,7 +526,7 @@ function aggregateRankStats(tables, playerIdentifier) {
 		const playerScore = Number(playerRanking.score);
 		const roomAverage = computeRoomAveragePrevMmr(players);
 		if (Number.isFinite(roomAverage)) {
-			const roomTier = getTierForMmr(roomAverage);
+			const roomTier = getTierForMmr(roomAverage, gameMode);
 			const bucket = ensureBucket(buckets, roomTier);
 			if (Number.isFinite(playerScore)) {
 				bucket.roomScoreTotal += playerScore;
@@ -541,7 +544,7 @@ function aggregateRankStats(tables, playerIdentifier) {
 				continue;
 			}
 
-			const tier = getTierForMmr(opponentPrevMmr);
+			const tier = getTierForMmr(opponentPrevMmr, gameMode);
 			const bucket = ensureBucket(buckets, tier);
 			const opponentRanking = findRankingForPlayer(opponent, lookup);
 			if (!opponentRanking) {
@@ -1075,11 +1078,66 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 	let favoriteVehicleImage = null;
 
 	let playerDetails = hasSessionDetails ? session.playerDetails : null;
+
+	// Invalidate playerDetails if it doesn't match the specific requested mode
+	if (playerDetails) {
+		const playerCountFilter = filters.playerCountFilter || "both";
+		if (playerCountFilter && playerCountFilter !== "both") {
+			const expectedMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+			if (playerDetails.gameMode !== expectedMode) {
+				playerDetails = null;
+			}
+		} else if (playerCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
+			// If switching back to "both" from a specific filter, invalidate to allow smart selection logic to run again
+			playerDetails = null;
+		}
+	} 
+
 	if (!playerDetails) {
-		playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(loungeId);
-		if (!playerDetails) {
+		const playerCountFilter = filters.playerCountFilter || "both";
+		let gameMode = "mkworld12p";
+		let details = null;
+
+		if (playerCountFilter && playerCountFilter !== "both") {
+			// Specific mode requested
+			gameMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+			details = await LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, gameMode);
+		} else {
+			// "both" or unspecified -> fetch both and compare
+			const [details12p, details24p] = await Promise.all([
+				LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld12p"),
+				LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld24p")
+			]);
+
+			if (!details12p && !details24p) {
+				return { success: false, message: "couldn't find that player in lounge." };
+			}
+
+			if (details12p && !details24p) {
+				details = details12p;
+				gameMode = "mkworld12p";
+			} else if (!details12p && details24p) {
+				details = details24p;
+				gameMode = "mkworld24p";
+			} else {
+				// Both exist, compare MMR
+				const mmr12p = details12p.mmr || 0;
+				const mmr24p = details24p.mmr || 0;
+				if (mmr24p > mmr12p) {
+					details = details24p;
+					gameMode = "mkworld24p";
+				} else {
+					details = details12p;
+					gameMode = "mkworld12p";
+				}
+			}
+		}
+
+		if (!details) {
 			return { success: false, message: "couldn't find that player in lounge." };
 		}
+		playerDetails = details;
+		playerDetails.gameMode = gameMode;
 	}
 
 	let result = {

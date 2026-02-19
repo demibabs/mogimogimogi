@@ -9,7 +9,8 @@ const database = require("./database");
 const LOUNGE_API_BASE = "https://lounge.mkcentral.com/api";
 
 // Default season (can be updated as needed for MK World)
-const DEFAULT_SEASON = 1;
+const DEFAULT_SEASON = 2;
+const DEFAULT_GAME = "mkworld12p";
 
 // Authentication config - many endpoints work without auth
 const AUTH_CONFIG = {
@@ -102,7 +103,7 @@ async function apiGet(endpoint, params = {}, retries = 3) {
 }
 
 async function searchPlayers(query, options = {}) {
-	const { limit = 25, season = DEFAULT_SEASON, skip = 0 } = options;
+	const { limit = 25, season = DEFAULT_SEASON, skip = 0, game = DEFAULT_GAME } = options;
 	const trimmedQuery = (query ?? "").trim();
 	if (!trimmedQuery) {
 		return [];
@@ -117,7 +118,7 @@ async function searchPlayers(query, options = {}) {
 			pageSize: boundedLimit,
 			skip: boundedSkip,
 			season,
-			game: "mkworld",
+			game,
 		};
 
 		const result = await apiGet("/player/leaderboard", params);
@@ -145,12 +146,12 @@ async function searchPlayers(query, options = {}) {
  * @param {number} season - Season number (optional, defaults to current season)
  * @returns {Promise<Object|null>} Player data or null if not found
  */
-async function getPlayer(name, season = DEFAULT_SEASON) {
+async function getPlayer(name, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
 	try {
 		const params = {
 			name: name,
 			season: season,
-			game: "mkworld",
+			game: game,
 		};
 
 		return await apiGet("/player", params);
@@ -163,7 +164,7 @@ async function getPlayer(name, season = DEFAULT_SEASON) {
 	}
 }
 
-async function getPlayerByLoungeId(loungeId, season = DEFAULT_SEASON) {
+async function getPlayerByLoungeId(loungeId, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
 	try {
 		if (loungeId === null || loungeId === undefined) {
 			return null;
@@ -172,7 +173,7 @@ async function getPlayerByLoungeId(loungeId, season = DEFAULT_SEASON) {
 		const params = {
 			id: Number(loungeId),
 			season,
-			game: "mkworld",
+			game: game,
 		};
 
 		return await apiGet("/player", params);
@@ -191,12 +192,12 @@ async function getPlayerByLoungeId(loungeId, season = DEFAULT_SEASON) {
  * @param {number} season - Season number (optional, defaults to current season)
  * @returns {Promise<Object|null>} Player data or null if not found
  */
-async function getPlayerByDiscordId(discordId, season = DEFAULT_SEASON) {
+async function getPlayerByDiscordId(discordId, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
 	try {
 		const params = {
 			discordId: discordId,
 			season: season,
-			game: "mkworld",
+			game: game,
 		};
 
 		return await apiGet("/player", params);
@@ -208,12 +209,12 @@ async function getPlayerByDiscordId(discordId, season = DEFAULT_SEASON) {
 		throw error;
 	}
 }
-async function getPlayerByDiscordIdDetailed(discordId, season = DEFAULT_SEASON) {
+async function getPlayerByDiscordIdDetailed(discordId, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
 	try {
 		const params = {
 			discordId: discordId,
 			season: season,
-			game: "mkworld",
+			game: game,
 		};
 
 		return await apiGet("/player/details", params);
@@ -226,7 +227,7 @@ async function getPlayerByDiscordIdDetailed(discordId, season = DEFAULT_SEASON) 
 	}
 }
 
-async function getPlayerDetailsByLoungeId(loungeId, season = DEFAULT_SEASON) {
+async function getPlayerDetailsByLoungeId(loungeId, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
 	try {
 		if (loungeId === null || loungeId === undefined) {
 			return null;
@@ -235,7 +236,7 @@ async function getPlayerDetailsByLoungeId(loungeId, season = DEFAULT_SEASON) {
 		const params = {
 			id: Number(loungeId),
 			season,
-			game: "mkworld",
+			game: game,
 		};
 
 		return await apiGet("/player/details", params);
@@ -322,33 +323,40 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 		// Get new tables from API
 		// We iterate through all seasons to ensure we don't miss any tables (filling holes)
 		for (let season = 0; season <= DEFAULT_SEASON; season++) {
-			try {
-				let details = null;
-				if (currentSeasonPlayerDetails && Number(currentSeasonPlayerDetails.season) === season) {
-					details = currentSeasonPlayerDetails;
-				}
-				else {
-					details = await getPlayerDetailsByLoungeId(numericId, season);
-				}
+			// Iterate over game modes relevant for the season
+			const gameModes = season < 2 ? ["mkworld"] : ["mkworld12p", "mkworld24p"];
+			
+			for (const gameMode of gameModes) {
+				try {
+					let details = null;
+					// If a specific details object was passed, only use it if it matches our loop
+					// Assume that if gameMode is missing, it corresponds to DEFAULT_GAME (likely 12p)
+					const detailsGameMode = currentSeasonPlayerDetails?.gameMode || DEFAULT_GAME;
 
-				if (!details?.mmrChanges) {
-					continue;
-				}
+					if (currentSeasonPlayerDetails &&
+						Number(currentSeasonPlayerDetails.season) === season &&
+						detailsGameMode === gameMode) {
+						
+						details = currentSeasonPlayerDetails;
+					}
+					else {
+						details = await getPlayerDetailsByLoungeId(numericId, season, gameMode);
+					}
 
-				// Check for consistency: do we have all the tables this player has played?
-				const seasonTables = Object.values(tables).filter(t => Number(t.season) === season);
-				const localCount = seasonTables.length;
-				const remoteCount = details.eventsPlayed;
+					if (!details?.mmrChanges) {
+						continue;
+					}
 
-				// If we have fewer tables than the API says we should, we need to find the missing ones.
-				if (localCount < remoteCount) {
-					// console.log(`[LoungeAPI] Season ${season} mismatch for ${numericId}: Local=${localCount}, Remote=${remoteCount}. Fetching missing tables...`);
+					// Fetch tables from mmrChanges...
+					// Note: tables are global entities so we can just merge them.
+					// However, we need to be careful not to double count or confuse counts if we are cross-checking 'eventsPlayed'.
+					// For now, let's just grab all tables referenced in mmrChanges.
 
-					const changes = details.mmrChanges.filter(c => c.reason === "Table" && !tables[c.changeId]);
-
+					const newTables = details.mmrChanges.filter(c => c.reason === "Table" && !tables[c.changeId]);
+					
 					const CHUNK_SIZE = 5;
-					for (let i = 0; i < changes.length; i += CHUNK_SIZE) {
-						const chunk = changes.slice(i, i + CHUNK_SIZE);
+					for (let i = 0; i < newTables.length; i += CHUNK_SIZE) {
+						const chunk = newTables.slice(i, i + CHUNK_SIZE);
 						await Promise.all(chunk.map(async (change) => {
 							try {
 								const tableData = await getTable(change.changeId);
@@ -363,10 +371,10 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 						}));
 					}
 				}
-			}
-			catch (error) {
-				// Skip this season if API call fails
-				console.warn(`API call failed for season ${season}, lounge user ${numericId}:`, error);
+				catch (error) {
+					// Skip this mode if API call fails (e.g. 404 for a game mode not played)
+					// console.warn(`API call failed for season ${season}/${gameMode}, lounge user ${numericId}:`, error);
+				}
 			}
 		}
 
@@ -473,9 +481,9 @@ async function getWeeklyMMRChange(loungeId) {
 	}
 }
 
-async function getGlobalStats(season = DEFAULT_SEASON) {
+async function getGlobalStats(season = DEFAULT_SEASON, game = DEFAULT_GAME) {
 	const params = {
-		game: "mkworld",
+		game,
 		season,
 	};
 	try {
@@ -535,6 +543,8 @@ module.exports = {
 	getPlayerDetailsByLoungeId,
 	getTable,
 	getAllPlayerTables,
+	DEFAULT_SEASON,
+	DEFAULT_GAME,
 	getCurrentMMR,
 	getWeeklyMMRChange,
 	getSeasonMMRChange,

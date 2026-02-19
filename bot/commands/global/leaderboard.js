@@ -94,6 +94,7 @@ const TIME_LABELS = {
 	weekly: "past week",
 	season: "this season",
 };
+const GAME_MODES = ["mkworld12p", "mkworld24p"];
 
 
 function getPalette() {
@@ -263,12 +264,14 @@ function computeActivityFlags(mmrChanges = []) {
 	};
 }
 
-function buildLeaderboardCustomId(action, { timeFilter, serverId, page }) {
+function buildLeaderboardCustomId(action, { timeFilter, serverId, page, game, roleId }) {
 	const safeAction = action || "time";
 	const safeTime = (timeFilter && TIME_FILTERS.includes(timeFilter)) ? timeFilter : "alltime";
 	const safeServer = serverId ? String(serverId) : "";
 	const safePage = page ? String(page) : "1";
-	return ["leaderboard", safeAction, safeTime, safeServer, safePage].join("|");
+	const safeGame = (game && GAME_MODES.includes(game)) ? game : "mkworld12p";
+	const safeRole = roleId ? String(roleId) : "";
+	return ["leaderboard", safeAction, safeTime, safeServer, safePage, safeGame, safeRole].join("|");
 }
 
 function parseLeaderboardInteraction(customId) {
@@ -279,45 +282,65 @@ function parseLeaderboardInteraction(customId) {
 	if (parts.length < 3) {
 		return null;
 	}
-	const [, action, timeFilter, serverId, page] = parts;
+	const [, action, timeFilter, serverId, page, game, roleId] = parts;
 	return {
 		action,
 		timeFilter: TIME_FILTERS.includes(timeFilter) ? timeFilter : "alltime",
 		serverId: serverId || null,
 		page: page ? parseInt(page, 10) : 1,
+		game: (game && GAME_MODES.includes(game)) ? game : "mkworld12p",
+		roleId: roleId || null,
 	};
 }
 
-function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages = 1 }) {
+function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages = 1, game = "mkworld12p", roleId = null }) {
+	const commonParams = { timeFilter, serverId, page: 1, roleId };
+	
 	const timeRow = new ActionRowBuilder()
 		.addComponents(
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "alltime", serverId, page: 1 }))
+				.setCustomId(buildLeaderboardCustomId("time", { ...commonParams, game, timeFilter: "alltime" }))
 				.setLabel("current")
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(timeFilter === "alltime"),
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "weekly", serverId, page: 1 }))
+				.setCustomId(buildLeaderboardCustomId("time", { ...commonParams, game, timeFilter: "weekly" }))
 				.setLabel("past week")
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(timeFilter === "weekly"),
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("time", { timeFilter: "season", serverId, page: 1 }))
+				.setCustomId(buildLeaderboardCustomId("time", { ...commonParams, game, timeFilter: "season" }))
 				.setLabel("this season")
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(timeFilter === "season"),
 		);
 
+	const formatRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildLeaderboardCustomId("format", { ...commonParams, page, game: "mkworld12p" }))
+				.setLabel("12p")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(game === "mkworld12p"),
+			new ButtonBuilder()
+				.setCustomId(buildLeaderboardCustomId("format", { ...commonParams, page, game: "mkworld24p" }))
+				.setLabel("24p")
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(game === "mkworld24p"),
+		);
+
 	if (totalPages <= 1) {
-		return [timeRow];
+		return [formatRow, timeRow];
 	}
 
 	const paginationRow = new ActionRowBuilder();
 
+	const pageParams = { timeFilter, serverId, game, roleId };
+
 	if (totalPages > 2) {
 		paginationRow.addComponents(
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("first", { timeFilter, serverId, page: 1 }))
+				.setCustomId(buildLeaderboardCustomId("first", { ...pageParams, page: 1 }))
 				.setLabel("≪")
 				.setStyle(ButtonStyle.Primary)
 				.setDisabled(page <= 1),
@@ -326,12 +349,12 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 
 	paginationRow.addComponents(
 		new ButtonBuilder()
-			.setCustomId(buildLeaderboardCustomId("prev", { timeFilter, serverId, page: page - 1 }))
+			.setCustomId(buildLeaderboardCustomId("prev", { ...pageParams, page: page - 1 }))
 			.setLabel("◀")
 			.setStyle(ButtonStyle.Primary)
 			.setDisabled(page <= 1),
 		new ButtonBuilder()
-			.setCustomId(buildLeaderboardCustomId("next", { timeFilter, serverId, page: page + 1 }))
+			.setCustomId(buildLeaderboardCustomId("next", { ...pageParams, page: page + 1 }))
 			.setLabel("▶")
 			.setStyle(ButtonStyle.Primary)
 			.setDisabled(page >= totalPages),
@@ -340,14 +363,14 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 	if (totalPages > 2) {
 		paginationRow.addComponents(
 			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("last", { timeFilter, serverId, page: totalPages }))
+				.setCustomId(buildLeaderboardCustomId("last", { ...pageParams, page: totalPages }))
 				.setLabel("≫")
 				.setStyle(ButtonStyle.Primary)
 				.setDisabled(page >= totalPages),
 		);
 	}
 
-	return [paginationRow, timeRow];
+	return [paginationRow, formatRow, timeRow];
 }
 
 function storeLeaderboardSession(messageId, session) {
@@ -629,7 +652,7 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 	}
 }
 
-async function collectLeaderboardEntries(interaction) {
+async function collectLeaderboardEntries(interaction, game, roleId = null) {
 	// Ensure cache is complete
 	if (interaction.guild.memberCount > interaction.guild.members.cache.size) {
 		try {
@@ -643,7 +666,12 @@ async function collectLeaderboardEntries(interaction) {
 
 	// Use the global cache which is populated on startup
 	const members = interaction.guild.members.cache;
-	const memberList = Array.from(members.values()).filter(m => !m.user.bot);
+	let memberList = Array.from(members.values()).filter(m => !m.user.bot);
+	
+	if (roleId) {
+		memberList = memberList.filter(m => m.roles.cache.has(roleId));
+	}
+	
 	const entries = [];
 	const BATCH_SIZE = 5;
 	const total = memberList.length;
@@ -659,7 +687,7 @@ async function collectLeaderboardEntries(interaction) {
 
 		const promises = batch.map(async (member) => {
 			try {
-				const details = await LoungeApi.getPlayerByDiscordIdDetailed(member.id);
+				const details = await LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, game);
 				if (!details) return null;
 
 				const mmr = Number(details.mmr ?? details.currentMmr ?? details.mmrValue);
@@ -725,20 +753,56 @@ async function hydrateEntryDisplay(interaction, entry) {
 async function generateLeaderboard(interaction, {
 	timeFilter = "alltime",
 	page = 1,
+	game = "mkworld12p",
+	roleId = null,
 	session: existingSession = null,
 } = {}) {
 	const serverId = interaction.guildId;
-	const guildName = (interaction.guild?.name || "server") + " leaderboard";
+			const selectedGame = game || existingSession?.game || "mkworld12p";
+	const selectedRoleId = roleId || existingSession?.roleId || null;
+	const formatLabel = selectedGame.includes("24p") ? " (24p)" : "";
+	
+	let roleName = "";
+	if (selectedRoleId) {
+		const role = interaction.guild.roles.cache.get(selectedRoleId);
+		if (role) {
+			roleName = ` (${role.name})`;
+		}
+	}
+	
+	const guildName = (interaction.guild?.name || "server") + roleName + " leaderboard" + formatLabel;
 	const palette = getPalette();
 
-	let session = existingSession || null;
-
-	if (!session) {
-		await interaction.editReply("scanning members...");
-		const entries = await collectLeaderboardEntries(interaction);
+	// If no session, make a dummy one for logic below, but we'll overwrite it
+	let session = existingSession;
+	if(!session) {
 		session = {
 			serverId,
 			serverName: guildName,
+			game: selectedGame,
+			roleId: selectedRoleId,
+			entries: [],
+			generatedAt: 0
+		};
+	}
+
+	// Regenerate session (fetch data) if cache is stale or if game mode or role changed
+	// 5 minute data freshness cache
+	const isStale = (Date.now() - (session.generatedAt || 0)) > (5 * 60 * 1000);
+	if (!session.entries?.length || session.game !== selectedGame || session.roleId !== selectedRoleId || isStale) {
+		
+		// If it's just a pagination or time filter change on existing valid data, we wouldn't be here unless data is missing/stale.
+		// However, generateLeaderboard is called with an existing session most times.
+		// But wait, the 'game' param passed in takes precedence, so we check if it matches session.
+		
+		await interaction.editReply("scanning members...");
+		const entries = await collectLeaderboardEntries(interaction, selectedGame, selectedRoleId);
+		session = {
+			...session,
+			serverId,
+			serverName: guildName,
+			game: selectedGame,
+			roleId: selectedRoleId,
 			entries,
 			generatedAt: Date.now(),
 		};
@@ -750,7 +814,7 @@ async function generateLeaderboard(interaction, {
 	});
 
 	if (!pool.length) {
-		const components = buildLeaderboardComponents({ timeFilter, serverId, page: 1, totalPages: 1 });
+		const components = buildLeaderboardComponents({ timeFilter, serverId, page: 1, totalPages: 1, game: selectedGame, roleId: selectedRoleId });
 		return {
 			success: false,
 			message: `no tracked players have mmr data for ${TIME_LABELS[timeFilter] || timeFilter}.`,
@@ -808,14 +872,34 @@ async function generateLeaderboard(interaction, {
 		content: "",
 		files: [attachment],
 		components,
-		session,
+		session: {
+			...session,
+			timeFilter,
+			game: selectedGame,
+			roleId: selectedRoleId,
+			page: safePage,
+			totalPages,
+		},
 	};
 }
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("leaderboard")
-		.setDescription("see your server's mmr leaderboard."),
+		.setDescription("see your server's mmr leaderboard.")
+		.addStringOption(option =>
+			option.setName("format")
+				.setDescription("12p or 24p (default: 12)")
+				.setRequired(false)
+				.addChoices(
+					{ name: "12p", value: "mkworld12p" },
+					{ name: "24p", value: "mkworld24p" }
+				))
+		.addRoleOption(option => 
+			option.setName("role")
+				.setDescription("filter by role")
+				.setRequired(false)
+		),
 
 	async execute(interaction) {
 		try {
@@ -826,9 +910,15 @@ module.exports = {
 				return;
 			}
 
+			const format = interaction.options.getString("format") || "mkworld12p";
+			const role = interaction.options.getRole("role");
+			const roleId = role ? role.id : null;
+
 			const result = await generateLeaderboard(interaction, {
 				timeFilter: "alltime",
 				page: 1,
+				game: format,
+				roleId,
 			});
 
 			if (!result.success) {
@@ -869,20 +959,29 @@ module.exports = {
 
 		try {
 			const messageId = interaction.message?.id || null;
-			const session = messageId ? getLeaderboardSession(messageId) : null;
+			let session = messageId ? getLeaderboardSession(messageId) : null;
 			const fallbackTimeFilter = parsed.timeFilter || "alltime";
-			// Prefer the ID state (parsed.timeFilter) over the session state
-			const nextTimeFilter = parsed.timeFilter || fallbackTimeFilter;
-
+			
+			// If we don't have a session, we need to reconstruct basic context or fail gracefully.
+			// However, parseLeaderboardInteraction returns serverId, so we might be able to restart if needed,
+			// but we'd lose the original role filter if it wasn't encoded in the button.
+			// Luckily we added roleId to the customId parser now!
+			
+			const nextTimeFilter = parsed.timeFilter || (session ? session.timeFilter : fallbackTimeFilter);
 			const requestedPage = parsed.page || 1;
+			const nextGame = parsed.game || (session ? session.game : "mkworld12p");
+			const nextRoleId = parsed.roleId || (session ? session.roleId : null);
+			
 			let totalPages = 1;
 
-			if (session && session.timeFilter === nextTimeFilter) {
-				// If filter hasn't changed, we can trust session.totalPages
+			// Check if we need to regenerate data (format or role changed)
+			const needsDataRefresh = !session || session.game !== nextGame || session.roleId !== nextRoleId;
+			
+			if (!needsDataRefresh && session && session.timeFilter === nextTimeFilter) {
+				// If filter hasn't changed and data is same, we can trust session.totalPages
 				totalPages = session.totalPages || 1;
 			}
-			// If filter changed, we assume 1 page until generated.
-
+			
 			if (session) {
 				session.pendingTimeFilter = nextTimeFilter;
 			}
@@ -892,6 +991,8 @@ module.exports = {
 				serverId: parsed.serverId || interaction.guildId,
 				page: requestedPage,
 				totalPages: totalPages,
+				game: nextGame,
+				roleId: nextRoleId,
 			});
 
 			await interaction.update({ components });
@@ -906,6 +1007,8 @@ module.exports = {
 				result = await generateLeaderboard(interaction, {
 					timeFilter: nextTimeFilter,
 					page: requestedPage,
+					game: nextGame,
+					roleId: nextRoleId,
 					session,
 				});
 

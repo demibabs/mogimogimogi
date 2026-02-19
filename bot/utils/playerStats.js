@@ -4,6 +4,7 @@
  */
 
 const database = require("./database");
+const LoungeApi = require("./loungeApi");
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -20,30 +21,51 @@ function normalizeRankName(name) {
 	return normalized;
 }
 
-const RANK_THRESHOLDS = [
+const RANK_THRESHOLDS_12P = [
 	{ key: "iron", label: "iron", text: "iron", min: 0, max: 2000, emoji: "⛏️" },
-	{ key: "bronze", label: "bronze", text: "bronze", min: 2000, max: 3500, emoji: "🧸" },
-	{ key: "silver", label: "silver", text: "silver", min: 3500, max: 5000, emoji: "💿" },
-	{ key: "gold", label: "gold", text: "gold", min: 5000, max: 6500, emoji: "⭐" },
-	{ key: "platinum", label: "platinum", text: "platinum", min: 6500, max: 8000, emoji: "🦚" },
-	{ key: "sapphire", label: "sapphire", text: "sapphire", min: 8000, max: 9500, emoji: "🌊" },
-	{ key: "ruby", label: "ruby", text: "ruby", min: 9500, max: 11000, emoji: "🍓" },
-	{ key: "diamond", label: "diamond", text: "diamond", min: 11000, max: 12500, emoji: "💎" },
-	{ key: "master", label: "master", text: "master", min: 12500, max: 13500, emoji: "🪻" },
-	{ key: "grandmaster", label: "grandmaster", text: "grandmaster", min: 13500, max: Infinity, emoji: "🎸" },
+	{ key: "bronze", label: "bronze", text: "bronze", min: 2000, max: 4000, emoji: "🧸" },
+	{ key: "silver", label: "silver", text: "silver", min: 4000, max: 6000, emoji: "💿" },
+	{ key: "gold", label: "gold", text: "gold", min: 6000, max: 7500, emoji: "⭐" },
+	{ key: "platinum", label: "platinum", text: "platinum", min: 7500, max: 9000, emoji: "🦚" },
+	{ key: "sapphire", label: "sapphire", text: "sapphire", min: 9000, max: 10500, emoji: "🌊" },
+	{ key: "ruby", label: "ruby", text: "ruby", min: 10500, max: 12000, emoji: "🍓" },
+	{ key: "diamond", label: "diamond", text: "diamond", min: 12000, max: 13500, emoji: "💎" },
+	{ key: "master", label: "master", text: "master", min: 13500, max: 14500, emoji: "🪻" },
+	{ key: "grandmaster", label: "grandmaster", text: "grandmaster", min: 14500, max: Infinity, emoji: "🎸" },
 ];
 
-const RANK_THRESHOLD_MAP = RANK_THRESHOLDS.reduce((map, tier) => {
-	const aliases = [tier.key, tier.label, tier.text];
-	for (const alias of aliases) {
-		const normalized = normalizeRankName(alias);
-		if (!normalized) {
-			continue;
+const RANK_THRESHOLDS_24P = [
+	{ key: "iron", label: "iron", text: "iron", min: 0, max: 2000, emoji: "⛏️" },
+	{ key: "bronze", label: "bronze", text: "bronze", min: 2000, max: 4000, emoji: "🧸" },
+	{ key: "silver", label: "silver", text: "silver", min: 4000, max: 6000, emoji: "💿" },
+	{ key: "gold", label: "gold", text: "gold", min: 6000, max: 8000, emoji: "⭐" },
+	{ key: "platinum", label: "platinum", text: "platinum", min: 8000, max: 10000, emoji: "🦚" },
+	{ key: "sapphire", label: "sapphire", text: "sapphire", min: 10000, max: 11500, emoji: "🌊" },
+	{ key: "ruby", label: "ruby", text: "ruby", min: 11500, max: 13000, emoji: "🍓" },
+	{ key: "diamond", label: "diamond", text: "diamond", min: 13000, max: 14500, emoji: "💎" },
+	{ key: "master", label: "master", text: "master", min: 14500, max: 15500, emoji: "🪻" },
+	{ key: "grandmaster", label: "grandmaster", text: "grandmaster", min: 15500, max: Infinity, emoji: "🎸" },
+];
+
+const RANK_THRESHOLDS = RANK_THRESHOLDS_12P;
+
+function createRankThresholdMap(thresholds) {
+	return thresholds.reduce((map, tier) => {
+		const aliases = [tier.key, tier.label, tier.text];
+		for (const alias of aliases) {
+			const normalized = normalizeRankName(alias);
+			if (!normalized) {
+				continue;
+			}
+			map[normalized] = tier;
 		}
-		map[normalized] = tier;
-	}
-	return map;
-}, Object.create(null));
+		return map;
+	}, Object.create(null));
+}
+
+const RANK_THRESHOLD_MAP_12P = createRankThresholdMap(RANK_THRESHOLDS_12P);
+const RANK_THRESHOLD_MAP_24P = createRankThresholdMap(RANK_THRESHOLDS_24P);
+const RANK_THRESHOLD_MAP = RANK_THRESHOLD_MAP_12P;
 
 const RANK_ICON_FILENAME_MAP = RANK_THRESHOLDS.reduce((map, tier) => {
 	const aliases = [tier.key, tier.label, tier.text];
@@ -61,29 +83,34 @@ const RANK_ICON_FILENAME_MAP = RANK_THRESHOLDS.reduce((map, tier) => {
 }, Object.create(null));
 
 class PlayerStats {
-	static getRankThresholds() {
-		return RANK_THRESHOLDS;
+	static getRankThresholds(mode = "12p") {
+		if (mode === "24p" || mode === "mkworld24p") {
+			return RANK_THRESHOLDS_24P;
+		}
+		return RANK_THRESHOLDS_12P;
 	}
 
-	static getRankThresholdByName(name) {
+	static getRankThresholdByName(name, mode = "12p") {
 		const normalized = normalizeRankName(name);
-		return normalized ? (RANK_THRESHOLD_MAP[normalized] || null) : null;
+		const map = (mode === "24p" || mode === "mkworld24p") ? RANK_THRESHOLD_MAP_24P : RANK_THRESHOLD_MAP_12P;
+		return normalized ? (map[normalized] || null) : null;
 	}
 
-	static getRankThresholdForMmr(mmr) {
+	static getRankThresholdForMmr(mmr, mode = "12p") {
 		const value = Number(mmr);
 		if (!Number.isFinite(value)) {
 			return null;
 		}
-		for (const tier of RANK_THRESHOLDS) {
+		const thresholds = (mode === "24p" || mode === "mkworld24p") ? RANK_THRESHOLDS_24P : RANK_THRESHOLDS_12P;
+		for (const tier of thresholds) {
 			if (value >= tier.min && (value < tier.max || !Number.isFinite(tier.max))) {
 				return tier;
 			}
 		}
-		return RANK_THRESHOLDS[RANK_THRESHOLDS.length - 1] || null;
+		return thresholds[thresholds.length - 1] || null;
 	}
 
-	static getRankIconFilename(name) {
+	static getRankIconFilename(name, mode = "12p") {
 		const normalized = normalizeRankName(name);
 		if (normalized) {
 			const direct = RANK_ICON_FILENAME_MAP[normalized];
@@ -91,7 +118,7 @@ class PlayerStats {
 				return direct;
 			}
 		}
-		const tier = PlayerStats.getRankThresholdByName(name);
+		const tier = PlayerStats.getRankThresholdByName(name, mode);
 		if (tier) {
 			const normalizedTier = normalizeRankName(tier.label);
 			return normalizedTier ? (RANK_ICON_FILENAME_MAP[normalizedTier] || null) : null;
@@ -99,8 +126,8 @@ class PlayerStats {
 		return null;
 	}
 
-	static getRankIconFilenameForMmr(mmr) {
-		const tier = PlayerStats.getRankThresholdForMmr(mmr);
+	static getRankIconFilenameForMmr(mmr, mode = "12p") {
+		const tier = PlayerStats.getRankThresholdForMmr(mmr, mode);
 		if (!tier) {
 			return null;
 		}
@@ -396,17 +423,19 @@ class PlayerStats {
 		return totalDelta;
 	}
 
-	static filterTablesByControls(tables, { timeFilter = "alltime", queueFilter = "both", playerCountFilter = "both" } = {}) {
+	static filterTablesByControls(tables, { timeFilter = "alltime", queueFilter = "both", playerCountFilter = "both", currentSeason = undefined } = {}) {
 		let filtered = tables || {};
 		if (!filtered || typeof filtered !== "object") {
 			return {};
 		}
 
+		const seasonNum = currentSeason || LoungeApi.DEFAULT_SEASON;
+
 		if (timeFilter === "weekly") {
 			filtered = PlayerStats.filterTablesByWeek(filtered, true);
 		}
 		else if (timeFilter === "season") {
-			filtered = PlayerStats.filterTablesBySeason(filtered, true);
+			filtered = PlayerStats.filterTablesBySeason(filtered, true, seasonNum);
 		}
 
 		if (queueFilter === "squads") {
@@ -421,9 +450,20 @@ class PlayerStats {
 		}
 
 		if (playerCountFilter !== "both") {
-			const desiredCount = playerCountFilter === "12p" ? 12 : 24;
+			const desiredCount = playerCountFilter === "12p" || playerCountFilter === "mkworld12p" ? 12 : 24;
+			const targetMode = playerCountFilter === "12p" ? "mkworld12p" : (playerCountFilter === "24p" ? "mkworld24p" : playerCountFilter);
+
 			filtered = Object.fromEntries(
 				Object.entries(filtered).filter(([, table]) => {
+					// If table has gameMode info, use it
+					if (table.gameMode || table.game) {
+						const mode = table.gameMode || table.game;
+						if (mode === targetMode) return true;
+						if (mode === "mkworld12p" && desiredCount === 12) return true;
+						if (mode === "mkworld24p" && desiredCount === 24) return true;
+						// If mode doesn't match, check legacy numPlayers
+					}
+
 					const rawValue = table?.numPlayers ?? table?.numplayers ?? table?.playerCount;
 					const playerCount = Number(rawValue);
 					if (!Number.isFinite(playerCount)) {

@@ -753,18 +753,38 @@ module.exports = {
 			const rawPlayer1 = interaction.options.getString("player");
 			const rawPlayer2 = interaction.options.getString("player2");
 
-			const target1 = await resolveTargetPlayer(interaction, {
-				rawInput: rawPlayer1,
-			});
+			let target1, target2;
+
+			if (!rawPlayer2) {
+				// Case: Only 1 parameter provided.
+				// Player 1 (Left) -> Invoker (You)
+				// Player 2 (Right) -> The provided player
+				target1 = await resolveTargetPlayer(interaction, {
+					rawInput: null, // Resolves to invoker
+					defaultToInvoker: true,
+				});
+
+				target2 = await resolveTargetPlayer(interaction, {
+					rawInput: rawPlayer1,
+				});
+			} else {
+				// Case: Both parameters provided.
+				// Player 1 -> First arg
+				// Player 2 -> Second arg
+				target1 = await resolveTargetPlayer(interaction, {
+					rawInput: rawPlayer1,
+				});
+
+				target2 = await resolveTargetPlayer(interaction, {
+					rawInput: rawPlayer2,
+				});
+			}
+
 			if (target1.error) {
 				await interaction.editReply({ content: target1.error, files: [] });
 				return;
 			}
 
-			const target2 = await resolveTargetPlayer(interaction, {
-				rawInput: rawPlayer2,
-				defaultToInvoker: !rawPlayer2,
-			});
 			if (target2.error) {
 				await interaction.editReply({ content: target2.error, files: [] });
 				return;
@@ -944,13 +964,63 @@ module.exports = {
 
 			let leftPlayerDetails = targetSession.playerLeftDetails || null;
 			let rightPlayerDetails = targetSession.playerRightDetails || null;
+			
+			const playerCountFilter = filters.playerCountFilter || "both";
+
+			// Helper: Fetch best mode if "both", or specific mode if filtered
+			const fetchPlayerDetails = async (loungeId) => {
+				if (playerCountFilter !== "both") {
+					// Specific mode
+					const mode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+					const d = await LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, mode);
+					if (d) d.gameMode = mode;
+					return d;
+				} else {
+					// Smart selection: fetch both, return best
+					const [d12, d24] = await Promise.all([
+						LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld12p"),
+						LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld24p")
+					]);
+					
+					if (!d12 && !d24) return null;
+					if (d12 && !d24) { d12.gameMode = "mkworld12p"; return d12; }
+					if (!d12 && d24) { d24.gameMode = "mkworld24p"; return d24; }
+					
+					// Both exist, compare
+					const m12 = Number(d12.mmr) || 0;
+					const m24 = Number(d24.mmr) || 0;
+					if (m24 > m12) {
+						d24.gameMode = "mkworld24p";
+						return d24;
+					} else {
+						d12.gameMode = "mkworld12p";
+						return d12;
+					}
+				}
+			};
 
 			if (!leftPlayerDetails) {
-				leftPlayerDetails = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLeftId);
+				leftPlayerDetails = await fetchPlayerDetails(normalizedLeftId);
 			}
 			if (!rightPlayerDetails) {
-				rightPlayerDetails = await LoungeApi.getPlayerDetailsByLoungeId(normalizedRightId);
+				rightPlayerDetails = await fetchPlayerDetails(normalizedRightId);
 			}
+
+			// If specific filter was used, verify cached details match
+			if (playerCountFilter !== "both") {
+				const expectedMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+				if (leftPlayerDetails && leftPlayerDetails.gameMode !== expectedMode) {
+					leftPlayerDetails = await fetchPlayerDetails(normalizedLeftId);
+				}
+				if (rightPlayerDetails && rightPlayerDetails.gameMode !== expectedMode) {
+					rightPlayerDetails = await fetchPlayerDetails(normalizedRightId);
+				}
+			} else if (targetSession.filters && targetSession.filters.playerCountFilter !== "both") {
+				// Switching back to "both" from specific -> reload to ensure smart selection
+				leftPlayerDetails = await fetchPlayerDetails(normalizedLeftId);
+				rightPlayerDetails = await fetchPlayerDetails(normalizedRightId);
+			}
+
 			if (!leftPlayerDetails || !rightPlayerDetails) {
 				return { success: false, message: "unable to load player details from lounge." };
 			}
@@ -1119,6 +1189,7 @@ module.exports = {
 			) => {
 				const mmr = Number(playerDetails?.mmr);
 				const mmrDisplay = Number.isFinite(mmr) ? `${NUMBER_FORMATTER.format(Math.round(mmr))} mmr` : "mmr unavailable";
+
 				const rankName = playerDetails?.rankName || playerDetails?.rank;
 				const rankIcon = await getRankIcon(rankName, mmr);
 				let avatarImage = cachedAvatar?.image || null;

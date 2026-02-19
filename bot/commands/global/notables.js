@@ -1129,6 +1129,21 @@ module.exports = {
 			let displayName = target.displayName || target.loungeName || fallbackName;
 			let loungeName = target.loungeName || displayName || fallbackName;
 			let playerDetails = useSession ? session.playerDetails : null;
+
+			// Invalidate playerDetails if it doesn't match the specific requested mode
+			if (playerDetails) {
+				const currentCountFilter = playerCountFilter || "both";
+				if (currentCountFilter && currentCountFilter !== "both") {
+					const expectedMode = currentCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+					if (playerDetails.gameMode !== expectedMode) {
+						playerDetails = null;
+					}
+				} else if (currentCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
+					// If switching back to "both" from a specific filter, invalidate to allow smart selection logic to run again
+					playerDetails = null;
+				}
+			}
+
 			let allTables = useSession ? session.allTables : null;
 			let favorites = useSession ? session.favorites || {} : null;
 			let favoriteCharacterImage = null;
@@ -1138,10 +1153,50 @@ module.exports = {
 			let storedRecord = null;
 
 			if (!playerDetails) {
-				playerDetails = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId);
-				if (!playerDetails) {
+				let gameMode = "mkworld12p";
+				let details = null;
+
+				if (playerCountFilter && playerCountFilter !== "both") {
+					// Specific mode requested
+					gameMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+					details = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, gameMode);
+				} else {
+					// "both" or unspecified -> fetch both and compare
+					const [details12p, details24p] = await Promise.all([
+						LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld12p"),
+						LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld24p")
+					]);
+
+					if (!details12p && !details24p) {
+						return { success: false, message: "couldn't find that player in mkw lounge." };
+					}
+
+					if (details12p && !details24p) {
+						details = details12p;
+						gameMode = "mkworld12p";
+					} else if (!details12p && details24p) {
+						details = details24p;
+						gameMode = "mkworld24p";
+					} else {
+						// Both exist, compare MMR
+						const mmr12p = details12p.mmr || 0;
+						const mmr24p = details24p.mmr || 0;
+						if (mmr24p > mmr12p) {
+							details = details24p;
+							gameMode = "mkworld24p";
+						} else {
+							details = details12p;
+							gameMode = "mkworld12p";
+						}
+					}
+				}
+
+				if (!details) {
 					return { success: false, message: "couldn't find that player in mkw lounge." };
 				}
+				playerDetails = details;
+				// Inject the gameMode
+				playerDetails.gameMode = gameMode;
 			}
 
 			if (!useSession && !skipAutoUserAndMembership) {
