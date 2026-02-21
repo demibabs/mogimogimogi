@@ -570,6 +570,26 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 	};
 
+	const darkenHex = (hex, amount) => {
+		if (!hex || !hex.startsWith("#")) return hex;
+		let r, g, b;
+		if (hex.length === 4) {
+			r = parseInt(hex[1] + hex[1], 16);
+			g = parseInt(hex[2] + hex[2], 16);
+			b = parseInt(hex[3] + hex[3], 16);
+		} else {
+			r = parseInt(hex.slice(1, 3), 16);
+			g = parseInt(hex.slice(3, 5), 16);
+			b = parseInt(hex.slice(5, 7), 16);
+		}
+		
+		r = Math.max(0, Math.floor(r * (1 - amount)));
+		g = Math.max(0, Math.floor(g * (1 - amount)));
+		b = Math.max(0, Math.floor(b * (1 - amount)));
+
+		return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+	};
+
 	const createConfig = (dataPoints, matchCount, gameMode, titleText) => {
 		const mmrValues = dataPoints.map(p => p.y);
 		const minMmr = Math.min(...mmrValues);
@@ -579,7 +599,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		const yMax = Math.ceil((maxMmr + padding) / 100) * 100;
 		const is24p = gameMode === "mkworld24p";
 
-		const getGradient = (context, opacity = 1.0) => {
+		const getGradient = (context, opacity = 1.0, darkenAmount = 0) => {
 			const chart = context.chart;
 			const { ctx, chartArea, scales } = chart;
 			if (!chartArea) return null;
@@ -595,9 +615,12 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 			tiers.forEach(tier => {
 				const label = tier.label.charAt(0).toUpperCase() + tier.label.slice(1);
-				const colorHex = rankColors[label] || "#888888";
+				let colorHex = rankColors[label] || "#888888"; 
+				if (darkenAmount > 0) {
+					colorHex = darkenHex(colorHex, darkenAmount);
+				}
 				const color = setHexAlpha(colorHex, opacity);
-
+				
 				const valStart = tier.min;
 				const yScaleMax = yScale.max;
 				const valEnd = Number.isFinite(tier.max) ? tier.max : (yScaleMax * 1.5);
@@ -607,15 +630,15 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				const pixelStart = yScale.getPixelForValue(valStart);
 				const pixelEnd = yScale.getPixelForValue(valEnd);
 				const chartHeight = chartArea.bottom - chartArea.top;
-
+				
 				let stopStart = (chartArea.bottom - pixelStart) / chartHeight;
 				let stopEnd = (chartArea.bottom - pixelEnd) / chartHeight;
-
+				
 				stopStart = Math.max(0, Math.min(1, stopStart));
 				stopEnd = Math.max(0, Math.min(1, stopEnd));
-
+				
 				if (stopStart === stopEnd) return;
-
+				
 				gradient.addColorStop(stopStart, color);
 				gradient.addColorStop(stopEnd, color);
 			});
@@ -639,7 +662,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			data: {
 				datasets: [{
 					data: dataPoints,
-					borderColor: trackColors.statsTextColor,
+					borderColor: (ctx) => getGradient(ctx, 1.0, 0.4),
 					backgroundColor: (ctx) => getGradient(ctx, 0.75),
 					borderWidth: 4,
 					pointRadius: 0,

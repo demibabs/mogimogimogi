@@ -370,6 +370,13 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 		);
 	}
 
+	paginationRow.addComponents(
+		new ButtonBuilder()
+			.setCustomId(buildLeaderboardCustomId("find_me", { ...pageParams }))
+			.setLabel("find me")
+			.setStyle(ButtonStyle.Success)
+	);
+
 	return [paginationRow, formatRow, timeRow];
 }
 
@@ -777,6 +784,7 @@ async function generateLeaderboard(interaction, {
 	game = "mkworld12p",
 	roleId = null,
 	session: existingSession = null,
+	targetLoungeId = null,
 } = {}) {
 	const serverId = interaction.guildId;
 			const selectedGame = game || existingSession?.game || "mkworld12p";
@@ -846,6 +854,21 @@ async function generateLeaderboard(interaction, {
 	}
 
 	const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, timeFilter));
+
+	if (targetLoungeId) {
+		const foundIndex = sortedPool.findIndex(p => String(p.loungeId) === String(targetLoungeId));
+		if (foundIndex !== -1) {
+			page = Math.floor(foundIndex / MAX_ENTRIES) + 1;
+		} else {
+			const components = buildLeaderboardComponents({ timeFilter, serverId, page: 1, totalPages: 1, game: selectedGame, roleId: selectedRoleId });
+			return {
+				success: false,
+				message: `could not find you in the ${TIME_LABELS[timeFilter]} leaderboard.`,
+				components,
+				session,
+			}
+		}
+	}
 
 	const totalPages = Math.ceil(sortedPool.length / MAX_ENTRIES) || 1;
 	const safePage = Math.max(1, Math.min(page, totalPages));
@@ -1012,16 +1035,30 @@ module.exports = {
 				session.pendingTimeFilter = nextTimeFilter;
 			}
 
-			const components = buildLeaderboardComponents({
-				timeFilter: nextTimeFilter,
-				serverId: parsed.serverId || interaction.guildId,
-				page: requestedPage,
-				totalPages: totalPages,
-				game: nextGame,
-				roleId: nextRoleId,
-			});
 
-			await interaction.update({ components });
+			let targetLoungeId = null;
+			let components = null;
+
+			if (parsed.action === "find_me") {
+				const player = await LoungeApi.getPlayerByDiscordId(interaction.user.id);
+				if (!player) {
+					await interaction.reply({ content: "you do not have a linked lounge account.", ephemeral: true });
+					return;
+				}
+				targetLoungeId = player.id;
+				await interaction.deferUpdate();
+			} else {
+				components = buildLeaderboardComponents({
+					timeFilter: nextTimeFilter,
+					serverId: parsed.serverId || interaction.guildId,
+					page: requestedPage,
+					totalPages: totalPages,
+					game: nextGame,
+					roleId: nextRoleId,
+				});
+
+				await interaction.update({ components });
+			}
 
 			const renderToken = beginLeaderboardRender(messageId);
 			if (session) {
@@ -1036,15 +1073,33 @@ module.exports = {
 					game: nextGame,
 					roleId: nextRoleId,
 					session,
+					targetLoungeId,
 				});
 
 				if (isLeaderboardRenderActive(messageId, renderToken)) {
 					if (!result.success) {
-						await interaction.editReply({
-							content: result.message || "unable to update leaderboard.",
-							files: [],
-							components: result.components || [],
-						});
+						if (targetLoungeId) {
+							// If find_me fails, show ephemeral error and restore original components/view if possible
+							// Since we deferred update, the button is "loading".
+							// We can editReply to restore the previous state (captured in components variable? No, components is null for find_me branch)
+							// We can just rebuild components for current page.
+							components = buildLeaderboardComponents({
+								timeFilter: nextTimeFilter,
+								serverId: parsed.serverId || interaction.guildId,
+								page: requestedPage,
+								totalPages: totalPages,
+								game: nextGame,
+								roleId: nextRoleId,
+							});
+							await interaction.editReply({ components });
+							await interaction.followUp({ content: result.message, ephemeral: true });
+						} else {
+							await interaction.editReply({
+								content: result.message || "unable to update leaderboard.",
+								files: [],
+								components: result.components || [],
+							});
+						}
 					}
 					else {
 						await interaction.editReply({
@@ -1061,20 +1116,23 @@ module.exports = {
 						}
 					}
 				}
-			}
-			finally {
-				endLeaderboardRender(messageId, renderToken);
-				if (session) {
-					session.pendingTimeFilter = null;
-					session.activeRequestToken = null;
-				}
+			} catch (error) {
+				console.error("leaderboard interaction error:", error);
+				// Try to stop loading state if error
+				try {
+					if (!interaction.replied) {
+						await interaction.reply({ content: "an error occurred.", ephemeral: true });
+					} else {
+						await interaction.followUp({ content: "an error occurred.", ephemeral: true });
+					}
+				} catch (e) { /* ignore */ }
 			}
 
 			return true;
-		}
-		catch (error) {
-			console.error("leaderboard button interaction error:", error);
+		} catch (fatalError) {
+			console.error("fatal leaderboard error:", fatalError);
 			return false;
 		}
 	},
+
 };
