@@ -1001,8 +1001,30 @@ module.exports = {
 					return true;
 				}
 
+				const candidateLoungeIds = new Set();
+
 				const target = await resolveTargetPlayer(interaction, { defaultToInvoker: true });
-				if (!target?.loungeId) {
+				if (target?.loungeId) {
+					candidateLoungeIds.add(String(target.loungeId));
+				}
+
+				try {
+					const [direct12p, direct24p] = await Promise.all([
+						LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, "mkworld12p"),
+						LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, "mkworld24p"),
+					]);
+					if (direct12p?.id) {
+						candidateLoungeIds.add(String(direct12p.id));
+					}
+					if (direct24p?.id) {
+						candidateLoungeIds.add(String(direct24p.id));
+					}
+				}
+				catch (lookupError) {
+					console.warn("leaderboard find me: direct discord lookup failed:", lookupError);
+				}
+
+				if (!candidateLoungeIds.size) {
 					await interaction.reply({
 						content: "you don't appear to have a linked lounge account.",
 						ephemeral: true,
@@ -1017,7 +1039,7 @@ module.exports = {
 				});
 				const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, nextTimeFilter));
 
-				const targetIndex = sortedPool.findIndex(entry => String(entry?.loungeId) === String(target.loungeId));
+				const targetIndex = sortedPool.findIndex(entry => candidateLoungeIds.has(String(entry?.loungeId)));
 				if (targetIndex < 0) {
 					await interaction.reply({
 						content: "you're not present on this leaderboard for the selected filters.",
