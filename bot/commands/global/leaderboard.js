@@ -1025,6 +1025,12 @@ module.exports = {
 				}
 
 				if (!candidateLoungeIds.size) {
+					console.log("leaderboard find me debug: no lounge ids", {
+						userId: interaction.user?.id,
+						timeFilter: nextTimeFilter,
+						game: nextGame,
+						roleId: nextRoleId,
+					});
 					await interaction.reply({
 						content: "you don't appear to have a linked lounge account.",
 						ephemeral: true,
@@ -1039,8 +1045,26 @@ module.exports = {
 				});
 				const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, nextTimeFilter));
 
+				console.log("leaderboard find me debug: attempting match", {
+					userId: interaction.user?.id,
+					candidateLoungeIds: [...candidateLoungeIds],
+					timeFilter: nextTimeFilter,
+					game: nextGame,
+					roleId: nextRoleId,
+					poolSize: sortedPool.length,
+					samplePoolIds: sortedPool.slice(0, 15).map(entry => String(entry?.loungeId)),
+				});
+
 				const targetIndex = sortedPool.findIndex(entry => candidateLoungeIds.has(String(entry?.loungeId)));
 				if (targetIndex < 0) {
+					console.log("leaderboard find me debug: no match", {
+						userId: interaction.user?.id,
+						candidateLoungeIds: [...candidateLoungeIds],
+						timeFilter: nextTimeFilter,
+						game: nextGame,
+						roleId: nextRoleId,
+						poolSize: sortedPool.length,
+					});
 					await interaction.reply({
 						content: "you're not present on this leaderboard for the selected filters.",
 						ephemeral: true,
@@ -1049,6 +1073,12 @@ module.exports = {
 				}
 
 				requestedPage = Math.floor(targetIndex / MAX_ENTRIES) + 1;
+				console.log("leaderboard find me debug: matched", {
+					userId: interaction.user?.id,
+					matchedLoungeId: String(sortedPool[targetIndex]?.loungeId),
+					targetIndex,
+					requestedPage,
+				});
 			}
 			
 			let totalPages = 1;
