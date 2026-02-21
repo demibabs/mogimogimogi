@@ -330,13 +330,7 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 				.setDisabled(game === "mkworld24p"),
 		);
 
-	const paginationRow = new ActionRowBuilder()
-		.addComponents(
-			new ButtonBuilder()
-				.setCustomId(buildLeaderboardCustomId("findme", { ...pageParams, page }))
-				.setLabel("find me")
-				.setStyle(ButtonStyle.Success),
-		);
+	const paginationRow = new ActionRowBuilder();
 
 	if (totalPages <= 1) {
 		return [paginationRow, formatRow, timeRow];
@@ -374,6 +368,13 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 				.setDisabled(page >= totalPages),
 		);
 	}
+
+	paginationRow.addComponents(
+		new ButtonBuilder()
+			.setCustomId(buildLeaderboardCustomId("findme", { ...pageParams, page }))
+			.setLabel("find me")
+			.setStyle(ButtonStyle.Success),
+	);
 
 	return [paginationRow, formatRow, timeRow];
 }
@@ -716,6 +717,7 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 					});
 
 					return {
+						discordId: member.id,
 						loungeId: String(details.id),
 						mmr,
 						activity,
@@ -1013,15 +1015,26 @@ module.exports = {
 			let targetLoungeId = null;
 
 			if (parsed.action === "findme") {
-				const selfDetails = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, nextGame);
-				if (!selfDetails?.id) {
+				const sessionEntries = nextGame.includes("24p") ? (session?.entries24p || []) : (session?.entries12p || []);
+				const sessionMatch = sessionEntries.find(entry => String(entry?.discordId || "") === String(interaction.user.id));
+
+				if (sessionMatch?.loungeId) {
+					targetLoungeId = String(sessionMatch.loungeId);
+				}
+				else {
+					const selfDetails = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, nextGame);
+					if (selfDetails?.id) {
+						targetLoungeId = String(selfDetails.id);
+					}
+				}
+
+				if (!targetLoungeId) {
 					await interaction.reply({
 						content: "couldn't find your mkw lounge account.",
 						ephemeral: true,
 					});
 					return true;
 				}
-				targetLoungeId = String(selfDetails.id);
 			}
 			
 			let totalPages = 1;
