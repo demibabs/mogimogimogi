@@ -9,7 +9,7 @@ const database = require("./database");
 const LOUNGE_API_BASE = "https://lounge.mkcentral.com/api";
 
 // Default season (can be updated as needed for MK World)
-const DEFAULT_SEASON = null;
+const DEFAULT_SEASON = 2;
 const DEFAULT_GAME = "mkworld12p";
 
 // Authentication config - many endpoints work without auth
@@ -325,7 +325,7 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 		for (let season = 0; season <= DEFAULT_SEASON; season++) {
 			// Iterate over game modes relevant for the season
 			const gameModes = season < 2 ? ["mkworld"] : ["mkworld12p", "mkworld24p"];
-			
+
 			for (const gameMode of gameModes) {
 				try {
 					let details = null;
@@ -336,7 +336,7 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 					if (currentSeasonPlayerDetails &&
 						Number(currentSeasonPlayerDetails.season) === season &&
 						detailsGameMode === gameMode) {
-						
+
 						details = currentSeasonPlayerDetails;
 					}
 					else {
@@ -353,7 +353,7 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 					// For now, let's just grab all tables referenced in mmrChanges.
 
 					const newTables = details.mmrChanges.filter(c => c.reason === "Table" && !tables[c.changeId]);
-					
+
 					const CHUNK_SIZE = 5;
 					for (let i = 0; i < newTables.length; i += CHUNK_SIZE) {
 						const chunk = newTables.slice(i, i + CHUNK_SIZE);

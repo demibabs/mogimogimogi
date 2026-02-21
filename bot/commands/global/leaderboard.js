@@ -295,7 +295,6 @@ function parseLeaderboardInteraction(customId) {
 
 function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages = 1, game = "mkworld12p", roleId = null }) {
 	const commonParams = { timeFilter, serverId, page: 1, roleId };
-	const pageParams = { timeFilter, serverId, game, roleId };
 	
 	const timeRow = new ActionRowBuilder()
 		.addComponents(
@@ -331,15 +330,8 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 		);
 
 	const paginationRow = new ActionRowBuilder();
-	const findMeButton = new ButtonBuilder()
-		.setCustomId(buildLeaderboardCustomId("findme", { ...pageParams, page }))
-		.setLabel("find me")
-		.setStyle(ButtonStyle.Success);
 
-	if (totalPages <= 1) {
-		paginationRow.addComponents(findMeButton);
-		return [paginationRow, formatRow, timeRow];
-	}
+	const pageParams = { timeFilter, serverId, game, roleId };
 
 	if (totalPages > 2) {
 		paginationRow.addComponents(
@@ -374,7 +366,12 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 		);
 	}
 
-	paginationRow.addComponents(findMeButton);
+	paginationRow.addComponents(
+		new ButtonBuilder()
+			.setCustomId(buildLeaderboardCustomId("find", { ...pageParams, page }))
+			.setLabel("find me")
+			.setStyle(ButtonStyle.Success),
+	);
 
 	return [paginationRow, formatRow, timeRow];
 }
@@ -717,7 +714,6 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 					});
 
 					return {
-						discordId: member.id,
 						loungeId: String(details.id),
 						mmr,
 						activity,
@@ -783,9 +779,6 @@ async function generateLeaderboard(interaction, {
 	page = 1,
 	game = "mkworld12p",
 	roleId = null,
-	targetLoungeId = null,
-	targetDiscordId = null,
-	forceRefresh = false,
 	session: existingSession = null,
 } = {}) {
 	const serverId = interaction.guildId;
@@ -821,7 +814,7 @@ async function generateLeaderboard(interaction, {
 	const isStale = (Date.now() - (session.generatedAt || 0)) > (5 * 60 * 1000);
 	const hasEntries = session.entries12p?.length > 0 || session.entries24p?.length > 0;
 	
-	if (!hasEntries || session.roleId !== selectedRoleId || isStale || forceRefresh) {
+	if (!hasEntries || session.roleId !== selectedRoleId || isStale) {
 		await interaction.editReply("scanning members...");
 		const { entries12p, entries24p } = await collectLeaderboardEntries(interaction, selectedRoleId);
 		session = {
@@ -858,18 +851,7 @@ async function generateLeaderboard(interaction, {
 	const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, timeFilter));
 
 	const totalPages = Math.ceil(sortedPool.length / MAX_ENTRIES) || 1;
-	let targetPage = page;
-	if (targetLoungeId || targetDiscordId) {
-		const targetIndex = sortedPool.findIndex(entry => {
-			const loungeMatch = targetLoungeId && String(entry?.loungeId) === String(targetLoungeId);
-			const discordMatch = targetDiscordId && String(entry?.discordId || "") === String(targetDiscordId);
-			return Boolean(loungeMatch || discordMatch);
-		});
-		if (targetIndex >= 0) {
-			targetPage = Math.floor(targetIndex / MAX_ENTRIES) + 1;
-		}
-	}
-	const safePage = Math.max(1, Math.min(targetPage, totalPages));
+	const safePage = Math.max(1, Math.min(page, totalPages));
 	const startIndex = (safePage - 1) * MAX_ENTRIES;
 	const endIndex = startIndex + MAX_ENTRIES;
 	const topEntries = sortedPool.slice(startIndex, endIndex);
@@ -934,14 +916,6 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("leaderboard")
 		.setDescription("see your server's mmr leaderboard.")
-		.addStringOption(option =>
-			option.setName("format")
-				.setDescription("12p or 24p (default: 12)")
-				.setRequired(false)
-				.addChoices(
-					{ name: "12p", value: "mkworld12p" },
-					{ name: "24p", value: "mkworld24p" }
-				))
 		.addRoleOption(option => 
 			option.setName("role")
 				.setDescription("filter by role")
@@ -957,14 +931,13 @@ module.exports = {
 				return;
 			}
 
-			const format = interaction.options.getString("format") || "mkworld12p";
 			const role = interaction.options.getRole("role");
 			const roleId = role ? role.id : null;
 
 			const result = await generateLeaderboard(interaction, {
 				timeFilter: "alltime",
 				page: 1,
-				game: format,
+				game: "mkworld12p",
 				roleId,
 			});
 
@@ -1006,7 +979,7 @@ module.exports = {
 
 		try {
 			const messageId = interaction.message?.id || null;
-			let session = messageId ? getLeaderboardSession(messageId) : null;
+			const session = messageId ? getLeaderboardSession(messageId) : null;
 			const fallbackTimeFilter = parsed.timeFilter || "alltime";
 			
 			// If we don't have a session, we need to reconstruct basic context or fail gracefully.
@@ -1015,39 +988,45 @@ module.exports = {
 			// Luckily we added roleId to the customId parser now!
 			
 			const nextTimeFilter = parsed.timeFilter || (session ? session.timeFilter : fallbackTimeFilter);
-			const requestedPage = parsed.page || 1;
+			let requestedPage = parsed.page || 1;
 			const nextGame = parsed.game || (session ? session.game : "mkworld12p");
 			const nextRoleId = parsed.roleId || (session ? session.roleId : null);
-			let targetLoungeId = null;
-			let targetDiscordId = null;
-			let forceRefresh = false;
 
-			if (parsed.action === "findme") {
-				targetDiscordId = String(interaction.user.id);
-				const sessionEntries = nextGame.includes("24p") ? (session?.entries24p || []) : (session?.entries12p || []);
-				const sessionHasDiscordIds = sessionEntries.some(entry => Boolean(entry?.discordId));
-				if (session && !sessionHasDiscordIds) {
-					forceRefresh = true;
-				}
-				const sessionMatch = sessionEntries.find(entry => String(entry?.discordId || "") === String(interaction.user.id));
-
-				if (sessionMatch?.loungeId) {
-					targetLoungeId = String(sessionMatch.loungeId);
-				}
-				else {
-					const selfDetails = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, nextGame);
-					if (selfDetails?.id) {
-						targetLoungeId = String(selfDetails.id);
-					}
-				}
-
-				if (!targetLoungeId) {
+			if (parsed.action === "find") {
+				if (!session) {
 					await interaction.reply({
-						content: "couldn't find your mkw lounge account.",
+						content: "this leaderboard session expired. please run /leaderboard again.",
 						ephemeral: true,
 					});
 					return true;
 				}
+
+				const target = await resolveTargetPlayer(interaction, { defaultToInvoker: true });
+				if (!target?.loungeId) {
+					await interaction.reply({
+						content: "you don't appear to have a linked lounge account.",
+						ephemeral: true,
+					});
+					return true;
+				}
+
+				const currentEntries = nextGame.includes("24p") ? (session.entries24p || []) : (session.entries12p || []);
+				const pool = currentEntries.filter(entry => {
+					if (nextTimeFilter === "alltime") return true;
+					return Boolean(entry.activity?.[nextTimeFilter]);
+				});
+				const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, nextTimeFilter));
+
+				const targetIndex = sortedPool.findIndex(entry => String(entry?.loungeId) === String(target.loungeId));
+				if (targetIndex < 0) {
+					await interaction.reply({
+						content: "you're not present on this leaderboard for the selected filters.",
+						ephemeral: true,
+					});
+					return true;
+				}
+
+				requestedPage = Math.floor(targetIndex / MAX_ENTRIES) + 1;
 			}
 			
 			let totalPages = 1;
@@ -1087,9 +1066,6 @@ module.exports = {
 					page: requestedPage,
 					game: nextGame,
 					roleId: nextRoleId,
-					targetLoungeId,
-					targetDiscordId,
-					forceRefresh,
 					session,
 				});
 
