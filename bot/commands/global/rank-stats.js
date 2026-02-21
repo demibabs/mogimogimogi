@@ -1087,11 +1087,12 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 			if (playerDetails.gameMode !== expectedMode) {
 				playerDetails = null;
 			}
-		} else if (playerCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
+		}
+		else if (playerCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
 			// If switching back to "both" from a specific filter, invalidate to allow smart selection logic to run again
 			playerDetails = null;
 		}
-	} 
+	}
 
 	if (!playerDetails) {
 		const playerCountFilter = filters.playerCountFilter || "both";
@@ -1102,11 +1103,12 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 			// Specific mode requested
 			gameMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
 			details = await LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, gameMode);
-		} else {
+		}
+		else {
 			// "both" or unspecified -> fetch both and compare
 			const [details12p, details24p] = await Promise.all([
 				LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld12p"),
-				LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld24p")
+				LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld24p"),
 			]);
 
 			if (!details12p && !details24p) {
@@ -1116,17 +1118,20 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 			if (details12p && !details24p) {
 				details = details12p;
 				gameMode = "mkworld12p";
-			} else if (!details12p && details24p) {
+			}
+			else if (!details12p && details24p) {
 				details = details24p;
 				gameMode = "mkworld24p";
-			} else {
+			}
+			else {
 				// Both exist, compare MMR
 				const mmr12p = details12p.mmr || 0;
 				const mmr24p = details24p.mmr || 0;
 				if (mmr24p > mmr12p) {
 					details = details24p;
 					gameMode = "mkworld24p";
-				} else {
+				}
+				else {
 					details = details12p;
 					gameMode = "mkworld12p";
 				}

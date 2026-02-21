@@ -492,6 +492,271 @@ async function getDivisionChart(trackName, trackColors, globals) {
 	};
 }
 
+async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, loungeId, timeFilter, playerCountFilter = null, extraDetails = null) {
+	// Helper to get points for a specific mode
+	const getModeData = (targetMode) => {
+		const tablesList = Object.values(allTables).sort((a, b) => new Date(a.createdOn) - new Date(b.createdOn));
+		const relevantTables = tablesList.filter(t => {
+			if (t.season < 2) return false;
+			const tableMode = (t.numPlayers > 12) ? "mkworld24p" : "mkworld12p";
+			if (tableMode !== targetMode) return false;
+			if (timeFilter === "season" && String(t.season) !== String(LoungeApi.DEFAULT_SEASON)) return false;
+			if (timeFilter === "weekly") {
+				const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+				if (new Date(t.createdOn).getTime() < oneWeekAgo) return false;
+			}
+			return true;
+		});
+
+		if (relevantTables.length === 0) return null;
+
+		const historyPoints = [];
+		let matchCount = 0;
+		const firstTable = relevantTables[0];
+		const firstScoreEntry = PlayerStats.getPlayerRankingInTable(firstTable, loungeId);
+
+		if (firstScoreEntry && Number.isFinite(firstScoreEntry.prevMmr)) {
+			historyPoints.push({ x: 0, y: firstScoreEntry.prevMmr });
+		}
+
+		relevantTables.forEach((table) => {
+			const scoreEntry = PlayerStats.getPlayerRankingInTable(table, loungeId);
+			if (scoreEntry && Number.isFinite(scoreEntry.newMmr)) {
+				matchCount++;
+				historyPoints.push({ x: matchCount, y: scoreEntry.newMmr });
+			}
+		});
+
+		if (historyPoints.length === 0) return null;
+
+		return { historyPoints, matchCount };
+	};
+
+	let dualMode = false;
+	let data12p = null;
+	let data24p = null;
+
+	if (playerCountFilter === "both" && extraDetails) {
+		data12p = getModeData("mkworld12p");
+		data24p = getModeData("mkworld24p");
+		if (data12p && data24p) {
+			dualMode = true;
+		}
+		else if (data12p) {
+			playerDetails = extraDetails.details12p || playerDetails;
+		}
+		else if (data24p) {
+			playerDetails = extraDetails.details24p || playerDetails;
+		}
+	}
+
+	/* Removed old filtering logic to use getModeData later */
+
+	// Helper to set alpha for hex colors
+	const setHexAlpha = (hex, alpha) => {
+		if (!hex || !hex.startsWith("#")) return `rgba(255, 255, 255, ${alpha})`;
+		let r, g, b;
+		if (hex.length === 4) {
+			r = parseInt(hex[1] + hex[1], 16);
+			g = parseInt(hex[2] + hex[2], 16);
+			b = parseInt(hex[3] + hex[3], 16);
+		}
+		else {
+			r = parseInt(hex.slice(1, 3), 16);
+			g = parseInt(hex.slice(3, 5), 16);
+			b = parseInt(hex.slice(5, 7), 16);
+		}
+		if (isNaN(r) || isNaN(g) || isNaN(b)) return `rgba(255, 255, 255, ${alpha})`;
+		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+	};
+
+	const createConfig = (dataPoints, matchCount, gameMode, titleText) => {
+		const mmrValues = dataPoints.map(p => p.y);
+		const minMmr = Math.min(...mmrValues);
+		const maxMmr = Math.max(...mmrValues);
+		const padding = (maxMmr - minMmr) * 0.1 || 100;
+		const yMin = Math.floor((minMmr - padding) / 100) * 100;
+		const yMax = Math.ceil((maxMmr + padding) / 100) * 100;
+		const is24p = gameMode === "mkworld24p";
+
+		const getGradient = (context, opacity = 1.0) => {
+			const chart = context.chart;
+			const { ctx, chartArea, scales } = chart;
+			if (!chartArea) return null;
+
+			const yScale = scales.y;
+			const rankMode = is24p ? "24p" : "12p";
+			const tiers = PlayerStats.getRankThresholds(rankMode);
+			const rankColors = ColorPalettes.rankColorMap;
+
+			const patternCanvas = createCanvas(Math.ceil(chartArea.width), Math.ceil(chartArea.height));
+			const pCtx = patternCanvas.getContext("2d");
+			const gradient = pCtx.createLinearGradient(0, patternCanvas.height, 0, 0);
+
+			tiers.forEach(tier => {
+				const label = tier.label.charAt(0).toUpperCase() + tier.label.slice(1);
+				const colorHex = rankColors[label] || "#888888";
+				const color = setHexAlpha(colorHex, opacity);
+
+				const valStart = tier.min;
+				const yScaleMax = yScale.max;
+				const valEnd = Number.isFinite(tier.max) ? tier.max : (yScaleMax * 1.5);
+
+				if (valStart >= yScaleMax) return;
+
+				const pixelStart = yScale.getPixelForValue(valStart);
+				const pixelEnd = yScale.getPixelForValue(valEnd);
+				const chartHeight = chartArea.bottom - chartArea.top;
+
+				let stopStart = (chartArea.bottom - pixelStart) / chartHeight;
+				let stopEnd = (chartArea.bottom - pixelEnd) / chartHeight;
+
+				stopStart = Math.max(0, Math.min(1, stopStart));
+				stopEnd = Math.max(0, Math.min(1, stopEnd));
+
+				if (stopStart === stopEnd) return;
+
+				gradient.addColorStop(stopStart, color);
+				gradient.addColorStop(stopEnd, color);
+			});
+
+			pCtx.fillStyle = gradient;
+			pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+
+			const patternStyle = EmbedEnhancer.randomPattern("rgba(0,0,0,0)", "rgba(255,255,255,0.3)", 20, [], 0.3);
+			pCtx.fillStyle = patternStyle;
+			pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+
+			const fullCanvas = createCanvas(ctx.canvas.width, ctx.canvas.height);
+			const fCtx = fullCanvas.getContext("2d");
+			fCtx.drawImage(patternCanvas, chartArea.left, chartArea.top);
+
+			return ctx.createPattern(fullCanvas, "no-repeat");
+		};
+
+		return {
+			type: "line",
+			data: {
+				datasets: [{
+					data: dataPoints,
+					borderColor: trackColors.statsTextColor,
+					backgroundColor: (ctx) => getGradient(ctx, 0.75),
+					borderWidth: 4,
+					pointRadius: 0,
+					pointHitRadius: 10,
+					fill: "start",
+					tension: 0.1,
+				}],
+			},
+			options: {
+				plugins: {
+					title: {
+						display: true,
+						text: titleText,
+						font: { size: 40 },
+						color: trackColors.chartTextColor,
+					},
+					legend: { display: false },
+					xAxisIcons: { icons: [] },
+				},
+				scales: {
+					y: {
+						title: {
+							display: true,
+							text: "mmr",
+							font: { size: 24 },
+							color: trackColors.chartTextColor,
+						},
+						min: yMin,
+						max: yMax,
+						grid: { color: trackColors.yGridColor },
+						ticks: {
+							font: { size: 20 },
+							color: trackColors.chartTextColor,
+							stepSize: 1000,
+						},
+					},
+					x: {
+						type: "linear",
+						title: {
+							display: true,
+							text: "events played",
+							font: { size: 24 },
+							color: trackColors.chartTextColor,
+						},
+						grid: { display: false },
+						ticks: {
+							font: { size: 20 },
+							color: trackColors.chartTextColor,
+							stepSize: Math.max(1, Math.ceil(matchCount / 10)),
+						},
+						min: 0,
+						max: matchCount,
+					},
+				},
+				layout: {
+					padding: { top: 25, right: 25, bottom: 25, left: 25 },
+				},
+			},
+			plugins: [],
+		};
+	};
+
+	if (dualMode) {
+		const heightPerChart = Math.floor(CHART_DIMENSIONS.height / 2);
+
+		const dualRenderer = new ChartJSNodeCanvas({
+			width: CHART_DIMENSIONS.width,
+			height: heightPerChart,
+			backgroundColour: "rgba(0,0,0,0)",
+			chartCallback: ChartJS => {
+				ChartJS.defaults.font.family = Fonts?.FONT_FAMILY_STACK || "Lexend, Arial, sans-serif";
+			},
+		});
+
+		const config12p = createConfig(data12p.historyPoints, data12p.matchCount, "mkworld12p", "mmr history (12p)");
+		const buf12p = await dualRenderer.renderToBuffer(config12p);
+
+		const config24p = createConfig(data24p.historyPoints, data24p.matchCount, "mkworld24p", "mmr history (24p)");
+		const buf24p = await dualRenderer.renderToBuffer(config24p);
+
+		const combinedCanvas = createCanvas(CHART_DIMENSIONS.width, CHART_DIMENSIONS.height);
+		const ctx = combinedCanvas.getContext("2d");
+
+		const img12p = await loadImage(buf12p);
+		const img24p = await loadImage(buf24p);
+
+		ctx.drawImage(img12p, 0, 0);
+		ctx.drawImage(img24p, 0, heightPerChart);
+
+		return {
+			image: await loadImage(combinedCanvas.toBuffer("image/png")),
+			metrics: null,
+			labels: [],
+		};
+
+	}
+	else {
+		// Single Mode
+		const is24p = playerDetails.gameMode === "mkworld24p";
+		const targetMode = is24p ? "mkworld24p" : "mkworld12p";
+		const data = getModeData(targetMode); // Should pass targetMode
+
+		if (!data) return null;
+
+		const renderer = getChartRenderer();
+		const config = createConfig(data.historyPoints, data.matchCount, targetMode, "mmr history");
+		const chartBuffer = await renderer.renderToBuffer(config);
+		const chartImage = await loadImage(chartBuffer);
+
+		return {
+			image: chartImage,
+			metrics: null,
+			labels: [],
+		};
+	}
+}
+
 async function getPlayerStats(loungeId, serverId, tables, playerDetails = null) {
 	try {
 		const normalizedLoungeId = String(loungeId);
@@ -708,7 +973,8 @@ async function renderStats({
 		if (playerDetails.gameMode !== expectedMode) {
 			playerDetails = null;
 		}
-	} else if (playerDetails && playerCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
+	}
+	else if (playerDetails && playerCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
 		// If switching back to "both" from a specific filter, invalidate to allow smart selection logic to run again
 		playerDetails = null;
 	}
@@ -725,16 +991,17 @@ async function renderStats({
 	if (!playerDetails) {
 		let gameMode = "mkworld12p";
 		let details = null;
-		
+
 		if (playerCountFilter && playerCountFilter !== "both") {
 			// Specific mode requested
 			gameMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
 			details = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, gameMode);
-		} else {
+		}
+		else {
 			// "both" or unspecified -> fetch both and compare
 			const [details12p, details24p] = await Promise.all([
 				LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld12p"),
-				LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld24p")
+				LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld24p"),
 			]);
 
 			if (!details12p && !details24p) {
@@ -744,18 +1011,25 @@ async function renderStats({
 			if (details12p && !details24p) {
 				details = details12p;
 				gameMode = "mkworld12p";
-			} else if (!details12p && details24p) {
+			}
+			else if (!details12p && details24p) {
 				details = details24p;
 				gameMode = "mkworld24p";
-			} else {
+			}
+			else {
 				// Both exist, compare MMR
 				const mmr12p = details12p.mmr || 0;
 				const mmr24p = details24p.mmr || 0;
 				if (mmr24p > mmr12p) {
 					details = details24p;
+					details.alternateDetails = details12p;
+					details.alternateGameMode = "mkworld12p";
 					gameMode = "mkworld24p";
-				} else {
+				}
+				else {
 					details = details12p;
+					details.alternateDetails = details24p;
+					details.alternateGameMode = "mkworld24p";
 					gameMode = "mkworld12p";
 				}
 			}
@@ -883,7 +1157,7 @@ async function renderStats({
 	// Determine what to show based on filters
 	// If playerCountFilter is "both" (or unspecified), we show current MMR + Peak/GameMode label
 	// If playerCountFilter is specific, we calculate Peak for that mode (Season 2+)
-	
+
 	const isSpecificPlayerCount = playerCountFilter === "12p" || playerCountFilter === "24p" || playerCountFilter === "mkworld12p" || playerCountFilter === "mkworld24p";
 	const isAllTimeOrSeason = timeFilter === "alltime" || timeFilter === "season";
 	const isQueueAny = queueFilter === "both" || !queueFilter;
@@ -906,9 +1180,9 @@ async function renderStats({
 		if (isSpecificPlayerCount && isAllTimeOrSeason) {
 			// Search history for peak in this specific mode, starting from Season 2
 			// Season 0 and 1 are ignored as requested
-			const startSeason = 2; 
+			const startSeason = 2;
 			const currentSeason = Number(LoungeApi.DEFAULT_SEASON) || 15; // Fallback if constant missing
-			const targetGameMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
+			const mode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
 
 			const pastSeasons = [];
 			for (let s = startSeason; s < currentSeason; s++) {
@@ -918,8 +1192,9 @@ async function renderStats({
 			if (pastSeasons.length > 0) {
 				const seasonResults = await Promise.all(pastSeasons.map(async s => {
 					try {
-						return await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, s, targetGameMode);
-					} catch (e) {
+						return await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, s, mode);
+					}
+					catch (e) {
 						console.warn(`failed to fetch season ${s} details for ${normalizedLoungeId}:`, e);
 						return null;
 					}
@@ -932,8 +1207,8 @@ async function renderStats({
 					}
 				});
 			}
-		} 
-		
+		}
+
 		if (peaks.length > 0) {
 			peakMmr = Math.max(...peaks);
 		}
@@ -945,8 +1220,8 @@ async function renderStats({
 	}
 
 	const mmrDisplay = showCurrentMmr && Number.isFinite(mmr) ? formatNumber(Math.round(mmr)) : formatSignedNumber(mmrDeltaForFilter);
-	const mmrFormatted = formatNumber(mmrRaw); 
-	
+	const mmrFormatted = formatNumber(mmrRaw);
+
 	let mmrSubLabel = null;
 	let mmrSubLabelPrefix = null;
 
@@ -957,7 +1232,8 @@ async function renderStats({
 				mmrSubLabelPrefix = "(peak: ";
 				mmrSubLabel = `${formatNumber(Math.round(peakMmr))})`;
 			}
-		} else {
+		}
+		else {
 			// Case: Both Modes - Show "12p" or "24p"
 			// The current MMR displayed comes from `playerDetails.gameMode` (logic added previously)
 			const mode = playerDetails?.gameMode === "mkworld24p" ? "24p" : "12p";
@@ -1005,7 +1281,7 @@ async function renderStats({
 	let percent = globals?.totalPlayers ? Math.ceil(100 * (rank / globals.totalPlayers)) : null;
 
 	if (percent !== null && percent >= 100) {
-		rank = "N/A";
+		rank = "n/a";
 		percent = null; // Hide percentile if rank is N/A
 	}
 
@@ -1094,11 +1370,36 @@ async function renderStats({
 
 	const playerEmoji = EmbedEnhancer.getCountryFlag(playerDetails.countryCode);
 	let chartResult = null;
+	let isHistoryChart = false;
 	try {
-		chartResult = await getDivisionChart(trackName, trackColors, globals);
+		if (isSpecificPlayerCount || !playerCountFilter || playerCountFilter === "both") {
+			let extraDetails = null;
+			if (!playerCountFilter || playerCountFilter === "both") {
+				// Construct details for both 12p and 24p.
+				// Note: playerDetails holds the primary mode, and .alternateDetails holds the secondary if available.
+				// If alternateDetails is missing, we will just have the primary.
+				const primaryMode = playerDetails.gameMode || "mkworld12p";
+				const alternateMode = primaryMode === "mkworld12p" ? "mkworld24p" : "mkworld12p";
+
+				extraDetails = {
+					details12p: primaryMode === "mkworld12p" ? playerDetails : playerDetails.alternateDetails,
+					details24p: primaryMode === "mkworld24p" ? playerDetails : playerDetails.alternateDetails,
+				};
+
+				// Ensure we have objects even if null, though getMmrHistoryChart checks for existence
+			}
+			chartResult = await getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, normalizedLoungeId, timeFilter, playerCountFilter || "both", extraDetails);
+			if (chartResult) {
+				isHistoryChart = true;
+			}
+		}
+
+		if (!chartResult) {
+			chartResult = await getDivisionChart(trackName, trackColors, globals);
+		}
 	}
 	catch (chartError) {
-		console.warn("failed to generate division chart:", chartError);
+		console.warn("failed to generate chart:", chartError);
 	}
 	const chartImage = chartResult?.image || null;
 	const chartLabels = chartResult?.labels || [];
@@ -1243,19 +1544,83 @@ async function renderStats({
 
 	const winRateText = tWR?.winRate != null ? `${tWR.winRate}%` : "-";
 	const winLossRecord = EmbedEnhancer.formatWinLoss(tWR);
-	const gridConfig = [
-		[
-			{
-				label: "mmr",
-				value: mmrDisplay,
-				subLabel: mmrSubLabel || undefined,
-				subLabelPrefix: mmrSubLabelPrefix || undefined,
-				icon: mmrIcon,
-				subLabelIcon: mmrSubLabelIcon,
-			},
-			{ label: "rank", value: rank, subLabel: percent ? `(top ${percent}%)` : undefined },
+
+	let topStatsRow = [
+		{
+			label: "mmr",
+			value: mmrDisplay,
+			subLabel: mmrSubLabel || undefined,
+			subLabelPrefix: mmrSubLabelPrefix || undefined,
+			icon: mmrIcon,
+			subLabelIcon: mmrSubLabelIcon,
+		},
+		{ label: "rank", value: rank, subLabel: percent ? `(top ${percent}%)` : undefined },
+		{ label: "team\nwin rate", value: winRateText, subLabel: winLossRecord ? `(${winLossRecord})` : undefined },
+	];
+
+	if ((playerCountFilter === "both" || !playerCountFilter) && playerDetails?.alternateDetails) {
+		const is12pPrimary = playerDetails.gameMode === "mkworld12p";
+		const details12p = is12pPrimary ? playerDetails : playerDetails.alternateDetails;
+		const details24p = is12pPrimary ? playerDetails.alternateDetails : playerDetails;
+
+		const getModeCell = async (details, modeName) => {
+			const mmrVal = Number(details?.mmr);
+			const hasMmr = Number.isFinite(mmrVal);
+			const modeFilter = modeName === "mkworld12p" ? "12p" : "24p";
+			const modeTables = PlayerStats.filterTablesByControls(filteredTables, { playerCountFilter: modeFilter });
+			const modeTableIds = Object.keys(modeTables);
+
+			const delta = timeFilter === "alltime"
+				? PlayerStats.getTotalMmrDeltaFromTables(modeTables, normalizedLoungeId)
+				: PlayerStats.computeMmrDeltaForFilter({
+					playerDetails: details,
+					mmrChanges: details?.mmrChanges,
+					tableIds: modeTableIds,
+					timeFilter,
+					queueFilter,
+					playerCountFilter: modeFilter,
+				});
+
+			let value, subLabel, subPrefix;
+			let cellIcon = null;
+			let subIcon = null;
+			const iconFilename = hasMmr ? PlayerStats.getRankIconFilenameForMmr(mmrVal, modeName) : null;
+
+			if (showCurrentMmr) {
+				value = hasMmr ? formatNumber(Math.round(mmrVal)) : "-";
+				subLabel = details.overallRank ? `(rank: ${details.overallRank})` : undefined;
+				if (iconFilename) {
+					cellIcon = await loadImageResource(`bot/images/ranks/${iconFilename}`, `${modeName} rank icon`);
+				}
+			}
+			else {
+				value = formatSignedNumber(delta);
+				subLabel = hasMmr ? `${formatNumber(Math.round(mmrVal))})` : "-";
+				subPrefix = "(current: ";
+				if (iconFilename) {
+					subIcon = await loadImageResource(`bot/images/ranks/${iconFilename}`, `${modeName} rank icon`);
+				}
+			}
+
+			return {
+				label: `${modeFilter} mmr`,
+				value,
+				subLabel,
+				subLabelPrefix: subPrefix,
+				icon: cellIcon,
+				subLabelIcon: subIcon,
+			};
+		};
+
+		topStatsRow = [
+			await getModeCell(details12p, "mkworld12p"),
+			await getModeCell(details24p, "mkworld24p"),
 			{ label: "team\nwin rate", value: winRateText, subLabel: winLossRecord ? `(${winLossRecord})` : undefined },
-		],
+		];
+	}
+
+	const gridConfig = [
+		topStatsRow,
 		[
 			{ label: "average\nroom mmr", value: averageRoomMmrDisplay },
 			{ label: "average\nscore", value: aSc, subLabel: aScSubLabel || undefined },
@@ -1282,17 +1647,19 @@ async function renderStats({
 		);
 	}
 
-	drawMMRMarker(ctx, mmr, trackName, {
-		chartX: chartFrame.left,
-		chartY: chartFrame.top,
-		chartWidth: chartFrame.width,
-		chartHeight: chartFrame.height,
-		labels: chartLabels,
-		metrics: chartMetrics,
-		iconSize: ICON_SIZE,
-		iconGap: ICON_GAP,
-		gameMode: playerDetails?.gameMode || "mkworld12p",
-	});
+	if (!isHistoryChart) {
+		drawMMRMarker(ctx, mmr, trackName, {
+			chartX: chartFrame.left,
+			chartY: chartFrame.top,
+			chartWidth: chartFrame.width,
+			chartHeight: chartFrame.height,
+			labels: chartLabels,
+			metrics: chartMetrics,
+			iconSize: ICON_SIZE,
+			iconGap: ICON_GAP,
+			gameMode: playerDetails?.gameMode || "mkworld12p",
+		});
+	}
 
 	const pngBuffer = canvas.toBuffer("image/png");
 
