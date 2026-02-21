@@ -414,6 +414,8 @@ async function renderLeaderboardImage({
 	guildIcon,
 	page = 1,
 	totalPages = 1,
+	highlightDiscordId = null,
+	highlightLoungeId = null,
 }) {
 	const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 	const ctx = canvas.getContext("2d");
@@ -540,14 +542,14 @@ async function renderLeaderboardImage({
 
 	const startRank = (page - 1) * MAX_ENTRIES + 1;
 
-	await drawLeaderboardColumn(ctx, columns[0], leftEntries, palette, startRank, timeFilter);
-	await drawLeaderboardColumn(ctx, columns[1], rightEntries, palette, startRank + ENTRIES_PER_COLUMN, timeFilter);
+	await drawLeaderboardColumn(ctx, columns[0], leftEntries, palette, startRank, timeFilter, highlightDiscordId, highlightLoungeId);
+	await drawLeaderboardColumn(ctx, columns[1], rightEntries, palette, startRank + ENTRIES_PER_COLUMN, timeFilter, highlightDiscordId, highlightLoungeId);
 
 	const buffer = canvas.toBuffer("image/png");
 	return new AttachmentBuilder(buffer, { name: "leaderboard.png" });
 }
 
-async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank, timeFilter) {
+async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank, timeFilter, highlightDiscordId = null, highlightLoungeId = null) {
 	if (!entries.length) {
 		return;
 	}
@@ -611,7 +613,15 @@ async function drawLeaderboardColumn(ctx, frame, entries, palette, startingRank,
 
 		const nameMaxWidth = Math.max(maxNameRight - currentX, 0);
 		const nameValue = entry.displayName || entry.playerDetails?.name || `player ${entry.loungeId}`;
+		const isHighlightedEntry = (
+			highlightDiscordId && String(entry?.discordId) === String(highlightDiscordId)
+		) || (
+			highlightLoungeId && String(entry?.loungeId) === String(highlightLoungeId)
+		);
 		ctx.font = `600 ${LAYOUT.nameFontSize}px ${Fonts.FONT_FAMILY_STACK}`;
+		ctx.fillStyle = isHighlightedEntry
+			? (palette.valuePositiveColor || palette.leaderboardTextColor || "#000000")
+			: (palette.leaderboardTextColor || "#000000");
 		const fittedName = truncateTextWithEmojis(ctx, nameValue, nameMaxWidth, {
 			font: ctx.font,
 			emojiSize: LAYOUT.nameFontSize * 0.92,
@@ -782,6 +792,8 @@ async function generateLeaderboard(interaction, {
 	game = "mkworld12p",
 	roleId = null,
 	session: existingSession = null,
+	highlightDiscordId = null,
+	highlightLoungeId = null,
 } = {}) {
 	const serverId = interaction.guildId;
 			const selectedGame = game || existingSession?.game || "mkworld12p";
@@ -878,6 +890,8 @@ async function generateLeaderboard(interaction, {
 		guildIcon: iconForRender,
 		page: safePage,
 		totalPages,
+		highlightDiscordId,
+		highlightLoungeId,
 	});
 
 	session = {
@@ -993,16 +1007,120 @@ module.exports = {
 			let requestedPage = parsed.page || 1;
 			const nextGame = parsed.game || (session ? session.game : "mkworld12p");
 			const nextRoleId = parsed.roleId || (session ? session.roleId : null);
+			let highlightDiscordId = null;
+			let highlightLoungeId = null;
 
-			if (parsed.action === "find") {
-				if (!session) {
-					await interaction.reply({
-						content: "this leaderboard session expired. please run /leaderboard again.",
-						ephemeral: true,
+			if (parsed.action === "find" && !session) {
+				await interaction.deferUpdate();
+
+				const seedResult = await generateLeaderboard(interaction, {
+					timeFilter: nextTimeFilter,
+					page: 1,
+					game: nextGame,
+					roleId: nextRoleId,
+					session: null,
+				});
+
+				if (!seedResult.success) {
+					await interaction.editReply({
+						content: seedResult.message || "unable to update leaderboard.",
+						files: [],
+						components: seedResult.components || [],
 					});
 					return true;
 				}
 
+				const freshSession = seedResult.session;
+				const currentEntries = nextGame.includes("24p") ? (freshSession?.entries24p || []) : (freshSession?.entries12p || []);
+				const userId = String(interaction.user.id);
+				const hasAccountForFormat = currentEntries.some(entry => String(entry?.discordId) === userId);
+				let fallbackLoungeId = null;
+				if (!hasAccountForFormat) {
+					try {
+						const direct = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, nextGame);
+						if (direct?.id !== undefined && direct?.id !== null) {
+							fallbackLoungeId = String(direct.id);
+						}
+					}
+					catch (lookupError) {
+						console.warn("leaderboard find me fallback lookup failed:", lookupError);
+					}
+				}
+
+				if (!hasAccountForFormat && !fallbackLoungeId) {
+					await interaction.followUp({
+						content: "you don't appear to have a lounge account for this format.",
+						ephemeral: true,
+					});
+					if (messageId && seedResult.session) {
+						storeLeaderboardSession(messageId, seedResult.session);
+					}
+					return true;
+				}
+
+				const pool = currentEntries.filter(entry => {
+					if (nextTimeFilter === "alltime") return true;
+					return Boolean(entry.activity?.[nextTimeFilter]);
+				});
+				const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, nextTimeFilter));
+
+				const targetIndex = sortedPool.findIndex(entry => {
+					if (String(entry?.discordId) === userId) return true;
+					if (fallbackLoungeId && String(entry?.loungeId) === fallbackLoungeId) return true;
+					return false;
+				});
+
+				if (targetIndex < 0) {
+					await interaction.followUp({
+						content: "you're not present on this leaderboard for the selected filters.",
+						ephemeral: true,
+					});
+					if (messageId && seedResult.session) {
+						storeLeaderboardSession(messageId, seedResult.session);
+					}
+					return true;
+				}
+
+				requestedPage = Math.floor(targetIndex / MAX_ENTRIES) + 1;
+				highlightDiscordId = userId;
+				highlightLoungeId = String(sortedPool[targetIndex]?.loungeId || fallbackLoungeId || "");
+				const finalResult = await generateLeaderboard(interaction, {
+					timeFilter: nextTimeFilter,
+					page: requestedPage,
+					game: nextGame,
+					roleId: nextRoleId,
+					session: freshSession,
+					highlightDiscordId,
+					highlightLoungeId,
+				});
+
+				if (!finalResult.success) {
+					await interaction.editReply({
+						content: finalResult.message || "unable to update leaderboard.",
+						files: [],
+						components: finalResult.components || [],
+					});
+					return true;
+				}
+
+				await interaction.editReply({
+					content: "",
+					files: finalResult.files,
+					components: finalResult.components,
+				});
+
+				if (messageId && finalResult.session) {
+					storeLeaderboardSession(messageId, {
+						...finalResult.session,
+						pendingTimeFilter: null,
+						activeRequestToken: null,
+					});
+				}
+
+				return true;
+			}
+
+			if (parsed.action === "find") {
 				const currentEntries = nextGame.includes("24p") ? (session.entries24p || []) : (session.entries12p || []);
 				const userId = String(interaction.user.id);
 				const hasAccountForFormat = currentEntries.some(entry => String(entry?.discordId) === userId);
@@ -1047,6 +1165,8 @@ module.exports = {
 				}
 
 				requestedPage = Math.floor(targetIndex / MAX_ENTRIES) + 1;
+				highlightDiscordId = userId;
+				highlightLoungeId = String(sortedPool[targetIndex]?.loungeId || fallbackLoungeId || "");
 			}
 			
 			let totalPages = 1;
@@ -1087,6 +1207,8 @@ module.exports = {
 					game: nextGame,
 					roleId: nextRoleId,
 					session,
+					highlightDiscordId,
+					highlightLoungeId,
 				});
 
 				if (isLeaderboardRenderActive(messageId, renderToken)) {
