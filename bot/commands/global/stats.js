@@ -577,7 +577,8 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			r = parseInt(hex[1] + hex[1], 16);
 			g = parseInt(hex[2] + hex[2], 16);
 			b = parseInt(hex[3] + hex[3], 16);
-		} else {
+		}
+		else {
 			r = parseInt(hex.slice(1, 3), 16);
 			g = parseInt(hex.slice(3, 5), 16);
 			b = parseInt(hex.slice(5, 7), 16);
@@ -615,12 +616,12 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 			tiers.forEach(tier => {
 				const label = tier.label.charAt(0).toUpperCase() + tier.label.slice(1);
-				let colorHex = rankColors[label] || "#888888"; 
+				let colorHex = rankColors[label] || "#888888";
 				if (darkenAmount > 0) {
 					colorHex = darkenHex(colorHex, darkenAmount);
 				}
 				const color = setHexAlpha(colorHex, opacity);
-				
+
 				const valStart = tier.min;
 				const yScaleMax = yScale.max;
 				const valEnd = Number.isFinite(tier.max) ? tier.max : (yScaleMax * 1.5);
@@ -761,9 +762,31 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 	}
 	else {
 		// Single Mode
-		const is24p = playerDetails.gameMode === "mkworld24p";
-		const targetMode = is24p ? "mkworld24p" : "mkworld12p";
-		const data = getModeData(targetMode); // Should pass targetMode
+		let targetMode = playerDetails?.gameMode === "mkworld24p" ? "mkworld24p" : "mkworld12p";
+		let data = null;
+
+		if (playerCountFilter === "both") {
+			if (data12p && !data24p) {
+				targetMode = "mkworld12p";
+				data = data12p;
+			}
+			else if (data24p && !data12p) {
+				targetMode = "mkworld24p";
+				data = data24p;
+			}
+			else {
+				const preferredMode = targetMode;
+				const fallbackMode = preferredMode === "mkworld24p" ? "mkworld12p" : "mkworld24p";
+				const preferredData = getModeData(preferredMode);
+				const fallbackData = getModeData(fallbackMode);
+				data = preferredData || fallbackData;
+				if (!data) return null;
+				targetMode = preferredData ? preferredMode : fallbackMode;
+			}
+		}
+		else {
+			data = getModeData(targetMode);
+		}
 
 		if (!data) return null;
 
@@ -1302,11 +1325,18 @@ async function renderStats({
 
 	let rank = playerStats?.rank ?? "-";
 	let percent = globals?.totalPlayers ? Math.ceil(100 * (rank / globals.totalPlayers)) : null;
+	const matchesPlayedCount = Number(playerStats?.matchesPlayed);
+	const hasMatches = Number.isFinite(matchesPlayedCount) && matchesPlayedCount > 0;
 
 	if (percent !== null && percent >= 100) {
 		rank = "n/a";
 		percent = null; // Hide percentile if rank is N/A
 	}
+
+	const selectedModeHasNoEvents = isSpecificPlayerCount && !hasMatches;
+	const rankSubLabel = selectedModeHasNoEvents
+		? "(rank: n/a)"
+		: (percent ? `(top ${percent}%)` : undefined);
 
 	const tWR = playerStats?.winRate || null;
 	if (tWR && typeof tWR.winRate === "number") {
@@ -1316,8 +1346,6 @@ async function renderStats({
 	const partnerAverage = playerStats?.partnerAverage || null;
 	const aSe = Number.isFinite(playerStats?.avgSeed) ? playerStats.avgSeed.toFixed(2) : "-";
 	const aP = Number.isFinite(playerStats?.avgPlacement) ? playerStats.avgPlacement.toFixed(2) : "-";
-	const matchesPlayedCount = Number(playerStats?.matchesPlayed);
-	const hasMatches = Number.isFinite(matchesPlayedCount) && matchesPlayedCount > 0;
 	const eP = Number.isFinite(matchesPlayedCount) ? String(matchesPlayedCount) : "-";
 	let eventsSubLabel = null;
 	const breakdown = PlayerStats.getPlayerCountBreakdown(filteredTables, normalizedLoungeId) || {};
@@ -1577,7 +1605,7 @@ async function renderStats({
 			icon: mmrIcon,
 			subLabelIcon: mmrSubLabelIcon,
 		},
-		{ label: "rank", value: rank, subLabel: percent ? `(top ${percent}%)` : undefined },
+		{ label: "rank", value: rank, subLabel: rankSubLabel },
 		{ label: "team\nwin rate", value: winRateText, subLabel: winLossRecord ? `(${winLossRecord})` : undefined },
 	];
 
@@ -1592,6 +1620,7 @@ async function renderStats({
 			const modeFilter = modeName === "mkworld12p" ? "12p" : "24p";
 			const modeTables = PlayerStats.filterTablesByControls(filteredTables, { playerCountFilter: modeFilter });
 			const modeTableIds = Object.keys(modeTables);
+			const modeHasEvents = modeTableIds.length > 0;
 
 			const delta = timeFilter === "alltime"
 				? PlayerStats.getTotalMmrDeltaFromTables(modeTables, normalizedLoungeId)
@@ -1611,7 +1640,7 @@ async function renderStats({
 
 			if (showCurrentMmr) {
 				value = hasMmr ? formatNumber(Math.round(mmrVal)) : "-";
-				subLabel = details.overallRank ? `(rank: ${details.overallRank})` : undefined;
+				subLabel = modeHasEvents && details?.overallRank ? `(rank: ${details.overallRank})` : "(rank: n/a)";
 				if (iconFilename) {
 					cellIcon = await loadImageResource(`bot/images/ranks/${iconFilename}`, `${modeName} rank icon`);
 				}
