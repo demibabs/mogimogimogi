@@ -708,6 +708,12 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 
 					const mmrChanges = Array.isArray(details.mmrChanges) ? details.mmrChanges : [];
 					const activity = computeActivityFlags(mmrChanges);
+					
+					// Force season activity if we have matches played in the result (since api was called with season param)
+					if ((details.matchesPlayed > 0 || details.eventsPlayed > 0) && !activity.season) {
+						activity.season = true;
+					}
+
 					const weeklyDelta = PlayerStats.computeMmrDeltaForFilter({
 						playerDetails: details,
 						timeFilter: "weekly",
@@ -860,10 +866,25 @@ async function generateLeaderboard(interaction, {
 		if (foundIndex !== -1) {
 			page = Math.floor(foundIndex / MAX_ENTRIES) + 1;
 		} else {
+			// Check if they exist in currentEntries but were filtered out
+			const inUnfiltered = currentEntries.find(p => String(p.loungeId) === String(targetLoungeId));
+			let errorMsg = `could not find you in the ${TIME_LABELS[timeFilter]} leaderboard.`;
+			
+			if (inUnfiltered) {
+				if (timeFilter === "season") {
+					errorMsg = "you were found, but have no recorded matches for the current season.";
+				} else if (timeFilter === "weekly") {
+					errorMsg = "you were found, but have no recorded matches in the last 7 days.";
+				}
+			} else {
+				// Not in list at all - probably not in cache or API failed for them
+				// Try a direct refresh for this user? No, too complex.
+			}
+
 			const components = buildLeaderboardComponents({ timeFilter, serverId, page: 1, totalPages: 1, game: selectedGame, roleId: selectedRoleId });
 			return {
 				success: false,
-				message: `could not find you in the ${TIME_LABELS[timeFilter]} leaderboard.`,
+				message: errorMsg,
 				components,
 				session,
 			}
@@ -1091,7 +1112,7 @@ module.exports = {
 								game: nextGame,
 								roleId: nextRoleId,
 							});
-							await interaction.editReply({ components });
+							await interaction.editReply({ content: "", components });
 							await interaction.followUp({ content: result.message, ephemeral: true });
 						} else {
 							await interaction.editReply({

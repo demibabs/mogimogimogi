@@ -9,7 +9,7 @@ const database = require("./database");
 const LOUNGE_API_BASE = "https://lounge.mkcentral.com/api";
 
 // Default season (can be updated as needed for MK World)
-const DEFAULT_SEASON = 2;
+const DEFAULT_SEASON = null;
 const DEFAULT_GAME = "mkworld12p";
 
 // Authentication config - many endpoints work without auth
