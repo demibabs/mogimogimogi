@@ -7,7 +7,6 @@ const EmbedEnhancer = require("../../utils/embedEnhancer");
 const AutoUserManager = require("../../utils/autoUserManager");
 const ColorPalettes = require("../../utils/colorPalettes");
 const Fonts = require("../../utils/fonts");
-const resolveTargetPlayer = require("../../utils/playerResolver");
 const {
 	setCacheEntry,
 	refreshCacheEntry,
@@ -701,6 +700,8 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 					if (!details) return null;
 					const mmr = Number(details.mmr ?? details.currentMmr ?? details.mmrValue);
 					if (!Number.isFinite(mmr)) return null;
+					const loungeId = details?.id ?? details?.loungeId ?? details?.playerId;
+					if (loungeId === undefined || loungeId === null) return null;
 
 					const mmrChanges = Array.isArray(details.mmrChanges) ? details.mmrChanges : [];
 					const activity = computeActivityFlags(mmrChanges);
@@ -714,7 +715,8 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 					});
 
 					return {
-						loungeId: String(details.id),
+						loungeId: String(loungeId),
+						discordId: String(member.id),
 						mmr,
 						activity,
 						countryCode: details.countryCode || null,
@@ -1001,70 +1003,42 @@ module.exports = {
 					return true;
 				}
 
-				const candidateLoungeIds = new Set();
-
-				const target = await resolveTargetPlayer(interaction, { defaultToInvoker: true });
-				if (target?.loungeId) {
-					candidateLoungeIds.add(String(target.loungeId));
-				}
-
-				try {
-					const [direct12p, direct24p] = await Promise.all([
-						LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, "mkworld12p"),
-						LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, "mkworld24p"),
-					]);
-					if (direct12p?.id) {
-						candidateLoungeIds.add(String(direct12p.id));
+				const currentEntries = nextGame.includes("24p") ? (session.entries24p || []) : (session.entries12p || []);
+				const userId = String(interaction.user.id);
+				const hasAccountForFormat = currentEntries.some(entry => String(entry?.discordId) === userId);
+				let fallbackLoungeId = null;
+				if (!hasAccountForFormat) {
+					try {
+						const direct = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, nextGame);
+						if (direct?.id !== undefined && direct?.id !== null) {
+							fallbackLoungeId = String(direct.id);
+						}
 					}
-					if (direct24p?.id) {
-						candidateLoungeIds.add(String(direct24p.id));
+					catch (lookupError) {
+						console.warn("leaderboard find me fallback lookup failed:", lookupError);
 					}
 				}
-				catch (lookupError) {
-					console.warn("leaderboard find me: direct discord lookup failed:", lookupError);
-				}
 
-				if (!candidateLoungeIds.size) {
-					console.log("leaderboard find me debug: no lounge ids", {
-						userId: interaction.user?.id,
-						timeFilter: nextTimeFilter,
-						game: nextGame,
-						roleId: nextRoleId,
-					});
+				if (!hasAccountForFormat && !fallbackLoungeId) {
 					await interaction.reply({
-						content: "you don't appear to have a linked lounge account.",
+						content: "you don't appear to have a lounge account for this format.",
 						ephemeral: true,
 					});
 					return true;
 				}
 
-				const currentEntries = nextGame.includes("24p") ? (session.entries24p || []) : (session.entries12p || []);
 				const pool = currentEntries.filter(entry => {
 					if (nextTimeFilter === "alltime") return true;
 					return Boolean(entry.activity?.[nextTimeFilter]);
 				});
 				const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, nextTimeFilter));
 
-				console.log("leaderboard find me debug: attempting match", {
-					userId: interaction.user?.id,
-					candidateLoungeIds: [...candidateLoungeIds],
-					timeFilter: nextTimeFilter,
-					game: nextGame,
-					roleId: nextRoleId,
-					poolSize: sortedPool.length,
-					samplePoolIds: sortedPool.slice(0, 15).map(entry => String(entry?.loungeId)),
+				const targetIndex = sortedPool.findIndex(entry => {
+					if (String(entry?.discordId) === userId) return true;
+					if (fallbackLoungeId && String(entry?.loungeId) === fallbackLoungeId) return true;
+					return false;
 				});
-
-				const targetIndex = sortedPool.findIndex(entry => candidateLoungeIds.has(String(entry?.loungeId)));
 				if (targetIndex < 0) {
-					console.log("leaderboard find me debug: no match", {
-						userId: interaction.user?.id,
-						candidateLoungeIds: [...candidateLoungeIds],
-						timeFilter: nextTimeFilter,
-						game: nextGame,
-						roleId: nextRoleId,
-						poolSize: sortedPool.length,
-					});
 					await interaction.reply({
 						content: "you're not present on this leaderboard for the selected filters.",
 						ephemeral: true,
@@ -1073,12 +1047,6 @@ module.exports = {
 				}
 
 				requestedPage = Math.floor(targetIndex / MAX_ENTRIES) + 1;
-				console.log("leaderboard find me debug: matched", {
-					userId: interaction.user?.id,
-					matchedLoungeId: String(sortedPool[targetIndex]?.loungeId),
-					targetIndex,
-					requestedPage,
-				});
 			}
 			
 			let totalPages = 1;
