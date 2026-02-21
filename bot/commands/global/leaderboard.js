@@ -295,6 +295,7 @@ function parseLeaderboardInteraction(customId) {
 
 function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages = 1, game = "mkworld12p", roleId = null }) {
 	const commonParams = { timeFilter, serverId, page: 1, roleId };
+	const pageParams = { timeFilter, serverId, game, roleId };
 	
 	const timeRow = new ActionRowBuilder()
 		.addComponents(
@@ -329,13 +330,17 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 				.setDisabled(game === "mkworld24p"),
 		);
 
+	const paginationRow = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId(buildLeaderboardCustomId("findme", { ...pageParams, page }))
+				.setLabel("find me")
+				.setStyle(ButtonStyle.Success),
+		);
+
 	if (totalPages <= 1) {
-		return [formatRow, timeRow];
+		return [paginationRow, formatRow, timeRow];
 	}
-
-	const paginationRow = new ActionRowBuilder();
-
-	const pageParams = { timeFilter, serverId, game, roleId };
 
 	if (totalPages > 2) {
 		paginationRow.addComponents(
@@ -776,6 +781,7 @@ async function generateLeaderboard(interaction, {
 	page = 1,
 	game = "mkworld12p",
 	roleId = null,
+	targetLoungeId = null,
 	session: existingSession = null,
 } = {}) {
 	const serverId = interaction.guildId;
@@ -848,7 +854,14 @@ async function generateLeaderboard(interaction, {
 	const sortedPool = [...pool].sort((a, b) => compareEntriesByTimeFilter(a, b, timeFilter));
 
 	const totalPages = Math.ceil(sortedPool.length / MAX_ENTRIES) || 1;
-	const safePage = Math.max(1, Math.min(page, totalPages));
+	let targetPage = page;
+	if (targetLoungeId) {
+		const targetIndex = sortedPool.findIndex(entry => String(entry?.loungeId) === String(targetLoungeId));
+		if (targetIndex >= 0) {
+			targetPage = Math.floor(targetIndex / MAX_ENTRIES) + 1;
+		}
+	}
+	const safePage = Math.max(1, Math.min(targetPage, totalPages));
 	const startIndex = (safePage - 1) * MAX_ENTRIES;
 	const endIndex = startIndex + MAX_ENTRIES;
 	const topEntries = sortedPool.slice(startIndex, endIndex);
@@ -997,6 +1010,19 @@ module.exports = {
 			const requestedPage = parsed.page || 1;
 			const nextGame = parsed.game || (session ? session.game : "mkworld12p");
 			const nextRoleId = parsed.roleId || (session ? session.roleId : null);
+			let targetLoungeId = null;
+
+			if (parsed.action === "findme") {
+				const selfDetails = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, nextGame);
+				if (!selfDetails?.id) {
+					await interaction.reply({
+						content: "couldn't find your mkw lounge account.",
+						ephemeral: true,
+					});
+					return true;
+				}
+				targetLoungeId = String(selfDetails.id);
+			}
 			
 			let totalPages = 1;
 
@@ -1035,6 +1061,7 @@ module.exports = {
 					page: requestedPage,
 					game: nextGame,
 					roleId: nextRoleId,
+					targetLoungeId,
 					session,
 				});
 
