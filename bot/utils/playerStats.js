@@ -359,18 +359,27 @@ class PlayerStats {
 		playerCountFilter = "both",
 		now = Date.now(),
 	} = {}) {
-		const changes = Array.isArray(mmrChangesOverride)
+		let changes = Array.isArray(mmrChangesOverride)
 			? mmrChangesOverride
 			: Array.isArray(playerDetails?.mmrChanges)
-				? playerDetails.mmrChanges
+				? [...playerDetails.mmrChanges]
 				: [];
+
+		// If we are looking at "both" counts, we must also include changes from the alternate mode
+		if (playerCountFilter === "both" && playerDetails?.alternateDetails?.mmrChanges) {
+			changes = changes.concat(playerDetails.alternateDetails.mmrChanges);
+		}
+
 		if (!changes.length) {
 			return 0;
 		}
 
+		// When calculating season delta with NO specific queue/count filters, we sum everything.
+		// However, if we have specific filters (like "soloq" or "squads"), we MUST rely on table filtering.
 		const includeAllSeason = timeFilter === "season"
 			&& queueFilter === "both"
 			&& playerCountFilter === "both";
+
 		if (includeAllSeason) {
 			let seasonDelta = 0;
 			for (const change of changes) {
