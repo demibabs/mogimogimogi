@@ -551,5 +551,4 @@ module.exports = {
 	apiGet,
 	getGlobalStats,
 	searchPlayers,
-	DEFAULT_SEASON,
 };

@@ -767,7 +767,8 @@ module.exports = {
 				target2 = await resolveTargetPlayer(interaction, {
 					rawInput: rawPlayer1,
 				});
-			} else {
+			}
+			else {
 				// Case: Both parameters provided.
 				// Player 1 -> First arg
 				// Player 2 -> Second arg
@@ -964,7 +965,7 @@ module.exports = {
 
 			let leftPlayerDetails = targetSession.playerLeftDetails || null;
 			let rightPlayerDetails = targetSession.playerRightDetails || null;
-			
+
 			const playerCountFilter = filters.playerCountFilter || "both";
 
 			// Helper: Fetch best mode if "both", or specific mode if filtered
@@ -975,24 +976,26 @@ module.exports = {
 					const d = await LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, mode);
 					if (d) d.gameMode = mode;
 					return d;
-				} else {
+				}
+				else {
 					// Smart selection: fetch both, return best
 					const [d12, d24] = await Promise.all([
 						LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld12p"),
-						LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld24p")
+						LoungeApi.getPlayerDetailsByLoungeId(loungeId, undefined, "mkworld24p"),
 					]);
-					
+
 					if (!d12 && !d24) return null;
 					if (d12 && !d24) { d12.gameMode = "mkworld12p"; return d12; }
 					if (!d12 && d24) { d24.gameMode = "mkworld24p"; return d24; }
-					
+
 					// Both exist, compare
 					const m12 = Number(d12.mmr) || 0;
 					const m24 = Number(d24.mmr) || 0;
 					if (m24 > m12) {
 						d24.gameMode = "mkworld24p";
 						return d24;
-					} else {
+					}
+					else {
 						d12.gameMode = "mkworld12p";
 						return d12;
 					}
@@ -1015,7 +1018,8 @@ module.exports = {
 				if (rightPlayerDetails && rightPlayerDetails.gameMode !== expectedMode) {
 					rightPlayerDetails = await fetchPlayerDetails(normalizedRightId);
 				}
-			} else if (targetSession.filters && targetSession.filters.playerCountFilter !== "both") {
+			}
+			else if (targetSession.filters && targetSession.filters.playerCountFilter !== "both") {
 				// Switching back to "both" from specific -> reload to ensure smart selection
 				leftPlayerDetails = await fetchPlayerDetails(normalizedLeftId);
 				rightPlayerDetails = await fetchPlayerDetails(normalizedRightId);
@@ -1276,9 +1280,17 @@ module.exports = {
 				filters,
 			});
 
+			const leanLeftDetails = { ...leftPlayerDetails };
+			if (leanLeftDetails.mmrChanges) delete leanLeftDetails.mmrChanges;
+			if (leanLeftDetails.seasonData) delete leanLeftDetails.seasonData;
+
+			const leanRightDetails = { ...rightPlayerDetails };
+			if (leanRightDetails.mmrChanges) delete leanRightDetails.mmrChanges;
+			if (leanRightDetails.seasonData) delete leanRightDetails.seasonData;
+
 			const sessionData = {
-				playerLeftDetails: leftPlayerDetails,
-				playerRightDetails: rightPlayerDetails,
+				playerLeftDetails: leanLeftDetails,
+				playerRightDetails: leanRightDetails,
 				primaryPlayerTables: basePlayerTables,
 				primaryPlayerId: basePlayerId,
 				sharedTables,

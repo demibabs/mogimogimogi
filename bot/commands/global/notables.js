@@ -1138,7 +1138,8 @@ module.exports = {
 					if (playerDetails.gameMode !== expectedMode) {
 						playerDetails = null;
 					}
-				} else if (currentCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
+				}
+				else if (currentCountFilter === "both" && session && session.filters && session.filters.playerCountFilter !== "both") {
 					// If switching back to "both" from a specific filter, invalidate to allow smart selection logic to run again
 					playerDetails = null;
 				}
@@ -1160,11 +1161,12 @@ module.exports = {
 					// Specific mode requested
 					gameMode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
 					details = await LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, gameMode);
-				} else {
+				}
+				else {
 					// "both" or unspecified -> fetch both and compare
 					const [details12p, details24p] = await Promise.all([
 						LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld12p"),
-						LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld24p")
+						LoungeApi.getPlayerDetailsByLoungeId(normalizedLoungeId, undefined, "mkworld24p"),
 					]);
 
 					if (!details12p && !details24p) {
@@ -1174,17 +1176,20 @@ module.exports = {
 					if (details12p && !details24p) {
 						details = details12p;
 						gameMode = "mkworld12p";
-					} else if (!details12p && details24p) {
+					}
+					else if (!details12p && details24p) {
 						details = details24p;
 						gameMode = "mkworld24p";
-					} else {
+					}
+					else {
 						// Both exist, compare MMR
 						const mmr12p = details12p.mmr || 0;
 						const mmr24p = details24p.mmr || 0;
 						if (mmr24p > mmr12p) {
 							details = details24p;
 							gameMode = "mkworld24p";
-						} else {
+						}
+						else {
 							details = details12p;
 							gameMode = "mkworld12p";
 						}
@@ -1319,12 +1324,19 @@ module.exports = {
 				totalEvents: filteredTableIds.length,
 			});
 
+			// Remove potentially large history arrays from session cache
+			const leanPlayerDetails = playerDetails ? { ...playerDetails } : null;
+			if (leanPlayerDetails) {
+				delete leanPlayerDetails.mmrChanges;
+				delete leanPlayerDetails.seasonData;
+			}
+
 			const updatedSession = {
 				loungeId: normalizedLoungeId,
 				serverId,
 				displayName,
 				loungeName,
-				playerDetails,
+				playerDetails: leanPlayerDetails,
 				allTables,
 				favorites,
 				trackName,

@@ -294,7 +294,7 @@ function parseLeaderboardInteraction(customId) {
 
 function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages = 1, game = "mkworld12p", roleId = null }) {
 	const commonParams = { timeFilter, serverId, page: 1, roleId };
-	
+
 	const timeRow = new ActionRowBuilder()
 		.addComponents(
 			new ButtonBuilder()
@@ -680,11 +680,11 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 	// Use the global cache which is populated on startup
 	const members = interaction.guild.members.cache;
 	let memberList = Array.from(members.values()).filter(m => !m.user.bot);
-	
+
 	if (roleId) {
 		memberList = memberList.filter(m => m.roles.cache.has(roleId));
 	}
-	
+
 	const entries12p = [];
 	const entries24p = [];
 	const BATCH_SIZE = 5;
@@ -703,7 +703,7 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 			try {
 				const [details12p, details24p] = await Promise.all([
 					LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, "mkworld12p"),
-					LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, "mkworld24p")
+					LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, "mkworld24p"),
 				]);
 
 				const processDetails = (details) => {
@@ -731,7 +731,6 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 						activity,
 						countryCode: details.countryCode || null,
 						rankName: details.rankName || details.rank || null,
-						mmrChanges,
 						metrics: {
 							alltime: mmr,
 							weekly: weeklyDelta,
@@ -747,7 +746,7 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 
 				return {
 					entry12p: processDetails(details12p),
-					entry24p: processDetails(details24p)
+					entry24p: processDetails(details24p),
 				};
 			}
 			catch (error) {
@@ -766,12 +765,12 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 
 	entries12p.sort((a, b) => b.mmr - a.mmr);
 	entries24p.sort((a, b) => b.mmr - a.mmr);
-	
+
 	// Hydrate immediately to fix display names
-	// Wait, hydrateEntryDisplay is async? 
+	// Wait, hydrateEntryDisplay is async?
 	// No, it handles fallback logic.
 	// We can do it in generateLeaderboard or here.
-	
+
 	return { entries12p, entries24p };
 }
 
@@ -796,10 +795,10 @@ async function generateLeaderboard(interaction, {
 	highlightLoungeId = null,
 } = {}) {
 	const serverId = interaction.guildId;
-			const selectedGame = game || existingSession?.game || "mkworld12p";
+	const selectedGame = game || existingSession?.game || "mkworld12p";
 	const selectedRoleId = roleId || existingSession?.roleId || null;
 	const gameLabel = selectedGame.includes("24p") ? "24p" : "12p";
-	
+
 	let roleName = "";
 	if (selectedRoleId) {
 		const role = interaction.guild.roles.cache.get(selectedRoleId);
@@ -807,27 +806,27 @@ async function generateLeaderboard(interaction, {
 			roleName = ` (${role.name})`;
 		}
 	}
-	
+
 	const guildName = (interaction.guild?.name || "server") + roleName + " leaderboard";
 	const palette = getPalette();
 
 	// If no session, make a dummy one for logic below, but we'll overwrite it
 	let session = existingSession;
-	if(!session) {
+	if (!session) {
 		session = {
 			serverId,
 			serverName: guildName,
 			game: selectedGame,
 			roleId: selectedRoleId,
 			entries: [],
-			generatedAt: 0
+			generatedAt: 0,
 		};
 	}
 
 	// Regenerate session (fetch data) if cache is stale or if role changed
 	const isStale = (Date.now() - (session.generatedAt || 0)) > (5 * 60 * 1000);
 	const hasEntries = session.entries12p?.length > 0 || session.entries24p?.length > 0;
-	
+
 	if (!hasEntries || session.roleId !== selectedRoleId || isStale) {
 		await interaction.editReply("scanning members...");
 		const { entries12p, entries24p } = await collectLeaderboardEntries(interaction, selectedRoleId);
@@ -844,10 +843,10 @@ async function generateLeaderboard(interaction, {
 	}
 
 	await interaction.editReply("sorting players...");
-	
+
 	// Select the correct list based on game mode
 	const currentEntries = selectedGame.includes("24p") ? (session.entries24p || []) : (session.entries12p || []);
-	
+
 	const pool = currentEntries.filter(entry => {
 		if (timeFilter === "alltime") return true;
 		return Boolean(entry.activity?.[timeFilter]);
@@ -932,10 +931,10 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("leaderboard")
 		.setDescription("see your server's mmr leaderboard.")
-		.addRoleOption(option => 
+		.addRoleOption(option =>
 			option.setName("role")
 				.setDescription("filter by role")
-				.setRequired(false)
+				.setRequired(false),
 		),
 
 	async execute(interaction) {
@@ -997,12 +996,12 @@ module.exports = {
 			const messageId = interaction.message?.id || null;
 			const session = messageId ? getLeaderboardSession(messageId) : null;
 			const fallbackTimeFilter = parsed.timeFilter || "alltime";
-			
+
 			// If we don't have a session, we need to reconstruct basic context or fail gracefully.
 			// However, parseLeaderboardInteraction returns serverId, so we might be able to restart if needed,
 			// but we'd lose the original role filter if it wasn't encoded in the button.
 			// Luckily we added roleId to the customId parser now!
-			
+
 			const nextTimeFilter = parsed.timeFilter || (session ? session.timeFilter : fallbackTimeFilter);
 			let requestedPage = parsed.page || 1;
 			const nextGame = parsed.game || (session ? session.game : "mkworld12p");
@@ -1168,17 +1167,17 @@ module.exports = {
 				highlightDiscordId = userId;
 				highlightLoungeId = String(sortedPool[targetIndex]?.loungeId || fallbackLoungeId || "");
 			}
-			
+
 			let totalPages = 1;
 
 			// Check if we need to regenerate data (format or role changed)
 			const needsDataRefresh = !session || session.game !== nextGame || session.roleId !== nextRoleId;
-			
+
 			if (!needsDataRefresh && session && session.timeFilter === nextTimeFilter) {
 				// If filter hasn't changed and data is same, we can trust session.totalPages
 				totalPages = session.totalPages || 1;
 			}
-			
+
 			if (session) {
 				session.pendingTimeFilter = nextTimeFilter;
 			}

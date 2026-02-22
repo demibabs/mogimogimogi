@@ -1276,13 +1276,18 @@ async function generateRankStats(interaction, target, serverId, serverDataOverri
 		tableCount: aggregation.tableCount,
 	});
 
+
+	const leanPlayerDetails = { ...playerDetails };
+	if (leanPlayerDetails.mmrChanges) delete leanPlayerDetails.mmrChanges;
+	if (leanPlayerDetails.seasonData) delete leanPlayerDetails.seasonData;
+
 	const linkMessage = buildMatchLinksMessage(aggregation.bestWin, aggregation.worstLoss);
 	const sessionPayload = {
 		loungeId,
 		serverId,
 		displayName,
 		allTables,
-		playerDetails,
+		playerDetails: leanPlayerDetails,
 		filters,
 		trackName,
 		favorites,

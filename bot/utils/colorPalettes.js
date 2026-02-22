@@ -714,6 +714,11 @@ const headToHeadPalette = {
 	valueNegativeColor: "#f35954ff",
 };
 
+const statsPalette = {
+	valuePositiveColor: "#2ecc71",
+	valueNegativeColor: "#e73c3c",
+};
+
 const rankColorMap = {
 	Grandmaster: "#a3022c",
 	Master: "#9370db",
@@ -735,5 +740,6 @@ module.exports = {
 	currentTrackName,
 	leaderboardPalette,
 	headToHeadPalette,
+	statsPalette,
 	rankColorMap,
 };

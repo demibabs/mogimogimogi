@@ -492,19 +492,33 @@ async function getDivisionChart(trackName, trackColors, globals) {
 	};
 }
 
-async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, loungeId, timeFilter, playerCountFilter = null, extraDetails = null) {
+async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, loungeId, timeFilter, playerCountFilter = null, extraDetails = null, queueFilter = "both") {
 	// Helper to get points for a specific mode
 	const getModeData = (targetMode) => {
 		const tablesList = Object.values(allTables).sort((a, b) => new Date(a.createdOn) - new Date(b.createdOn));
 		const relevantTables = tablesList.filter(t => {
-			if (t.season < 2) return false;
+			const isQueueFilterActive = queueFilter === "soloq" || queueFilter === "squads";
+			const isAllTimeFilter = timeFilter === "alltime";
+			// If queue filter is active OR alltime filter is active, allow Season < 2
+			// Otherwise (e.g. standard Season/Weekly filter with no queue filter), enforce Season >= 2
+			if (!isQueueFilterActive && !isAllTimeFilter && t.season < 2) return false;
 			const tableMode = (t.numPlayers > 12) ? "mkworld24p" : "mkworld12p";
 			if (tableMode !== targetMode) return false;
+			
+			// Apply time filter
 			if (timeFilter === "season" && String(t.season) !== String(LoungeApi.DEFAULT_SEASON)) return false;
 			if (timeFilter === "weekly") {
 				const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
 				if (new Date(t.createdOn).getTime() < oneWeekAgo) return false;
 			}
+
+			// Apply queue filter
+			if (queueFilter === "soloq" || queueFilter === "squads") {
+				const isSquads = t.tier === "SQ";
+				if (queueFilter === "soloq" && isSquads) return false;
+				if (queueFilter === "squads" && !isSquads) return false;
+			}
+
 			return true;
 		});
 
@@ -512,42 +526,170 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 		const historyPoints = [];
 		let matchCount = 0;
-		const firstTable = relevantTables[0];
-		const firstScoreEntry = PlayerStats.getPlayerRankingInTable(firstTable, loungeId);
+		const isHybridMode = timeFilter === "alltime" && queueFilter === "both";
+		const useDeltaMode = (queueFilter === "soloq" || queueFilter === "squads");
 
-		if (firstScoreEntry && Number.isFinite(firstScoreEntry.prevMmr)) {
-			historyPoints.push({ x: 0, y: firstScoreEntry.prevMmr });
-		}
+		if (isHybridMode) {
+			// Hybrid Strategy:
+			// 1. Tables before S2: Calculate as cumulative deltas, relative to S2 Start
+			// 2. Tables S2+: Use absolute MMR values
+			// 3. Continuity: Pre-S2 deltas must end at S2 start value. 
+			//    So we trace S2 start, then walk backwards for Pre-S2.
 
-		relevantTables.forEach((table) => {
-			const scoreEntry = PlayerStats.getPlayerRankingInTable(table, loungeId);
-			if (scoreEntry && Number.isFinite(scoreEntry.newMmr)) {
-				matchCount++;
-				historyPoints.push({ x: matchCount, y: scoreEntry.newMmr });
+			const season2StartTableIndex = relevantTables.findIndex(t => t.season >= 2);
+			
+			// If no Season 2+ data, just default to delta mode (or absolute if it works)
+			// But user asked for specific behavior.
+			// If we ONLY have pre-S2 data, we can't anchor to S2. 
+			// In that case, maybe just show it as 0-based delta? Or absolute if available?
+			// Let's assume we want to anchor to the first available S2 MMR if exists.
+			
+			if (season2StartTableIndex === -1) {
+				// No Season 2 data found. Just show pure delta mode for everything (pre-S2 style).
+				let currentDelta = 0;
+				historyPoints.push({ x: 0, y: 0 });
+				relevantTables.forEach((table) => {
+					const s = PlayerStats.getPlayerRankingInTable(table, loungeId);
+					if (s && Number.isFinite(s.newMmr) && Number.isFinite(s.prevMmr)) {
+						matchCount++;
+						const delta = s.newMmr - s.prevMmr;
+						currentDelta += delta;
+						historyPoints.push({ x: matchCount, y: currentDelta });
+					}
+				});
+			} else {
+				// We have Season 2 data.
+				// S2 Start Value = prevMmr of the first S2 table.
+				const s2FirstTable = relevantTables[season2StartTableIndex];
+				const s2FirstScore = PlayerStats.getPlayerRankingInTable(s2FirstTable, loungeId);
+				const s2StartMmr = (s2FirstScore && Number.isFinite(s2FirstScore.prevMmr)) ? s2FirstScore.prevMmr : 0; // Default 0 if missing
+
+				// Process Pre-S2 tables (Backwards from S2 start or Forwards then shift?)
+				// Let's go simple: Calculate cumulative delta for Pre-S2 tables starting at 0.
+				// Then find the final value. Shift all points so final value == s2StartMmr.
+				
+				const preS2Tables = relevantTables.slice(0, season2StartTableIndex);
+				const s2Tables = relevantTables.slice(season2StartTableIndex);
+
+				// Step 1: Calculate pre-S2 relative offsets
+				let runningPreDelta = 0;
+				// We need intermediate points.
+				// Point 0 is "Start of history".
+				const prePointsRel = [{ x: 0, delta: 0 }];
+				
+				let tempMatchCount = 0;
+				preS2Tables.forEach(table => {
+					const s = PlayerStats.getPlayerRankingInTable(table, loungeId);
+					if (s && Number.isFinite(s.newMmr) && Number.isFinite(s.prevMmr)) {
+						tempMatchCount++;
+						const delta = s.newMmr - s.prevMmr;
+						runningPreDelta += delta;
+						prePointsRel.push({ x: tempMatchCount, delta: runningPreDelta });
+					}
+				});
+
+				// Step 2: Shift Pre-S2 points to align end with s2StartMmr
+				// Final pre-S2 point is at `runningPreDelta`. This should map to `s2StartMmr`.
+				// so: shiftedY = originalY + (s2StartMmr - runningPreDelta)
+				const shiftAmount = s2StartMmr - runningPreDelta;
+				
+				prePointsRel.forEach(p => {
+					historyPoints.push({ x: p.x, y: p.delta + shiftAmount, isProjected: true }); 
+					// isProjected flag to know this is the "delta" part
+				});
+
+				matchCount = tempMatchCount;
+
+				// Step 3: Add S2+ points (Absolute)
+				// Note: historyPoints already has an entry for the end of Pre-S2 (which matches start of S2).
+				// However, the S2 loop will add the result of the first S2 match.
+				// The "Start of S2" is technically the last point of Pre-S2.
+				// But visual continuity: standard logic adds point for NewMmr.
+				// It usually adds a "Start" point (0, prevMmr) IF it's the very first thing.
+				// Here, the last pre-S2 point IS the start point for S2. So we don't add strictly "(0, prevMmr)" again.
+
+				s2Tables.forEach(table => {
+					const scoreEntry = PlayerStats.getPlayerRankingInTable(table, loungeId);
+					if (scoreEntry && Number.isFinite(scoreEntry.newMmr)) {
+						matchCount++;
+						historyPoints.push({ x: matchCount, y: scoreEntry.newMmr, isProjected: false });
+					}
+				});
 			}
-		});
+
+		} else if (useDeltaMode) {
+			// DELTA MODE: Start at 0, cumulative sum of deltas
+			let currentDelta = 0;
+			historyPoints.push({ x: 0, y: 0 }); // Start at 0
+
+			relevantTables.forEach((table) => {
+				const scoreEntry = PlayerStats.getPlayerRankingInTable(table, loungeId);
+				// In Queue Filter modes, we strictly use deltas.
+				if (scoreEntry && Number.isFinite(scoreEntry.newMmr) && Number.isFinite(scoreEntry.prevMmr)) {
+					matchCount++;
+					const delta = scoreEntry.newMmr - scoreEntry.prevMmr;
+					currentDelta += delta;
+					historyPoints.push({ x: matchCount, y: currentDelta });
+				}
+			});
+		} else {
+			// STANDARD MODE: Absolute MMR
+			const firstTable = relevantTables[0];
+			const firstScoreEntry = PlayerStats.getPlayerRankingInTable(firstTable, loungeId);
+
+			if (firstScoreEntry && Number.isFinite(firstScoreEntry.prevMmr)) {
+				historyPoints.push({ x: 0, y: firstScoreEntry.prevMmr });
+			}
+
+			relevantTables.forEach((table) => {
+				const scoreEntry = PlayerStats.getPlayerRankingInTable(table, loungeId);
+				if (scoreEntry && Number.isFinite(scoreEntry.newMmr)) {
+					matchCount++;
+					historyPoints.push({ x: matchCount, y: scoreEntry.newMmr });
+				}
+			});
+		}
 
 		if (historyPoints.length === 0) return null;
 
-		return { historyPoints, matchCount };
+		// Calculate transition index for hybrid mode
+		// It's the index where isProjected flips from true to false
+		let transitionIndex = -1;
+		if (isHybridMode) {
+			// Find the last point that is projected (end of pre-S2)
+			for (let i = historyPoints.length - 1; i >= 0; i--) {
+				if (historyPoints[i].isProjected) {
+					transitionIndex = i;
+					break;
+				}
+			}
+		}
+
+		return { historyPoints, matchCount, transitionIndex, isHybridMode };
 	};
 
 	let dualMode = false;
-	let data12p = null;
+	let data12p = getModeData("mkworld12p"); 
 	let data24p = null;
-
+	
+	let selectedData = null;
 	if (playerCountFilter === "both" && extraDetails) {
-		data12p = getModeData("mkworld12p");
-		data24p = getModeData("mkworld24p");
-		if (data12p && data24p) {
+		const result12p = getModeData("mkworld12p");
+		const result24p = getModeData("mkworld24p");
+		if (result12p && result24p) {
 			dualMode = true;
-		}
-		else if (data12p) {
+			data12p = result12p;
+			data24p = result24p;
+		} else if (result12p) {
+			selectedData = result12p;
 			playerDetails = extraDetails.details12p || playerDetails;
-		}
-		else if (data24p) {
+		} else if (result24p) {
+			selectedData = result24p;
 			playerDetails = extraDetails.details24p || playerDetails;
 		}
+	} else {
+		const targetMode = (playerCountFilter === "24p") ? "mkworld24p" : "mkworld12p";
+		selectedData = getModeData(targetMode);
 	}
 
 	/* Removed old filtering logic to use getModeData later */
@@ -591,22 +733,154 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 	};
 
-	const createConfig = (dataPoints, matchCount, gameMode, titleText) => {
+	const createConfig = (dataPoints, matchCount, gameMode, titleText, transitionIndex = -1, isHybrid = false) => {
 		const mmrValues = dataPoints.map(p => p.y);
 		const minMmr = Math.min(...mmrValues);
 		const maxMmr = Math.max(...mmrValues);
 		const padding = (maxMmr - minMmr) * 0.1 || 100;
+		// Round range to nice numbers
 		const yMin = Math.floor((minMmr - padding) / 100) * 100;
 		const yMax = Math.ceil((maxMmr + padding) / 100) * 100;
 		const is24p = gameMode === "mkworld24p";
 
-		const getGradient = (context, opacity = 1.0, darkenAmount = 0) => {
+		// Calculate Y-axis step size
+		// Minimum step of 100. Max 5 ticks means we categorize range into 4 intervals.
+		// So approx step = range / 4.
+		const yRange = yMax - yMin;
+		let stepSize = Math.max(100, Math.ceil(yRange / 4));
+		
+		// Round stepSize to nearest 100 for cleaner labels
+		stepSize = Math.ceil(stepSize / 100) * 100;
+
+		// Split datasets if hybrid
+		const datasets = [];
+		// The baseline used for calculating the offset of the Left Axis (Delta)
+		// We want the Left Axis 0 to correspond to the Start of the Data? Or the End of Pre-S2?
+		// Typically Delta charts start at 0.
+		// In our shifted data, the "Start of Pre-S2" (which was visually 0 before shift) is at y = shiftAmount.
+		// So if we want the Left Axis to show 0 at the start of the chart, we need to subtract `shiftAmount` from the tick values.
+		// Let's recover the shift amount.
+		// We know: shiftedY = originalDelta + shiftAmount.
+		// We want: label = shiftedY - shiftAmount.
+		// shiftAmount = s2StartMmr - finalPreDelta.
+		// But we don't have shiftAmount easily here.
+		// Let's calculate it from the first point?
+		// preS2Points[0] is (0, shiftAmount) because originalDelta at 0 is 0.
+		// So shiftAmount = preS2Points[0].y
+		
+		let matchShiftAmount = 0;
+
+		if (isHybrid && transitionIndex >= 0) {
+			const preS2Points = dataPoints.slice(0, transitionIndex + 1);
+			const s2Points = dataPoints.slice(transitionIndex);
+
+			// Calculate offset (Left Y-Axis 0 = Start of Chart)
+			if (preS2Points.length > 0) {
+				matchShiftAmount = preS2Points[0].y;
+			}
+			
+			// We need the baseline Y value for the pre-S2 delta coloring (Gradient).
+			// The gradient should be Green above 0 and Red below 0 (relative to the start).
+			// Since our "0" line is at y = matchShiftAmount:
+			const overflowBaseline = matchShiftAmount;
+			
+			datasets.push({
+				label: "Pre-Season 2",
+				data: preS2Points,
+				// Delta Color Logic
+                // Map datasets to specific axes
+				yAxisID: 'y', // Left Axis (Delta)
+				borderColor: (context) => {
+					const chart = context.chart;
+					const { ctx, chartArea, scales } = chart;
+					if (!chartArea) return null;
+					const yScale = scales.y;
+					
+                    // The "Zero" line for coloring is at matchShiftAmount
+					const pixelZero = yScale.getPixelForValue(overflowBaseline);
+					const pixelTop = chartArea.top;
+					const pixelBottom = chartArea.bottom;
+					
+					const gradient = ctx.createLinearGradient(0, pixelTop, 0, pixelBottom);
+					
+					// Calculate stop for the baseline
+					let stopZero = (pixelZero - pixelTop) / (pixelBottom - pixelTop);
+					stopZero = Math.max(0, Math.min(1, stopZero));
+					
+					// Darken amounts for border
+					const green = darkenHex(ColorPalettes.statsPalette.valuePositiveColor, 0.5);
+					const red = darkenHex(ColorPalettes.statsPalette.valueNegativeColor, 0.5);
+
+					gradient.addColorStop(0, green);
+					gradient.addColorStop(stopZero, green);
+					gradient.addColorStop(stopZero, red);
+					gradient.addColorStop(1, red);
+					
+					return gradient;
+				},
+				backgroundColor: (context) => {
+					// Area fill for Delta with Pattern (using getGradient helper)
+					// Force useDeltaChart logic inside getGradient by relying on valid filters or shared logic? 
+					// Actually getGradient checks closure variables. 
+					// But we also need to pass the baseline.
+					return getGradient(context, 0.75, 0, true, overflowBaseline);
+				},
+				borderWidth: 4,
+				pointRadius: 0,
+				// Fill to the calculated baseline for visual continuity
+				fill: { value: overflowBaseline },
+				tension: 0.1,
+				order: 2,
+			});
+
+			// Find lowest MMR in S2 dataset for fill boundary
+			let s2MinVal = overflowBaseline;
+			if (s2Points.length > 0) {
+				const minPoint = s2Points.reduce((min, p) => p.y < min ? p.y : min, Infinity);
+				if (minPoint !== Infinity) s2MinVal = minPoint;
+			}
+
+			datasets.push({
+				label: "Season 2+",
+				data: s2Points,
+				yAxisID: 'y', 
+				// Rank Color Logic
+				borderColor: (context) => {
+					return getRankGradient(context, 1.0, 0.5, false, is24p, scales => scales.y, true, s2MinVal);
+				},
+				backgroundColor: (context) => {
+					return getRankGradient(context, 0.75, 0, true, is24p, scales => scales.y, true, s2MinVal);
+				},
+				borderWidth: 4,
+				pointRadius: 0,
+				fill: { value: overflowBaseline },
+				tension: 0.1,
+				order: 1, // Draw on top
+			});
+
+
+		} else {
+			// Standard single dataset
+			datasets.push({
+				data: dataPoints,
+				borderColor: (ctx) => getGradient(ctx, 1.0, 0.5, false),
+				backgroundColor: (ctx) => getGradient(ctx, 0.75, 0, true),
+				borderWidth: 4,
+				pointRadius: 0,
+				pointHitRadius: 10,
+				fill: (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime") ? "origin" : "start",
+				tension: 0.1,
+			});
+		}
+
+		// Extracted Rank Gradient Logic
+		const getRankGradient = (context, opacity, darkenAmount, applyPattern, is24pMode, getScale, limitToMin = false, minVal = 0) => {
 			const chart = context.chart;
 			const { ctx, chartArea, scales } = chart;
 			if (!chartArea) return null;
 
-			const yScale = scales.y;
-			const rankMode = is24p ? "24p" : "12p";
+			const yScale = getScale ? getScale(scales) : scales.y;
+			const rankMode = is24pMode ? "24p" : "12p";
 			const tiers = PlayerStats.getRankThresholds(rankMode);
 			const rankColors = ColorPalettes.rankColorMap;
 
@@ -614,13 +888,27 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			const pCtx = patternCanvas.getContext("2d");
 			const gradient = pCtx.createLinearGradient(0, patternCanvas.height, 0, 0);
 
-			tiers.forEach(tier => {
-				const label = tier.label.charAt(0).toUpperCase() + tier.label.slice(1);
-				let colorHex = rankColors[label] || "#888888";
-				if (darkenAmount > 0) {
-					colorHex = darkenHex(colorHex, darkenAmount);
+			// Find tier index for minVal
+			let minTierIndex = -1;
+			if (limitToMin) {
+				minTierIndex = tiers.findIndex(t => {
+					const max = Number.isFinite(t.max) ? t.max : Infinity;
+					return minVal >= t.min && minVal < max;
+				});
+				// If not found (e.g. abnormally low), just use 0 (Iron)
+				if (minTierIndex === -1 && minVal < tiers[0].min) minTierIndex = 0;
+			}
+
+			tiers.forEach((tier, index) => {
+				let effectiveTier = tier;
+				// If we want to extend the lowest rank color downwards:
+				// If current tier is below the minTierIndex, use minTierIndex's color.
+				if (limitToMin && minTierIndex !== -1 && index < minTierIndex) {
+					effectiveTier = tiers[minTierIndex];
 				}
-				const color = setHexAlpha(colorHex, opacity);
+
+				const label = effectiveTier.label.charAt(0).toUpperCase() + effectiveTier.label.slice(1);
+				let colorHex = rankColors[label] || "#888888";
 				
 				const valStart = tier.min;
 				const yScaleMax = yScale.max;
@@ -628,6 +916,9 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 				if (valStart >= yScaleMax) return;
 
+				if (darkenAmount > 0) colorHex = darkenHex(colorHex, darkenAmount);
+				const color = setHexAlpha(colorHex, opacity);
+				
 				const pixelStart = yScale.getPixelForValue(valStart);
 				const pixelEnd = yScale.getPixelForValue(valEnd);
 				const chartHeight = chartArea.bottom - chartArea.top;
@@ -643,13 +934,16 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				gradient.addColorStop(stopStart, color);
 				gradient.addColorStop(stopEnd, color);
 			});
-
+			
+			// ... (Rest of filling)
 			pCtx.fillStyle = gradient;
 			pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
-
-			const patternStyle = EmbedEnhancer.randomPattern("rgba(0,0,0,0)", "rgba(255,255,255,0.3)", 20, [], 0.3);
-			pCtx.fillStyle = patternStyle;
-			pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+			
+			if (applyPattern) {
+				const patternStyle = EmbedEnhancer.randomPattern("rgba(0,0,0,0)", "rgba(255,255,255,0.3)", 20, [], 0.3);
+				pCtx.fillStyle = patternStyle;
+				pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+			}
 
 			const fullCanvas = createCanvas(ctx.canvas.width, ctx.canvas.height);
 			const fCtx = fullCanvas.getContext("2d");
@@ -658,19 +952,80 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			return ctx.createPattern(fullCanvas, "no-repeat");
 		};
 
+		const getGradient = (context, opacity = 1.0, darkenAmount = 0, applyPattern = true, baselineVal = 0) => {
+			// This is the original function, mostly used for the 'Standard' non-hybrid case
+			// ... (Original logic)
+			const chart = context.chart;
+			const { ctx, chartArea, scales } = chart;
+			if (!chartArea) return null;
+			const yScale = scales.y;
+
+			const useDeltaChart = (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime");
+
+			if (useDeltaChart) {
+				// (Delta Logic)
+				const pixelZero = yScale.getPixelForValue(baselineVal);
+				const pixelTop = chartArea.top;
+				const pixelBottom = chartArea.bottom;
+				const chartHeight = pixelBottom - pixelTop;
+				let stopZero = (pixelZero - pixelTop) / chartHeight;
+				stopZero = Math.max(0, Math.min(1, stopZero));
+				
+				let green, red;
+				if (darkenAmount > 0) {
+					green = darkenHex(ColorPalettes.statsPalette.valuePositiveColor, darkenAmount);
+					red = darkenHex(ColorPalettes.statsPalette.valueNegativeColor, darkenAmount);
+					// If opacity is involved, we might need to apply it too, but darkenHex returns hex.
+					// setHexAlpha works on hex.
+					green = setHexAlpha(green, opacity);
+					red = setHexAlpha(red, opacity);
+				} else {
+					green = setHexAlpha(ColorPalettes.statsPalette.valuePositiveColor, opacity);
+					red = setHexAlpha(ColorPalettes.statsPalette.valueNegativeColor, opacity);
+				}
+				
+				if (applyPattern) {
+					// Pattern logic for Delta
+					const patternCanvas = createCanvas(Math.ceil(chartArea.width), Math.ceil(chartArea.height));
+					const pCtx = patternCanvas.getContext("2d");
+					
+					// Gradient coordinates must be relative to the patternCanvas (0 to height)
+					const gradient = pCtx.createLinearGradient(0, 0, 0, patternCanvas.height);
+					gradient.addColorStop(0, green);
+					gradient.addColorStop(stopZero, green);
+					gradient.addColorStop(stopZero, red);
+					gradient.addColorStop(1, red);
+					
+					pCtx.fillStyle = gradient;
+					pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+					
+					const patternStyle = EmbedEnhancer.randomPattern("rgba(0,0,0,0)", "rgba(255,255,255,0.3)", 20, [], 0.3);
+					pCtx.fillStyle = patternStyle;
+					pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+
+					const fullCanvas = createCanvas(ctx.canvas.width, ctx.canvas.height);
+					const fCtx = fullCanvas.getContext("2d");
+					fCtx.drawImage(patternCanvas, chartArea.left, chartArea.top);
+
+					return ctx.createPattern(fullCanvas, "no-repeat");
+				}
+
+				const gradient = ctx.createLinearGradient(0, pixelTop, 0, pixelBottom);
+				
+				gradient.addColorStop(0, green);
+				gradient.addColorStop(stopZero, green);
+				gradient.addColorStop(stopZero, red);
+				gradient.addColorStop(1, red);
+				return gradient;
+			} 
+			// Use rank gradient helper
+			return getRankGradient(context, opacity, darkenAmount, applyPattern, is24p, null);
+		};
+
 		return {
 			type: "line",
 			data: {
-				datasets: [{
-					data: dataPoints,
-					borderColor: (ctx) => getGradient(ctx, 1.0, 0.4),
-					backgroundColor: (ctx) => getGradient(ctx, 0.75),
-					borderWidth: 4,
-					pointRadius: 0,
-					pointHitRadius: 10,
-					fill: "start",
-					tension: 0.1,
-				}],
+				datasets: datasets,
 			},
 			options: {
 				plugins: {
@@ -685,9 +1040,12 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				},
 				scales: {
 					y: {
+						type: "linear",
+						display: true,
+						position: "left",
 						title: {
 							display: true,
-							text: "mmr",
+							text: isHybrid ? "mmr (delta)" : "mmr",
 							font: { size: 24 },
 							color: trackColors.chartTextColor,
 						},
@@ -697,8 +1055,38 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 						ticks: {
 							font: { size: 20 },
 							color: trackColors.chartTextColor,
-							stepSize: 1000,
+							stepSize: stepSize,
+							autoSkip: true,
+							maxTicksLimit: 6, // 5 evenly spaced + min/max might overflow slightly, but aim for small number
+							callback: (value) => {
+								if (isHybrid) {
+                                    // Delta Mode for Hybrid Left Axis
+									const delta = Math.round(value - matchShiftAmount);
+									const sign = delta > 0 ? "+" : "";
+									return sign + delta;
+								}
+								if ((queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime") && value > 0) {
+									return "+" + Math.round(value);
+								}
+								return Math.round(value);
+							},
 						},
+					},
+					// Optional Right Axis for Hybrid mode logic?
+					y1: {
+						type: "linear",
+						display: isHybrid && transitionIndex >= 0,
+						position: "right",
+						min: yMin,
+						max: yMax,
+						grid: { drawOnChartArea: false },
+						ticks: {
+							font: { size: 20 },
+							color: trackColors.chartTextColor,
+							stepSize: stepSize,
+							maxTicksLimit: 6,
+							callback: (value) => Math.round(value),
+						}
 					},
 					x: {
 						type: "linear",
@@ -712,14 +1100,43 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 						ticks: {
 							font: { size: 20 },
 							color: trackColors.chartTextColor,
+							// Reintroduce manual step size to control label density
 							stepSize: Math.max(1, Math.ceil(matchCount / 10)),
+							callback: (value) => Math.round(value), 
+							maxRotation: 0,
+							autoSkip: false, // Disable autoSkip to force all generated ticks to show
+                            // If labels overlap, they overlap, but we ensure they exist. Only 10 points anyway.
 						},
 						min: 0,
 						max: matchCount,
+						afterBuildTicks: (axis) => {
+							// Manually generate evenly spaced ticks
+							const step = Math.ceil(matchCount / 10);
+                            const ticks = [];
+                            for (let v = 0; v < matchCount; v += step) {
+                                ticks.push({ value: v, major: true });
+                            }
+
+                            // Conditional check: if the last generated tick is too close to the end, remove it.
+                            if (ticks.length > 0) {
+                                const lastGenerated = ticks[ticks.length - 1].value;
+                                const diff = matchCount - lastGenerated;
+                                // "skip the second to last label if the difference ... is less than 1/4 the step distance"
+                                if (diff < (step * 0.25)) {
+                                    ticks.pop();
+                                }
+                            }
+                            
+                            // Always add the final matchCount tick
+                            ticks.push({ value: matchCount, major: true });
+                            
+                            axis.ticks = ticks;
+						}
 					},
 				},
 				layout: {
-					padding: { top: 25, right: 25, bottom: 25, left: 25 },
+					padding: { top: 25, right: 35, bottom: 25, left: 25 },
+
 				},
 			},
 			plugins: [],
@@ -738,10 +1155,10 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			},
 		});
 
-		const config12p = createConfig(data12p.historyPoints, data12p.matchCount, "mkworld12p", "mmr history (12p)");
+		const config12p = createConfig(data12p.historyPoints, data12p.matchCount, "mkworld12p", "mmr history (12p)", data12p.transitionIndex, data12p.isHybridMode);
 		const buf12p = await dualRenderer.renderToBuffer(config12p);
 
-		const config24p = createConfig(data24p.historyPoints, data24p.matchCount, "mkworld24p", "mmr history (24p)");
+		const config24p = createConfig(data24p.historyPoints, data24p.matchCount, "mkworld24p", "mmr history (24p)", data24p.transitionIndex, data24p.isHybridMode);
 		const buf24p = await dualRenderer.renderToBuffer(config24p);
 
 		const combinedCanvas = createCanvas(CHART_DIMENSIONS.width, CHART_DIMENSIONS.height);
@@ -762,15 +1179,38 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 	}
 	else {
 		// Single Mode
-		const is24p = playerDetails.gameMode === "mkworld24p";
-		const targetMode = is24p ? "mkworld24p" : "mkworld12p";
-		const data = getModeData(targetMode); // Should pass targetMode
+		let data = selectedData;
+		let targetMode = "mkworld12p";
+
+		if (!data) {
+			const is24p = (playerCountFilter === "24p") || (playerDetails && playerDetails.gameMode === "mkworld24p");
+			targetMode = is24p ? "mkworld24p" : "mkworld12p";
+			data = getModeData(targetMode);
+		} else {
+			// If selectedData was set, we need to know which mode it corresponds to.
+            // Since we don't store the mode in the data object, we must infer it from the logic that set selectedData.
+            // Logic:
+            // if (result12p) -> selectedData = result12p -> mode is 12p
+            // else if (result24p) -> selectedData = result24p -> mode is 24p
+            // We can check playerDetails.gameMode if we updated it correctly.
+            
+            const is24p = playerDetails && playerDetails.gameMode === "mkworld24p";
+            targetMode = is24p ? "mkworld24p" : "mkworld12p";
+		}
 
 		if (!data) return null;
 
-		const renderer = getChartRenderer();
+		const renderer = new ChartJSNodeCanvas({
+			width: CHART_DIMENSIONS.width,
+			height: CHART_DIMENSIONS.height,
+			backgroundColour: "rgba(0,0,0,0)",
+			chartCallback: ChartJS => {
+				ChartJS.defaults.font.family = Fonts?.FONT_FAMILY_STACK || "Lexend, Arial, sans-serif";
+			},
+		});
+
 		const modeLabel = targetMode === "mkworld24p" ? "24p" : "12p";
-		const config = createConfig(data.historyPoints, data.matchCount, targetMode, `mmr history (${modeLabel})`);
+		const config = createConfig(data.historyPoints, data.matchCount, targetMode, `mmr history (${modeLabel})`, data.transitionIndex, data.isHybridMode);
 		const chartBuffer = await renderer.renderToBuffer(config);
 		const chartImage = await loadImage(chartBuffer);
 
@@ -1413,7 +1853,7 @@ async function renderStats({
 
 				// Ensure we have objects even if null, though getMmrHistoryChart checks for existence
 			}
-			chartResult = await getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, normalizedLoungeId, timeFilter, playerCountFilter || "both", extraDetails);
+			chartResult = await getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, normalizedLoungeId, timeFilter, playerCountFilter || "both", extraDetails, queueFilter);
 			if (chartResult) {
 				isHistoryChart = true;
 			}
@@ -1698,12 +2138,19 @@ async function renderStats({
 
 	const pngBuffer = canvas.toBuffer("image/png");
 
+	// Remove potentially large history arrays from session cache
+	const leanPlayerDetails = playerDetails ? { ...playerDetails } : null;
+	if (leanPlayerDetails) {
+		delete leanPlayerDetails.mmrChanges;
+		delete leanPlayerDetails.seasonData; // If not needed for other things
+	}
+
 	const updatedSession = {
 		loungeId: normalizedLoungeId,
 		serverId,
 		displayName,
 		loungeName,
-		playerDetails,
+		playerDetails: leanPlayerDetails,
 		allTables,
 		favorites,
 		trackName,
