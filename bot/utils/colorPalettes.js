@@ -727,9 +727,9 @@ const rankColorMap = {
 	Sapphire: "#286cd3",
 	Platinum: "#3fabb8",
 	Gold: "#f1c232",
-	Silver: "#cccccc",
+	Silver: "#868686",
 	Bronze: "#b45f06",
-	Iron: "#817876",
+	Iron: "#464646",
 };
 
 module.exports = {
