@@ -504,7 +504,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			if (!isQueueFilterActive && !isAllTimeFilter && t.season < 2) return false;
 			const tableMode = (t.numPlayers > 12) ? "mkworld24p" : "mkworld12p";
 			if (tableMode !== targetMode) return false;
-			
+
 			// Apply time filter
 			if (timeFilter === "season" && String(t.season) !== String(LoungeApi.DEFAULT_SEASON)) return false;
 			if (timeFilter === "weekly") {
@@ -533,17 +533,17 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			// Hybrid Strategy:
 			// 1. Tables before S2: Calculate as cumulative deltas, relative to S2 Start
 			// 2. Tables S2+: Use absolute MMR values
-			// 3. Continuity: Pre-S2 deltas must end at S2 start value. 
+			// 3. Continuity: Pre-S2 deltas must end at S2 start value.
 			//    So we trace S2 start, then walk backwards for Pre-S2.
 
 			const season2StartTableIndex = relevantTables.findIndex(t => t.season >= 2);
-			
+
 			// If no Season 2+ data, just default to delta mode (or absolute if it works)
 			// But user asked for specific behavior.
-			// If we ONLY have pre-S2 data, we can't anchor to S2. 
+			// If we ONLY have pre-S2 data, we can't anchor to S2.
 			// In that case, maybe just show it as 0-based delta? Or absolute if available?
 			// Let's assume we want to anchor to the first available S2 MMR if exists.
-			
+
 			if (season2StartTableIndex === -1) {
 				// No Season 2 data found. Just show pure delta mode for everything (pre-S2 style).
 				let currentDelta = 0;
@@ -557,7 +557,8 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 						historyPoints.push({ x: matchCount, y: currentDelta });
 					}
 				});
-			} else {
+			}
+			else {
 				// We have Season 2 data.
 				// S2 Start Value = prevMmr of the first S2 table.
 				const s2FirstTable = relevantTables[season2StartTableIndex];
@@ -567,7 +568,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				// Process Pre-S2 tables (Backwards from S2 start or Forwards then shift?)
 				// Let's go simple: Calculate cumulative delta for Pre-S2 tables starting at 0.
 				// Then find the final value. Shift all points so final value == s2StartMmr.
-				
+
 				const preS2Tables = relevantTables.slice(0, season2StartTableIndex);
 				const s2Tables = relevantTables.slice(season2StartTableIndex);
 
@@ -576,7 +577,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				// We need intermediate points.
 				// Point 0 is "Start of history".
 				const prePointsRel = [{ x: 0, delta: 0 }];
-				
+
 				let tempMatchCount = 0;
 				preS2Tables.forEach(table => {
 					const s = PlayerStats.getPlayerRankingInTable(table, loungeId);
@@ -592,9 +593,9 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				// Final pre-S2 point is at `runningPreDelta`. This should map to `s2StartMmr`.
 				// so: shiftedY = originalY + (s2StartMmr - runningPreDelta)
 				const shiftAmount = s2StartMmr - runningPreDelta;
-				
+
 				prePointsRel.forEach(p => {
-					historyPoints.push({ x: p.x, y: p.delta + shiftAmount, isProjected: true }); 
+					historyPoints.push({ x: p.x, y: p.delta + shiftAmount, isProjected: true });
 					// isProjected flag to know this is the "delta" part
 				});
 
@@ -617,7 +618,8 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				});
 			}
 
-		} else if (useDeltaMode) {
+		}
+		else if (useDeltaMode) {
 			// DELTA MODE: Start at 0, cumulative sum of deltas
 			let currentDelta = 0;
 			historyPoints.push({ x: 0, y: 0 }); // Start at 0
@@ -632,7 +634,8 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 					historyPoints.push({ x: matchCount, y: currentDelta });
 				}
 			});
-		} else {
+		}
+		else {
 			// STANDARD MODE: Absolute MMR
 			const firstTable = relevantTables[0];
 			const firstScoreEntry = PlayerStats.getPlayerRankingInTable(firstTable, loungeId);
@@ -669,9 +672,9 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 	};
 
 	let dualMode = false;
-	let data12p = getModeData("mkworld12p"); 
+	let data12p = getModeData("mkworld12p");
 	let data24p = null;
-	
+
 	let selectedData = null;
 	if (playerCountFilter === "both" && extraDetails) {
 		const result12p = getModeData("mkworld12p");
@@ -680,14 +683,17 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			dualMode = true;
 			data12p = result12p;
 			data24p = result24p;
-		} else if (result12p) {
+		}
+		else if (result12p) {
 			selectedData = result12p;
 			playerDetails = extraDetails.details12p || playerDetails;
-		} else if (result24p) {
+		}
+		else if (result24p) {
 			selectedData = result24p;
 			playerDetails = extraDetails.details24p || playerDetails;
 		}
-	} else {
+	}
+	else {
 		const targetMode = (playerCountFilter === "24p") ? "mkworld24p" : "mkworld12p";
 		selectedData = getModeData(targetMode);
 	}
@@ -725,7 +731,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			g = parseInt(hex.slice(3, 5), 16);
 			b = parseInt(hex.slice(5, 7), 16);
 		}
-		
+
 		r = Math.max(0, Math.floor(r * (1 - amount)));
 		g = Math.max(0, Math.floor(g * (1 - amount)));
 		b = Math.max(0, Math.floor(b * (1 - amount)));
@@ -748,7 +754,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		// So approx step = range / 4.
 		const yRange = yMax - yMin;
 		let stepSize = Math.max(100, Math.ceil(yRange / 4));
-		
+
 		// Round stepSize to nearest 100 for cleaner labels
 		stepSize = Math.ceil(stepSize / 100) * 100;
 
@@ -767,7 +773,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		// Let's calculate it from the first point?
 		// preS2Points[0] is (0, shiftAmount) because originalDelta at 0 is 0.
 		// So shiftAmount = preS2Points[0].y
-		
+
 		let matchShiftAmount = 0;
 
 		if (isHybrid && transitionIndex >= 0) {
@@ -778,35 +784,35 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			if (preS2Points.length > 0) {
 				matchShiftAmount = preS2Points[0].y;
 			}
-			
+
 			// We need the baseline Y value for the pre-S2 delta coloring (Gradient).
 			// The gradient should be Green above 0 and Red below 0 (relative to the start).
 			// Since our "0" line is at y = matchShiftAmount:
 			const overflowBaseline = matchShiftAmount;
-			
+
 			datasets.push({
 				label: "Pre-Season 2",
 				data: preS2Points,
 				// Delta Color Logic
-                // Map datasets to specific axes
-				yAxisID: 'y', // Left Axis (Delta)
+				// Map datasets to specific axes
+				yAxisID: "y", // Left Axis (Delta)
 				borderColor: (context) => {
 					const chart = context.chart;
 					const { ctx, chartArea, scales } = chart;
 					if (!chartArea) return null;
 					const yScale = scales.y;
-					
-                    // The "Zero" line for coloring is at matchShiftAmount
+
+					// The "Zero" line for coloring is at matchShiftAmount
 					const pixelZero = yScale.getPixelForValue(overflowBaseline);
 					const pixelTop = chartArea.top;
 					const pixelBottom = chartArea.bottom;
-					
+
 					const gradient = ctx.createLinearGradient(0, pixelTop, 0, pixelBottom);
-					
+
 					// Calculate stop for the baseline
 					let stopZero = (pixelZero - pixelTop) / (pixelBottom - pixelTop);
 					stopZero = Math.max(0, Math.min(1, stopZero));
-					
+
 					// Darken amounts for border
 					const green = darkenHex(ColorPalettes.statsPalette.valuePositiveColor, 0.5);
 					const red = darkenHex(ColorPalettes.statsPalette.valueNegativeColor, 0.5);
@@ -815,13 +821,13 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 					gradient.addColorStop(stopZero, green);
 					gradient.addColorStop(stopZero, red);
 					gradient.addColorStop(1, red);
-					
+
 					return gradient;
 				},
 				backgroundColor: (context) => {
 					// Area fill for Delta with Pattern (using getGradient helper)
-					// Force useDeltaChart logic inside getGradient by relying on valid filters or shared logic? 
-					// Actually getGradient checks closure variables. 
+					// Force useDeltaChart logic inside getGradient by relying on valid filters or shared logic?
+					// Actually getGradient checks closure variables.
 					// But we also need to pass the baseline.
 					return getGradient(context, 0.75, 0, true, overflowBaseline);
 				},
@@ -843,7 +849,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			datasets.push({
 				label: "Season 2+",
 				data: s2Points,
-				yAxisID: 'y', 
+				yAxisID: "y",
 				// Rank Color Logic
 				borderColor: (context) => {
 					return getRankGradient(context, 1.0, 0.5, false, is24p, scales => scales.y, true, s2MinVal);
@@ -859,7 +865,8 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			});
 
 
-		} else {
+		}
+		else {
 			// Standard single dataset
 			datasets.push({
 				data: dataPoints,
@@ -909,7 +916,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 				const label = effectiveTier.label.charAt(0).toUpperCase() + effectiveTier.label.slice(1);
 				let colorHex = rankColors[label] || "#888888";
-				
+
 				const valStart = tier.min;
 				const yScaleMax = yScale.max;
 				const valEnd = Number.isFinite(tier.max) ? tier.max : (yScaleMax * 1.5);
@@ -918,27 +925,27 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 				if (darkenAmount > 0) colorHex = darkenHex(colorHex, darkenAmount);
 				const color = setHexAlpha(colorHex, opacity);
-				
+
 				const pixelStart = yScale.getPixelForValue(valStart);
 				const pixelEnd = yScale.getPixelForValue(valEnd);
 				const chartHeight = chartArea.bottom - chartArea.top;
-				
+
 				let stopStart = (chartArea.bottom - pixelStart) / chartHeight;
 				let stopEnd = (chartArea.bottom - pixelEnd) / chartHeight;
-				
+
 				stopStart = Math.max(0, Math.min(1, stopStart));
 				stopEnd = Math.max(0, Math.min(1, stopEnd));
-				
+
 				if (stopStart === stopEnd) return;
-				
+
 				gradient.addColorStop(stopStart, color);
 				gradient.addColorStop(stopEnd, color);
 			});
-			
+
 			// ... (Rest of filling)
 			pCtx.fillStyle = gradient;
 			pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
-			
+
 			if (applyPattern) {
 				const patternStyle = EmbedEnhancer.randomPattern("rgba(0,0,0,0)", "rgba(255,255,255,0.3)", 20, [], 0.3);
 				pCtx.fillStyle = patternStyle;
@@ -970,7 +977,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				const chartHeight = pixelBottom - pixelTop;
 				let stopZero = (pixelZero - pixelTop) / chartHeight;
 				stopZero = Math.max(0, Math.min(1, stopZero));
-				
+
 				let green, red;
 				if (darkenAmount > 0) {
 					green = darkenHex(ColorPalettes.statsPalette.valuePositiveColor, darkenAmount);
@@ -979,26 +986,27 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 					// setHexAlpha works on hex.
 					green = setHexAlpha(green, opacity);
 					red = setHexAlpha(red, opacity);
-				} else {
+				}
+				else {
 					green = setHexAlpha(ColorPalettes.statsPalette.valuePositiveColor, opacity);
 					red = setHexAlpha(ColorPalettes.statsPalette.valueNegativeColor, opacity);
 				}
-				
+
 				if (applyPattern) {
 					// Pattern logic for Delta
 					const patternCanvas = createCanvas(Math.ceil(chartArea.width), Math.ceil(chartArea.height));
 					const pCtx = patternCanvas.getContext("2d");
-					
+
 					// Gradient coordinates must be relative to the patternCanvas (0 to height)
 					const gradient = pCtx.createLinearGradient(0, 0, 0, patternCanvas.height);
 					gradient.addColorStop(0, green);
 					gradient.addColorStop(stopZero, green);
 					gradient.addColorStop(stopZero, red);
 					gradient.addColorStop(1, red);
-					
+
 					pCtx.fillStyle = gradient;
 					pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
-					
+
 					const patternStyle = EmbedEnhancer.randomPattern("rgba(0,0,0,0)", "rgba(255,255,255,0.3)", 20, [], 0.3);
 					pCtx.fillStyle = patternStyle;
 					pCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
@@ -1011,13 +1019,13 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				}
 
 				const gradient = ctx.createLinearGradient(0, pixelTop, 0, pixelBottom);
-				
+
 				gradient.addColorStop(0, green);
 				gradient.addColorStop(stopZero, green);
 				gradient.addColorStop(stopZero, red);
 				gradient.addColorStop(1, red);
 				return gradient;
-			} 
+			}
 			// Use rank gradient helper
 			return getRankGradient(context, opacity, darkenAmount, applyPattern, is24p, null);
 		};
@@ -1060,7 +1068,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 							maxTicksLimit: 6, // 5 evenly spaced + min/max might overflow slightly, but aim for small number
 							callback: (value) => {
 								if (isHybrid) {
-                                    // Delta Mode for Hybrid Left Axis
+									// Delta Mode for Hybrid Left Axis
 									const delta = Math.round(value - matchShiftAmount);
 									const sign = delta > 0 ? "+" : "";
 									return sign + delta;
@@ -1086,7 +1094,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 							stepSize: stepSize,
 							maxTicksLimit: 6,
 							callback: (value) => Math.round(value),
-						}
+						},
 					},
 					x: {
 						type: "linear",
@@ -1102,36 +1110,36 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 							color: trackColors.chartTextColor,
 							// Reintroduce manual step size to control label density
 							stepSize: Math.max(1, Math.ceil(matchCount / 10)),
-							callback: (value) => Math.round(value), 
+							callback: (value) => Math.round(value),
 							maxRotation: 0,
 							autoSkip: false, // Disable autoSkip to force all generated ticks to show
-                            // If labels overlap, they overlap, but we ensure they exist. Only 10 points anyway.
+							// If labels overlap, they overlap, but we ensure they exist. Only 10 points anyway.
 						},
 						min: 0,
 						max: matchCount,
 						afterBuildTicks: (axis) => {
 							// Manually generate evenly spaced ticks
 							const step = Math.ceil(matchCount / 10);
-                            const ticks = [];
-                            for (let v = 0; v < matchCount; v += step) {
-                                ticks.push({ value: v, major: true });
-                            }
+							const ticks = [];
+							for (let v = 0; v < matchCount; v += step) {
+								ticks.push({ value: v, major: true });
+							}
 
-                            // Conditional check: if the last generated tick is too close to the end, remove it.
-                            if (ticks.length > 0) {
-                                const lastGenerated = ticks[ticks.length - 1].value;
-                                const diff = matchCount - lastGenerated;
-                                // "skip the second to last label if the difference ... is less than 1/4 the step distance"
-                                if (diff < (step * 0.25)) {
-                                    ticks.pop();
-                                }
-                            }
-                            
-                            // Always add the final matchCount tick
-                            ticks.push({ value: matchCount, major: true });
-                            
-                            axis.ticks = ticks;
-						}
+							// Conditional check: if the last generated tick is too close to the end, remove it.
+							if (ticks.length > 0) {
+								const lastGenerated = ticks[ticks.length - 1].value;
+								const diff = matchCount - lastGenerated;
+								// "skip the second to last label if the difference ... is less than 1/4 the step distance"
+								if (diff < (step * 0.25)) {
+									ticks.pop();
+								}
+							}
+
+							// Always add the final matchCount tick
+							ticks.push({ value: matchCount, major: true });
+
+							axis.ticks = ticks;
+						},
 					},
 				},
 				layout: {
@@ -1139,7 +1147,33 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 				},
 			},
-			plugins: [],
+			plugins: [{
+				id: 'verticalLine',
+				afterDraw: (chart) => {
+					if (!isHybrid || transitionIndex < 0 || !dataPoints[transitionIndex]) return;
+					
+					const xValue = dataPoints[transitionIndex].x;
+					const { ctx, chartArea, scales } = chart;
+					const xAxis = scales.x;
+					
+					// Calculate pixel position
+					const xPixel = xAxis.getPixelForValue(xValue);
+					
+					// Ensure line is within chart area
+					if (xPixel < chartArea.left || xPixel > chartArea.right) return;
+
+					ctx.save();
+					ctx.beginPath();
+					ctx.setLineDash([5, 5]); // Dotted pattern
+					ctx.lineWidth = 2;
+					// Use a slightly transparent version of the text color or just text color
+					ctx.strokeStyle = trackColors.chartTextColor || '#FFFFFF'; 
+					ctx.moveTo(xPixel, chartArea.top);
+					ctx.lineTo(xPixel, chartArea.bottom);
+					ctx.stroke();
+					ctx.restore();
+				}
+			}],
 		};
 	};
 
@@ -1186,16 +1220,17 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			const is24p = (playerCountFilter === "24p") || (playerDetails && playerDetails.gameMode === "mkworld24p");
 			targetMode = is24p ? "mkworld24p" : "mkworld12p";
 			data = getModeData(targetMode);
-		} else {
+		}
+		else {
 			// If selectedData was set, we need to know which mode it corresponds to.
-            // Since we don't store the mode in the data object, we must infer it from the logic that set selectedData.
-            // Logic:
-            // if (result12p) -> selectedData = result12p -> mode is 12p
-            // else if (result24p) -> selectedData = result24p -> mode is 24p
-            // We can check playerDetails.gameMode if we updated it correctly.
-            
-            const is24p = playerDetails && playerDetails.gameMode === "mkworld24p";
-            targetMode = is24p ? "mkworld24p" : "mkworld12p";
+			// Since we don't store the mode in the data object, we must infer it from the logic that set selectedData.
+			// Logic:
+			// if (result12p) -> selectedData = result12p -> mode is 12p
+			// else if (result24p) -> selectedData = result24p -> mode is 24p
+			// We can check playerDetails.gameMode if we updated it correctly.
+
+			const is24p = playerDetails && playerDetails.gameMode === "mkworld24p";
+			targetMode = is24p ? "mkworld24p" : "mkworld12p";
 		}
 
 		if (!data) return null;
