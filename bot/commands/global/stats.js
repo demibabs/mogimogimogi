@@ -775,6 +775,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		// So shiftAmount = preS2Points[0].y
 
 		let matchShiftAmount = 0;
+		const gradientCache = new Map();
 
 		if (isHybrid && transitionIndex >= 0) {
 			const preS2Points = dataPoints.slice(0, transitionIndex + 1);
@@ -886,6 +887,12 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			const { ctx, chartArea, scales } = chart;
 			if (!chartArea) return null;
 
+			// Cache key generation
+			const cacheKey = `rank-${opacity}-${darkenAmount}-${applyPattern}-${is24pMode}-${limitToMin}-${minVal}-${chartArea.width}-${chartArea.height}`;
+			if (gradientCache.has(cacheKey)) {
+				return gradientCache.get(cacheKey);
+			}
+
 			const yScale = getScale ? getScale(scales) : scales.y;
 			const rankMode = is24pMode ? "24p" : "12p";
 			const tiers = PlayerStats.getRankThresholds(rankMode);
@@ -956,7 +963,9 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			const fCtx = fullCanvas.getContext("2d");
 			fCtx.drawImage(patternCanvas, chartArea.left, chartArea.top);
 
-			return ctx.createPattern(fullCanvas, "no-repeat");
+			const result = ctx.createPattern(fullCanvas, "no-repeat");
+			gradientCache.set(cacheKey, result);
+			return result;
 		};
 
 		const getGradient = (context, opacity = 1.0, darkenAmount = 0, applyPattern = true, baselineVal = 0) => {
@@ -970,6 +979,12 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			const useDeltaChart = (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime");
 
 			if (useDeltaChart) {
+				// Cache key generation for Delta
+				const cacheKey = `delta-${opacity}-${darkenAmount}-${applyPattern}-${baselineVal}-${chartArea.width}-${chartArea.height}`;
+				if (gradientCache.has(cacheKey)) {
+					return gradientCache.get(cacheKey);
+				}
+
 				// (Delta Logic)
 				const pixelZero = yScale.getPixelForValue(baselineVal);
 				const pixelTop = chartArea.top;
@@ -1015,7 +1030,9 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 					const fCtx = fullCanvas.getContext("2d");
 					fCtx.drawImage(patternCanvas, chartArea.left, chartArea.top);
 
-					return ctx.createPattern(fullCanvas, "no-repeat");
+					const result = ctx.createPattern(fullCanvas, "no-repeat");
+					gradientCache.set(cacheKey, result);
+					return result;
 				}
 
 				const gradient = ctx.createLinearGradient(0, pixelTop, 0, pixelBottom);
@@ -1024,6 +1041,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				gradient.addColorStop(stopZero, green);
 				gradient.addColorStop(stopZero, red);
 				gradient.addColorStop(1, red);
+				gradientCache.set(cacheKey, gradient);
 				return gradient;
 			}
 			// Use rank gradient helper
