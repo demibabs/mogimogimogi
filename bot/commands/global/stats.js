@@ -859,10 +859,20 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 			// Find lowest MMR in S2 dataset for fill boundary
 			let s2MinVal = overflowBaseline;
+			let s2MaxVal = -Infinity;
 			if (s2Points.length > 0) {
 				const minPoint = s2Points.reduce((min, p) => p.y < min ? p.y : min, Infinity);
 				if (minPoint !== Infinity) s2MinVal = minPoint;
+
+				const maxPoint = s2Points.reduce((max, p) => p.y > max ? p.y : max, -Infinity);
+				if (maxPoint !== -Infinity) s2MaxVal = maxPoint;
 			}
+
+			// Determine if we should limit to max instead of min
+			// If max value is below the baseline, then the entire curve is below origin.
+			// In that case, we want to limit to max (fill upwards with highest rank color).
+			// Note: If s2Points is empty, s2MaxVal is -Infinity, so this logic triggers but draws nothing.
+			const isBelowOrigin = s2MaxVal < overflowBaseline;
 
 			datasets.push({
 				label: "Season 2+",
@@ -870,9 +880,17 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				yAxisID: "y",
 				// Rank Color Logic
 				borderColor: (context) => {
+					// If below origin, use limitToMax logic with s2MaxVal. Otherwise limitToMin with s2MinVal.
+					if (isBelowOrigin) {
+						// Pass limitToMin=false, minVal=0. Pass limitToMax=true, maxVal=s2MaxVal.
+						return getRankGradient(context, 1.0, 0.5, false, is24p, scales => scales.y, false, 0, true, s2MaxVal);
+					}
 					return getRankGradient(context, 1.0, 0.5, false, is24p, scales => scales.y, true, s2MinVal);
 				},
 				backgroundColor: (context) => {
+					if (isBelowOrigin) {
+						return getRankGradient(context, 0.75, 0, true, is24p, scales => scales.y, false, 0, true, s2MaxVal);
+					}
 					return getRankGradient(context, 0.75, 0, true, is24p, scales => scales.y, true, s2MinVal);
 				},
 				borderWidth: 4,
@@ -899,13 +917,13 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		}
 
 		// Extracted Rank Gradient Logic
-		const getRankGradient = (context, opacity, darkenAmount, applyPattern, is24pMode, getScale, limitToMin = false, minVal = 0) => {
+		const getRankGradient = (context, opacity, darkenAmount, applyPattern, is24pMode, getScale, limitToMin = false, minVal = 0, limitToMax = false, maxVal = Infinity) => {
 			const chart = context.chart;
 			const { ctx, chartArea, scales } = chart;
 			if (!chartArea) return null;
 
 			// Cache key generation
-			const cacheKey = `rank-${opacity}-${darkenAmount}-${applyPattern}-${is24pMode}-${limitToMin}-${minVal}-${chartArea.width}-${chartArea.height}`;
+			const cacheKey = `rank-${opacity}-${darkenAmount}-${applyPattern}-${is24pMode}-${limitToMin}-${minVal}-${limitToMax}-${maxVal}-${chartArea.width}-${chartArea.height}`;
 			if (gradientCache.has(cacheKey)) {
 				return gradientCache.get(cacheKey);
 			}
@@ -930,12 +948,31 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				if (minTierIndex === -1 && minVal < tiers[0].min) minTierIndex = 0;
 			}
 
+			// Find tier index for maxVal
+			let maxTierIndex = -1;
+			if (limitToMax) {
+				maxTierIndex = tiers.findIndex(t => {
+					const max = Number.isFinite(t.max) ? t.max : Infinity;
+					return maxVal >= t.min && maxVal < max;
+				});
+				// If not found (e.g. abnormally high), just use last tier
+				if (maxTierIndex === -1 && maxVal >= tiers[tiers.length - 1].max) maxTierIndex = tiers.length - 1;
+				// If not found (e.g. abnormally low), just use 0 (Iron)
+				if (maxTierIndex === -1 && maxVal < tiers[0].min) maxTierIndex = 0;
+			}
+
 			tiers.forEach((tier, index) => {
 				let effectiveTier = tier;
 				// If we want to extend the lowest rank color downwards:
 				// If current tier is below the minTierIndex, use minTierIndex's color.
 				if (limitToMin && minTierIndex !== -1 && index < minTierIndex) {
 					effectiveTier = tiers[minTierIndex];
+				}
+
+				// If we want to extend the highest rank color upwards:
+				// If current tier is above the maxTierIndex, use maxTierIndex's color.
+				if (limitToMax && maxTierIndex !== -1 && index > maxTierIndex) {
+					effectiveTier = tiers[maxTierIndex];
 				}
 
 				const label = effectiveTier.label.charAt(0).toUpperCase() + effectiveTier.label.slice(1);
