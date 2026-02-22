@@ -1268,7 +1268,12 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		const renderer = getChartRenderer();
 
 		const modeLabel = targetMode === "mkworld24p" ? "24p" : "12p";
-		const config = createConfig(data.historyPoints, data.matchCount, targetMode, `mmr history (${modeLabel})`, data.transitionIndex, data.isHybridMode);
+		// If the user specifically requested this mode (playerCountFilter is matched), don't show the suffix.
+		// If they requested "both" or undefined, we keep the suffix to be clear.
+		const showSuffix = !playerCountFilter || (playerCountFilter !== "12p" && playerCountFilter !== "24p");
+		const titleText = showSuffix ? `mmr history (${modeLabel})` : "mmr history";
+
+		const config = createConfig(data.historyPoints, data.matchCount, targetMode, titleText, data.transitionIndex, data.isHybridMode);
 		const chartBuffer = await renderer.renderToBuffer(config);
 		const chartImage = await loadImage(chartBuffer);
 
