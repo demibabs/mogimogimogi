@@ -58,6 +58,7 @@ const ICON_GAP = 12;
 const MAX_BAR_HEIGHT_RATIO = 0.90;
 
 let chartRenderer = null;
+let dualChartRenderer = null;
 
 if (typeof document === "undefined") {
 	global.document = {
@@ -299,6 +300,22 @@ function getChartRenderer() {
 		},
 	});
 	return chartRenderer;
+}
+
+function getDualChartRenderer() {
+	if (dualChartRenderer) {
+		return dualChartRenderer;
+	}
+	const heightPerChart = Math.floor(CHART_DIMENSIONS.height / 2);
+	dualChartRenderer = new ChartJSNodeCanvas({
+		width: CHART_DIMENSIONS.width,
+		height: heightPerChart,
+		backgroundColour: "rgba(0,0,0,0)",
+		chartCallback: ChartJS => {
+			ChartJS.defaults.font.family = Fonts?.FONT_FAMILY_STACK || "Lexend, Arial, sans-serif";
+		},
+	});
+	return dualChartRenderer;
 }
 
 async function loadImageResource(resource, label = null) {
@@ -1086,15 +1103,17 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 							maxTicksLimit: 6, // 5 evenly spaced + min/max might overflow slightly, but aim for small number
 							callback: (value) => {
 								if (isHybrid) {
-									// Delta Mode for Hybrid Left Axis
-									const delta = Math.round(value - matchShiftAmount);
+									// Round to nearest 100
+									const delta = Math.round((value - matchShiftAmount) / 100) * 100;
 									const sign = delta > 0 ? "+" : "";
 									return sign + delta;
 								}
-								if ((queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime") && value > 0) {
-									return "+" + Math.round(value);
+								// Round to nearest 100
+								const roundedValue = Math.round(value / 100) * 100;
+								if ((queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime") && roundedValue > 0) {
+									return "+" + roundedValue;
 								}
-								return Math.round(value);
+								return roundedValue;
 							},
 						},
 					},
@@ -1111,7 +1130,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 							color: trackColors.chartTextColor,
 							stepSize: stepSize,
 							maxTicksLimit: 6,
-							callback: (value) => Math.round(value),
+							callback: (value) => Math.round(value / 100) * 100,
 						},
 					},
 					x: {
@@ -1147,8 +1166,8 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 							if (ticks.length > 0) {
 								const lastGenerated = ticks[ticks.length - 1].value;
 								const diff = matchCount - lastGenerated;
-								// "skip the second to last label if the difference ... is less than 1/4 the step distance"
-								if (diff < (step * 0.25)) {
+								// "skip the second to last label if the difference ... is less than 1/2 the step distance"
+								if (diff < (step * 0.5)) {
 									ticks.pop();
 								}
 							}
@@ -1198,14 +1217,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 	if (dualMode) {
 		const heightPerChart = Math.floor(CHART_DIMENSIONS.height / 2);
 
-		const dualRenderer = new ChartJSNodeCanvas({
-			width: CHART_DIMENSIONS.width,
-			height: heightPerChart,
-			backgroundColour: "rgba(0,0,0,0)",
-			chartCallback: ChartJS => {
-				ChartJS.defaults.font.family = Fonts?.FONT_FAMILY_STACK || "Lexend, Arial, sans-serif";
-			},
-		});
+		const dualRenderer = getDualChartRenderer();
 
 		const config12p = createConfig(data12p.historyPoints, data12p.matchCount, "mkworld12p", "mmr history (12p)", data12p.transitionIndex, data12p.isHybridMode);
 		const buf12p = await dualRenderer.renderToBuffer(config12p);
@@ -1223,7 +1235,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		ctx.drawImage(img24p, 0, heightPerChart);
 
 		return {
-			image: await loadImage(combinedCanvas.toBuffer("image/png")),
+			image: combinedCanvas,
 			metrics: null,
 			labels: [],
 		};
@@ -1253,14 +1265,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 
 		if (!data) return null;
 
-		const renderer = new ChartJSNodeCanvas({
-			width: CHART_DIMENSIONS.width,
-			height: CHART_DIMENSIONS.height,
-			backgroundColour: "rgba(0,0,0,0)",
-			chartCallback: ChartJS => {
-				ChartJS.defaults.font.family = Fonts?.FONT_FAMILY_STACK || "Lexend, Arial, sans-serif";
-			},
-		});
+		const renderer = getChartRenderer();
 
 		const modeLabel = targetMode === "mkworld24p" ? "24p" : "12p";
 		const config = createConfig(data.historyPoints, data.matchCount, targetMode, `mmr history (${modeLabel})`, data.transitionIndex, data.isHybridMode);
