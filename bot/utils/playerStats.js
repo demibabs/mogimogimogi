@@ -365,8 +365,9 @@ class PlayerStats {
 				? [...playerDetails.mmrChanges]
 				: [];
 
-		// If we are looking at "both" counts, we must also include changes from the alternate mode
-		if (playerCountFilter === "both" && playerDetails?.alternateDetails?.mmrChanges) {
+		// Always include alternate details if available, because the tableIdSet is the source of truth for filtering.
+		// If a change is from the wrong mode, its tableId simply won't be in the allowed set.
+		if (playerDetails?.alternateDetails?.mmrChanges) {
 			changes = changes.concat(playerDetails.alternateDetails.mmrChanges);
 		}
 
@@ -405,13 +406,37 @@ class PlayerStats {
 		const weeklyCutoffMs = includeNonTableWeekly ? now - ONE_WEEK_MS : null;
 
 		let totalDelta = 0;
+		// Parsing regex for "Table #12345" patterns in reason strings
+		const tableIdRegex = /(?:Table|Mogi)\s*#?(\d+)/i;
+
 		for (const change of changes) {
 			if (!change) continue;
 			const delta = Number(change.mmrDelta ?? change.delta);
 			if (!Number.isFinite(delta)) continue;
 
-			const rawTableId = change.tableId ?? change.changeId;
-			const changeTableId = rawTableId != null ? String(rawTableId) : null;
+			let changeTableId = null;
+
+			// Priority 1: explicit tableId property
+			if (change.tableId != null) {
+				changeTableId = String(change.tableId);
+			}
+			// Priority 2: Extract from reason string if available
+			else if (change.reason) {
+				const match = String(change.reason).match(tableIdRegex);
+				if (match) {
+					changeTableId = match[1];
+				}
+			}
+
+			// Fallback: If no dedicated tableId found, check if changeId happens to be in our set
+			// (Only if we haven't found a better ID yet)
+			if (!changeTableId && change.changeId != null) {
+				const cId = String(change.changeId);
+				if (tableIdSet.has(cId)) {
+					changeTableId = cId;
+				}
+			}
+
 			let include = false;
 			if (changeTableId && tableIdSet.has(changeTableId)) {
 				include = true;
