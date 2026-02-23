@@ -2092,24 +2092,39 @@ async function renderStats({
 			});
 			const noSeasonEventsForMode = Object.keys(seasonModeTables).length === 0;
 
-			const delta = timeFilter === "alltime"
-				? PlayerStats.getTotalMmrDeltaFromTables(modeTables, normalizedLoungeId)
-				: PlayerStats.computeMmrDeltaForFilter({
-					playerDetails: details,
-					// Explicitly concatenate changes from the OTHER mode so computeMmrDeltaForFilter has everything.
-					// If 'details' is primary, 'alternateDetails' is the other.
-					// If 'details' is secondary (originally alternateDetails), we need to grab primary changes.
-					// However, inside this function 'playerDetails' is the ROOT object which holds everything.
-					// So let's construct the complete change list manually here.
-					mmrChanges: [
-						...(details12p?.mmrChanges || []),
-						...(details24p?.mmrChanges || []),
-					],
-					tableIds: modeTableIds,
-					timeFilter,
-					queueFilter,
-					playerCountFilter: modeFilter,
-				});
+			// When fetching for a specific mode cell, pass purely the changes for that mode
+			// The compute function works by filtering a list of changes against a list of tables.
+			// As long as the changes include the events for that mode, it works.
+			
+			// Use table-based delta calculation consistently if possible, as it matches the chart logic. 
+			// The chart uses tables exclusively. If we want consistency, we should use tables too.
+			// However, mmrChanges theoretically captures non-table adjustments.
+			// But if mmrChanges parsing is failing, we get 0.
+			// Let's try to use table-based calculation for ALL filters if we have tables, 
+			// and fallback to mmrChanges only if table-based yields nothing?
+			// Actually, let's just use table-based calculation for everything except maybe very specific cases?
+			// The issue report says "chart works fine", so let's mirror chart logic.
+			
+			const delta = PlayerStats.getTotalMmrDeltaFromTables(modeTables, normalizedLoungeId);
+
+			if (delta === 0 && modeTableIds.length > 0 && timeFilter !== "alltime") {
+				console.log(`[StatsDebug] Delta 0 for ${modeFilter} | Tables: ${modeTableIds.length} | Details: ${details ? "Yes" : "No"} | Changes: ${details?.mmrChanges?.length || 0}`);
+				if (modeTableIds.length < 5) {
+					console.log(`[StatsDebug] Table IDs: ${modeTableIds.join(", ")}`);
+					if (details?.mmrChanges) {
+						// Check if any change matches these IDs
+						const matchingChanges = details.mmrChanges.filter(c => {
+							const tid = c.tableId ? String(c.tableId) : null;
+							return tid && modeTableIds.includes(tid);
+						});
+						console.log(`[StatsDebug] Matching Changes Found: ${matchingChanges.length}`);
+						if (matchingChanges.length === 0 && details.mmrChanges.length > 0) {
+                             // Log first few changes to see structure
+                             console.log(`[StatsDebug] Sample Change: ${JSON.stringify(details.mmrChanges[0])}`);
+                        }
+					}
+				}
+			}
 
 			let value, subLabel, subPrefix;
 			let cellIcon = null;

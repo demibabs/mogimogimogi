@@ -339,7 +339,16 @@ class PlayerStats {
 				const fallbackDelta = Number.isFinite(prevMmr) && Number.isFinite(newMmr)
 					? newMmr - prevMmr
 					: null;
-				const delta = Number(player.delta ?? player.mmrDelta ?? fallbackDelta);
+				
+				// Prefer calculated delta from MMRs if available, as it's the raw truth of the table state.
+				// Fallback to explicit delta fields only if MMRs are missing (e.g. placement matches with no MMR shown?)
+				// Actually, if newMmr/prevMmr are present, trusting them is safer than trusting a potentially stale 'delta' field.
+				let deltaVal = fallbackDelta;
+				if (deltaVal === null) {
+					deltaVal = player.delta ?? player.mmrDelta;
+				}
+
+				const delta = Number(deltaVal);
 				if (Number.isFinite(delta)) {
 					totalDelta += delta;
 				}
