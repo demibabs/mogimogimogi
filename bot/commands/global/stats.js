@@ -1637,6 +1637,8 @@ async function renderStats({
 	if (!trackName) {
 		trackName = favorites.track || GameData.getRandomTrack();
 	}
+	const trackColors = ColorPalettes.statsTrackColors[trackName];
+
 	if (!favoriteCharacterImage || !favoriteVehicleImage) {
 		const [characterImage, vehicleImage] = await Promise.all([
 			favoriteCharacterImage ? Promise.resolve(favoriteCharacterImage) : EmbedEnhancer.loadFavoriteCharacterImage(favorites),
@@ -1651,25 +1653,63 @@ async function renderStats({
 		globals = await LoungeApi.getGlobalStats(undefined, globalStatsGameMode);
 	}
 
+	const isSpecificPlayerCount = playerCountFilter === "12p" || playerCountFilter === "24p" || playerCountFilter === "mkworld12p" || playerCountFilter === "mkworld24p";
+	let chartResult = null;
+	let isHistoryChart = false;
+	try {
+		if (isSpecificPlayerCount || !playerCountFilter || playerCountFilter === "both") {
+			let extraDetails = null;
+			if (!playerCountFilter || playerCountFilter === "both") {
+				// Construct details for both 12p and 24p.
+				const primaryMode = playerDetails.gameMode || "mkworld12p";
+				extraDetails = {
+					details12p: primaryMode === "mkworld12p" ? playerDetails : playerDetails.alternateDetails,
+					details24p: primaryMode === "mkworld24p" ? playerDetails : playerDetails.alternateDetails,
+				};
+			}
+			chartResult = await getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, normalizedLoungeId, timeFilter, playerCountFilter || "both", extraDetails, queueFilter);
+			if (chartResult) {
+				isHistoryChart = true;
+			}
+		}
+
+		if (!chartResult) {
+			chartResult = await getDivisionChart(trackName, trackColors, globals);
+		}
+	}
+	catch (chartError) {
+		console.warn("failed to generate chart:", chartError);
+	}
+	const chartImage = chartResult?.image || null;
+
 	const playerStats = await getPlayerStats(normalizedLoungeId, serverId, filteredTables, playerDetails, null);
 	const mmrRaw = Number(playerStats?.mmr);
 	const mmr = Number.isFinite(mmrRaw) ? mmrRaw : 0;
-	const mmrDeltaFromTables = PlayerStats.getTotalMmrDeltaFromTables(filteredTables, normalizedLoungeId);
-	const mmrDeltaForFilter = timeFilter === "alltime"
-		? mmrDeltaFromTables
-		: PlayerStats.computeMmrDeltaForFilter({
-			playerDetails,
-			tableIds: filteredTableIds,
-			timeFilter,
-			queueFilter,
-			playerCountFilter,
-		});
+	
+	let mmrDeltaForFilter = 0;
+	if (isHistoryChart && chartResult.historyPoints && chartResult.historyPoints.length > 0) {
+		const points = chartResult.historyPoints;
+		const startY = points[0].y;
+		const endY = points[points.length - 1].y;
+		mmrDeltaForFilter = endY - startY;
+	}
+	else {
+		const mmrDeltaFromTables = PlayerStats.getTotalMmrDeltaFromTables(filteredTables, normalizedLoungeId);
+		mmrDeltaForFilter = timeFilter === "alltime"
+			? mmrDeltaFromTables
+			: PlayerStats.computeMmrDeltaForFilter({
+				playerDetails,
+				tableIds: filteredTableIds,
+				timeFilter,
+				queueFilter,
+				playerCountFilter,
+			});
+	}
 
 	// Determine what to show based on filters
 	// If playerCountFilter is "both" (or unspecified), we show current MMR + Peak/GameMode label
 	// If playerCountFilter is specific, we calculate Peak for that mode (Season 2+)
 
-	const isSpecificPlayerCount = playerCountFilter === "12p" || playerCountFilter === "24p" || playerCountFilter === "mkworld12p" || playerCountFilter === "mkworld24p";
 	const isAllTimeOrSeason = timeFilter === "alltime" || timeFilter === "season";
 	const isQueueAny = queueFilter === "both" || !queueFilter;
 	const filtersAreBoth = queueFilter === "both" && playerCountFilter === "both";
@@ -1846,7 +1886,6 @@ async function renderStats({
 
 	await reportProgress("rendering image...");
 
-	const trackColors = ColorPalettes.statsTrackColors[trackName];
 	const canvasWidth = 1920;
 	const canvasHeight = 1080;
 	const canvas = createCanvas(canvasWidth, canvasHeight);
@@ -1880,39 +1919,6 @@ async function renderStats({
 	}
 
 	const playerEmoji = EmbedEnhancer.getCountryFlag(playerDetails.countryCode);
-	let chartResult = null;
-	let isHistoryChart = false;
-	try {
-		if (isSpecificPlayerCount || !playerCountFilter || playerCountFilter === "both") {
-			let extraDetails = null;
-			if (!playerCountFilter || playerCountFilter === "both") {
-				// Construct details for both 12p and 24p.
-				// Note: playerDetails holds the primary mode, and .alternateDetails holds the secondary if available.
-				// If alternateDetails is missing, we will just have the primary.
-				const primaryMode = playerDetails.gameMode || "mkworld12p";
-				const alternateMode = primaryMode === "mkworld12p" ? "mkworld24p" : "mkworld12p";
-
-				extraDetails = {
-					details12p: primaryMode === "mkworld12p" ? playerDetails : playerDetails.alternateDetails,
-					details24p: primaryMode === "mkworld24p" ? playerDetails : playerDetails.alternateDetails,
-				};
-
-				// Ensure we have objects even if null, though getMmrHistoryChart checks for existence
-			}
-			chartResult = await getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, normalizedLoungeId, timeFilter, playerCountFilter || "both", extraDetails, queueFilter);
-			if (chartResult) {
-				isHistoryChart = true;
-			}
-		}
-
-		if (!chartResult) {
-			chartResult = await getDivisionChart(trackName, trackColors, globals);
-		}
-	}
-	catch (chartError) {
-		console.warn("failed to generate chart:", chartError);
-	}
-	const chartImage = chartResult?.image || null;
 	const chartLabels = chartResult?.labels || [];
 	const chartMetrics = chartResult?.metrics || null;
 
@@ -2090,7 +2096,15 @@ async function renderStats({
 				? PlayerStats.getTotalMmrDeltaFromTables(modeTables, normalizedLoungeId)
 				: PlayerStats.computeMmrDeltaForFilter({
 					playerDetails: details,
-					mmrChanges: details?.mmrChanges,
+					// Explicitly concatenate changes from the OTHER mode so computeMmrDeltaForFilter has everything.
+					// If 'details' is primary, 'alternateDetails' is the other.
+					// If 'details' is secondary (originally alternateDetails), we need to grab primary changes.
+					// However, inside this function 'playerDetails' is the ROOT object which holds everything.
+					// So let's construct the complete change list manually here.
+					mmrChanges: [
+						...(details12p?.mmrChanges || []),
+						...(details24p?.mmrChanges || []),
+					],
 					tableIds: modeTableIds,
 					timeFilter,
 					queueFilter,
