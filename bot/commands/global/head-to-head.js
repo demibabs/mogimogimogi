@@ -1,12 +1,9 @@
 // commands/head-to-head.js
 const {
 	SlashCommandBuilder,
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
 	AttachmentBuilder,
 } = require("discord.js");
-const { createCanvas, loadImage } = require("canvas");
+const { createCanvas } = require("canvas");
 
 const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
@@ -17,11 +14,11 @@ const Fonts = require("../../utils/fonts");
 const EmbedEnhancer = require("../../utils/embedEnhancer");
 const resolveTargetPlayer = require("../../utils/playerResolver");
 const AutoUserManager = require("../../utils/autoUserManager");
-const {
-	setCacheEntry,
-	refreshCacheEntry,
-	deleteCacheEntry,
-} = require("../../utils/cacheManager");
+const { createImageLoader } = require("../../utils/imageLoader");
+const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
+const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/filterControls");
+const { getTableTimestamp } = require("../../utils/tableUtils");
+const loadImageResource = createImageLoader("head-to-head");
 
 // -------------------- constants --------------------
 const EDGE_RADIUS = 30;
@@ -77,61 +74,27 @@ const EVENT_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
 });
 
 // -------------------- caches / state --------------------
-const headToHeadSessionCache = new Map(); // messageId -> { ...session, expiresAt }
-const headToHeadSessionExpiryTimers = new Map();
-const headToHeadRenderTokens = new Map(); // messageId -> Symbol
+const headToHeadSessionStore = createSessionStore({ ttlMs: SESSION_CACHE_TTL_MS });
+const headToHeadRenderTracker = createRenderTracker();
 
 // -------------------- session helpers --------------------
 function getHeadToHeadSession(messageId) {
-	if (!messageId) return null;
-	const session = headToHeadSessionCache.get(messageId);
-	if (!session) return null;
-	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		deleteCacheEntry(headToHeadSessionCache, headToHeadSessionExpiryTimers, messageId);
-		return null;
-	}
-	refreshCacheEntry(headToHeadSessionCache, headToHeadSessionExpiryTimers, messageId, SESSION_CACHE_TTL_MS);
-	session.expiresAt = Date.now() + SESSION_CACHE_TTL_MS;
-	return session;
+	return headToHeadSessionStore.get(messageId);
 }
 function storeHeadToHeadSession(messageId, session) {
-	if (!messageId || !session) return;
-	const payload = {
-		...session,
-		messageId,
-		expiresAt: Date.now() + SESSION_CACHE_TTL_MS,
-	};
-	setCacheEntry(headToHeadSessionCache, headToHeadSessionExpiryTimers, messageId, payload, SESSION_CACHE_TTL_MS);
+	headToHeadSessionStore.store(messageId, session);
 }
 function beginHeadToHeadRender(messageId) {
-	if (!messageId) return null;
-	const token = Symbol("headToHeadRender");
-	headToHeadRenderTokens.set(messageId, token);
-	return token;
+	return headToHeadRenderTracker.begin(messageId, "headToHeadRender");
 }
 function isHeadToHeadRenderActive(messageId, token) {
-	if (!messageId || !token) return true;
-	return headToHeadRenderTokens.get(messageId) === token;
+	return headToHeadRenderTracker.isActive(messageId, token);
 }
 function endHeadToHeadRender(messageId, token) {
-	if (!messageId || !token) return;
-	if (headToHeadRenderTokens.get(messageId) === token) {
-		headToHeadRenderTokens.delete(messageId);
-	}
+	headToHeadRenderTracker.end(messageId, token);
 }
 
 // -------------------- image helpers --------------------
-async function loadImageResource(resource, label = null) {
-	if (!resource) return null;
-	try {
-		return await loadImage(resource);
-	}
-	catch (err) {
-		const descriptor = label || resource;
-		console.warn(`head-to-head: failed to load image ${descriptor}:`, err);
-		return null;
-	}
-}
 async function getRankIcon(rankName, mmr) {
 	const filename =
 	PlayerStats.getRankIconFilename(rankName) ||
@@ -155,17 +118,9 @@ function formatSignedDelta(value) {
 	return `${sign}${NUMBER_FORMATTER.format(magnitude)}`;
 }
 
-function getTableTimestamp(table) {
-	if (!table) return null;
-	const raw = table.verifiedOn || table.createdOn || table.date || table.updatedOn;
-	if (!raw) return null;
-	const parsed = new Date(raw);
-	return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
 function formatEventDescriptor(table) {
 	if (!table) return "event details unavailable";
-	const date = getTableTimestamp(table);
+	const date = getTableTimestamp(table, ["verifiedOn", "createdOn", "date", "updatedOn"]);
 	const formattedDate = date ? EVENT_DATE_FORMATTER.format(date) : "date unknown";
 	const count = table.numPlayers ?? table.numplayers ?? table.playerCount;
 	const format = table.format || table.queue || "room";
@@ -184,81 +139,31 @@ function buildCustomId(action, { loungeId1, loungeId2, timeFilter, queueFilter, 
 	return ["h2h", safeAction, safeTime, safeQueue, safePlayers, id1, id2].join("|");
 }
 function parseCustomId(customId) {
-	if (!customId?.startsWith("h2h|")) return null;
-	const parts = customId.split("|");
-	if (parts.length < 7) return null;
-	const [, actionRaw, timeRaw, queueRaw, playersRaw, loungeId1, loungeId2] = parts;
-	return {
-		action: (actionRaw || "").toLowerCase(),
-		timeFilter: (timeRaw || DEFAULT_FILTERS.timeFilter).toLowerCase(),
-		queueFilter: (queueRaw || DEFAULT_FILTERS.queueFilter).toLowerCase(),
-		playerCountFilter: (playersRaw || DEFAULT_FILTERS.playerCountFilter).toLowerCase(),
-		loungeId1: loungeId1 || null,
-		loungeId2: loungeId2 || null,
-	};
+	return parseStandardFilterCustomId({
+		customId,
+		prefix: "h2h",
+		defaults: {
+			action: "time",
+			timeFilter: DEFAULT_FILTERS.timeFilter,
+			queueFilter: DEFAULT_FILTERS.queueFilter,
+			playerCountFilter: DEFAULT_FILTERS.playerCountFilter,
+		},
+		loungeIdFields: ["loungeId1", "loungeId2"],
+	});
 }
 
 // -------------------- component rows --------------------
 function buildComponentRows({ loungeId1, loungeId2, timeFilter, queueFilter, playerCountFilter }) {
-	const safeTime = timeFilter || DEFAULT_FILTERS.timeFilter;
-	const safeQueue = queueFilter || DEFAULT_FILTERS.queueFilter;
-	const safePlayers = playerCountFilter || DEFAULT_FILTERS.playerCountFilter;
-
-	const timeRow = new ActionRowBuilder().addComponents(
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("time", { loungeId1, loungeId2, timeFilter: "alltime", queueFilter: safeQueue, playerCountFilter: safePlayers }))
-			.setLabel("all time")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeTime === "alltime"),
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("time", { loungeId1, loungeId2, timeFilter: "weekly", queueFilter: safeQueue, playerCountFilter: safePlayers }))
-			.setLabel("past week")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeTime === "weekly"),
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("time", { loungeId1, loungeId2, timeFilter: "season", queueFilter: safeQueue, playerCountFilter: safePlayers }))
-			.setLabel("this season")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeTime === "season"),
-	);
-
-	const queueRow = new ActionRowBuilder().addComponents(
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("queue", { loungeId1, loungeId2, timeFilter: safeTime, queueFilter: "soloq", playerCountFilter: safePlayers }))
-			.setLabel("soloq")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeQueue === "soloq"),
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("queue", { loungeId1, loungeId2, timeFilter: safeTime, queueFilter: "squads", playerCountFilter: safePlayers }))
-			.setLabel("squads")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeQueue === "squads"),
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("queue", { loungeId1, loungeId2, timeFilter: safeTime, queueFilter: "both", playerCountFilter: safePlayers }))
-			.setLabel("both")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeQueue === "both"),
-	);
-
-	const playerRow = new ActionRowBuilder().addComponents(
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("players", { loungeId1, loungeId2, timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "12p" }))
-			.setLabel("12p")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safePlayers === "12p"),
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("players", { loungeId1, loungeId2, timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "24p" }))
-			.setLabel("24p")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safePlayers === "24p"),
-		new ButtonBuilder()
-			.setCustomId(buildCustomId("players", { loungeId1, loungeId2, timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "both" }))
-			.setLabel("both")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safePlayers === "both"),
-	);
-
-	return [timeRow, queueRow, playerRow];
+	return buildStandardFilterRows({
+		buildCustomId: buildCustomId,
+		customIdParams: { loungeId1, loungeId2 },
+		timeFilter,
+		queueFilter,
+		playerCountFilter,
+		defaultTime: DEFAULT_FILTERS.timeFilter,
+		defaultQueue: DEFAULT_FILTERS.queueFilter,
+		defaultPlayers: DEFAULT_FILTERS.playerCountFilter,
+	});
 }
 
 // -------------------- renderer --------------------

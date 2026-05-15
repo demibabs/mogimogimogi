@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require("discord.js");
-const { createCanvas, loadImage } = require("canvas");
+const { SlashCommandBuilder, AttachmentBuilder } = require("discord.js");
+const { createCanvas } = require("canvas");
 const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
@@ -9,11 +9,12 @@ const AutoUserManager = require("../../utils/autoUserManager");
 const GameData = require("../../utils/gameData");
 const ColorPalettes = require("../../utils/colorPalettes");
 const resolveTargetPlayer = require("../../utils/playerResolver");
-const {
-	setCacheEntry,
-	refreshCacheEntry,
-	deleteCacheEntry,
-} = require("../../utils/cacheManager");
+const { createImageLoader } = require("../../utils/imageLoader");
+const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
+const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/filterControls");
+const { getTableTimestamp } = require("../../utils/tableUtils");
+
+const loadImageResource = createImageLoader("notables");
 
 const {
 	getPlayerAvatarUrl,
@@ -33,33 +34,19 @@ const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 const NOTABLES_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
 
-const notablesSessionCache = new Map();
-const notablesSessionExpiryTimers = new Map();
-const notablesRenderTokens = new Map();
+const notablesSessionStore = createSessionStore({ ttlMs: NOTABLES_SESSION_CACHE_TTL_MS });
+const notablesRenderTracker = createRenderTracker();
 
 function beginNotablesRender(messageId) {
-	if (!messageId) {
-		return null;
-	}
-	const token = Symbol("notablesRender");
-	notablesRenderTokens.set(messageId, token);
-	return token;
+	return notablesRenderTracker.begin(messageId, "notablesRender");
 }
 
 function isNotablesRenderActive(messageId, token) {
-	if (!messageId || !token) {
-		return true;
-	}
-	return notablesRenderTokens.get(messageId) === token;
+	return notablesRenderTracker.isActive(messageId, token);
 }
 
 function endNotablesRender(messageId, token) {
-	if (!messageId || !token) {
-		return;
-	}
-	if (notablesRenderTokens.get(messageId) === token) {
-		notablesRenderTokens.delete(messageId);
-	}
+	notablesRenderTracker.end(messageId, token);
 }
 
 const EVENT_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
@@ -206,19 +193,6 @@ function getRandomMessage(pool) {
 	return "";
 }
 
-async function loadImageResource(resource) {
-	if (!resource) {
-		return null;
-	}
-	try {
-		return await loadImage(resource);
-	}
-	catch (error) {
-		console.warn(`failed to load image ${resource}:`, error);
-		return null;
-	}
-}
-
 function wrapText(ctx, text, maxWidth) {
 	if (!text) {
 		return [];
@@ -259,151 +233,46 @@ function buildNotablesCustomId(action, { timeFilter, queueFilter, playerCountFil
 }
 
 function buildNotablesComponentRows({ loungeId, timeFilter, queueFilter, playerCountFilter }) {
-	const safeTime = timeFilter || "alltime";
-	const safeQueue = queueFilter || "both";
-	const safePlayerCount = playerCountFilter || "both";
-	const rows = [];
-
-	const timeRow = new ActionRowBuilder()
-		.addComponents(
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("time", { timeFilter: "alltime", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("all time")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeTime === "alltime"),
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("time", { timeFilter: "weekly", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("past week")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeTime === "weekly"),
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("time", { timeFilter: "season", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("this season")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeTime === "season"),
-		);
-	rows.push(timeRow);
-
-	const queueRow = new ActionRowBuilder()
-		.addComponents(
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("queue", { timeFilter: safeTime, queueFilter: "soloq", playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("soloq")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeQueue === "soloq"),
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("queue", { timeFilter: safeTime, queueFilter: "squads", playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("squads")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeQueue === "squads"),
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("queue", { timeFilter: safeTime, queueFilter: "both", playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("both")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeQueue === "both"),
-		);
-	rows.push(queueRow);
-
-	const playerRow = new ActionRowBuilder()
-		.addComponents(
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "12p", loungeId }))
-				.setLabel("12p")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safePlayerCount === "12p"),
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "24p", loungeId }))
-				.setLabel("24p")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safePlayerCount === "24p"),
-			new ButtonBuilder()
-				.setCustomId(buildNotablesCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "both", loungeId }))
-				.setLabel("both")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safePlayerCount === "both"),
-		);
-	rows.push(playerRow);
-
-	return rows;
+	return buildStandardFilterRows({
+		buildCustomId: buildNotablesCustomId,
+		customIdParams: { loungeId },
+		timeFilter,
+		queueFilter,
+		playerCountFilter,
+	});
 }
 
 function parseNotablesInteraction(customId) {
-	if (!customId?.startsWith("notables|")) {
-		return null;
-	}
-	const parts = customId.split("|");
-	if (parts.length < 6) {
-		return null;
-	}
-	const [, actionRaw, timeRaw, queueRaw, playerRaw, loungeId] = parts;
-	return {
-		action: (actionRaw || "").toLowerCase(),
-		timeFilter: (timeRaw || "alltime").toLowerCase(),
-		queueFilter: (queueRaw || "both").toLowerCase(),
-		playerCountFilter: (playerRaw || "both").toLowerCase(),
-		loungeId,
-	};
+	return parseStandardFilterCustomId({
+		customId,
+		prefix: "notables",
+		defaults: {
+			action: "time",
+			timeFilter: "alltime",
+			queueFilter: "both",
+			playerCountFilter: "both",
+		},
+		loungeIdFields: ["loungeId"],
+	});
 }
 
 function getNotablesSession(messageId) {
-	if (!messageId) {
-		return null;
-	}
-	const session = notablesSessionCache.get(messageId);
-	if (!session) {
-		return null;
-	}
-	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		deleteCacheEntry(notablesSessionCache, notablesSessionExpiryTimers, messageId);
-		return null;
-	}
-	refreshCacheEntry(notablesSessionCache, notablesSessionExpiryTimers, messageId, NOTABLES_SESSION_CACHE_TTL_MS);
-	session.expiresAt = Date.now() + NOTABLES_SESSION_CACHE_TTL_MS;
-	return session;
+	return notablesSessionStore.get(messageId);
 }
 
 function storeNotablesSession(messageId, session) {
-	if (!messageId || !session) {
-		return;
-	}
-	const expiresAt = Date.now() + NOTABLES_SESSION_CACHE_TTL_MS;
-	const payload = {
-		...session,
-		messageId,
-		expiresAt,
-	};
-	setCacheEntry(notablesSessionCache, notablesSessionExpiryTimers, messageId, payload, NOTABLES_SESSION_CACHE_TTL_MS);
+	notablesSessionStore.store(messageId, session);
 }
 
 function refreshNotablesSession(messageId) {
-	if (!messageId) {
-		return;
-	}
-	const session = notablesSessionCache.get(messageId);
-	if (!session) {
-		return;
-	}
-	refreshCacheEntry(notablesSessionCache, notablesSessionExpiryTimers, messageId, NOTABLES_SESSION_CACHE_TTL_MS);
-	session.expiresAt = Date.now() + NOTABLES_SESSION_CACHE_TTL_MS;
-}
-
-function getTableTimestamp(table) {
-	if (!table) {
-		return null;
-	}
-	const raw = table.verifiedOn || table.createdOn || table.date || table.updatedOn;
-	if (!raw) {
-		return null;
-	}
-	const parsed = new Date(raw);
-	return Number.isNaN(parsed.getTime()) ? null : parsed;
+	notablesSessionStore.refresh(messageId);
 }
 
 function formatTableDescriptor(table) {
 	if (!table) {
 		return "event details unavailable";
 	}
-	const date = getTableTimestamp(table);
+	const date = getTableTimestamp(table, ["verifiedOn", "createdOn", "date", "updatedOn"]);
 	const formattedDate = date ? EVENT_DATE_FORMATTER.format(date) : "date unknown";
 	const count = table.numPlayers ?? table.numplayers ?? table.playerCount;
 	const format = table.format || table.queue || "room";

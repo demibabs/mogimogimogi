@@ -339,16 +339,7 @@ class PlayerStats {
 				const fallbackDelta = Number.isFinite(prevMmr) && Number.isFinite(newMmr)
 					? newMmr - prevMmr
 					: null;
-				
-				// Prefer calculated delta from MMRs if available, as it's the raw truth of the table state.
-				// Fallback to explicit delta fields only if MMRs are missing (e.g. placement matches with no MMR shown?)
-				// Actually, if newMmr/prevMmr are present, trusting them is safer than trusting a potentially stale 'delta' field.
-				let deltaVal = fallbackDelta;
-				if (deltaVal === null) {
-					deltaVal = player.delta ?? player.mmrDelta;
-				}
-
-				const delta = Number(deltaVal);
+				const delta = Number(player.delta ?? player.mmrDelta ?? fallbackDelta);
 				if (Number.isFinite(delta)) {
 					totalDelta += delta;
 				}
@@ -368,28 +359,18 @@ class PlayerStats {
 		playerCountFilter = "both",
 		now = Date.now(),
 	} = {}) {
-		let changes = Array.isArray(mmrChangesOverride)
+		const changes = Array.isArray(mmrChangesOverride)
 			? mmrChangesOverride
 			: Array.isArray(playerDetails?.mmrChanges)
-				? [...playerDetails.mmrChanges]
+				? playerDetails.mmrChanges
 				: [];
-
-		// Always include alternate details if available, because the tableIdSet is the source of truth for filtering.
-		// If a change is from the wrong mode, its tableId simply won't be in the allowed set.
-		if (playerDetails?.alternateDetails?.mmrChanges) {
-			changes = changes.concat(playerDetails.alternateDetails.mmrChanges);
-		}
-
 		if (!changes.length) {
 			return 0;
 		}
 
-		// When calculating season delta with NO specific queue/count filters, we sum everything.
-		// However, if we have specific filters (like "soloq" or "squads"), we MUST rely on table filtering.
 		const includeAllSeason = timeFilter === "season"
 			&& queueFilter === "both"
 			&& playerCountFilter === "both";
-
 		if (includeAllSeason) {
 			let seasonDelta = 0;
 			for (const change of changes) {
@@ -415,37 +396,13 @@ class PlayerStats {
 		const weeklyCutoffMs = includeNonTableWeekly ? now - ONE_WEEK_MS : null;
 
 		let totalDelta = 0;
-		// Parsing regex for "Table #12345" patterns in reason strings
-		const tableIdRegex = /(?:Table|Mogi)\s*#?(\d+)/i;
-
 		for (const change of changes) {
 			if (!change) continue;
 			const delta = Number(change.mmrDelta ?? change.delta);
 			if (!Number.isFinite(delta)) continue;
 
-			let changeTableId = null;
-
-			// Priority 1: explicit tableId property
-			if (change.tableId != null) {
-				changeTableId = String(change.tableId);
-			}
-			// Priority 2: Extract from reason string if available
-			else if (change.reason) {
-				const match = String(change.reason).match(tableIdRegex);
-				if (match) {
-					changeTableId = match[1];
-				}
-			}
-
-			// Fallback: If no dedicated tableId found, check if changeId happens to be in our set
-			// (Only if we haven't found a better ID yet)
-			if (!changeTableId && change.changeId != null) {
-				const cId = String(change.changeId);
-				if (tableIdSet.has(cId)) {
-					changeTableId = cId;
-				}
-			}
-
+			const rawTableId = change.tableId ?? change.changeId;
+			const changeTableId = rawTableId != null ? String(rawTableId) : null;
 			let include = false;
 			if (changeTableId && tableIdSet.has(changeTableId)) {
 				include = true;

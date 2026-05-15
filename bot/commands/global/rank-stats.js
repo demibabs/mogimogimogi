@@ -1,11 +1,8 @@
 const {
 	SlashCommandBuilder,
 	AttachmentBuilder,
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
 } = require("discord.js");
-const { createCanvas, loadImage } = require("canvas");
+const { createCanvas } = require("canvas");
 const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
@@ -15,11 +12,11 @@ const AutoUserManager = require("../../utils/autoUserManager");
 const ColorPalettes = require("../../utils/colorPalettes");
 const GameData = require("../../utils/gameData");
 const resolveTargetPlayer = require("../../utils/playerResolver");
-const {
-	setCacheEntry,
-	refreshCacheEntry,
-	deleteCacheEntry,
-} = require("../../utils/cacheManager");
+const { createImageLoader } = require("../../utils/imageLoader");
+const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
+const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/filterControls");
+const { getTableTimestamp } = require("../../utils/tableUtils");
+const loadImageResource = createImageLoader("rank-stats");
 
 const {
 	getPlayerAvatarUrl,
@@ -148,20 +145,6 @@ async function resolveRankStatsTrackName(loungeId, sessionTrackName) {
 	return getRandomRankStatsTrack();
 }
 
-async function loadImageResource(resource, label = null) {
-	if (!resource) {
-		return null;
-	}
-	try {
-		return await loadImage(resource);
-	}
-	catch (error) {
-		const descriptor = label || resource;
-		console.warn(`rank-stats: failed to load image ${descriptor}:`, error);
-		return null;
-	}
-}
-
 const SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
 const DEFAULT_FILTERS = {
 	timeFilter: "alltime",
@@ -192,62 +175,27 @@ function normalizeRankStatsFilters(filters = {}) {
 	return normalized;
 }
 
-const rankStatsSessionCache = new Map();
-const rankStatsSessionExpiryTimers = new Map();
-const rankStatsRenderTokens = new Map();
+const rankStatsSessionStore = createSessionStore({ ttlMs: SESSION_CACHE_TTL_MS });
+const rankStatsRenderTracker = createRenderTracker();
 
 function getRankStatsSession(messageId) {
-	if (!messageId) {
-		return null;
-	}
-	const session = rankStatsSessionCache.get(messageId);
-	if (!session) {
-		return null;
-	}
-	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		deleteCacheEntry(rankStatsSessionCache, rankStatsSessionExpiryTimers, messageId);
-		return null;
-	}
-	refreshCacheEntry(rankStatsSessionCache, rankStatsSessionExpiryTimers, messageId, SESSION_CACHE_TTL_MS);
-	session.expiresAt = Date.now() + SESSION_CACHE_TTL_MS;
-	return session;
+	return rankStatsSessionStore.get(messageId);
 }
 
 function storeRankStatsSession(messageId, session) {
-	if (!messageId || !session) {
-		return;
-	}
-	const payload = {
-		...session,
-		messageId,
-		expiresAt: Date.now() + SESSION_CACHE_TTL_MS,
-	};
-	setCacheEntry(rankStatsSessionCache, rankStatsSessionExpiryTimers, messageId, payload, SESSION_CACHE_TTL_MS);
+	rankStatsSessionStore.store(messageId, session);
 }
 
 function beginRankStatsRender(messageId) {
-	if (!messageId) {
-		return null;
-	}
-	const token = Symbol("rankStatsRender");
-	rankStatsRenderTokens.set(messageId, token);
-	return token;
+	return rankStatsRenderTracker.begin(messageId, "rankStatsRender");
 }
 
 function isRankStatsRenderActive(messageId, token) {
-	if (!messageId || !token) {
-		return true;
-	}
-	return rankStatsRenderTokens.get(messageId) === token;
+	return rankStatsRenderTracker.isActive(messageId, token);
 }
 
 function endRankStatsRender(messageId, token) {
-	if (!messageId || !token) {
-		return;
-	}
-	if (rankStatsRenderTokens.get(messageId) === token) {
-		rankStatsRenderTokens.delete(messageId);
-	}
+	rankStatsRenderTracker.end(messageId, token);
 }
 
 function buildRankStatsCustomId(action, { timeFilter, queueFilter, playerCountFilter, loungeId }) {
@@ -265,88 +213,29 @@ function buildRankStatsCustomId(action, { timeFilter, queueFilter, playerCountFi
 }
 
 function parseRankStatsCustomId(customId) {
-	if (!customId?.startsWith("rankstats|")) {
-		return null;
-	}
-	const parts = customId.split("|");
-	if (parts.length < 6) {
-		return null;
-	}
-	const [, actionRaw, timeRaw, queueRaw, playersRaw, loungeId] = parts;
-	const normalizedFilters = normalizeRankStatsFilters({
-		timeFilter: timeRaw,
-		queueFilter: queueRaw,
-		playerCountFilter: playersRaw,
+	return parseStandardFilterCustomId({
+		customId,
+		prefix: "rankstats",
+		defaults: {
+			action: "time",
+			timeFilter: "alltime",
+			queueFilter: "both",
+			playerCountFilter: "both",
+		},
+		loungeIdFields: ["loungeId"],
+		normalizeFilters: normalizeRankStatsFilters,
 	});
-	return {
-		action: (actionRaw || "time").toLowerCase(),
-		...normalizedFilters,
-		loungeId: loungeId || null,
-	};
 }
 
 function buildRankStatsComponentRows({ loungeId, timeFilter, queueFilter, playerCountFilter }) {
 	const normalizedFilters = normalizeRankStatsFilters({ timeFilter, queueFilter, playerCountFilter });
-	const safeTime = normalizedFilters.timeFilter;
-	const safeQueue = normalizedFilters.queueFilter;
-	const safePlayers = normalizedFilters.playerCountFilter;
-	const rows = [];
-
-	rows.push(new ActionRowBuilder().addComponents(
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("time", { timeFilter: "alltime", queueFilter: safeQueue, playerCountFilter: safePlayers, loungeId }))
-			.setLabel("all time")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeTime === "alltime"),
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("time", { timeFilter: "weekly", queueFilter: safeQueue, playerCountFilter: safePlayers, loungeId }))
-			.setLabel("past week")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeTime === "weekly"),
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("time", { timeFilter: "season", queueFilter: safeQueue, playerCountFilter: safePlayers, loungeId }))
-			.setLabel("this season")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeTime === "season"),
-	));
-
-	rows.push(new ActionRowBuilder().addComponents(
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "soloq", playerCountFilter: safePlayers, loungeId }))
-			.setLabel("soloq")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeQueue === "soloq"),
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "squads", playerCountFilter: safePlayers, loungeId }))
-			.setLabel("squads")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeQueue === "squads"),
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "both", playerCountFilter: safePlayers, loungeId }))
-			.setLabel("both")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safeQueue === "both"),
-	));
-
-	rows.push(new ActionRowBuilder().addComponents(
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "12p", loungeId }))
-			.setLabel("12p")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safePlayers === "12p"),
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "24p", loungeId }))
-			.setLabel("24p")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safePlayers === "24p"),
-		new ButtonBuilder()
-			.setCustomId(buildRankStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "both", loungeId }))
-			.setLabel("both")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(safePlayers === "both"),
-	));
-
-	return rows;
+	return buildStandardFilterRows({
+		buildCustomId: buildRankStatsCustomId,
+		customIdParams: { loungeId },
+		timeFilter: normalizedFilters.timeFilter,
+		queueFilter: normalizedFilters.queueFilter,
+		playerCountFilter: normalizedFilters.playerCountFilter,
+	});
 }
 
 function getTierForMmr(mmr, mode = "12p") {
@@ -358,16 +247,8 @@ function getTierForMmr(mmr, mode = "12p") {
 	return PlayerStats.getRankThresholdForMmr(mmr, resolveMode) || null;
 }
 
-function getTableTimestamp(table) {
-	if (!table) return null;
-	const raw = table.verifiedOn || table.createdOn || table.updatedOn || table.date;
-	if (!raw) return null;
-	const parsed = new Date(raw);
-	return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
 function getTableDateText(table) {
-	const timestamp = getTableTimestamp(table);
+	const timestamp = getTableTimestamp(table, ["verifiedOn", "createdOn", "updatedOn", "date"]);
 	return timestamp ? FOOTER_DATE_FORMATTER.format(timestamp) : "date unknown";
 }
 
@@ -588,13 +469,7 @@ async function loadRankIcon(filename) {
 		return null;
 	}
 	const resource = `bot/images/ranks/${filename}`;
-	try {
-		return await loadImage(resource);
-	}
-	catch (error) {
-		console.warn(`failed to load rank icon ${resource}:`, error);
-		return null;
-	}
+	return loadImageResource(resource, `rank icon ${filename}`);
 }
 
 function formatWinRate(winRate) {

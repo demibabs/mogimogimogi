@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require("discord.js");
-const { createCanvas, loadImage } = require("canvas");
+const { createCanvas } = require("canvas");
 const Database = require("../../utils/database");
 const LoungeApi = require("../../utils/loungeApi");
 const PlayerStats = require("../../utils/playerStats");
@@ -7,11 +7,9 @@ const EmbedEnhancer = require("../../utils/embedEnhancer");
 const AutoUserManager = require("../../utils/autoUserManager");
 const ColorPalettes = require("../../utils/colorPalettes");
 const Fonts = require("../../utils/fonts");
-const {
-	setCacheEntry,
-	refreshCacheEntry,
-	deleteCacheEntry,
-} = require("../../utils/cacheManager");
+const { createImageLoader } = require("../../utils/imageLoader");
+const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
+const loadImageResource = createImageLoader("leaderboard");
 
 const {
 	drawRoundedPanel,
@@ -30,33 +28,19 @@ const MAX_ENTRIES = 10;
 const ENTRIES_PER_COLUMN = 5;
 const BACKGROUND_RESOURCE = "bot/images/other backgrounds blurred/leaderboardbg.png";
 
-const leaderboardSessionCache = new Map();
-const leaderboardSessionExpiryTimers = new Map();
-const leaderboardRenderTokens = new Map();
+const leaderboardSessionStore = createSessionStore({ ttlMs: LEADERBOARD_SESSION_CACHE_TTL_MS });
+const leaderboardRenderTracker = createRenderTracker();
 
 function beginLeaderboardRender(messageId) {
-	if (!messageId) {
-		return null;
-	}
-	const token = Symbol("leaderboardRender");
-	leaderboardRenderTokens.set(messageId, token);
-	return token;
+	return leaderboardRenderTracker.begin(messageId, "leaderboardRender");
 }
 
 function isLeaderboardRenderActive(messageId, token) {
-	if (!messageId || !token) {
-		return true;
-	}
-	return leaderboardRenderTokens.get(messageId) === token;
+	return leaderboardRenderTracker.isActive(messageId, token);
 }
 
 function endLeaderboardRender(messageId, token) {
-	if (!messageId || !token) {
-		return;
-	}
-	if (leaderboardRenderTokens.get(messageId) === token) {
-		leaderboardRenderTokens.delete(messageId);
-	}
+	leaderboardRenderTracker.end(messageId, token);
 }
 
 const MMR_NUMBER_FORMATTER = new Intl.NumberFormat("en-US");
@@ -208,20 +192,6 @@ function truncateText(ctx, text, maxWidth) {
 		}
 	}
 	return ellipsis;
-}
-
-async function loadImageResource(resource, label = null) {
-	if (!resource) {
-		return null;
-	}
-	try {
-		return await loadImage(resource);
-	}
-	catch (error) {
-		const descriptor = label || resource;
-		console.warn(`leaderboard: failed to load image ${descriptor}:`, error);
-		return null;
-	}
 }
 
 function safeParseDate(value) {
@@ -376,32 +346,11 @@ function buildLeaderboardComponents({ timeFilter, serverId, page = 1, totalPages
 }
 
 function storeLeaderboardSession(messageId, session) {
-	if (!messageId || !session) {
-		return;
-	}
-	const payload = {
-		...session,
-		messageId,
-		expiresAt: Date.now() + LEADERBOARD_SESSION_CACHE_TTL_MS,
-	};
-	setCacheEntry(leaderboardSessionCache, leaderboardSessionExpiryTimers, messageId, payload, LEADERBOARD_SESSION_CACHE_TTL_MS);
+	leaderboardSessionStore.store(messageId, session);
 }
 
 function getLeaderboardSession(messageId) {
-	if (!messageId) {
-		return null;
-	}
-	const session = leaderboardSessionCache.get(messageId);
-	if (!session) {
-		return null;
-	}
-	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		deleteCacheEntry(leaderboardSessionCache, leaderboardSessionExpiryTimers, messageId);
-		return null;
-	}
-	refreshCacheEntry(leaderboardSessionCache, leaderboardSessionExpiryTimers, messageId, LEADERBOARD_SESSION_CACHE_TTL_MS);
-	session.expiresAt = Date.now() + LEADERBOARD_SESSION_CACHE_TTL_MS;
-	return session;
+	return leaderboardSessionStore.get(messageId);
 }
 
 async function renderLeaderboardImage({

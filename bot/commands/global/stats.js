@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require("discord.js");
+const { SlashCommandBuilder, AttachmentBuilder } = require("discord.js");
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const { createCanvas, loadImage } = require("canvas");
 const Database = require("../../utils/database");
@@ -10,17 +10,16 @@ const Fonts = require("../../utils/fonts");
 const EmbedEnhancer = require("../../utils/embedEnhancer");
 const GameData = require("../../utils/gameData");
 const ColorPalettes = require("../../utils/colorPalettes");
-const {
-	setCacheEntry,
-	refreshCacheEntry,
-	deleteCacheEntry,
-} = require("../../utils/cacheManager");
+const { createImageLoader } = require("../../utils/imageLoader");
+const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
+const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/filterControls");
 const { formatNumber, formatSignedNumber } = EmbedEnhancer;
 
+const loadImageResource = createImageLoader("stats");
+
 const STATS_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
-const statsSessionCache = new Map();
-const statsSessionExpiryTimers = new Map();
-const statsRenderTokens = new Map();
+const statsSessionStore = createSessionStore({ ttlMs: STATS_SESSION_CACHE_TTL_MS });
+const statsRenderTracker = createRenderTracker();
 
 const EDGE_RADIUS = 30;
 
@@ -72,70 +71,27 @@ if (typeof document === "undefined") {
 }
 
 function beginStatsRender(messageId) {
-	if (!messageId) {
-		return null;
-	}
-	const token = Symbol("statsRender");
-	statsRenderTokens.set(messageId, token);
-	return token;
+	return statsRenderTracker.begin(messageId, "statsRender");
 }
 
 function isStatsRenderActive(messageId, token) {
-	if (!messageId || !token) {
-		return true;
-	}
-	return statsRenderTokens.get(messageId) === token;
+	return statsRenderTracker.isActive(messageId, token);
 }
 
 function endStatsRender(messageId, token) {
-	if (!messageId || !token) {
-		return;
-	}
-	if (statsRenderTokens.get(messageId) === token) {
-		statsRenderTokens.delete(messageId);
-	}
+	statsRenderTracker.end(messageId, token);
 }
 
 function getStatsSession(messageId) {
-	if (!messageId) {
-		return null;
-	}
-	const session = statsSessionCache.get(messageId);
-	if (!session) {
-		return null;
-	}
-	if (session.expiresAt && session.expiresAt <= Date.now()) {
-		deleteCacheEntry(statsSessionCache, statsSessionExpiryTimers, messageId);
-		return null;
-	}
-	refreshCacheEntry(statsSessionCache, statsSessionExpiryTimers, messageId, STATS_SESSION_CACHE_TTL_MS);
-	session.expiresAt = Date.now() + STATS_SESSION_CACHE_TTL_MS;
-	return session;
+	return statsSessionStore.get(messageId);
 }
 
 function storeStatsSession(messageId, session) {
-	if (!messageId || !session) {
-		return;
-	}
-	const expiresAt = Date.now() + STATS_SESSION_CACHE_TTL_MS;
-	const payload = {
-		...session,
-		messageId,
-		expiresAt,
-	};
-	setCacheEntry(statsSessionCache, statsSessionExpiryTimers, messageId, payload, STATS_SESSION_CACHE_TTL_MS);
+	statsSessionStore.store(messageId, session);
 }
 
 function refreshStatsSession(messageId) {
-	if (!messageId) {
-		return;
-	}
-	const session = statsSessionCache.get(messageId);
-	if (!session) {
-		return;
-	}
-	refreshCacheEntry(statsSessionCache, statsSessionExpiryTimers, messageId, STATS_SESSION_CACHE_TTL_MS);
-	session.expiresAt = Date.now() + STATS_SESSION_CACHE_TTL_MS;
+	statsSessionStore.refresh(messageId);
 }
 
 function computeCanvasLayout({ chartWidth, chartHeight }) {
@@ -316,20 +272,6 @@ function getDualChartRenderer() {
 		},
 	});
 	return dualChartRenderer;
-}
-
-async function loadImageResource(resource, label = null) {
-	if (!resource) {
-		return null;
-	}
-	try {
-		return await loadImage(resource);
-	}
-	catch (error) {
-		const descriptor = label || resource;
-		console.warn(`stats: failed to load image ${descriptor}:`, error);
-		return null;
-	}
 }
 
 async function getRankIcon(tier) {
@@ -1637,8 +1579,6 @@ async function renderStats({
 	if (!trackName) {
 		trackName = favorites.track || GameData.getRandomTrack();
 	}
-	const trackColors = ColorPalettes.statsTrackColors[trackName];
-
 	if (!favoriteCharacterImage || !favoriteVehicleImage) {
 		const [characterImage, vehicleImage] = await Promise.all([
 			favoriteCharacterImage ? Promise.resolve(favoriteCharacterImage) : EmbedEnhancer.loadFavoriteCharacterImage(favorites),
@@ -1653,63 +1593,26 @@ async function renderStats({
 		globals = await LoungeApi.getGlobalStats(undefined, globalStatsGameMode);
 	}
 
-	const isSpecificPlayerCount = playerCountFilter === "12p" || playerCountFilter === "24p" || playerCountFilter === "mkworld12p" || playerCountFilter === "mkworld24p";
-	let chartResult = null;
-	let isHistoryChart = false;
-	try {
-		if (isSpecificPlayerCount || !playerCountFilter || playerCountFilter === "both") {
-			let extraDetails = null;
-			if (!playerCountFilter || playerCountFilter === "both") {
-				// Construct details for both 12p and 24p.
-				const primaryMode = playerDetails.gameMode || "mkworld12p";
-				extraDetails = {
-					details12p: primaryMode === "mkworld12p" ? playerDetails : playerDetails.alternateDetails,
-					details24p: primaryMode === "mkworld24p" ? playerDetails : playerDetails.alternateDetails,
-				};
-			}
-			chartResult = await getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, normalizedLoungeId, timeFilter, playerCountFilter || "both", extraDetails, queueFilter);
-			if (chartResult) {
-				isHistoryChart = true;
-			}
-		}
-
-		if (!chartResult) {
-			chartResult = await getDivisionChart(trackName, trackColors, globals);
-		}
-	}
-	catch (chartError) {
-		console.warn("failed to generate chart:", chartError);
-	}
-	const chartImage = chartResult?.image || null;
-
 	const playerStats = await getPlayerStats(normalizedLoungeId, serverId, filteredTables, playerDetails, null);
 	const mmrRaw = Number(playerStats?.mmr);
 	const mmr = Number.isFinite(mmrRaw) ? mmrRaw : 0;
-	
-	let mmrDeltaForFilter = 0;
-	if (isHistoryChart && chartResult.historyPoints && chartResult.historyPoints.length > 0) {
-		const points = chartResult.historyPoints;
-		const startY = points[0].y;
-		const endY = points[points.length - 1].y;
-		mmrDeltaForFilter = endY - startY;
-	}
-	else {
-		const mmrDeltaFromTables = PlayerStats.getTotalMmrDeltaFromTables(filteredTables, normalizedLoungeId);
-		mmrDeltaForFilter = timeFilter === "alltime"
-			? mmrDeltaFromTables
-			: PlayerStats.computeMmrDeltaForFilter({
-				playerDetails,
-				tableIds: filteredTableIds,
-				timeFilter,
-				queueFilter,
-				playerCountFilter,
-			});
-	}
+	const mmrDeltaFromTables = PlayerStats.getTotalMmrDeltaFromTables(filteredTables, normalizedLoungeId);
+	const isQueueDeltaMode = queueFilter === "soloq" || queueFilter === "squads";
+	const mmrDeltaForFilter = (timeFilter === "alltime" || isQueueDeltaMode)
+		? mmrDeltaFromTables
+		: PlayerStats.computeMmrDeltaForFilter({
+			playerDetails,
+			tableIds: filteredTableIds,
+			timeFilter,
+			queueFilter,
+			playerCountFilter,
+		});
 
 	// Determine what to show based on filters
 	// If playerCountFilter is "both" (or unspecified), we show current MMR + Peak/GameMode label
 	// If playerCountFilter is specific, we calculate Peak for that mode (Season 2+)
 
+	const isSpecificPlayerCount = playerCountFilter === "12p" || playerCountFilter === "24p" || playerCountFilter === "mkworld12p" || playerCountFilter === "mkworld24p";
 	const isAllTimeOrSeason = timeFilter === "alltime" || timeFilter === "season";
 	const isQueueAny = queueFilter === "both" || !queueFilter;
 	const filtersAreBoth = queueFilter === "both" && playerCountFilter === "both";
@@ -1886,6 +1789,7 @@ async function renderStats({
 
 	await reportProgress("rendering image...");
 
+	const trackColors = ColorPalettes.statsTrackColors[trackName];
 	const canvasWidth = 1920;
 	const canvasHeight = 1080;
 	const canvas = createCanvas(canvasWidth, canvasHeight);
@@ -1919,6 +1823,39 @@ async function renderStats({
 	}
 
 	const playerEmoji = EmbedEnhancer.getCountryFlag(playerDetails.countryCode);
+	let chartResult = null;
+	let isHistoryChart = false;
+	try {
+		if (isSpecificPlayerCount || !playerCountFilter || playerCountFilter === "both") {
+			let extraDetails = null;
+			if (!playerCountFilter || playerCountFilter === "both") {
+				// Construct details for both 12p and 24p.
+				// Note: playerDetails holds the primary mode, and .alternateDetails holds the secondary if available.
+				// If alternateDetails is missing, we will just have the primary.
+				const primaryMode = playerDetails.gameMode || "mkworld12p";
+				const alternateMode = primaryMode === "mkworld12p" ? "mkworld24p" : "mkworld12p";
+
+				extraDetails = {
+					details12p: primaryMode === "mkworld12p" ? playerDetails : playerDetails.alternateDetails,
+					details24p: primaryMode === "mkworld24p" ? playerDetails : playerDetails.alternateDetails,
+				};
+
+				// Ensure we have objects even if null, though getMmrHistoryChart checks for existence
+			}
+			chartResult = await getMmrHistoryChart(trackName, trackColors, playerDetails, allTables, normalizedLoungeId, timeFilter, playerCountFilter || "both", extraDetails, queueFilter);
+			if (chartResult) {
+				isHistoryChart = true;
+			}
+		}
+
+		if (!chartResult) {
+			chartResult = await getDivisionChart(trackName, trackColors, globals);
+		}
+	}
+	catch (chartError) {
+		console.warn("failed to generate chart:", chartError);
+	}
+	const chartImage = chartResult?.image || null;
 	const chartLabels = chartResult?.labels || [];
 	const chartMetrics = chartResult?.metrics || null;
 
@@ -2092,39 +2029,17 @@ async function renderStats({
 			});
 			const noSeasonEventsForMode = Object.keys(seasonModeTables).length === 0;
 
-			// When fetching for a specific mode cell, pass purely the changes for that mode
-			// The compute function works by filtering a list of changes against a list of tables.
-			// As long as the changes include the events for that mode, it works.
-			
-			// Use table-based delta calculation consistently if possible, as it matches the chart logic. 
-			// The chart uses tables exclusively. If we want consistency, we should use tables too.
-			// However, mmrChanges theoretically captures non-table adjustments.
-			// But if mmrChanges parsing is failing, we get 0.
-			// Let's try to use table-based calculation for ALL filters if we have tables, 
-			// and fallback to mmrChanges only if table-based yields nothing?
-			// Actually, let's just use table-based calculation for everything except maybe very specific cases?
-			// The issue report says "chart works fine", so let's mirror chart logic.
-			
-			const delta = PlayerStats.getTotalMmrDeltaFromTables(modeTables, normalizedLoungeId);
-
-			if (delta === 0 && modeTableIds.length > 0 && timeFilter !== "alltime") {
-				console.log(`[StatsDebug] Delta 0 for ${modeFilter} | Tables: ${modeTableIds.length} | Details: ${details ? "Yes" : "No"} | Changes: ${details?.mmrChanges?.length || 0}`);
-				if (modeTableIds.length < 5) {
-					console.log(`[StatsDebug] Table IDs: ${modeTableIds.join(", ")}`);
-					if (details?.mmrChanges) {
-						// Check if any change matches these IDs
-						const matchingChanges = details.mmrChanges.filter(c => {
-							const tid = c.tableId ? String(c.tableId) : null;
-							return tid && modeTableIds.includes(tid);
-						});
-						console.log(`[StatsDebug] Matching Changes Found: ${matchingChanges.length}`);
-						if (matchingChanges.length === 0 && details.mmrChanges.length > 0) {
-                             // Log first few changes to see structure
-                             console.log(`[StatsDebug] Sample Change: ${JSON.stringify(details.mmrChanges[0])}`);
-                        }
-					}
-				}
-			}
+			const useTableDelta = timeFilter === "alltime" || isQueueDeltaMode;
+			const delta = useTableDelta
+				? PlayerStats.getTotalMmrDeltaFromTables(modeTables, normalizedLoungeId)
+				: PlayerStats.computeMmrDeltaForFilter({
+					playerDetails: details,
+					mmrChanges: details?.mmrChanges,
+					tableIds: modeTableIds,
+					timeFilter,
+					queueFilter,
+					playerCountFilter: modeFilter,
+				});
 
 			let value, subLabel, subPrefix;
 			let cellIcon = null;
@@ -2258,91 +2173,27 @@ function buildStatsCustomId(action, { timeFilter, queueFilter, playerCountFilter
 }
 
 function buildStatsComponentRows({ loungeId, timeFilter, queueFilter, playerCountFilter }) {
-	const safeTime = timeFilter || "alltime";
-	const safeQueue = queueFilter || "both";
-	const safePlayerCount = playerCountFilter || "both";
-	const rows = [];
-
-	const timeRow = new ActionRowBuilder()
-		.addComponents(
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("time", { timeFilter: "alltime", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("all time")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeTime === "alltime"),
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("time", { timeFilter: "weekly", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("past week")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeTime === "weekly"),
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("time", { timeFilter: "season", queueFilter: safeQueue, playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("this season")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeTime === "season"),
-		);
-	rows.push(timeRow);
-
-	const queueRow = new ActionRowBuilder()
-		.addComponents(
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "soloq", playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("soloq")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeQueue === "soloq"),
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "squads", playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("squads")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeQueue === "squads"),
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("queue", { timeFilter: safeTime, queueFilter: "both", playerCountFilter: safePlayerCount, loungeId }))
-				.setLabel("both")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safeQueue === "both"),
-		);
-	rows.push(queueRow);
-
-	const playerRow = new ActionRowBuilder()
-		.addComponents(
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "12p", loungeId }))
-				.setLabel("12p")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safePlayerCount === "12p"),
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "24p", loungeId }))
-				.setLabel("24p")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safePlayerCount === "24p"),
-			new ButtonBuilder()
-				.setCustomId(buildStatsCustomId("players", { timeFilter: safeTime, queueFilter: safeQueue, playerCountFilter: "both", loungeId }))
-				.setLabel("both")
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(safePlayerCount === "both"),
-		);
-	rows.push(playerRow);
-
-	return rows;
+	return buildStandardFilterRows({
+		buildCustomId: buildStatsCustomId,
+		customIdParams: { loungeId },
+		timeFilter,
+		queueFilter,
+		playerCountFilter,
+	});
 }
 
 function parseStatsInteraction(customId) {
-	if (!customId?.startsWith("stats|")) {
-		return null;
-	}
-	const parts = customId.split("|");
-	if (parts.length < 6) {
-		return null;
-	}
-	const [, actionRaw, timeRaw, queueRaw, playerRaw, loungeId] = parts;
-	const normalizedAction = (actionRaw || "").toLowerCase();
-	return {
-		action: normalizedAction,
-		timeFilter: (timeRaw || "alltime").toLowerCase(),
-		queueFilter: (queueRaw || "both").toLowerCase(),
-		playerCountFilter: (playerRaw || "both").toLowerCase(),
-		loungeId,
-	};
+	return parseStandardFilterCustomId({
+		customId,
+		prefix: "stats",
+		defaults: {
+			action: "time",
+			timeFilter: "alltime",
+			queueFilter: "both",
+			playerCountFilter: "both",
+		},
+		loungeIdFields: ["loungeId"],
+	});
 }
 
 module.exports = {
