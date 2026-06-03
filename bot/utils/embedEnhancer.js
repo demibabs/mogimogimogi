@@ -150,6 +150,22 @@ function drawRoundedPanel(ctx, frame, fillColor, radius = 20, options = {}) {
 	ctx.restore();
 }
 
+function createImageLoader(contextLabel = "image") {
+	return async function loadImageResource(resource, label = null) {
+		if (!resource) {
+			return null;
+		}
+		try {
+			return await loadImage(resource);
+		}
+		catch (error) {
+			const descriptor = label || resource;
+			console.warn(`${contextLabel}: failed to load image ${descriptor}:`, error);
+			return null;
+		}
+	};
+}
+
 function emojiToUrl(emoji) {
 	const parsed = twemoji.convert.toCodePoint(emoji); // e.g. "1f1fa-1f1f8" for US flag
 	return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${parsed}.png`;
@@ -601,6 +617,7 @@ module.exports = {
 	tryLoadImageResource,
 	loadFavoriteCharacterImage,
 	loadFavoriteVehicleImage,
+	createImageLoader,
 	formatNumber,
 	formatSignedNumber,
 };

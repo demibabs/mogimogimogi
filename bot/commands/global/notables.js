@@ -9,12 +9,10 @@ const AutoUserManager = require("../../utils/autoUserManager");
 const GameData = require("../../utils/gameData");
 const ColorPalettes = require("../../utils/colorPalettes");
 const resolveTargetPlayer = require("../../utils/playerResolver");
-const { createImageLoader } = require("../../utils/imageLoader");
-const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
-const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/filterControls");
-const { getTableTimestamp } = require("../../utils/tableUtils");
+const { createSessionStore, createRenderTracker } = require("../../utils/cacheManager");
+const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/globalCommands");
 
-const loadImageResource = createImageLoader("notables");
+const loadImageResource = EmbedEnhancer.createImageLoader("notables");
 
 const {
 	getPlayerAvatarUrl,
@@ -272,7 +270,7 @@ function formatTableDescriptor(table) {
 	if (!table) {
 		return "event details unavailable";
 	}
-	const date = getTableTimestamp(table, ["verifiedOn", "createdOn", "date", "updatedOn"]);
+	const date = PlayerStats.getTableTimestamp(table, ["verifiedOn", "createdOn", "date", "updatedOn"]);
 	const formattedDate = date ? EVENT_DATE_FORMATTER.format(date) : "date unknown";
 	const count = table.numPlayers ?? table.numplayers ?? table.playerCount;
 	const format = table.format || table.queue || "room";

@@ -223,6 +223,29 @@ class PlayerStats {
 		const playerIds = PlayerStats.getPlayerIdentifiers(player);
 		return playerIds.includes(normalized);
 	}
+
+	static getTableTimestamp(table, fields = ["verifiedOn", "createdOn", "date", "updatedOn"]) {
+		if (!table) {
+			return null;
+		}
+		const fieldList = Array.isArray(fields) && fields.length ? fields : ["verifiedOn", "createdOn", "date", "updatedOn"];
+		let raw = null;
+		for (const field of fieldList) {
+			if (!field) {
+				continue;
+			}
+			const value = table[field];
+			if (value) {
+				raw = value;
+				break;
+			}
+		}
+		if (!raw) {
+			return null;
+		}
+		const parsed = new Date(raw);
+		return Number.isNaN(parsed.getTime()) ? null : parsed;
+	}
 	/**
 	 * Get individual player rankings from a table, sorted by score
 	 * @param {Object} table - Table object from the API

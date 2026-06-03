@@ -14,11 +14,9 @@ const Fonts = require("../../utils/fonts");
 const EmbedEnhancer = require("../../utils/embedEnhancer");
 const resolveTargetPlayer = require("../../utils/playerResolver");
 const AutoUserManager = require("../../utils/autoUserManager");
-const { createImageLoader } = require("../../utils/imageLoader");
-const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
-const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/filterControls");
-const { getTableTimestamp } = require("../../utils/tableUtils");
-const loadImageResource = createImageLoader("head-to-head");
+const { createSessionStore, createRenderTracker } = require("../../utils/cacheManager");
+const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/globalCommands");
+const loadImageResource = EmbedEnhancer.createImageLoader("head-to-head");
 
 // -------------------- constants --------------------
 const EDGE_RADIUS = 30;
@@ -120,7 +118,7 @@ function formatSignedDelta(value) {
 
 function formatEventDescriptor(table) {
 	if (!table) return "event details unavailable";
-	const date = getTableTimestamp(table, ["verifiedOn", "createdOn", "date", "updatedOn"]);
+	const date = PlayerStats.getTableTimestamp(table, ["verifiedOn", "createdOn", "date", "updatedOn"]);
 	const formattedDate = date ? EVENT_DATE_FORMATTER.format(date) : "date unknown";
 	const count = table.numPlayers ?? table.numplayers ?? table.playerCount;
 	const format = table.format || table.queue || "room";

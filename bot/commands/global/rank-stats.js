@@ -12,11 +12,9 @@ const AutoUserManager = require("../../utils/autoUserManager");
 const ColorPalettes = require("../../utils/colorPalettes");
 const GameData = require("../../utils/gameData");
 const resolveTargetPlayer = require("../../utils/playerResolver");
-const { createImageLoader } = require("../../utils/imageLoader");
-const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
-const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/filterControls");
-const { getTableTimestamp } = require("../../utils/tableUtils");
-const loadImageResource = createImageLoader("rank-stats");
+const { createSessionStore, createRenderTracker } = require("../../utils/cacheManager");
+const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/globalCommands");
+const loadImageResource = EmbedEnhancer.createImageLoader("rank-stats");
 
 const {
 	getPlayerAvatarUrl,
@@ -248,7 +246,7 @@ function getTierForMmr(mmr, mode = "12p") {
 }
 
 function getTableDateText(table) {
-	const timestamp = getTableTimestamp(table, ["verifiedOn", "createdOn", "updatedOn", "date"]);
+	const timestamp = PlayerStats.getTableTimestamp(table, ["verifiedOn", "createdOn", "updatedOn", "date"]);
 	return timestamp ? FOOTER_DATE_FORMATTER.format(timestamp) : "date unknown";
 }
 

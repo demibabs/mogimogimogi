@@ -10,10 +10,9 @@ const Fonts = require("../../utils/fonts");
 const EmbedEnhancer = require("../../utils/embedEnhancer");
 const GameData = require("../../utils/gameData");
 const ColorPalettes = require("../../utils/colorPalettes");
-const { createImageLoader } = require("../../utils/imageLoader");
-const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
-const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/filterControls");
-const { formatNumber, formatSignedNumber } = EmbedEnhancer;
+const { createSessionStore, createRenderTracker } = require("../../utils/cacheManager");
+const { buildStandardFilterRows, parseStandardFilterCustomId } = require("../../utils/globalCommands");
+const { formatNumber, formatSignedNumber, createImageLoader } = EmbedEnhancer;
 
 const loadImageResource = createImageLoader("stats");
 
@@ -486,7 +485,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		const historyPoints = [];
 		let matchCount = 0;
 		const isHybridMode = timeFilter === "alltime" && queueFilter === "both";
-		const useDeltaMode = (queueFilter === "soloq" || queueFilter === "squads");
+		const useDeltaMode = (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "weekly");
 
 		if (isHybridMode) {
 			// Hybrid Strategy:
@@ -1598,7 +1597,8 @@ async function renderStats({
 	const mmr = Number.isFinite(mmrRaw) ? mmrRaw : 0;
 	const mmrDeltaFromTables = PlayerStats.getTotalMmrDeltaFromTables(filteredTables, normalizedLoungeId);
 	const isQueueDeltaMode = queueFilter === "soloq" || queueFilter === "squads";
-	const mmrDeltaForFilter = (timeFilter === "alltime" || isQueueDeltaMode)
+	const isWeeklyDeltaMode = timeFilter === "weekly";
+	const mmrDeltaForFilter = (timeFilter === "alltime" || isQueueDeltaMode || isWeeklyDeltaMode)
 		? mmrDeltaFromTables
 		: PlayerStats.computeMmrDeltaForFilter({
 			playerDetails,
@@ -2029,7 +2029,7 @@ async function renderStats({
 			});
 			const noSeasonEventsForMode = Object.keys(seasonModeTables).length === 0;
 
-			const useTableDelta = timeFilter === "alltime" || isQueueDeltaMode;
+			const useTableDelta = timeFilter === "alltime" || isQueueDeltaMode || isWeeklyDeltaMode;
 			const delta = useTableDelta
 				? PlayerStats.getTotalMmrDeltaFromTables(modeTables, normalizedLoungeId)
 				: PlayerStats.computeMmrDeltaForFilter({

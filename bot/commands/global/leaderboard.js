@@ -7,9 +7,8 @@ const EmbedEnhancer = require("../../utils/embedEnhancer");
 const AutoUserManager = require("../../utils/autoUserManager");
 const ColorPalettes = require("../../utils/colorPalettes");
 const Fonts = require("../../utils/fonts");
-const { createImageLoader } = require("../../utils/imageLoader");
-const { createSessionStore, createRenderTracker } = require("../../utils/commandSession");
-const loadImageResource = createImageLoader("leaderboard");
+const { createSessionStore, createRenderTracker } = require("../../utils/cacheManager");
+const loadImageResource = EmbedEnhancer.createImageLoader("leaderboard");
 
 const {
 	drawRoundedPanel,
