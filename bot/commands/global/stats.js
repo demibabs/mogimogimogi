@@ -833,7 +833,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				borderWidth: 4,
 				pointRadius: 0,
 				pointHitRadius: 10,
-				fill: (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime") ? "origin" : "start",
+				fill: (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime" || timeFilter === "weekly") ? "origin" : "start",
 				tension: 0.1,
 			});
 		}
@@ -917,7 +917,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			if (!chartArea) return null;
 			const yScale = scales.y;
 
-			const useDeltaChart = (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime");
+			const useDeltaChart = (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime" || timeFilter === "weekly");
 
 			if (useDeltaChart) {
 				// Cache key generation for Delta
@@ -1034,7 +1034,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 								}
 								// Round to nearest 100
 								const roundedValue = Math.round(value / 100) * 100;
-								if ((queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime") && roundedValue > 0) {
+								if ((queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime" || timeFilter === "weekly") && roundedValue > 0) {
 									return "+" + roundedValue;
 								}
 								return roundedValue;
