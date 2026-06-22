@@ -2055,7 +2055,7 @@ async function renderStats({
 				}
 			}
 			else {
-				value = formatSignedNumber(delta);
+				value = noModeEventsForFilter ? "n/a" : formatSignedNumber(delta);
 				subLabel = hasMmr ? `${formatNumber(Math.round(mmrVal))})` : "-";
 				subPrefix = "(current: ";
 				if (iconFilename) {
@@ -2079,7 +2079,7 @@ async function renderStats({
 			{ label: "team\nwin rate", value: winRateText, subLabel: winLossRecord ? `(${winLossRecord})` : undefined },
 		];
 	}
-				value = noModeEventsForFilter ? "n/a" : formatSignedNumber(delta);
+
 	const gridConfig = [
 		topStatsRow,
 		[
