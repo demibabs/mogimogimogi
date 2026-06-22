@@ -2023,11 +2023,7 @@ async function renderStats({
 			const modeFilter = modeName === "mkworld12p" ? "12p" : "24p";
 			const modeTables = PlayerStats.filterTablesByControls(filteredTables, { playerCountFilter: modeFilter });
 			const modeTableIds = Object.keys(modeTables);
-			const seasonModeTables = PlayerStats.filterTablesByControls(allTables, {
-				timeFilter: "season",
-				playerCountFilter: modeFilter,
-			});
-			const noSeasonEventsForMode = Object.keys(seasonModeTables).length === 0;
+			const noModeEventsForFilter = modeTableIds.length === 0;
 
 			const useTableDelta = timeFilter === "alltime" || isQueueDeltaMode || isWeeklyDeltaMode;
 			const delta = useTableDelta
@@ -2048,7 +2044,7 @@ async function renderStats({
 
 			if (showCurrentMmr) {
 				value = hasMmr ? formatNumber(Math.round(mmrVal)) : "-";
-				if (noSeasonEventsForMode) {
+				if (noModeEventsForFilter) {
 					subLabel = "(rank: n/a)";
 				}
 				else {
@@ -2083,7 +2079,7 @@ async function renderStats({
 			{ label: "team\nwin rate", value: winRateText, subLabel: winLossRecord ? `(${winLossRecord})` : undefined },
 		];
 	}
-				value = noSeasonEventsForMode ? "n/a" : formatSignedNumber(delta);
+				value = noModeEventsForFilter ? "n/a" : formatSignedNumber(delta);
 	const gridConfig = [
 		topStatsRow,
 		[
