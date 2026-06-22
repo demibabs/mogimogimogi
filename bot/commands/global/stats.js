@@ -917,7 +917,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 			if (!chartArea) return null;
 			const yScale = scales.y;
 
-			const useDeltaChart = (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime" || timeFilter === "weekly");
+			const useDeltaChart = (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime");
 
 			if (useDeltaChart) {
 				// Cache key generation for Delta
