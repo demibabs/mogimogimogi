@@ -11,6 +11,7 @@ const LOUNGE_API_BASE = "https://lounge.mkcentral.com/api";
 // Default season (can be updated as needed for MK World)
 const DEFAULT_SEASON = 3;
 const DEFAULT_GAME = "mkworld12p";
+const currentSeasonCache = new Map();
 
 // Authentication config - many endpoints work without auth
 const AUTH_CONFIG = {
@@ -102,8 +103,44 @@ async function apiGet(endpoint, params = {}, retries = 3) {
 	throw lastError;
 }
 
+function getSeasonCacheKey(game) {
+	return game || DEFAULT_GAME;
+}
+
+function cacheCurrentSeason(game, season) {
+	if (season === null || season === undefined || Number.isNaN(Number(season))) {
+		return;
+	}
+	currentSeasonCache.set(getSeasonCacheKey(game), Number(season));
+}
+
+function getCachedCurrentSeason(game = DEFAULT_GAME) {
+	return currentSeasonCache.get(getSeasonCacheKey(game)) ?? null;
+}
+
+async function getCurrentSeason(game = DEFAULT_GAME, seedLoungeId = null) {
+	const cacheKey = getSeasonCacheKey(game);
+	if (currentSeasonCache.has(cacheKey)) {
+		return currentSeasonCache.get(cacheKey);
+	}
+
+	if (seedLoungeId !== null && seedLoungeId !== undefined) {
+		const details = await getPlayerDetailsByLoungeId(seedLoungeId, null, game);
+		if (details?.season !== null && details?.season !== undefined) {
+			cacheCurrentSeason(game, details.season);
+			return Number(details.season);
+		}
+		if (details?.season === 0) {
+			cacheCurrentSeason(game, 0);
+			return 0;
+		}
+	}
+
+	return DEFAULT_SEASON;
+}
+
 async function searchPlayers(query, options = {}) {
-	const { limit = 25, season = DEFAULT_SEASON, skip = 0, game = DEFAULT_GAME } = options;
+	const { limit = 25, season = null, skip = 0, game = DEFAULT_GAME } = options;
 	const trimmedQuery = (query ?? "").trim();
 	if (!trimmedQuery) {
 		return [];
@@ -117,9 +154,11 @@ async function searchPlayers(query, options = {}) {
 			search: trimmedQuery,
 			pageSize: boundedLimit,
 			skip: boundedSkip,
-			season,
 			game,
 		};
+		if (season !== null && season !== undefined) {
+			params.season = season;
+		}
 
 		const result = await apiGet("/player/leaderboard", params);
 		if (!result) return [];
@@ -146,13 +185,15 @@ async function searchPlayers(query, options = {}) {
  * @param {number} season - Season number (optional, defaults to current season)
  * @returns {Promise<Object|null>} Player data or null if not found
  */
-async function getPlayer(name, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
+async function getPlayer(name, season = null, game = DEFAULT_GAME) {
 	try {
 		const params = {
 			name: name,
-			season: season,
 			game: game,
 		};
+		if (season !== null && season !== undefined) {
+			params.season = season;
+		}
 
 		return await apiGet("/player", params);
 	}
@@ -164,7 +205,7 @@ async function getPlayer(name, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
 	}
 }
 
-async function getPlayerByLoungeId(loungeId, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
+async function getPlayerByLoungeId(loungeId, season = null, game = DEFAULT_GAME) {
 	try {
 		if (loungeId === null || loungeId === undefined) {
 			return null;
@@ -172,9 +213,11 @@ async function getPlayerByLoungeId(loungeId, season = DEFAULT_SEASON, game = DEF
 
 		const params = {
 			id: Number(loungeId),
-			season,
 			game: game,
 		};
+		if (season !== null && season !== undefined) {
+			params.season = season;
+		}
 
 		return await apiGet("/player", params);
 	}
@@ -192,13 +235,15 @@ async function getPlayerByLoungeId(loungeId, season = DEFAULT_SEASON, game = DEF
  * @param {number} season - Season number (optional, defaults to current season)
  * @returns {Promise<Object|null>} Player data or null if not found
  */
-async function getPlayerByDiscordId(discordId, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
+async function getPlayerByDiscordId(discordId, season = null, game = DEFAULT_GAME) {
 	try {
 		const params = {
 			discordId: discordId,
-			season: season,
 			game: game,
 		};
+		if (season !== null && season !== undefined) {
+			params.season = season;
+		}
 
 		return await apiGet("/player", params);
 	}
@@ -209,13 +254,15 @@ async function getPlayerByDiscordId(discordId, season = DEFAULT_SEASON, game = D
 		throw error;
 	}
 }
-async function getPlayerByDiscordIdDetailed(discordId, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
+async function getPlayerByDiscordIdDetailed(discordId, season = null, game = DEFAULT_GAME) {
 	try {
 		const params = {
 			discordId: discordId,
-			season: season,
 			game: game,
 		};
+		if (season !== null && season !== undefined) {
+			params.season = season;
+		}
 
 		return await apiGet("/player/details", params);
 	}
@@ -227,7 +274,7 @@ async function getPlayerByDiscordIdDetailed(discordId, season = DEFAULT_SEASON, 
 	}
 }
 
-async function getPlayerDetailsByLoungeId(loungeId, season = DEFAULT_SEASON, game = DEFAULT_GAME) {
+async function getPlayerDetailsByLoungeId(loungeId, season = null, game = DEFAULT_GAME) {
 	try {
 		if (loungeId === null || loungeId === undefined) {
 			return null;
@@ -235,9 +282,11 @@ async function getPlayerDetailsByLoungeId(loungeId, season = DEFAULT_SEASON, gam
 
 		const params = {
 			id: Number(loungeId),
-			season,
 			game: game,
 		};
+		if (season !== null && season !== undefined) {
+			params.season = season;
+		}
 
 		return await apiGet("/player/details", params);
 	}
@@ -320,9 +369,11 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 		// 	}
 		// }
 
+		const inferredCurrentSeason = currentSeasonPlayerDetails?.season ?? await getCurrentSeason(DEFAULT_GAME, numericId);
+
 		// Get new tables from API
-		// We iterate through all seasons to ensure we don't miss any tables (filling holes)
-		for (let season = 0; season <= DEFAULT_SEASON; season++) {
+		// We iterate through all seasons up to the current one to ensure we don't miss any tables (filling holes)
+		for (let season = 0; season <= inferredCurrentSeason; season++) {
 			// Iterate over game modes relevant for the season
 			const gameModes = season < 2 ? ["mkworld"] : ["mkworld12p", "mkworld24p"];
 
@@ -331,7 +382,7 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 					let details = null;
 					// If a specific details object was passed, only use it if it matches our loop
 					// Assume that if gameMode is missing, it corresponds to DEFAULT_GAME (likely 12p)
-					const detailsGameMode = currentSeasonPlayerDetails?.gameMode || DEFAULT_GAME;
+						const detailsGameMode = currentSeasonPlayerDetails?.gameMode || DEFAULT_GAME;
 
 					if (currentSeasonPlayerDetails &&
 						Number(currentSeasonPlayerDetails.season) === season &&
@@ -340,7 +391,7 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
 						details = currentSeasonPlayerDetails;
 					}
 					else {
-						details = await getPlayerDetailsByLoungeId(numericId, season, gameMode);
+							details = await getPlayerDetailsByLoungeId(numericId, season, gameMode);
 					}
 
 					if (!details?.mmrChanges) {
@@ -418,7 +469,7 @@ async function getAllPlayerTables(loungeId, serverId, currentSeasonPlayerDetails
  * @param {number} season - Season number (optional, defaults to current season)
  * @returns {Promise<number|null>} Current MMR or null if not found
  */
-async function getCurrentMMR(loungeId, season = DEFAULT_SEASON) {
+async function getCurrentMMR(loungeId, season = null) {
 	try {
 		const player = await getPlayerByLoungeId(loungeId, season);
 		if (!player) {
@@ -443,11 +494,12 @@ async function getWeeklyMMRChange(loungeId) {
 	try {
 		const oneWeekAgo = new Date();
 		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+		const currentSeason = await getCurrentSeason(DEFAULT_GAME, loungeId);
 
 		let totalChange = 0;
 		let hasChanges = false;
 
-		for (let season = 0; season <= DEFAULT_SEASON; season++) {
+		for (let season = 0; season <= currentSeason; season++) {
 			try {
 				const details = await getPlayerDetailsByLoungeId(loungeId, season);
 				if (!details?.mmrChanges) {
@@ -481,11 +533,13 @@ async function getWeeklyMMRChange(loungeId) {
 	}
 }
 
-async function getGlobalStats(season = DEFAULT_SEASON, game = DEFAULT_GAME) {
+async function getGlobalStats(season = null, game = DEFAULT_GAME) {
 	const params = {
 		game,
-		season,
 	};
+	if (season !== null && season !== undefined) {
+		params.season = season;
+	}
 	try {
 		const stats = await apiGet("/player/stats", params);
 		return stats;
@@ -502,13 +556,14 @@ async function getGlobalStats(season = DEFAULT_SEASON, game = DEFAULT_GAME) {
  * @param {number} season - Season to check (defaults to current season)
  * @returns {Promise<number|null>} Season MMR change or null if not found
  */
-async function getSeasonMMRChange(loungeId, season = DEFAULT_SEASON) {
+async function getSeasonMMRChange(loungeId, season = null) {
 	try {
+		const targetSeason = season !== null && season !== undefined ? season : await getCurrentSeason(DEFAULT_GAME, loungeId);
 		let totalChange = 0;
 		let hasChanges = false;
 
 		try {
-			const details = await getPlayerDetailsByLoungeId(loungeId, season);
+			const details = await getPlayerDetailsByLoungeId(loungeId, targetSeason);
 
 			if (details?.mmrChanges) {
 				const seasonChanges = details.mmrChanges;
@@ -523,7 +578,7 @@ async function getSeasonMMRChange(loungeId, season = DEFAULT_SEASON) {
 			}
 		}
 		catch (error) {
-			console.warn(`API call failed for season ${season}, lounge user ${loungeId}:`, error);
+				console.warn(`API call failed for season ${targetSeason}, lounge user ${loungeId}:`, error);
 		}
 
 		return hasChanges ? totalChange : null;
@@ -537,6 +592,7 @@ async function getSeasonMMRChange(loungeId, season = DEFAULT_SEASON) {
 
 module.exports = {
 	getPlayer,
+	getCurrentSeason,
 	getPlayerByLoungeId,
 	getPlayerByDiscordId,
 	getPlayerByDiscordIdDetailed,
@@ -545,6 +601,7 @@ module.exports = {
 	getAllPlayerTables,
 	DEFAULT_SEASON,
 	DEFAULT_GAME,
+	getCachedCurrentSeason,
 	getCurrentMMR,
 	getWeeklyMMRChange,
 	getSeasonMMRChange,

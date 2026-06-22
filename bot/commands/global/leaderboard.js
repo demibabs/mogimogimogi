@@ -219,7 +219,7 @@ function computeActivityFlags(mmrChanges = []) {
 		if (change?.season === undefined || change?.season === null) {
 			season = true;
 		}
-		else if (Number(change.season) === Number(LoungeApi.DEFAULT_SEASON)) {
+		else if (Number(change.season) === Number(LoungeApi.getCachedCurrentSeason?.() ?? LoungeApi.DEFAULT_SEASON)) {
 			season = true;
 		}
 	}
@@ -650,8 +650,8 @@ async function collectLeaderboardEntries(interaction, roleId = null) {
 		const promises = batch.map(async (member) => {
 			try {
 				const [details12p, details24p] = await Promise.all([
-					LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, "mkworld12p"),
-					LoungeApi.getPlayerByDiscordIdDetailed(member.id, LoungeApi.DEFAULT_SEASON, "mkworld24p"),
+					LoungeApi.getPlayerByDiscordIdDetailed(member.id, undefined, "mkworld12p"),
+					LoungeApi.getPlayerByDiscordIdDetailed(member.id, undefined, "mkworld24p"),
 				]);
 
 				const processDetails = (details) => {
@@ -984,7 +984,7 @@ module.exports = {
 				let fallbackLoungeId = null;
 				if (!hasAccountForFormat) {
 					try {
-						const direct = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, nextGame);
+						const direct = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, undefined, nextGame);
 						if (direct?.id !== undefined && direct?.id !== null) {
 							fallbackLoungeId = String(direct.id);
 						}
@@ -1074,7 +1074,7 @@ module.exports = {
 				let fallbackLoungeId = null;
 				if (!hasAccountForFormat) {
 					try {
-						const direct = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, LoungeApi.DEFAULT_SEASON, nextGame);
+						const direct = await LoungeApi.getPlayerByDiscordIdDetailed(interaction.user.id, undefined, nextGame);
 						if (direct?.id !== undefined && direct?.id !== null) {
 							fallbackLoungeId = String(direct.id);
 						}

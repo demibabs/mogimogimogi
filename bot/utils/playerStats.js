@@ -452,7 +452,7 @@ class PlayerStats {
 			return {};
 		}
 
-		const seasonNum = currentSeason || LoungeApi.DEFAULT_SEASON;
+		const seasonNum = currentSeason ?? LoungeApi.getCachedCurrentSeason?.() ?? LoungeApi.DEFAULT_SEASON;
 
 		if (timeFilter === "weekly") {
 			filtered = PlayerStats.filterTablesByWeek(filtered, true);

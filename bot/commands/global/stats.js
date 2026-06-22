@@ -485,7 +485,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 		const historyPoints = [];
 		let matchCount = 0;
 		const isHybridMode = timeFilter === "alltime" && queueFilter === "both";
-		const useDeltaMode = (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "weekly");
+		const useDeltaMode = (queueFilter === "soloq" || queueFilter === "squads");
 
 		if (isHybridMode) {
 			// Hybrid Strategy:
@@ -833,7 +833,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 				borderWidth: 4,
 				pointRadius: 0,
 				pointHitRadius: 10,
-				fill: (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime" || timeFilter === "weekly") ? "origin" : "start",
+				fill: (queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime") ? "origin" : "start",
 				tension: 0.1,
 			});
 		}
@@ -1034,7 +1034,7 @@ async function getMmrHistoryChart(trackName, trackColors, playerDetails, allTabl
 								}
 								// Round to nearest 100
 								const roundedValue = Math.round(value / 100) * 100;
-								if ((queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime" || timeFilter === "weekly") && roundedValue > 0) {
+								if ((queueFilter === "soloq" || queueFilter === "squads" || timeFilter === "alltime") && roundedValue > 0) {
 									return "+" + roundedValue;
 								}
 								return roundedValue;
@@ -1635,7 +1635,7 @@ async function renderStats({
 			// Search history for peak in this specific mode, starting from Season 2
 			// Season 0 and 1 are ignored as requested
 			const startSeason = 2;
-			const currentSeason = Number(LoungeApi.DEFAULT_SEASON) || 15; // Fallback if constant missing
+			const currentSeason = Number(LoungeApi.getCachedCurrentSeason?.() ?? LoungeApi.DEFAULT_SEASON) || 15; // Fallback if cache is empty
 			const mode = playerCountFilter.includes("24p") ? "mkworld24p" : "mkworld12p";
 
 			const pastSeasons = [];
