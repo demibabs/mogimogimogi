@@ -2083,7 +2083,7 @@ async function renderStats({
 			{ label: "team\nwin rate", value: winRateText, subLabel: winLossRecord ? `(${winLossRecord})` : undefined },
 		];
 	}
-
+				value = noSeasonEventsForMode ? "n/a" : formatSignedNumber(delta);
 	const gridConfig = [
 		topStatsRow,
 		[
