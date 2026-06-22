@@ -92,16 +92,26 @@ function mergeTableIds(existingEntries, incomingIds) {
 
 class Database {
 	constructor() {
-		this.useDatabase = !!process.env.DATABASE_URL;
+		this.useDatabase = !!(
+			process.env.DATABASE_URL
+			|| process.env.PGHOST
+			|| process.env.PGPORT
+			|| process.env.PGDATABASE
+			|| process.env.PGUSER
+		);
 		this.usersDir = path.join(__dirname, "..", "data", "users");
 		this.legacyServersDir = path.join(__dirname, "..", "data", "servers");
 		this._legacyMigrationPromise = null;
 		this._userTablesFileMigrationPromise = null;
 
 		if (this.useDatabase) {
-			this.pool = new Pool({
-				connectionString: "Data Source=lounge.db",
+			const poolConfig = {
+				...(process.env.DATABASE_URL ? { connectionString: process.env.DATABASE_URL } : {}),
 				ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+			};
+			this.pool = new Pool(poolConfig);
+			this.pool.on("error", error => {
+				console.error("database pool error:", error);
 			});
 			this.initializeDatabase();
 		}
