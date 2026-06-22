@@ -100,7 +100,7 @@ class Database {
 
 		if (this.useDatabase) {
 			this.pool = new Pool({
-				connectionString: process.env.DATABASE_URL,
+				connectionString: "Data Source=lounge.db",
 				ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 			});
 			this.initializeDatabase();
