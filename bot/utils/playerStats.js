@@ -25,13 +25,13 @@ const RANK_THRESHOLDS_12P = [
 	{ key: "iron", label: "iron", text: "iron", min: 0, max: 2000, emoji: "⛏️" },
 	{ key: "bronze", label: "bronze", text: "bronze", min: 2000, max: 4000, emoji: "🧸" },
 	{ key: "silver", label: "silver", text: "silver", min: 4000, max: 6000, emoji: "💿" },
-	{ key: "gold", label: "gold", text: "gold", min: 6000, max: 7500, emoji: "⭐" },
-	{ key: "platinum", label: "platinum", text: "platinum", min: 7500, max: 9000, emoji: "🦚" },
-	{ key: "sapphire", label: "sapphire", text: "sapphire", min: 9000, max: 10500, emoji: "🌊" },
-	{ key: "ruby", label: "ruby", text: "ruby", min: 10500, max: 12000, emoji: "🍓" },
-	{ key: "diamond", label: "diamond", text: "diamond", min: 12000, max: 13500, emoji: "💎" },
-	{ key: "master", label: "master", text: "master", min: 13500, max: 14500, emoji: "🪻" },
-	{ key: "grandmaster", label: "grandmaster", text: "grandmaster", min: 14500, max: Infinity, emoji: "🎸" },
+	{ key: "gold", label: "gold", text: "gold", min: 6000, max: 8000, emoji: "⭐" },
+	{ key: "platinum", label: "platinum", text: "platinum", min: 8000, max: 9500, emoji: "🦚" },
+	{ key: "sapphire", label: "sapphire", text: "sapphire", min: 9500, max: 11000, emoji: "🌊" },
+	{ key: "ruby", label: "ruby", text: "ruby", min: 11000, max: 12500, emoji: "🍓" },
+	{ key: "diamond", label: "diamond", text: "diamond", min: 12500, max: 14000, emoji: "💎" },
+	{ key: "master", label: "master", text: "master", min: 14000, max: 15000, emoji: "🪻" },
+	{ key: "grandmaster", label: "grandmaster", text: "grandmaster", min: 15000, max: Infinity, emoji: "🎸" },
 ];
 
 const RANK_THRESHOLDS_24P = [
